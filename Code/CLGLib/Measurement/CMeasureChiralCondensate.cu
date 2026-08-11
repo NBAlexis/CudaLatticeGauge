@@ -56,6 +56,7 @@ _kernelDotMeasureAll(
 )
 {
     intokernalInt4;
+    const UINT _ixy = uiSiteIndex / _DC_GridDimZT;
 
     deviceWilsonVectorSU3 right(pOther[uiSiteIndex]);
     switch (byMeasureIndex)
@@ -140,8 +141,8 @@ _kernelChiralCondensateMeasureDist(
     SSmallInt4 sSite4;
     sSite4.z = _DC_Centerz;
     sSite4.w = _DC_Centert;
-    sSite4.x = static_cast<SBYTE>(uiX);
-    sSite4.y = static_cast<SBYTE>(uiY);
+    sSite4.x = static_cast<SCHAR>(uiX);
+    sSite4.y = static_cast<SCHAR>(uiY);
     if (uiC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
     {
         if (bCalcR)
@@ -174,7 +175,7 @@ CMeasureChiralCondensate::~CMeasureChiralCondensate()
     {
         for (UINT i = 0; i < _kCondMeasureCount; ++i)
         {
-            checkCudaErrors(cudaFree(m_pDeviceXYBuffer[i]));
+            checkCudaErrors(__cudaFree(m_pDeviceXYBuffer[i]));
         }
     }
 
@@ -185,12 +186,12 @@ CMeasureChiralCondensate::~CMeasureChiralCondensate()
 
     if (NULL != m_pDistributionR)
     {
-        checkCudaErrors(cudaFree(m_pDistributionR));
+        checkCudaErrors(__cudaFree(m_pDistributionR));
     }
 
     if (NULL != m_pDistribution)
     {
-        checkCudaErrors(cudaFree(m_pDistribution));
+        checkCudaErrors(__cudaFree(m_pDistribution));
     }
 
     if (NULL != m_pHostDistributionR)
@@ -210,7 +211,7 @@ void CMeasureChiralCondensate::Initial(CMeasurementManager* pOwner, CLatticeData
 
     for (UINT i = 0; i < _kCondMeasureCount; ++i)
     {
-        checkCudaErrors(cudaMalloc((void**)&m_pDeviceXYBuffer[i], sizeof(CLGComplex) * _HC_Lx * _HC_Ly));
+        checkCudaErrors(__cudaMalloc((void**)&m_pDeviceXYBuffer[i], sizeof(CLGComplex) * _HC_Lx * _HC_Ly));
     }    
     m_pHostXYBuffer = (CLGComplex*)malloc(sizeof(CLGComplex) * _HC_Lx * _HC_Ly);
 
@@ -226,8 +227,8 @@ void CMeasureChiralCondensate::Initial(CMeasurementManager* pOwner, CLatticeData
         m_uiMaxR = ((_HC_Lx + 1) / 2 ) * ((_HC_Lx + 1) / 2 )
             + ((_HC_Ly + 1) / 2 ) * ((_HC_Ly + 1) / 2 );
 
-        checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
-        checkCudaErrors(cudaMalloc((void**)&m_pDistribution, sizeof(CLGComplex) * (m_uiMaxR + 1)));
+        checkCudaErrors(__cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
+        checkCudaErrors(__cudaMalloc((void**)&m_pDistribution, sizeof(CLGComplex) * (m_uiMaxR + 1)));
 
         m_pHostDistributionR = (UINT*)malloc(sizeof(UINT) * (m_uiMaxR + 1));
         m_pHostDistribution = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMaxR + 1));
@@ -246,12 +247,22 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4SingleField(
     {
         for (UINT i = 0; i < _kCondMeasureCount; ++i)
         {
-            _ZeroXYPlaneC(m_pDeviceXYBuffer[i]);
+            _ZeroXYPlane(m_pDeviceXYBuffer[i]);
             m_cTmpSum[i] = _zeroc;
         }
     }
 
-    const Real oneOuiVolume = F(1.0) / appGetLattice()->m_pIndexCache->m_uiSiteNumber[GetFermionFieldId()];
+    //P4-3.4: on multi-GPU the condensate is a per-site average of a local sum;
+    //normalize by the GLOBAL volume (local site number is the per-rank share).
+    DOUBLE fCondVolume = static_cast<DOUBLE>(appGetLattice()->m_pIndexCache->m_uiSiteNumber[GetFermionFieldId()]);
+#if _CLG_MULTI_GPU
+    if (NULL != appGetComm())
+    {
+        const UINT* pG = appGetComm()->GlobalLattice();
+        fCondVolume = static_cast<DOUBLE>(pG[0]) * pG[1] * pG[2] * pG[3];
+    }
+#endif
+    const Real oneOuiVolume = F(1.0) / fCondVolume;
     const CFieldFermionWilsonSquareSU3 * pF1W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pZ4);
     const CFieldFermionWilsonSquareSU3 * pF2W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pInverseZ4);
     const CFieldFermionWilsonSquareSU3DR* pF1WR = dynamic_cast<const CFieldFermionWilsonSquareSU3DR*>(pZ4);
@@ -267,7 +278,7 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4SingleField(
     preparethread;
     for (BYTE i = 0; i < _kCondMeasureCount; ++i)
     {
-        _kernelDotMeasureAll << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelDotMeasureAll, block, threads, 
             i,
             fOmega,
             pF1W->m_pDeviceData,
@@ -276,10 +287,13 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4SingleField(
             _D_ComplexThreadBuffer
             );
 #if !_CLG_DOUBLEFLOAT
-        const CLGComplex thisSum = _cToFloat(appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer));
+        CLGComplex thisSum = _cToFloat(appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer));
 #else
-        const CLGComplex thisSum = appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer); 
+        CLGComplex thisSum = appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer); 
 #endif
+        //P4-3.4: ThreadBufferSum is the LOCAL partial sum (per-rank sites);
+        //reduce across ranks so every rank accumulates the GLOBAL value.
+        GlobalSumComplex(thisSum);
         m_cTmpSum[i] = _cuCaddf(m_cTmpSum[i], cuCmulf_cr(thisSum, oneOuiVolume));
     }
 
@@ -289,18 +303,39 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4SingleField(
     {
         if (m_bMeasureDistribution)
         {
+#if _CLG_MULTI_GPU
+            //P4-3.4: the XY distribution accumulates per-rank partial sums over
+            //the local z/t extent; sum across ranks so the R-distribution is
+            //global. Requires x/y NOT split (same (x,y) index set per rank).
+            if (NULL != appGetComm())
+            {
+                if (appGetComm()->GpuGrid()[0] > 1 || appGetComm()->GpuGrid()[1] > 1)
+                {
+                    appCrucial(_T("CMeasureChiralCondensate: the XY distribution is not supported on multi-GPU with a split x/y direction. Rejected.\n"));
+                    return;
+                }
+                for (UINT i = 0; i < _kCondMeasureCount; ++i)
+                {
+                    //Device -> host -> global sum -> device.
+                    checkCudaErrors(cudaMemcpy(m_pHostXYBuffer, m_pDeviceXYBuffer[i], sizeof(CLGComplex) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
+                    GlobalSumComplexArray(m_pHostXYBuffer, _HC_Lx * _HC_Ly);
+                    checkCudaErrors(cudaMemcpy(m_pDeviceXYBuffer[i], m_pHostXYBuffer, sizeof(CLGComplex) * _HC_Lx * _HC_Ly, cudaMemcpyHostToDevice));
+                }
+            }
+#endif
             dim3 block2(_HC_DecompX, 1, 1);
             dim3 threads2(_HC_DecompLx, 1, 1);
             dim3 block3(1, 1, 1);
             dim3 threads3(m_uiMaxR + 1, 1, 1);
 
-            const Real fDivider = F(1.0) / (m_uiFieldCount * _HC_Lz * _HC_Lt);
-            _kernelChiralCondensateInitialDistR << <block3, threads3 >> > (m_pDistributionR);
+            //P4-3.4: global normalization (local Lz*Lt is the per-rank share).
+            const Real fDivider = F(1.0) / (static_cast<Real>(m_uiFieldCount) * static_cast<Real>(GlobalL(2)) * static_cast<Real>(GlobalL(3)));
+            _LAUNCH_KERNEL(_kernelChiralCondensateInitialDistR, block3, threads3, m_pDistributionR);
             for (UINT i = 0; i < _kCondMeasureCount; ++i)
             {
-                _kernelChiralCondensateInitialDistCond << <block3, threads3 >> > (m_pDistribution);
+                _LAUNCH_KERNEL(_kernelChiralCondensateInitialDistCond, block3, threads3, m_pDistribution);
 
-                _kernelChiralCondensateMeasureDist << <block2, threads2 >> > (
+                _LAUNCH_KERNEL(_kernelChiralCondensateMeasureDist, block2, threads2, 
                     m_pDeviceXYBuffer[i],
                     m_uiMaxR,
                     pF1W->m_byFieldId,
@@ -309,7 +344,7 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4SingleField(
                     m_pDistribution
                     );
 
-                _kernelChiralAverageDist << <block3, threads3 >> > (m_pDistributionR, m_pDistribution);
+                _LAUNCH_KERNEL(_kernelChiralAverageDist, block3, threads3, m_pDistributionR, m_pDistribution);
 
                 if (0 == i)
                 {
@@ -322,9 +357,9 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4SingleField(
                 {
                     if (0 == i)
                     {
-                        assert(0 == m_lstR.Num());
+                        appAssert(0 == m_lstR.Num());
                     }
-                    assert(0 == m_lstCond[i].Num());
+                    appAssert(0 == m_lstCond[i].Num());
                     for (UINT uiL = 0; uiL <= m_uiMaxR; ++uiL)
                     {
                         if (m_pHostDistributionR[uiL] > 0)
@@ -351,7 +386,7 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4SingleField(
                 {
                     for (INT j = 0; j < m_lstR.Num(); ++j)
                     {
-                        assert(m_pHostDistributionR[m_lstR[j]] > 0);
+                        appAssert(m_pHostDistributionR[m_lstR[j]] > 0);
                         m_lstCond[i].AddItem(cuCmulf_cr(m_pHostDistribution[m_lstR[j]], fDivider));
 
                         if (m_bShowResult)
@@ -365,6 +400,18 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4SingleField(
                         }
                     }
                 }
+            }
+            if (NULL != m_pOwner && m_lstR.Num() > 0)
+            {
+                m_pOwner->AddOneConfigurationResult(this, _T("ChiralDistribution"), m_lstCond[0][m_lstCond[0].Num() - 1]);
+                m_pOwner->AddOneConfigurationResult(this, _T("Gamma1Distribution"), m_lstCond[1][m_lstCond[1].Num() - 1]);
+                m_pOwner->AddOneConfigurationResult(this, _T("Gamma2Distribution"), m_lstCond[2][m_lstCond[2].Num() - 1]);
+                m_pOwner->AddOneConfigurationResult(this, _T("Gamma3Distribution"), m_lstCond[3][m_lstCond[3].Num() - 1]);
+                m_pOwner->AddOneConfigurationResult(this, _T("Gamma4Distribution"), m_lstCond[4][m_lstCond[4].Num() - 1]);
+                m_pOwner->AddOneConfigurationResult(this, _T("Gamma5Distribution"), m_lstCond[5][m_lstCond[5].Num() - 1]);
+                m_pOwner->AddOneConfigurationResult(this, _T("Gamma45Distribution"), m_lstCond[6][m_lstCond[6].Num() - 1]);
+                m_pOwner->AddOneConfigurationResult(this, _T("GammaXDistribution"), m_lstCond[7][m_lstCond[7].Num() - 1]);
+                m_pOwner->AddOneConfigurationResult(this, _T("GammaYDistribution"), m_lstCond[8][m_lstCond[8].Num() - 1]);
             }
         }
 
@@ -381,6 +428,19 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4SingleField(
             }
         }
 
+        if (NULL != m_pOwner)
+        {
+            m_pOwner->AddOneConfigurationResult(this, _T("Chiral"), m_cTmpSum[0]);
+            m_pOwner->AddOneConfigurationResult(this, _T("Gamma1"), m_cTmpSum[1]);
+            m_pOwner->AddOneConfigurationResult(this, _T("Gamma2"), m_cTmpSum[2]);
+            m_pOwner->AddOneConfigurationResult(this, _T("Gamma3"), m_cTmpSum[3]);
+            m_pOwner->AddOneConfigurationResult(this, _T("Gamma4"), m_cTmpSum[4]);
+            m_pOwner->AddOneConfigurationResult(this, _T("Gamma5"), m_cTmpSum[5]);
+            m_pOwner->AddOneConfigurationResult(this, _T("Gamma45"), m_cTmpSum[6]);
+            m_pOwner->AddOneConfigurationResult(this, _T("GammaX"), m_cTmpSum[7]);
+            m_pOwner->AddOneConfigurationResult(this, _T("GammaY"), m_cTmpSum[8]);
+        }
+
         ++m_uiConfigurationCount;
     }
 }
@@ -390,7 +450,7 @@ void CMeasureChiralCondensate::Report()
     appPushLogDate(FALSE);
     for (UINT i = 0; i < _kCondMeasureCount; ++i)
     {
-        assert(m_uiConfigurationCount == static_cast<UINT>(m_lstCondAll[i].Num()));
+        appAssert(m_uiConfigurationCount == static_cast<UINT>(m_lstCondAll[i].Num()));
 
         appGeneral(_T("\n==========================================================================\n"));
         appGeneral(_T("==================== Condensate No %d (%d con)============================\n"), i, m_uiConfigurationCount);

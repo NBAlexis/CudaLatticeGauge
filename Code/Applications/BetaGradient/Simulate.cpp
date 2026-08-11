@@ -212,7 +212,7 @@ INT Simulate(CParameters& params)
     {
         appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sOldFileName, EFFT_CLGBin);
         pPL->OnConfigurationAccepted(_FIELDS, NULL);
-        Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fOldPolyakov);
+        Real fError = static_cast<Real>(appAbs(cuCabs(pPL->m_lstLoop[0]) - fOldPolyakov));
 #if _CLG_DOUBLEFLOAT
         if (fError < F(1E-07))
 #else
@@ -224,7 +224,7 @@ INT Simulate(CParameters& params)
         else
         {
             appGeneral(_T("\n ================ have the initial file, but not matching.... %2.12f, %2.12f, diff=%f ===========\n"),
-                _cuCabsf(pPL->m_lstLoop[0]), fOldPolyakov, fError);
+                cuCabs(pPL->m_lstLoop[0]), fOldPolyakov, fError);
         }
         bNeedBake = FALSE;
     }
@@ -258,7 +258,7 @@ INT Simulate(CParameters& params)
         appGeneral(_T("\n|<P>|,arg<P>={\n"));
         for (INT i = 0; i < pPL->m_lstLoop.Num(); ++i)
         {
-            appGeneral(_T("{%f, %f},\n"), _cuCabsf(pPL->m_lstLoop[i]), __cuCargf(pPL->m_lstLoop[i]));
+            appGeneral(_T("{%f, %f},\n"), cuCabs(pPL->m_lstLoop[i]), cuCarg(pPL->m_lstLoop[i]));
         }
         appGeneral(_T("}\n"));
         appPopLogDate();
@@ -379,7 +379,7 @@ INT Simulate(CParameters& params)
             sFileName.Format(_T("%sGradient_%s_%d.con"), sSavePrefix.c_str(), sPrefixList[uiOmega].c_str(), iSaveStartIndex);
             appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, EFFT_CLGBin);
             pPL->OnConfigurationAccepted(_FIELDS, NULL);
-            Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fPolyaOld);
+            Real fError = static_cast<Real>(appAbs(cuCabs(pPL->m_lstLoop[0]) - fPolyaOld));
 #if _CLG_DOUBLEFLOAT
             if (fError < F(1E-07))
 #else
@@ -391,7 +391,7 @@ INT Simulate(CParameters& params)
             else
             {
                 appGeneral(_T("\n ================ have the initial file, but not matching.... %2.12f, %2.12f, diff=%f ===========\n"),
-                    _cuCabsf(pPL->m_lstLoop[0]), fPolyaOld, fError);
+                    cuCabs(pPL->m_lstLoop[0]), fPolyaOld, fError);
                 appFailQuitCLG();
                 return 1;
             }

@@ -35,15 +35,29 @@ extern "C" {
     }
 
 #if !_CLG_DOUBLEFLOAT
-    __device__ __host__ static __inline__ DOUBLE __cuCabsSqfd(const cuDoubleComplex& c)
+    __device__ __host__ static __inline__ DOUBLE cuCarg(const cuDoubleComplex& c)
     {
-        return c.x * c.x + c.y * c.y;
+        return atan2(c.y, c.x);
     }
 
-    __device__ __host__ static __inline__ DOUBLE __cuCabsSqd(const cuDoubleComplex& c)
+    __device__ __host__ static __inline__ DOUBLE cuCabsSq(const cuDoubleComplex& c)
     {
         return c.x * c.x + c.y * c.y;
     }
+#define cuCargf __cuCargf
+#define cuCabsSqf __cuCabsSqf
+#else
+    __device__ __host__ static __inline__ FLOAT cuCargf(const cuComplex& c)
+    {
+        return atan2f(c.y, c.x);
+    }
+
+    __device__ __host__ static __inline__ FLOAT cuCabsSqf(const cuComplex& c)
+    {
+        return c.x * c.x + c.y * c.y;
+    }
+#define cuCarg __cuCargf
+#define cuCabsSq __cuCabsSqf
 #endif
 
     /**
@@ -108,6 +122,12 @@ extern "C" {
     {
         return _make_cuComplex(__div(x.x, y), __div(x.y, y));
     }
+
+    __host__ static __inline__ CLGComplex cuCdivf_cr_host(const CLGComplex& x, Real y)
+    {
+        return _make_cuComplex(x.x / y, x.y / y);
+    }
+
 #if !_CLG_DOUBLEFLOAT
     __host__ static __inline__ cuDoubleComplex cuCdivf_cd_host(const cuDoubleComplex& x, DOUBLE y)
     {
@@ -117,22 +137,23 @@ extern "C" {
     {
         return make_cuDoubleComplex(__div(x.x, y), __div(x.y, y));
     }
+#else
+#define cuCdivf_cd_host cuCdivf_cr_host
+#define cuCdivf_cd cuCdivf_cr
 #endif
-
-    __host__ static __inline__ CLGComplex cuCdivf_cr_host(const CLGComplex& x, Real y)
-    {
-        return _make_cuComplex(x.x / y, x.y / y);
-    }
 
     __device__ __host__ static __inline__ CLGComplex cuCmulf_cr(const CLGComplex& x, Real y)
     {
         return _make_cuComplex(x.x * y, x.y * y);
     }
-
+#if !_CLG_DOUBLEFLOAT
     __device__ __host__ static __inline__ cuDoubleComplex cuCmulf_cd(const cuDoubleComplex& x, DOUBLE y)
     {
         return make_cuDoubleComplex(x.x * y, x.y * y);
     }
+#else
+#define cuCmulf_cd cuCmulf_cr
+#endif
 
     __device__ static __inline__ CLGComplex cuCmulf_rc(Real y, const CLGComplex& x)
     {
@@ -176,6 +197,11 @@ UBOOL operator!=(const cuDoubleComplex& c1, const cuDoubleComplex& c2)
 }
 
 #endif /* __cplusplus */
+
+#define _CLGCMPFMTSTR(s) #s
+#define _CLGFLOATFMT "%.7f"
+#define _CLGCMPFMT _CLGFLOATFMT "%s" _CLGFLOATFMT " I"
+
 
 __END_NAMESPACE
 

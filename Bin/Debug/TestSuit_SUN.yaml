@@ -12,20 +12,20 @@ TestSU4:
     ExponentialPrecision : 10
     CacheStaple : 0
 
-    ActionListLength : 7
-    GaugeFieldCount : 7
-    MeasureListLength : 7
+    ActionListLength : 4
+    GaugeFieldCount : 4
+    MeasureListLength : 4
     FermionFieldCount : 0
 
-    SkipThermalDebug : 1
+    SkipThermalDebug : 0
     BeforeMetropolis : 5
-    BeforeMetropolisDebug : 2
+    BeforeMetropolisDebug : 3
     Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [0.878774, 0.802603, 0.165529, 0.101361, 0.068469, 0.050312, 0.038658]
-    ExpectedResDebug : [0.720067, 0.699366, 0.166071, 0.103458, 0.069438, 0.052172, 0.039148]
+    ExpectedRes : [0.878774, 0.802603, 0.165529, 0.038658]
+    ExpectedResDebug : [0.720067, 0.699366, 0.166071, 0.039148]
 
     Updator:
 
@@ -68,42 +68,15 @@ TestSU4:
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
         FieldId : 3
-        
+
     Gauge4:
-    
-        ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU5
-
-        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_Random
-        FieldId : 4
-
-    Gauge5:
-    
-        ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU6
-
-        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_Random
-        FieldId : 5
-
-    Gauge6:
-    
-        ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU7
-
-        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_Random
-        FieldId : 6
-
-    Gauge7:
     
         ## FieldName = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU8
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-        FieldId : 7
+        FieldId : 4
 
     Measure1:
 
@@ -124,21 +97,6 @@ TestSU4:
 
         MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [4]
-
-    Measure5:
-
-        MeasureName : CMeasurePlaqutteEnergy
-        GaugeFields : [5]
-
-    Measure6:
-
-        MeasureName : CMeasurePlaqutteEnergy
-        GaugeFields : [6]
-
-    Measure7:
-
-        MeasureName : CMeasurePlaqutteEnergy
-        GaugeFields : [7]
 
     Action1:
 
@@ -164,23 +122,6 @@ TestSU4:
         Beta : 5.0
         GaugeFields : [4]
 
-    Action5:
-
-        ActionName : CActionGaugePlaquette
-        Beta : 5.0
-        GaugeFields : [5]
-
-    Action6:
-
-        ActionName : CActionGaugePlaquette
-        Beta : 5.0
-        GaugeFields : [6]
-
-    Action7:
-
-        ActionName : CActionGaugePlaquette
-        Beta : 5.0
-        GaugeFields : [7]
 
 TestSU4D:
 
@@ -195,9 +136,9 @@ TestSU4D:
     ExponentialPrecision : 10
     CacheStaple : 0
 
-    ActionListLength : 7
-    GaugeFieldCount : 7
-    MeasureListLength : 7
+    ActionListLength : 4
+    GaugeFieldCount : 4
+    MeasureListLength : 4
     FermionFieldCount : 0
 
     SkipThermalDebug : 1
@@ -207,8 +148,8 @@ TestSU4D:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [0.919147, 0.631860, 0.303950, 0.247870, 0.219536, 0.203825, 0.195019]
-    ExpectedResDebug : [0.771988, 0.561441, 0.309630, 0.252141, 0.225020, 0.208575, 0.197247]
+    ExpectedRes : [0.908274, 0.845414, 0.302959, 0.194808]
+    ExpectedResDebug : [0.791914, 0.774119, 0.300661, 0.194574]
 
     Updator:
 
@@ -220,7 +161,7 @@ TestSU4D:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorForceGradient }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 8
+        IntegratorStep : 9
         Omelyan2Lambda : 0.38636665500756728
 
         ReportMeasure : 0
@@ -257,48 +198,15 @@ TestSU4D:
         FieldId : 3
 
         Period : [0, 0, 1, 1]
-        
+
     Gauge4:
-    
-        ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU5D
-
-        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_Random
-        FieldId : 4
-
-        Period : [0, 0, 1, 1]
-
-    Gauge5:
-    
-        ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU6D
-
-        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_Random
-        FieldId : 5
-
-        Period : [0, 0, 1, 1]
-
-    Gauge6:
-    
-        ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU7D
-
-        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_Random
-        FieldId : 6
-
-        Period : [0, 0, 1, 1]
-
-    Gauge7:
     
         ## FieldName = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU8D
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-        FieldId : 7
+        FieldId : 4
         
         Period : [0, 0, 1, 1]
 
@@ -319,23 +227,8 @@ TestSU4D:
 
     GaugeBoundary4:
 
-        FieldName : CFieldBoundaryGaugeSU5
-        FieldId : 4
-
-    GaugeBoundary5:
-
-        FieldName : CFieldBoundaryGaugeSU6
-        FieldId : 5
-
-    GaugeBoundary6:
-
-        FieldName : CFieldBoundaryGaugeSU7
-        FieldId : 6
-
-    GaugeBoundary7:
-
         FieldName : CFieldBoundaryGaugeSU8
-        FieldId : 7
+        FieldId : 4
 
     Measure1:
 
@@ -356,21 +249,6 @@ TestSU4D:
 
         MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [4]
-
-    Measure5:
-
-        MeasureName : CMeasurePlaqutteEnergy
-        GaugeFields : [5]
-
-    Measure6:
-
-        MeasureName : CMeasurePlaqutteEnergy
-        GaugeFields : [6]
-
-    Measure7:
-
-        MeasureName : CMeasurePlaqutteEnergy
-        GaugeFields : [7]
 
     Action1:
 
@@ -396,24 +274,6 @@ TestSU4D:
         Beta : 5.0
         GaugeFields : [4]
 
-    Action5:
-
-        ActionName : CActionGaugePlaquette
-        Beta : 5.0
-        GaugeFields : [5]
-
-    Action6:
-
-        ActionName : CActionGaugePlaquette
-        Beta : 5.0
-        GaugeFields : [6]
-
-    Action7:
-
-        ActionName : CActionGaugePlaquette
-        Beta : 5.0
-        GaugeFields : [7]
-
 TestRotationSUND:
 
     Dim : 4
@@ -432,15 +292,15 @@ TestRotationSUND:
     MeasureListLength : 2
     FermionFieldCount : 0
 
-    SkipThermalDebug : 1
+    SkipThermalDebug : 0
     BeforeMetropolis : 5
-    BeforeMetropolisDebug : 1
+    BeforeMetropolisDebug : 2
     Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [0.631026, 0.305829]
-    ExpectedResDebug : [0.522527, 0.305695]
+    ExpectedRes : [0.839029, 0.304981]
+    ExpectedResDebug : [0.714805, 0.301603]
 
     Updator:
 
@@ -452,7 +312,7 @@ TestRotationSUND:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorForceGradient }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 8
+        IntegratorStep : 6
         Omelyan2Lambda : 0.38636665500756728
 
         ReportMeasure : 0
@@ -536,7 +396,7 @@ TestRotationSUNP:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [0.698130, 0.171356]
+    ExpectedRes : [0.802390, 0.172639]
     ExpectedResDebug : [0.698130, 0.171356]
 
     Updator:

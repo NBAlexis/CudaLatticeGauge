@@ -1,0 +1,208 @@
+\subsection{\label{sec:hmcdiag}\index{HMC diagnostics}HMC diagnostics}
+
+The HMC diagnostic suite contains two tests: molecular-dynamics
+reversibility and a finite-difference check of the production force.  The
+implementation is in
+\texttt{Code/CLGTest/Tests/TestHmcDiagnostics.cpp}; its test configurations
+are in \texttt{Bin/Debug/TestSuit\_HmcDiagnostics.yaml}.
+
+\subsubsection{\label{sec:hmcdiag_state}Gauge-dependent state}
+
+Let $U$ denote the thin gauge field supplied to an action.  Before evaluating
+the force or energy at a particular value of $U$, the diagnostic rebuilds all
+objects derived from that same $U$ in the production order:
+\begin{enumerate}
+  \item update the registered cache before gauge updating;
+  \item update the registered cache before smearing;
+  \item construct the registered smeared or effective gauge field, if the
+        smearing object is enabled during an update;
+  \item update the registered cache after smearing.
+\end{enumerate}
+Thus an energy evaluated at a perturbed gauge field never uses a smeared field,
+staple, plaquette, or $F_{\mu\nu}$ cache made from a different gauge field.
+
+For a fermion action, the diagnostic first performs this refresh at the
+unperturbed field $U_0$ and then calls \texttt{PrepareForHMC} once.  Denote the
+resulting pseudofermion field by $\phi_0$.  The same $\phi_0$ is used for the
+production-force calculation and for every positive and negative perturbation
+defined below.  In particular, $\phi_0$ is not regenerated when the link,
+direction, or finite-difference step size changes.
+
+\subsubsection{\label{sec:hmcdiag_force}Production-force convention}
+
+For each link $l$, \texttt{CalculateForce} adds a raw matrix $Y_l$ to the raw
+force field.  The force actually used by the integrator is
+\begin{equation}
+F_l={\rm TA}\!\left(U_{0,l}Y_l^\dagger\right),
+\label{eq.hmcdiag.force}
+\end{equation}
+where $U_{0,l}$ is link $l$ of the unperturbed gauge field and
+\begin{equation}
+{\rm TA}(M)
+=\frac{M-M^\dagger}{2}
+-\frac{1}{3}{\rm tr}\!\left(\frac{M-M^\dagger}{2}\right)\mathbb I.
+\label{eq.hmcdiag.ta}
+\end{equation}
+Here $\mathbb I$ is the $3\times3$ identity matrix and ${\rm tr}$ is the
+color-matrix trace.
+In the code, Eq.~(\ref{eq.hmcdiag.force}) is implemented by
+\texttt{LeftMul(U0,FALSE,TRUE)} followed by \texttt{TA()}.  Directions fixed
+by \texttt{BindDir} are then set to zero in $F$.
+
+For two gauge-shaped matrix fields $A$ and $B$, define the real Frobenius inner
+product
+\begin{equation}
+\langle A,B\rangle
+=\mathop{\rm Re}\sum_l {\rm tr}\!\left(A_l^\dagger B_l\right).
+\label{eq.hmcdiag.inner}
+\end{equation}
+This is the real part returned by \texttt{A.Dot(B)}.  The CLGLib force
+normalization predicts the action derivative
+\begin{equation}
+D_{\rm force}=-2\langle F,X\rangle.
+\label{eq.hmcdiag.fdforcefield}
+\end{equation}
+The perturbation field $X$ used below is nonzero on only one link $l$.
+Consequently Eq.~(\ref{eq.hmcdiag.fdforcefield}) reduces to
+\begin{equation}
+D_{\rm force}
+=-2\mathop{\rm Re}{\rm tr}\!\left(F_l^\dagger X_l\right),
+\label{eq.hmcdiag.fdforce}
+\end{equation}
+which is calculated by
+\texttt{-2.0*pForce->Dot(pX).x}.
+
+\subsubsection{\label{sec:hmcdiag_fd}Finite-difference force test}
+
+The diagnostic tests each continuous action separately.  Fix one such action,
+its unperturbed thin gauge field $U_0$, and, for a fermion action, the
+pseudofermion field $\phi_0$ defined above.  The action value written below is
+therefore
+\begin{equation}
+S[U]\equiv S[U;\phi_0]
+\end{equation}
+for a fermion action; for a gauge action there is no pseudofermion argument.
+
+Choose a link $l$ which is neither Dirichlet nor fixed by \texttt{BindDir}.
+Choose a $3\times3$ matrix $X_l$ satisfying
+\begin{equation}
+X_l^\dagger=-X_l,\qquad
+{\rm tr}(X_l)=0,\qquad
+\lVert X_l\rVert_{\rm F}=1,
+\label{eq.hmcdiag.x}
+\end{equation}
+where
+\begin{equation}
+\lVert X_l\rVert_{\rm F}^2
+={\rm tr}(X_l^\dagger X_l).
+\end{equation}
+Define the gauge-shaped field $X$ by setting its value to $X_l$ on link $l$
+and to zero on every other link.  This definition makes
+$\langle F,X\rangle$ in Eq.~(\ref{eq.hmcdiag.fdforcefield}) depend only on the
+selected link.
+
+Let $\Delta>0$ be the YAML parameter \texttt{Delta}, and let $N_h$ be the
+integer YAML parameter \texttt{DeltaLevels}.  For
+$k=0,1,\ldots,N_h-1$, define
+\begin{equation}
+h_k=\frac{\Delta}{2^k}.
+\label{eq.hmcdiag.hk}
+\end{equation}
+For each $k$, make two independent copies of $U_0$.  Change only link $l$ and
+define
+\begin{align}
+U_{+,k}(l)&=\exp(h_kX_l)U_0(l),
+&U_{+,k}(l')&=U_0(l')\quad(l'\ne l),
+\label{eq.hmcdiag.uplus}\\
+U_{-,k}(l)&=\exp(-h_kX_l)U_0(l),
+&U_{-,k}(l')&=U_0(l')\quad(l'\ne l).
+\label{eq.hmcdiag.uminus}
+\end{align}
+The multiplication is on the left.  In the implementation it is performed by
+\texttt{pX->ExpMult(+h,pWorkGauge)} and
+\texttt{pX->ExpMult(-h,pWorkGauge)}.  Because $X_l$ is traceless and
+anti-Hermitian, both exponentials are in $SU(3)$, so the perturbed link remains
+in $SU(3)$.
+
+After rebuilding all gauge-dependent data separately from $U_{+,k}$ and
+$U_{-,k}$, calculate
+\begin{equation}
+S_{+,k}=S[U_{+,k}],\qquad S_{-,k}=S[U_{-,k}].
+\label{eq.hmcdiag.spm}
+\end{equation}
+The central finite-difference estimate of the directional derivative at
+$U_0$ is
+\begin{equation}
+D_{{\rm FD},k}
+=\frac{S_{+,k}-S_{-,k}}{2h_k}.
+\label{eq.hmcdiag.fd}
+\end{equation}
+The production-force prediction $D_{\rm force}$ in
+Eq.~(\ref{eq.hmcdiag.fdforce}) is calculated once at $U_0$ and is the same for
+all $k$.
+
+For every level define the absolute disagreement
+\begin{equation}
+e_k=\left|D_{{\rm FD},k}-D_{\rm force}\right|,
+\label{eq.hmcdiag.error}
+\end{equation}
+the comparison scale
+\begin{equation}
+q_k=\max\!\left(\left|D_{{\rm FD},k}\right|,
+                 \left|D_{\rm force}\right|\right),
+\label{eq.hmcdiag.scale}
+\end{equation}
+and the allowed error
+\begin{equation}
+b_k=\epsilon_{\rm abs}+\epsilon_{\rm rel}q_k,
+\label{eq.hmcdiag.bound}
+\end{equation}
+where $\epsilon_{\rm abs}$ and $\epsilon_{\rm rel}$ are the YAML parameters
+\texttt{TolAbs} and \texttt{TolRel}, respectively.
+
+A link-and-direction trial fails if any required value
+$S_{+,k}$, $S_{-,k}$, $D_{{\rm FD},k}$, $D_{\rm force}$, $e_k$, or $b_k$ is
+not finite.  Otherwise the trial passes exactly when
+\begin{equation}
+\text{there exists }k\in\{0,\ldots,N_h-1\}\text{ such that }e_k\leq b_k.
+\label{eq.hmcdiag.pass}
+\end{equation}
+There is no additional plateau, monotonic-decrease, convergence-rate, or
+adjacent-level requirement.  The code reports all levels and identifies the
+level with the smallest $e_k$, but the smallest-error level has no separate
+acceptance rule beyond Eq.~(\ref{eq.hmcdiag.pass}).  Every sampled direction
+on every sampled link must pass, and every selected continuous action is
+tested independently.
+
+The central difference in Eq.~(\ref{eq.hmcdiag.fd}) has an $O(h_k^2)$
+truncation error in exact arithmetic.  Several values of $h_k$ are used because
+decreasing $h_k$ reduces this truncation error but can amplify subtraction,
+round-off, and fermion-solver errors.  This observation explains the step-size
+sweep; it is not an extra pass condition.
+
+\subsubsection{\label{sec:hmcdiag_rev}Reversibility}
+
+Reversibility is tested using one prepared Hamiltonian state.  The test calls
+\texttt{Prepare(FALSE,0)} exactly once, which prepares the action state and
+generates the initial momentum.  Let the saved integrator working gauge and
+momentum immediately after that call be $U_0$ and $P_0$.  The test performs
+\begin{equation}
+(U_0,P_0)\longrightarrow(U_1,P_1),
+\end{equation}
+negates the momentum, and then performs a second evolution without another
+call to \texttt{Prepare}:
+\begin{equation}
+(U_1,-P_1)\longrightarrow(U_2,P_2).
+\end{equation}
+The same integrator, step size, step count, action state, and boundary
+conditions are therefore used in both evolutions.  Reversibility requires
+\begin{equation}
+U_2\simeq U_0,\qquad P_2\simeq -P_0.
+\end{equation}
+The diagnostic reports average and maximum Frobenius norms of $U_2-U_0$ and
+$P_2+P_0$ and compares them with the configured tolerances.
+
+The two calls to \texttt{Evaluate()} modify the integrator working fields but
+do not copy them to the lattice gauge field.  Reversibility checks the complete
+molecular-dynamics map, but it does not prove that the force is correct: an
+incorrect force can still be used reversibly in both evolutions.

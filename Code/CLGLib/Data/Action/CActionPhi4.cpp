@@ -5,6 +5,7 @@
 // (nabla phi)*(nabla phi) + m phi* phi + lambda (phi*phi)^2
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [06/13/2024 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -27,7 +28,7 @@ void CActionPhi4::Initial(class CLatticeData* pOwner, const CParameters& param, 
 * calculate |Dphi|^2
 * calculate |phi|^2
 */
-DOUBLE CActionPhi4::Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldGauge* const* stableFields)
+DOUBLE CActionPhi4::Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields, const CFieldGauge* const* stapleFields)
 {
     if (1 != m_byBosonFieldIds.Num())
     {
@@ -36,19 +37,19 @@ DOUBLE CActionPhi4::Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, c
     }
     INT ibosonidx = CLatticeData::GetBosonFieldIndexById(bosonNum, bosonFields, m_byBosonFieldIds[0]);
     const CFieldBoson* bosonfield = bosonFields[ibosonidx];
-    CFieldBoson* dboson = dynamic_cast<CFieldBoson*>(appGetLattice()->GetPooledCopy(bosonfield));
-    dboson->D(gaugeNum, bosonNum, gaugeFields, bosonFields);
+    CFieldBoson* dboson = dynamic_cast<CFieldBoson*>(appGetLattice()->GetPooledCopy(bosonfield, _T(__FILE__), __LINE__));
+    dboson->D(gaugeNum, bosonNum, 0, gaugeFields, bosonFields, NULL);
     checkCudaErrors(cudaDeviceSynchronize());
     cuDoubleComplex partiald = bosonfield->Dot(dboson);
     checkCudaErrors(cudaDeviceSynchronize());
-    cuDoubleComplex phi2 = bosonfield->Dot(bosonfield);
+    DOUBLE phi2 = bosonfield->GetLength();
     checkCudaErrors(cudaDeviceSynchronize());
     bosonfield->CopyTo(dboson);
     dboson->Mul(bosonfield);
     checkCudaErrors(cudaDeviceSynchronize());
-    cuDoubleComplex phi4 = dboson->Dot(dboson);
+    DOUBLE phi4 = dboson->GetLength();
     checkCudaErrors(cudaDeviceSynchronize());
-    m_fLastEnergy = (8.0 + m_fM) * phi2.x + m_fLambda * phi4.x - partiald.x;
+    m_fLastEnergy = (8.0 + m_fM) * phi2 + m_fLambda * phi4 - partiald.x;
     dboson->Return();
     return m_fLastEnergy;
 }
@@ -70,10 +71,10 @@ UBOOL CActionPhi4::CalculateForce(INT gaugeNum, INT bosonNum, const CFieldGauge*
     //Boson force
     INT ibosonidx = CLatticeData::GetBosonFieldIndexById(bosonNum, bosonFields, m_byBosonFieldIds[0]);
     const CFieldBoson* bosonfield = bosonFields[ibosonidx];
-    CFieldBoson* dboson = dynamic_cast<CFieldBoson*>(appGetLattice()->GetPooledCopy(bosonfield));
+    CFieldBoson* dboson = dynamic_cast<CFieldBoson*>(appGetLattice()->GetPooledCopy(bosonfield, _T(__FILE__), __LINE__));
     if (!bosonfield->m_bConstant)
     {
-        dboson->D(gaugeNum, bosonNum, gaugeFields, bosonFields);
+        dboson->D(gaugeNum, bosonNum, 0, gaugeFields, bosonFields, NULL);
         checkCudaErrors(cudaDeviceSynchronize());
 
         bosonForces[ibosonidx]->Axpy(_make_cuComplex(F(1.0), F(0.0)), dboson);
@@ -104,8 +105,16 @@ void CActionPhi4::PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* c
 {
     if (0 == iUpdateIterate)
     {
-        m_fLastEnergy = Energy(TRUE, gaugeNum, bosonNum, gaugeFields, bosonFields, NULL);
+        m_fLastEnergy = Energy(TRUE, gaugeNum, bosonNum, 0, gaugeFields, bosonFields, NULL, NULL);
     }
+}
+
+CCString CActionPhi4::GetInfos(const CCString& tab) const
+{
+    CCString sRet = CAction::GetInfos(tab);
+    sRet = sRet + tab + _T("Mass : ") + appToString(m_fM) + _T("\n");
+    sRet = sRet + tab + _T("Lambda : ") + appToString(m_fLambda) + _T("\n");
+    return sRet;
 }
 
 __END_NAMESPACE

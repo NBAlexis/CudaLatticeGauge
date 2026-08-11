@@ -18,6 +18,10 @@ INT Simulate(CParameters& params)
     params.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
     UINT iBeforeEquib = static_cast<UINT>(iVaule);
 
+    iVaule = 1;
+    params.FetchValueINT(_T("WarmUp"), iVaule);
+    UINT iWarmUp = static_cast<UINT>(iVaule);
+
     iVaule = 6;
     params.FetchValueINT(_T("EquvibStep"), iVaule);
     UINT iEquib = static_cast<UINT>(iVaule);
@@ -44,6 +48,9 @@ INT Simulate(CParameters& params)
 
     TArray<Real> lstElectric;
     params.FetchValueArrayReal(_T("Electric"), lstElectric);
+
+    TArray<Real> lstMagnetic;
+    params.FetchValueArrayReal(_T("Magnetic"), lstMagnetic);
 
     TArray<Real> lstChemical;
     params.FetchValueArrayReal(_T("Chemical"), lstChemical);
@@ -97,7 +104,7 @@ INT Simulate(CParameters& params)
     {
         appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sOldFileName, EFFT_CLGBin);
         pPL->OnConfigurationAccepted(_FIELDS, NULL);
-        Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fOldPolyakov);
+        Real fError = static_cast<Real>(appAbs(cuCabs(pPL->m_lstLoop[0]) - fOldPolyakov));
 #if _CLG_DOUBLEFLOAT
         if (fError < F(1E-07))
 #else
@@ -109,7 +116,7 @@ INT Simulate(CParameters& params)
         else
         {
             appGeneral(_T("\n ================ have the initial file, but not matching.... %2.12f, %2.12f, diff=%f ===========\n"),
-                _cuCabsf(pPL->m_lstLoop[0]), fOldPolyakov, fError);
+                cuCabs(pPL->m_lstLoop[0]), fOldPolyakov, fError);
         }
         bNeedBake = FALSE;
     }
@@ -125,9 +132,16 @@ INT Simulate(CParameters& params)
         {
             appGeneral(_T("!!!! Has old file but still bake !!!!\n"));
         }
+
         appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
         appGetLattice()->m_pUpdator->SetConfigurationCount(0);
         appGetLattice()->m_pMeasurements->Reset();
+        if (iWarmUp > 0)
+        {
+            appGetLattice()->m_pUpdator->SetAutoCorrection(FALSE);
+            appGetLattice()->m_pUpdator->Update(iWarmUp, FALSE);
+            appGetLattice()->m_pUpdator->SetAutoCorrection(TRUE);
+        }
         UINT uiAccepCountBeforeE = 0;
         while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
         {
@@ -143,7 +157,7 @@ INT Simulate(CParameters& params)
         appGeneral(_T("\n|<P>|,arg<P>={\n"));
         for (INT i = 0; i < pPL->m_lstLoop.Num(); ++i)
         {
-            appGeneral(_T("{%f, %f},\n"), _cuCabsf(pPL->m_lstLoop[i]), __cuCargf(pPL->m_lstLoop[i]));
+            appGeneral(_T("{%f, %f},\n"), cuCabs(pPL->m_lstLoop[i]), cuCarg(pPL->m_lstLoop[i]));
         }
         appGeneral(_T("}\n"));
         appPopLogDate();
@@ -158,13 +172,16 @@ INT Simulate(CParameters& params)
         CCString sHeader;
         sHeader.Format(_T("%d"), uiOmega);
         appSetLogHeader(sHeader);
-        appGeneral(_T("\n========= Electric =%f Chemical = %f  ==========\n"), lstElectric[uiOmega], lstChemical[uiOmega]);
+        appGeneral(_T("\n========= Electric =%f Chemical = %f, Magnetic = %f  ==========\n"), lstElectric[uiOmega], lstChemical[uiOmega], lstMagnetic[uiOmega]);
 
         pU->m_fCoeffGamma54 = lstChemical[uiOmega];
-        pU->UpdatePooledParamters();
+        //pU->UpdatePooledParamters();
         pD->m_fCoeffGamma54 = lstChemical[uiOmega];
-        pD->UpdatePooledParamters();
-        pU1->InitialU1Real(EURT_None, EURT_E_t, EURT_None, F(0.0), lstElectric[uiOmega], F(0.0), FALSE);
+        //pD->UpdatePooledParamters();
+
+        EU1RealType eEzType = pU1->m_eE;
+        EU1RealType eBzType = pU1->m_eB;
+        pU1->InitialU1Real(EURT_None, eEzType, eBzType, F(0.0), lstElectric[uiOmega], lstMagnetic[uiOmega], FALSE);
 
         //pU1->DebugPrintMe();
 
@@ -183,7 +200,7 @@ INT Simulate(CParameters& params)
             sFileName.Format(_T("%sEC_%d_%d.con"), sSavePrefix.c_str(), uiOmega, iSaveStartIndex);
             appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, EFFT_CLGBin);
             pPL->OnConfigurationAccepted(_FIELDS, NULL);
-            Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fPolyaOld);
+            Real fError = static_cast<Real>(appAbs(cuCabs(pPL->m_lstLoop[0]) - fPolyaOld));
 #if _CLG_DOUBLEFLOAT
             if (fError < F(1E-07))
 #else
@@ -195,7 +212,7 @@ INT Simulate(CParameters& params)
             else
             {
                 appGeneral(_T("\n ================ have the initial file, but not matching.... %2.12f, %2.12f, diff=%f ===========\n"),
-                    _cuCabsf(pPL->m_lstLoop[0]), fPolyaOld, fError);
+                    cuCabs(pPL->m_lstLoop[0]), fPolyaOld, fError);
                 appFailQuitCLG();
                 return 1;
             }

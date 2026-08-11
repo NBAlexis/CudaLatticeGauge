@@ -5,6 +5,7 @@
 //   This is to compress the configuration files to half the size
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [08/21/2020 nbale]
 //=============================================================================
 

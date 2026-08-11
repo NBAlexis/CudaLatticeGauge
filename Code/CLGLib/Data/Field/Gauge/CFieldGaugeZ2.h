@@ -13,14 +13,14 @@
 
 __BEGIN_NAMESPACE
 
-class CLGAPI CFieldGaugeZ2 : public CFieldGauge
-{
-public:
-
-
-private:
-
-};
+//class CLGAPI CFieldGaugeZ2 : public CFieldGauge
+//{
+//public:
+//
+//
+//private:
+//
+//};
 
 __END_NAMESPACE
 

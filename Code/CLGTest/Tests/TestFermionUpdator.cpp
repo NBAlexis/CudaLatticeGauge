@@ -4,6 +4,7 @@
 // DESCRIPTION:
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [02/07/2019 nbale]
 //=============================================================================
 
@@ -66,25 +67,39 @@ UINT TestFermionUpdator(CParameters& sParam)
 
 //__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdator, FermionUpdator);
 
-__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorOmelyanGCRODR, FermionOmelyanGCRODR);
+__REGIST_TEST(TestUpdateCommon, WDUpdator, TestFermionUpdatorOmelyanGCRODR, FermionOmelyanGCRODR);
 
-__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorOmelyanGMRESMDR, FermionOmelyanGMRESMDR);
+__REGIST_TEST(TestUpdateCommon, WDUpdator, TestFermionUpdatorOmelyanGMRESMDR, FermionOmelyanGMRESMDR);
 
 //__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyan, FermionOmelyan);
 
-__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorForceGradient, FermionForceGradient);
+//__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorForceGradient, WDForceGradient);
 
 //__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedLeapFrog, FermionNestedLeapFrog);
 
 //REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorNestedOmelyan, FermionNestedOmelyan);
 
-__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorNestedForceGradient, NestedForceGradient);
+__REGIST_TEST(TestUpdateCommon, WDUpdator, TestFermionUpdatorNestedForceGradient, NestedForceGradient);
+___REGIST_TEST(TestUpdateCommon, WDUpdator, TestFermionUpdatorCG, FermionCG, _TEST_MULTIGPU);
+___REGIST_TEST(TestUpdateCommon, WDUpdator, TestFermionUpdatorDeflatedCG, FermionDCG, _TEST_MULTIGPU);
+
+__REGIST_TEST(TestUpdateCommon, WDUpdator, TestFermionUpdatorNestedForceGradientRHMC, WDRHMC);
 
 //#if !_CLG_DEBUG
 
-__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorWilsonDiracGamma1, WilsonDiracExpGamma);
+__REGIST_TEST(TestUpdateCommon, WDUpdator, TestFermionUpdatorWilsonDiracGamma1, WilsonDiracExpGamma);
 
-__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorWilsonDiracGamma2, WilsonDiracGamma);
+__REGIST_TEST(TestUpdateCommon, WDUpdator, TestFermionUpdatorWilsonDiracGamma2, WilsonDiracGamma);
+
+__REGIST_TEST(TestUpdateCommon, WDUpdator, TestFermionUpdatorWilsonDiracEM, WilsonDiracEM);
+
+__REGIST_TEST(TestUpdateCommon, WDUpdator, TestFermionUpdatorCloverWilsonNf2p1, CloverNf2p1);
+
+__REGIST_TEST(TestUpdateCommon, WDUpdator, TestFermionUpdatorStoutLinkCloverWilsonNf2p1, StoutNf2p1);
+
+__REGIST_TEST(TestUpdateCommon, WDUpdator, TestFermionUpdatorStoutLinkCloverWilsonEMNf2, StoutEMNf2);
+
+__REGIST_TEST(TestUpdateCommon, Boundary, TestFermionUpdatorStoutLinkCloverWilsonDNf2p1, StoutDirichNf2p1);
 
 //#endif
 
@@ -143,16 +158,16 @@ UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
 }
 
 #if _CLG_DEBUG
-__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestFermionUpdatorWithMesonCorrelator, FermionMesonCorrelator);
+__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, WDUpdator, TestFermionUpdatorWithMesonCorrelator, FermionMesonCorrelator);
 #else
-__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestFermionUpdatorWithMesonCorrelatorRelease, FermionMesonCorrelator);
+__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, WDUpdator, TestFermionUpdatorWithMesonCorrelatorRelease, FermionMesonCorrelator);
 #endif
 
 //Why I cannot find 'TestGaugeSmearingAPEProj'?
 
-__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestGaugeSmearingAPEProj, GaugeSmearingAPEProj);
+__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, WDUpdator, TestGaugeSmearingAPEProj, GaugeSmearingAPEProj);
 
-__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestGaugeSmearingAPEStout, GaugeSmearingAPEStout);
+__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, WDUpdator, TestGaugeSmearingAPEStout, GaugeSmearingAPEStout);
 
 UINT TestFermionUpdatorL(CParameters& sParam)
 {
@@ -215,13 +230,102 @@ UINT TestFermionUpdatorL(CParameters& sParam)
     return uiError;
 }
 
-___REGIST_TEST(TestFermionUpdatorL, Updator, TestFermionUpdatorLargeScale, LargeScale, _TEST_RELEASE);
-___REGIST_TEST(TestFermionUpdatorL, Updator, TestFermionUpdatorLargeScaleFloat, LargeScaleFloat, _TEST_RELEASE | _TEST_SINGLE);
+___REGIST_TEST(TestFermionUpdatorL, WDUpdator, TestFermionUpdatorLargeScale, LargeScale, _TEST_RELEASE);
+___REGIST_TEST(TestFermionUpdatorL, WDUpdator, TestFermionUpdatorLargeScaleFloat, LargeScaleFloat, _TEST_RELEASE | _TEST_SINGLE);
+
+static UINT CheckStaggeredMesonMeasureShape(const CMeasureMesonCorrelatorStaggered* pMeasure)
+{
+    UINT uiError = 0;
+    const INT nt = _HC_Lti;
+    const INT typeCount = CMeasureMesonCorrelatorStaggered::_kMesonCorrelatorType;
+    const INT nConf = pMeasure->m_lstW2WCombinedCorrelator.Num();
+
+    if (NULL == pMeasure->m_pW2WPArray || NULL == pMeasure->m_pP2PPArray)
+    {
+        appGeneral(_T("CMeasureMesonCorrelatorStaggered p arrays are not allocated.\n"));
+        ++uiError;
+    }
+
+    if (nConf <= 0)
+    {
+        appGeneral(_T("CMeasureMesonCorrelatorStaggered has no measured configurations.\n"));
+        return uiError + 1;
+    }
+
+    if (pMeasure->m_lstP2PCombinedCorrelator.Num() != nConf
+     || pMeasure->m_lstW2WCorrelator.Num() != nConf
+     || pMeasure->m_lstP2PCorrelator.Num() != nConf)
+    {
+        appGeneral(_T("CMeasureMesonCorrelatorStaggered configuration count mismatch.\n"));
+        return uiError + 1;
+    }
+
+    if (pMeasure->m_lstAverageResults.Num() != typeCount)
+    {
+        appGeneral(_T("CMeasureMesonCorrelatorStaggered average result type count mismatch.\n"));
+        ++uiError;
+    }
+
+    for (INT conf = 0; conf < nConf; ++conf)
+    {
+        if (pMeasure->m_lstW2WCombinedCorrelator[conf].Num() != typeCount
+         || pMeasure->m_lstP2PCombinedCorrelator[conf].Num() != typeCount
+         || pMeasure->m_lstW2WCorrelator[conf].Num() != typeCount
+         || pMeasure->m_lstP2PCorrelator[conf].Num() != typeCount)
+        {
+            appGeneral(_T("CMeasureMesonCorrelatorStaggered type count mismatch at conf %d.\n"), conf);
+            ++uiError;
+            continue;
+        }
+
+        for (INT ty = 0; ty < typeCount; ++ty)
+        {
+            if (pMeasure->m_lstW2WCombinedCorrelator[conf][ty].Num() != nt
+             || pMeasure->m_lstP2PCombinedCorrelator[conf][ty].Num() != nt)
+            {
+                appGeneral(_T("CMeasureMesonCorrelatorStaggered combined Nt mismatch at conf %d type %d.\n"), conf, ty);
+                ++uiError;
+            }
+
+            const INT subCount = pMeasure->m_nSubChannels[ty];
+            if (pMeasure->m_lstW2WCorrelator[conf][ty].Num() != subCount
+             || pMeasure->m_lstP2PCorrelator[conf][ty].Num() != subCount)
+            {
+                appGeneral(_T("CMeasureMesonCorrelatorStaggered sub-channel count mismatch at conf %d type %d.\n"), conf, ty);
+                ++uiError;
+                continue;
+            }
+
+            for (INT sub = 0; sub < subCount; ++sub)
+            {
+                if (pMeasure->m_lstW2WCorrelator[conf][ty][sub].Num() != nt
+                 || pMeasure->m_lstP2PCorrelator[conf][ty][sub].Num() != nt)
+                {
+                    appGeneral(_T("CMeasureMesonCorrelatorStaggered sub-channel Nt mismatch at conf %d type %d sub %d.\n"), conf, ty, sub);
+                    ++uiError;
+                }
+            }
+        }
+    }
+
+    for (INT ty = 0; ty < pMeasure->m_lstAverageResults.Num(); ++ty)
+    {
+        if (pMeasure->m_lstAverageResults[ty].Num() != nt)
+        {
+            appGeneral(_T("CMeasureMesonCorrelatorStaggered average Nt mismatch at type %d.\n"), ty);
+            ++uiError;
+        }
+    }
+
+    return uiError;
+}
 
 UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
 {
     CMeasureMesonCorrelatorStaggered* pMeasure = dynamic_cast<CMeasureMesonCorrelatorStaggered*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
-    CMeasureMesonCorrelatorStaggeredSimple* pMeasuresimple = dynamic_cast<CMeasureMesonCorrelatorStaggeredSimple*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
+
+    //TODO, the CMeasureMesonCorrelatorStaggeredSimple is removed
+    CMeasureMesonCorrelatorStaggeredSimple2* pMeasuresimple = dynamic_cast<CMeasureMesonCorrelatorStaggeredSimple2*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     if (NULL == pMeasure)
     {
         return 1;
@@ -270,9 +374,15 @@ UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
     //}
     //appGeneral(_T("\n"));
 
+    uiError += CheckStaggeredMesonMeasureShape(pMeasure);
+    if (uiError > 0)
+    {
+        return uiError;
+    }
+
     appGeneral(_T("check1 pMeasure m_lstAverageResults[0][0] = %f, expected: %f\n"), pMeasure->m_lstAverageResults[0][0], fExpected1);
     appGeneral(_T("check2 pMeasure m_lstAverageResults[1][1] = %f, expected: %f\n"), pMeasure->m_lstAverageResults[1][1], fExpected2);
-    appGeneral(_T("check2 pMeasuresimple m_lstAverageResults[1][1] = %f, expected: %f\n"), pMeasuresimple->m_lstAverageResults[1][1], fExpected3);
+    appGeneral(_T("check1 pMeasuresimple m_lstAverageResults[0][0] = %f, expected: %f\n"), pMeasuresimple->m_lstAverageResults[0][0], fExpected3);
     appGeneral(_T("check2 pMeasuresimple m_lstAverageResults[1][1] = %f, expected: %f\n"), pMeasuresimple->m_lstAverageResults[1][1], fExpected4);
 
     if (appAbs(pMeasure->m_lstAverageResults[0][0] - fExpected1) > F(2.0))
@@ -309,16 +419,30 @@ UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
     appGetLattice()->m_pUpdator->Update(100, TRUE);
     //appGeneral(_T("res1=%f\n"), pMeasure->m_lstAverageResults[0][0]);
     //appGeneral(_T("res2=%f\n"), pMeasure->m_lstAverageResults[1][1]);
+    uiError += CheckStaggeredMesonMeasureShape(pMeasure);
+    if (uiError > 0)
+    {
+        return uiError;
+    }
+
     appGeneral(_T("check1 pMeasure m_lstAverageResults[0][0] = %f, expected: %f\n"), pMeasure->m_lstAverageResults[0][0], fExpected1);
     appGeneral(_T("check2 pMeasure m_lstAverageResults[1][1] = %f, expected: %f\n"), pMeasure->m_lstAverageResults[1][1], fExpected2);
-    appGeneral(_T("check2 pMeasuresimple m_lstAverageResults[1][1] = %f, expected: %f\n"), pMeasuresimple->m_lstAverageResults[1][1], fExpected3);
+    appGeneral(_T("check1 pMeasuresimple m_lstAverageResults[0][0] = %f, expected: %f\n"), pMeasuresimple->m_lstAverageResults[0][0], fExpected3);
     appGeneral(_T("check2 pMeasuresimple m_lstAverageResults[1][1] = %f, expected: %f\n"), pMeasuresimple->m_lstAverageResults[1][1], fExpected4);
 
-    if (appAbs(pMeasure->m_lstAverageResults[0][0] - fExpected1) > F(0.3))
+    if (appAbs(pMeasure->m_lstAverageResults[0][0] - fExpected1) > F(0.1))
     {
         ++uiError;
     }
-    if (appAbs(pMeasure->m_lstAverageResults[1][1] - fExpected2) > F(0.3))
+    if (appAbs(pMeasure->m_lstAverageResults[1][1] - fExpected2) > F(0.1))
+    {
+        ++uiError;
+    }
+    if (appAbs(pMeasuresimple->m_lstAverageResults[0][0] - fExpected3) > F(0.1))
+    {
+        ++uiError;
+    }
+    if (appAbs(pMeasuresimple->m_lstAverageResults[1][1] - fExpected4) > F(0.1))
     {
         ++uiError;
     }
@@ -352,9 +476,9 @@ UINT TestBerryPhase(CParameters& sParam)
     //gauge.AddItem(appGetLattice()->m_pGaugeField);
 
 #if _CLG_DEBUG
-    appGetLattice()->m_pUpdator->Update(10, FALSE);
+    appGetLattice()->m_pUpdator->Update(5, FALSE);
 #else
-    appGetLattice()->m_pUpdator->Update(20, FALSE);
+    appGetLattice()->m_pUpdator->Update(5, FALSE);
 #endif
     appGetLattice()->m_pUpdator->SetAutoCorrection(TRUE);
     //Measure
@@ -363,9 +487,9 @@ UINT TestBerryPhase(CParameters& sParam)
     appGetLattice()->m_pUpdator->SetConfigurationCount(0);
     INT iAccepted = appGetLattice()->m_pUpdator->GetConfigurationCount();
 #if _CLG_DEBUG
-    while (iAccepted < 20)
+    while (iAccepted < 5)
 #else
-    while (iAccepted < 50)
+    while (iAccepted < 10)
 #endif
     {
         const INT newCount = appGetLattice()->m_pUpdator->Update(1, FALSE);

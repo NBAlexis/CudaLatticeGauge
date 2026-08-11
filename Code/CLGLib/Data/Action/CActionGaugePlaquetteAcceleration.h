@@ -14,8 +14,10 @@
 //
 // f01^2 + f02^2 + f03^2 + f12^2 + f13^2 + f23^2 + g^2t^2(f13^2 + f23^2) - 2gt(f01f13 + f02f23)
 // REVISION:
+//  [mm/dd/yy]
 //  [07/27/2020 nbale]
 //=============================================================================
+#pragma once
 
 #ifndef _CACTIONGAUGEPLAQUETTE_ACCELERATION_H_
 #define _CACTIONGAUGEPLAQUETTE_ACCELERATION_H_
@@ -42,7 +44,7 @@ public:
 
 protected:
 
-    DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;
+    DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStaple = NULL) override;
     UBOOL CalculateForceOnGaugeSingleField(const class CFieldGauge* pGauge, class CFieldGauge* pForce, class CFieldGauge* pStaple, ESolverPhase ePhase) const override;
     void PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
 
@@ -59,7 +61,7 @@ protected:
 /*
 static __device__ __inline__ Real _deviceGnAcc(const SSmallInt4& sSite, Real fGsq)
 {
-    if (sSite.w == static_cast<SBYTE>(_DC_Lt) - 1)
+    if (sSite.w == static_cast<SCHAR>(_DC_Lt) - 1)
     {
         return F(0.5) * sSite.w * sSite.w  * fGsq;
     }
@@ -170,8 +172,16 @@ static __device__ __inline__ Real _deviceHi_Acc(
     SSmallInt4 site,
     const SIndex& uiSiteBI)
 {
-    site = __deviceSiteIndexToInt4(uiSiteBI.m_uiSiteIndex);
-    return -F(2.0) * static_cast<Real>(site.w);
+    //Multi-GPU: the g*t coefficient needs the GLOBAL t, and the SIndex may be
+    //halo-redirected (P4-1.4); identity on single-GPU.
+    //The energy (CActionGaugePlaquetteAcceleration.cu energy kernel) uses the
+    //plain global t coefficient -2*t_global (no rotation centre), so the force
+    //coefficient must match exactly or the MD trajectory diverges. The SIndex
+    //may be a halo slot (P4-1.4): resolve it to the GLOBAL t first.
+    //Improve-1 (3.7): 32-bit global coordinate; `site` stays the local storage
+    //coordinate and is not used by the physics formula.
+    const SInt4 siteG = _deviceSIndexToGlobalInt4(uiSiteBI);
+    return -F(2.0) * static_cast<Real>(siteG.w);
 }
 
 #pragma endregion

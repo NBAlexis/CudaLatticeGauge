@@ -5,6 +5,7 @@
 // This is the Omelyan integrator for HMC
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/12/2018 nbale]
 //=============================================================================
 
@@ -34,6 +35,12 @@ public:
     void ChangeStepCount(UBOOL bGrow) override
     {
         CNestedIntegrator::ChangeStepCount(bGrow);
+        m_fNestedStepLength = F(0.5) * m_fNestedStepLength;
+    }
+
+    void ChangeStepCountTo(UINT uiStep) override
+    {
+        CNestedIntegrator::ChangeStepCountTo(uiStep);
         m_fNestedStepLength = F(0.5) * m_fNestedStepLength;
     }
 

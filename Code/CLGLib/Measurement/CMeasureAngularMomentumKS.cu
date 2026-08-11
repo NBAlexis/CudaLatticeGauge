@@ -10,7 +10,7 @@
 
 #include "CLGLib_Private.h"
 #include "Data/Field/Gauge/CFieldGaugeU1Real.h"
-#include "Data/Field/Staggered/CFieldFermionKSSU3.h"
+#include "Data/Field/Staggered/CFieldFermionKST.h"
 #include "CMeasureChiralCondensateKS.h"
 #include "CMeasureAngularMomentumKS.h"
 
@@ -72,7 +72,7 @@ _kernelDFermionKS_PR_XYTermCopy(
             this_eta_tau = this_eta_tau + 1;
         }
 
-        deviceSU3Vector right = _deviceVXXTauOptimized(pGauge, sSite4, byGaugeFieldId, bXorY, bPlusMu, bPlusTau).MulVector(
+        deviceSU3Vector right = _deviceVXXTauOptimizedT(pGauge, sSite4, byGaugeFieldId, bXorY, bPlusMu, bPlusTau).MulVector(
             pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
 
         //when bXorY = 1, it is y partial _x, so is [1]
@@ -125,13 +125,13 @@ _kernelDFermionKS_PR_XYTau_TermCopy(
         //We have anti-periodic boundary, so we need to use index out of lattice to get the correct sign
         const SIndex& sTargetBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sOffset)];
 
-        const deviceSU3Vector right = _deviceVXYTOptimized(pGauge, sSite4, byGaugeFieldId, bPlusX, bPlusY, bPlusT)
+        const deviceSU3Vector right = _deviceVXYTOptimizedT(pGauge, sSite4, byGaugeFieldId, bPlusX, bPlusY, bPlusT)
         .MulVector(pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
         const SSmallInt4 site_target = __deviceSiteIndexToInt4(sTargetBigIndex.m_uiSiteIndex);
 
         //eta124 of site is almost always -target, so use left or right is same
         //The only exception is on the boundary
-        INT eta124 = bPlusT ? (sSite4.y + sSite4.z) : (site_target.y + site_target.z + 1);
+        INT eta124 = bPlusT ? _deviceEta3(sSite4, 2) : (_deviceEta3(site_target, 2) + 1);
 
         if (sTargetBigIndex.NeedToOpposite())
         {
@@ -206,12 +206,18 @@ _kernelKSApplyGammaEtaCopy(
     //pMe[uiSiteIndex].MulReal(F(0.5));
 
     //Here it is gamma _4 psi, we still need r x Aphys times it
-    const Real fY = static_cast<Real>(sSite4.y - _DC_Centery + F(0.5));
-    const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx + F(0.5));
+    //Multi-GPU (P4-1.6): the angular-momentum lever arms x, y must be GLOBAL;
+    //identity on single-GPU (offsets 0). The site stays local for the
+    //index-table lookups below.
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
+    const INT iXg = sSite4G.x;
+    const INT iYg = sSite4G.y;
+    const Real fY = static_cast<Real>(iYg - _DC_Centery + F(0.5));
+    const Real fX = static_cast<Real>(iXg - _DC_Centerx + F(0.5));
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //x ay - y ax
-    deviceSU3 midY = _deviceGetGaugeBCSU3DirZero(byGaugeFieldId, pAphys, uiBigIdx, 1);
-    deviceSU3 midX = _deviceGetGaugeBCSU3DirZero(byGaugeFieldId, pAphys, uiBigIdx, 0);
+    deviceSU3 midY = _deviceGetGaugeBCDirZeroT(byGaugeFieldId, pAphys, uiBigIdx, 1);
+    deviceSU3 midX = _deviceGetGaugeBCDirZeroT(byGaugeFieldId, pAphys, uiBigIdx, 0);
     midY.MulReal(fX);
     midX.MulReal(fY);
     midY.Sub(midX);
@@ -236,6 +242,7 @@ _kernelMeasureDotAndDist(
 )
 {
     intokernalInt4;
+    const UINT _ixy = uiSiteIndex / _DC_GridDimZT;
     
 #if !_CLG_DOUBLEFLOAT
     result[uiSiteIndex] = _cToDouble(pZ4[uiSiteIndex].ConjugateDotC(pApplied[uiSiteIndex]));
@@ -274,7 +281,7 @@ CMeasureAngularMomentumKS::~CMeasureAngularMomentumKS()
     {
         for (UINT i = 0; i < EAngularMeasureMax; ++i)
         {
-            checkCudaErrors(cudaFree(m_pDeviceXYBuffer[i]));
+            checkCudaErrors(__cudaFree(m_pDeviceXYBuffer[i]));
         }
     }
 
@@ -282,7 +289,7 @@ CMeasureAngularMomentumKS::~CMeasureAngularMomentumKS()
     {
         for (UINT i = 0; i < ChiralKSMax; ++i)
         {
-            checkCudaErrors(cudaFree(m_pDeviceZBuffer[i]));
+            checkCudaErrors(__cudaFree(m_pDeviceZBuffer[i]));
         }
     }
 
@@ -298,12 +305,12 @@ CMeasureAngularMomentumKS::~CMeasureAngularMomentumKS()
 
     if (NULL != m_pDistributionR)
     {
-        checkCudaErrors(cudaFree(m_pDistributionR));
+        checkCudaErrors(__cudaFree(m_pDistributionR));
     }
 
     if (NULL != m_pDistribution)
     {
-        checkCudaErrors(cudaFree(m_pDistribution));
+        checkCudaErrors(__cudaFree(m_pDistribution));
     }
 
     if (NULL != m_pHostDistributionR)
@@ -323,7 +330,7 @@ void CMeasureAngularMomentumKS::Initial(CMeasurementManager* pOwner, CLatticeDat
 
     for (UINT i = 0; i < EAngularMeasureMax; ++i)
     {
-        checkCudaErrors(cudaMalloc((void**)&m_pDeviceXYBuffer[i], sizeof(CLGComplex) * _HC_Lx * _HC_Ly));
+        checkCudaErrors(__cudaMalloc((void**)&m_pDeviceXYBuffer[i], sizeof(CLGComplex) * _HC_Lx * _HC_Ly));
     }    
     m_pHostXYBuffer = (CLGComplex*)malloc(sizeof(CLGComplex) * _HC_Lx * _HC_Ly);
 
@@ -340,7 +347,7 @@ void CMeasureAngularMomentumKS::Initial(CMeasurementManager* pOwner, CLatticeDat
     {
         for (UINT i = 0; i < EAngularMeasureMax; ++i)
         {
-            checkCudaErrors(cudaMalloc((void**)&m_pDeviceZBuffer[i], sizeof(CLGComplex) * _HC_Lz));
+            checkCudaErrors(__cudaMalloc((void**)&m_pDeviceZBuffer[i], sizeof(CLGComplex) * _HC_Lz));
         }
         m_pHostZBuffer = (CLGComplex*)malloc(sizeof(CLGComplex) * _HC_Lz);
     }
@@ -353,8 +360,8 @@ void CMeasureAngularMomentumKS::Initial(CMeasurementManager* pOwner, CLatticeDat
     }
 
     SetMaxAndEdge(&m_uiMaxR, &m_uiEdge, m_bShiftCenter);
-    checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
-    checkCudaErrors(cudaMalloc((void**)&m_pDistribution, sizeof(CLGComplex) * (m_uiMaxR + 1)));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDistribution, sizeof(CLGComplex) * (m_uiMaxR + 1)));
 
     m_pHostDistributionR = (UINT*)malloc(sizeof(UINT) * (m_uiMaxR + 1));
     m_pHostDistribution = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMaxR + 1));
@@ -367,7 +374,7 @@ void CMeasureAngularMomentumKS::ApplyOrbitalMatrix(
     BYTE byGaugeFieldId) const
 {
     preparethread;
-    _kernelDFermionKS_PR_XYTermCopy << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDFermionKS_PR_XYTermCopy, block, threads, 
         pInverseZ4,
         pGauge,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
@@ -383,7 +390,7 @@ void CMeasureAngularMomentumKS::ApplyOrbitalMatrix(
     const deviceSU3* pGauge, BYTE byFieldId, BYTE byGaugeFieldId)
 {
     preparethread;
-    _kernelDFermionKS_PR_XYTermCopy << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDFermionKS_PR_XYTermCopy, block, threads, 
         pInverseZ4,
         pGauge,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
@@ -400,7 +407,7 @@ void CMeasureAngularMomentumKS::ApplySpinMatrix(
     BYTE byGaugeFieldId) const
 {
     preparethread;
-    _kernelDFermionKS_PR_XYTau_TermCopy << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDFermionKS_PR_XYTau_TermCopy, block, threads, 
         pInverseZ4,
         pGauge,
         pAppliedBuffer,
@@ -411,7 +418,7 @@ void CMeasureAngularMomentumKS::ApplySpinMatrix(
 void CMeasureAngularMomentumKS::ApplySpinMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge, BYTE fieldId, BYTE byGaugeFieldId)
 {
     preparethread;
-    _kernelDFermionKS_PR_XYTau_TermCopy << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDFermionKS_PR_XYTau_TermCopy, block, threads, 
         pInverseZ4,
         pGauge,
         pAppliedBuffer,
@@ -431,7 +438,7 @@ void CMeasureAngularMomentumKS::ApplyPotentialMatrix(
         appCrucial(_T("CMeasureAMomentumStochastic: A phys undefined.\n"));
     }
     preparethread;
-    _kernelKSApplyGammaEtaCopy << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelKSApplyGammaEtaCopy, block, threads, 
         byGaugeFieldId,
         pAppliedBuffer,
         pInverseZ4,
@@ -457,12 +464,12 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4SingleField(
         dim3 threadz(_HC_DecompLy, 1, 1);
         for (UINT i = 0; i < EAngularMeasureMax; ++i)
         {
-            _ZeroXYPlaneC(m_pDeviceXYBuffer[i]);
+            _ZeroXYPlane(m_pDeviceXYBuffer[i]);
             //m_cTmpSum[i] = _zeroc;
 
             if (m_bMeasureZSlice)
             {
-                _kernelInitialZSliceAMomentumKS << <blockz, threadz >> > (m_pDeviceZBuffer[i]);
+                _LAUNCH_KERNEL(_kernelInitialZSliceAMomentumKS, blockz, threadz, m_pDeviceZBuffer[i]);
             }
         }
     }
@@ -471,7 +478,7 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4SingleField(
     //const Real oneOuiVolume = F(-1.0) / appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
     const CFieldFermionKSSU3 * pF1W = dynamic_cast<const CFieldFermionKSSU3*>(pZ4);
     const CFieldFermionKSSU3* pF2W = dynamic_cast<const CFieldFermionKSSU3*>(pInverseZ4);
-    CFieldFermionKSSU3* pAfterApplied = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
+    CFieldFermionKSSU3* pAfterApplied = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId(), _T(__FILE__), __LINE__));
     const CFieldGaugeSU3* pAcceptGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pAcceptGauge);
 
 #pragma region Dot
@@ -496,12 +503,15 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4SingleField(
                 ApplyPotentialMatrix(pAfterApplied->m_pDeviceData, pF2W->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData, pAcceptGaugeSU3->m_byFieldId);
             }
             break;
+        default:
+            appCrucial(_T("This is impossible!\n"));
+            break;
         }
 
 
         //Dot and to XY distribution
         preparethread;
-        _kernelMeasureDotAndDist << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelMeasureDotAndDist, block, threads, 
             pF1W->m_pDeviceData,
             pAfterApplied->m_pDeviceData,
             m_pDeviceXYBuffer[i],
@@ -523,7 +533,7 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4SingleField(
 
     if (bEnd)
     {
-        TransformFromXYDataToRData_C(
+        TransformFromXYDataToRData(
             TRUE,
             m_bShiftCenter,
             m_uiMaxR,
@@ -557,6 +567,58 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4SingleField(
             }
         }
 
+        if (NULL != m_pOwner)
+        {
+            for (INT i = 0; i < static_cast<INT>(EAngularMeasureMax); ++i)
+            {
+                const TCHAR* sTypeName = NULL;
+                switch ((EAngularMeasureTypeKS)i)
+                {
+                case OrbitalKS:
+                    sTypeName = _T("Orbital");
+                    break;
+                case SpinKS:
+                    sTypeName = _T("Spin");
+                    break;
+                case PotentialKS:
+                    sTypeName = _T("Potential");
+                    break;
+                default:
+                    sTypeName = _T("Unknown");
+                    break;
+                }
+
+                m_pOwner->AddOneConfigurationResult(this, CCString(sTypeName) + _T("Total"), m_lstCondAll[i][m_uiConfigurationCount]);
+
+                if (m_lstCondIn[i].Num() > static_cast<INT>(m_uiConfigurationCount))
+                {
+                    m_pOwner->AddOneConfigurationResult(this, CCString(sTypeName) + _T("Inner"), m_lstCondIn[i][m_uiConfigurationCount]);
+                }
+
+                if (m_lstR.Num() > 0 && m_lstCond[i].Num() >= static_cast<INT>(m_lstR.Num()))
+                {
+                    TArray<CLGComplex> radial;
+                    const UINT uiStart = m_lstCond[i].Num() - m_lstR.Num();
+                    for (INT r = 0; r < m_lstR.Num(); ++r)
+                    {
+                        radial.AddItem(m_lstCond[i][uiStart + r]);
+                    }
+                    m_pOwner->AddOneConfigurationResult(this, CCString(sTypeName) + _T("Radial"), radial);
+                }
+
+                if (m_bMeasureZSlice && m_lstCondZSlice[i].Num() >= static_cast<INT>(_HC_Lz))
+                {
+                    TArray<CLGComplex> zslice;
+                    const UINT uiStartZ = m_lstCondZSlice[i].Num() - _HC_Lz;
+                    for (UINT z = 0; z < _HC_Lz; ++z)
+                    {
+                        zslice.AddItem(m_lstCondZSlice[i][uiStartZ + z]);
+                    }
+                    m_pOwner->AddOneConfigurationResult(this, CCString(sTypeName) + _T("ZSlice"), zslice);
+                }
+            }
+        }
+
         ++m_uiConfigurationCount;
     }
 }
@@ -566,7 +628,7 @@ void CMeasureAngularMomentumKS::Report()
     appPushLogDate(FALSE);
     for (UINT i = 0; i < EAngularMeasureMax; ++i)
     {
-        assert(m_uiConfigurationCount == static_cast<UINT>(m_lstCondAll[i].Num()));
+        appAssert(m_uiConfigurationCount == static_cast<UINT>(m_lstCondAll[i].Num()));
 
         appGeneral(_T("\n==========================================================================\n"));
         appGeneral(_T("==================== Fermion Angular Momentum No %d (%d con)============================\n"), i, m_uiConfigurationCount);
@@ -619,7 +681,7 @@ void CMeasureAngularMomentumKS::Reset()
     m_lstR.RemoveAll();
 }
 
-TArray<TArray<CLGComplex>> CMeasureAngularMomentumKS::ExportDiagnal(INT gn, INT bn, const CFieldGauge* const* gs, const CFieldBoson* const* bs, class CFieldFermion* pooled1, class CFieldFermion* pooled2)
+TArray<TArray<CLGComplex>> CMeasureAngularMomentumKS::ExportDiagnal(INT gn, INT bn, INT tensor2Num, const CFieldGauge* const* gs, const CFieldBoson* const* bs, const CFieldTensor2* const* tensor2Fields, class CFieldFermion* pooled1, class CFieldFermion* pooled2)
 {
     TArray<TArray<CLGComplex>> ret;
     CFieldFermionKSSU3* pF1 = dynamic_cast<CFieldFermionKSSU3*>(pooled1);
@@ -644,7 +706,7 @@ TArray<TArray<CLGComplex>> CMeasureAngularMomentumKS::ExportDiagnal(INT gn, INT 
             source.m_byColorIndex = c;
             source.m_sSourcePoint = __hostSiteIndexToInt4(x);
             pF1->InitialAsSource(source);
-            pF1->InverseD(gn, bn, gs, bs);
+            pF1->InverseD(gn, bn, tensor2Num, gs, bs, tensor2Fields);
             
             for (BYTE i = 0; i < EAngularMeasureMax; ++i)
             {
@@ -666,6 +728,9 @@ TArray<TArray<CLGComplex>> CMeasureAngularMomentumKS::ExportDiagnal(INT gn, INT 
                     ApplyPotentialMatrix(pF2->m_pDeviceData, pF1->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData, pAcceptGaugeSU3->m_byFieldId);
                 }
                 break;
+                default:
+                    appWarning(_T("not handled EAngularMeasureTypeKS (which is impossible!\n"));
+                    break;
                 }
 
                 checkCudaErrors(cudaMemcpy(hostv, pF2->m_pDeviceData + x, sizeof(deviceSU3Vector), cudaMemcpyDeviceToHost));

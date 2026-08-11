@@ -11,6 +11,31 @@
 
 __BEGIN_NAMESPACE
 
+#undef preparethread
+#undef intokernal
+#undef intokernaldir
+#undef intokernalInt4
+
+#define preparethreadIndex \
+const dim3 block(_HC_DecompX, _HC_DecompY, _HC_DecompZ); \
+const dim3 threads(_HC_DecompLx, _HC_DecompLy, _HC_DecompLz);
+
+#define intokernalOnlyInt4Index \
+SSmallInt4 sSite4; \
+const UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x); \
+sSite4.x = static_cast<SCHAR> (_ixy / _DC_Ly); \
+sSite4.y = static_cast<SCHAR> (_ixy % _DC_Ly); \
+sSite4.z = static_cast<SCHAR>(threadIdx.y + blockIdx.y * blockDim.y); \
+sSite4.w = static_cast<SCHAR>(threadIdx.z + blockIdx.z * blockDim.z); 
+
+#define intokernalInt4Index \
+SSmallInt4 sSite4; \
+const UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x); \
+sSite4.x = static_cast<SCHAR> (_ixy / _DC_Ly); \
+sSite4.y = static_cast<SCHAR> (_ixy % _DC_Ly); \
+sSite4.z = static_cast<SCHAR>(threadIdx.y + blockIdx.y * blockDim.y); \
+sSite4.w = static_cast<SCHAR>(threadIdx.z + blockIdx.z * blockDim.z); \
+const UINT uiSiteIndex = _ixy * _DC_GridDimZT + sSite4.z * _DC_Lt + sSite4.w; 
 
 #pragma region kernels
 
@@ -22,7 +47,7 @@ _kernelCalculateLinkCount(
     const UINT* __restrict__ pSmallData
 )
 {
-    intokernalOnlyInt4;
+    intokernalOnlyInt4Index;
     const UINT uiBigIdx = _deviceGetBigIndex(sSite4, pSmallData);
 
     INT uiCount = 0;
@@ -44,7 +69,7 @@ _kernelCalculateSiteCount(
     const UINT* __restrict__ pSmallData
 )
 {
-    intokernalOnlyInt4;
+    intokernalOnlyInt4Index;
     const UINT uiBigIdx = _deviceGetBigIndex(sSite4, pSmallData);
 
     if (!pMappingTable[uiBigIdx].IsDirichlet())
@@ -153,6 +178,9 @@ void CIndexData::DebugPlaqutteTable(BYTE byFieldId)
     appPopLogDate();
 }
 
+/**
+* not verified, not use
+*/
 void CIndexData::DebugPlaqutteTable(const SSmallInt4& sSite, BYTE byFieldId)
 {
     const UINT uiPlaqLength = 4;
@@ -160,7 +188,7 @@ void CIndexData::DebugPlaqutteTable(const SSmallInt4& sSite, BYTE byFieldId)
     const UINT uiSiteCount = _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt;
 
     SIndex* cache = (SIndex*)malloc(sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite);
-    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pStappleCache[byFieldId], sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pPlaqutteCache[byFieldId], sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite, cudaMemcpyDeviceToHost));
     UINT uiSite = _hostGetSiteIndex(sSite);
     appGeneral(_T("me = %d, %d, %d, %d\n"), sSite.x, sSite.y, sSite.z, sSite.w);
 
@@ -191,16 +219,60 @@ void CIndexData::DebugStapleTable(BYTE byFieldId)
     const UINT uiPlaqLength = 4;
     const UINT uiPlaqPerLink = 2 * (_HC_Dim - 1);
     const UINT uiSiteCount = _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt;
-    SIndex* cache = (SIndex*)malloc(sizeof(SIndex) * uiSiteCount * (uiPlaqLength - 1) * uiPlaqPerLink);
+    SIndex* cache = (SIndex*)malloc(sizeof(SIndex) * uiSiteCount * _HC_Dir * (uiPlaqLength - 1) * uiPlaqPerLink);
     checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pStappleCache[byFieldId],
-        sizeof(SIndex) * uiSiteCount * (uiPlaqLength - 1) * uiPlaqPerLink, cudaMemcpyDeviceToHost));
+        sizeof(SIndex) * uiSiteCount * _HC_Dim * (uiPlaqLength - 1) * uiPlaqPerLink, cudaMemcpyDeviceToHost));
 
     for (UINT uiSite = 0; uiSite < uiSiteCount; ++uiSite)
     {
         const SSmallInt4 myself = __hostSiteIndexToInt4(uiSite);
-        appGeneral(_T("me = %d, %d, %d, %d\n"), myself.x, myself.y, myself.z, myself.w);
+        for (UINT uiDir = 0; uiDir < _HC_Dim; ++uiDir)
+        {
+            UINT uiLinkIdx = uiSite * _HC_Dir + uiDir;
+            appGeneral(_T("me = %d(%d,%d,%d,%d)_(%d)\n"), uiLinkIdx, myself.x, myself.y, myself.z, myself.w, uiDir);
 
-        const UINT uiListIdx = uiSite * (uiPlaqLength - 1) * uiPlaqPerLink;
+            const UINT uiListIdx = uiLinkIdx * (uiPlaqLength - 1) * uiPlaqPerLink;
+
+            for (UINT i = 0; i < uiPlaqPerLink; ++i)
+            {
+                for (UINT j = 0; j < uiPlaqLength - 1; ++j)
+                {
+                    const UINT uiIdx = i * (uiPlaqLength - 1) + j;
+                    const SIndex& idx = cache[uiListIdx + uiIdx];
+                    const SSmallInt4 coord = __hostSiteIndexToInt4(idx.m_uiSiteIndex);
+
+                    appGeneral(_T("%s%s(%d,%d,%d,%d)_(%d)  "),
+                        (idx.m_byTag & _kDaggerOrOpposite ? "-" : "+"),
+                        (idx.m_byTag & _kDirichlet ? "D" : ""),
+                        coord.x, coord.y, coord.z, coord.w,
+                        idx.m_byDir);
+                }
+                appGeneral(_T("\n"));
+            }
+        }
+    }
+    appSafeFree(cache);
+    appPopLogDate();
+}
+
+void CIndexData::DebugStapleTable(BYTE byFieldId, const SSmallInt4& xyzt)
+{
+    appPushLogDate(FALSE);
+    const UINT uiPlaqLength = 4;
+    const UINT uiPlaqPerLink = 2 * (_HC_Dim - 1);
+    const UINT uiSiteCount = _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt;
+    SIndex* cache = (SIndex*)malloc(sizeof(SIndex) * uiSiteCount * _HC_Dir * (uiPlaqLength - 1) * uiPlaqPerLink);
+    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pStappleCache[byFieldId],
+        sizeof(SIndex) * uiSiteCount * _HC_Dim * (uiPlaqLength - 1) * uiPlaqPerLink, cudaMemcpyDeviceToHost));
+
+    UINT uiSite = _hostGetSiteIndex(xyzt);
+    for (UINT uiDir = 0; uiDir < _HC_Dim; ++uiDir)
+    {
+
+        UINT uiLinkIdx = uiSite * _HC_Dir + uiDir;
+        appGeneral(_T("me = %d(%d,%d,%d,%d)_(%d)\n"), uiLinkIdx, xyzt.x, xyzt.y, xyzt.z, xyzt.w, uiDir);
+
+        const UINT uiListIdx = uiLinkIdx * (uiPlaqLength - 1) * uiPlaqPerLink;
 
         for (UINT i = 0; i < uiPlaqPerLink; ++i)
         {
@@ -219,6 +291,66 @@ void CIndexData::DebugStapleTable(BYTE byFieldId)
             appGeneral(_T("\n"));
         }
     }
+
+    appSafeFree(cache);
+    appPopLogDate();
+}
+
+void CIndexData::DebugStapleTable(BYTE byFieldId, const SSmallInt4& xyzt, UINT uiDir)
+{
+    appPushLogDate(FALSE);
+    const UINT uiPlaqLength = 4;
+    const UINT uiPlaqPerLink = 2 * (_HC_Dim - 1);
+    const UINT uiSiteCount = _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt;
+    SIndex* cache = (SIndex*)malloc(sizeof(SIndex) * uiSiteCount * _HC_Dir * (uiPlaqLength - 1) * uiPlaqPerLink);
+    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pStappleCache[byFieldId],
+        sizeof(SIndex) * uiSiteCount * _HC_Dim * (uiPlaqLength - 1) * uiPlaqPerLink, cudaMemcpyDeviceToHost));
+
+    UINT uiSite = _hostGetSiteIndex(xyzt);
+    UINT uiLinkIdx = uiSite * _HC_Dir + uiDir;
+    appGeneral(_T("me = %d(%d,%d,%d,%d)_(%d)\n"), uiLinkIdx, xyzt.x, xyzt.y, xyzt.z, xyzt.w, uiDir);
+
+    const UINT uiListIdx = uiLinkIdx * (uiPlaqLength - 1) * uiPlaqPerLink;
+
+    for (UINT i = 0; i < uiPlaqPerLink; ++i)
+    {
+        for (UINT j = 0; j < uiPlaqLength - 1; ++j)
+        {
+            const UINT uiIdx = i * (uiPlaqLength - 1) + j;
+            const SIndex& idx = cache[uiListIdx + uiIdx];
+            const SSmallInt4 coord = __hostSiteIndexToInt4(idx.m_uiSiteIndex);
+
+            appGeneral(_T("%s%s(%d,%d,%d,%d)_(%d)  "),
+                (idx.m_byTag & _kDaggerOrOpposite ? "-" : "+"),
+                (idx.m_byTag & _kDirichlet ? "D" : ""),
+                coord.x, coord.y, coord.z, coord.w,
+                idx.m_byDir);
+        }
+        appGeneral(_T("\n"));
+    }
+
+    appSafeFree(cache);
+    appPopLogDate();
+}
+
+void CIndexData::DebugStapleTable(BYTE byFieldId, UINT uiIndex)
+{
+    appPushLogDate(FALSE);
+    const UINT uiPlaqLength = 4;
+    const UINT uiPlaqPerLink = 2 * (_HC_Dim - 1);
+    const UINT uiSiteCount = _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt;
+    SIndex* cache = (SIndex*)malloc(sizeof(SIndex) * uiSiteCount * _HC_Dir * (uiPlaqLength - 1) * uiPlaqPerLink);
+    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pStappleCache[byFieldId],
+        sizeof(SIndex) * uiSiteCount * _HC_Dim * (uiPlaqLength - 1) * uiPlaqPerLink, cudaMemcpyDeviceToHost));
+
+    const SIndex& idx = cache[uiIndex];
+    const SSmallInt4 coord = __hostSiteIndexToInt4(idx.m_uiSiteIndex);
+    appGeneral(_T("%s%s(%d,%d,%d,%d)_(%d)  "),
+        (idx.m_byTag & _kDaggerOrOpposite ? "-" : "+"),
+        (idx.m_byTag & _kDirichlet ? "D" : ""),
+        coord.x, coord.y, coord.z, coord.w,
+        idx.m_byDir);
+
     appSafeFree(cache);
     appPopLogDate();
 }
@@ -365,11 +497,11 @@ void CIndex::CalculateSiteCount(class CIndexData* pData) const
 {
     INT hostres[2] = { 0, 0 };
     INT* deviceRes = NULL;
-    checkCudaErrors(cudaMalloc((void**)&deviceRes, sizeof(INT) * 2));
+    checkCudaErrors(__cudaMalloc((void**)&deviceRes, sizeof(INT) * 2));
 
-    preparethread;
+    preparethreadIndex;
 
-    assert(NULL != pData->m_pSmallData);
+    appAssert(NULL != pData->m_pSmallData);
 
     for (BYTE i = 1; i < kMaxFieldCount; ++i)
     {
@@ -379,7 +511,7 @@ void CIndex::CalculateSiteCount(class CIndexData* pData) const
             hostres[1] = 0;
             checkCudaErrors(cudaMemcpy(deviceRes, hostres, sizeof(INT) * 2, cudaMemcpyHostToDevice));
 
-            _kernelCalculateSiteCount << <block, threads >> > (deviceRes, pData->m_pIndexPositionToSIndex[i], pData->m_pSmallData);
+            _LAUNCH_KERNEL(_kernelCalculateSiteCount, block, threads, deviceRes, pData->m_pIndexPositionToSIndex[i], pData->m_pSmallData);
             checkCudaErrors(cudaMemcpy(hostres, deviceRes, sizeof(INT) * 2, cudaMemcpyDeviceToHost));
             pData->m_uiSiteNumber[i] = static_cast<UINT>(hostres[0]);
 
@@ -398,7 +530,7 @@ void CIndex::CalculateSiteCount(class CIndexData* pData) const
         //    hostres[1] = 0;
 
         //    checkCudaErrors(cudaMemcpy(deviceRes, hostres, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-        //    _kernelCalculateLinkCount << <block, threads >> > (deviceRes, pData->m_pBondInfoTable[i], pData->m_pSmallData);
+        //    _LAUNCH_KERNEL(_kernelCalculateLinkCount, block, threads, deviceRes, pData->m_pBondInfoTable[i], pData->m_pSmallData);
         //    checkCudaErrors(cudaMemcpy(hostres, deviceRes, sizeof(INT) * 2, cudaMemcpyDeviceToHost));
         //    pData->m_uiLinkNumber = static_cast<UINT>(hostres[0]);
         //    
@@ -411,14 +543,14 @@ void CIndex::CalculateSiteCount(class CIndexData* pData) const
             hostres[1] = 0;
 
             checkCudaErrors(cudaMemcpy(deviceRes, hostres, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-            _kernelCalculateLinkCount << <block, threads >> > (deviceRes, pData->m_pIndexLinkToSIndex[i], pData->m_pSmallData);
+            _LAUNCH_KERNEL(_kernelCalculateLinkCount, block, threads, deviceRes, pData->m_pIndexLinkToSIndex[i], pData->m_pSmallData);
             checkCudaErrors(cudaMemcpy(hostres, deviceRes, sizeof(INT) * 2, cudaMemcpyDeviceToHost));
             pData->m_uiLinkNumber = static_cast<UINT>(hostres[0]);
 
             appGeneral(_T("============== Real Link Count = %d ============\n"), pData->m_uiLinkNumber);
         }
     }
-    checkCudaErrors(cudaFree(deviceRes));
+    checkCudaErrors(__cudaFree(deviceRes));
 }
 
 

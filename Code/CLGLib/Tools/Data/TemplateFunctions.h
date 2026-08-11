@@ -4,6 +4,7 @@
 // DESCRIPTION:
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [3/13/2018 nbale]
 //=============================================================================
 #ifndef _TEMPLATEFUNCTION_H_
@@ -67,7 +68,7 @@ template< class T > FORCEINLINE T appLerp( T& A, T& B, Real Alpha )
 template<typename TYPE>
 FORCEINLINE void appCopyElements(TYPE* pDest, const TYPE* pSrc, INT nCount)
 {
-    assert(nCount>=0);
+    appAssert(nCount>=0);
     // default is element-copy using assignment
     while (nCount--)
         *pDest++ = *pSrc++;

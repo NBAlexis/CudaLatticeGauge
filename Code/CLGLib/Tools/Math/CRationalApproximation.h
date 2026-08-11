@@ -6,6 +6,7 @@
 //
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [05/06/2020 nbale]
 //=============================================================================
 
@@ -38,64 +39,17 @@ __BEGIN_NAMESPACE
 class CLGAPI CRatinalApproximation
 {
 public:
-    CRatinalApproximation() : m_uiDegree(0), m_fC(F(0.0))
+    CRatinalApproximation() 
+        : m_uiDegree(0)
+        , m_fC(F(0.0))
+        , m_pDeviceData(NULL)
     {
         
     }
+    CRatinalApproximation(const TArray<Real>& parameters);
+    ~CRatinalApproximation();
 
-    CRatinalApproximation(TArray<Real> parameters)
-    {
-        m_uiDegree = parameters.Num() / 2;
-        assert(static_cast<INT>(m_uiDegree * 2 + 1) == parameters.Num());
-
-        m_fC = parameters[0];
-        for (UINT i = 0; i < m_uiDegree; ++i)
-        {
-            m_lstA.AddItem(parameters[1 + i]);
-            m_lstB.AddItem(parameters[1 + m_uiDegree + i]);
-        }
-    }
-
-    CRatinalApproximation(UINT uiDegree, TArray<Real> parameters)
-        : m_uiDegree(uiDegree)
-        , m_fC(parameters[0])
-    {
-        for (UINT i = 0; i < uiDegree; ++i)
-        {
-            m_lstA.AddItem(parameters[1 + i]);
-            m_lstB.AddItem(parameters[1 + uiDegree + i]);
-        }
-    }
-
-    CRatinalApproximation(const CRatinalApproximation& other)
-        : m_uiDegree(other.m_uiDegree)
-        , m_fC(other.m_fC)
-    {
-        for (UINT i = 0; i < other.m_uiDegree; ++i)
-        {
-            m_lstA.AddItem(other.m_lstA[i]);
-            m_lstB.AddItem(other.m_lstB[i]);
-        }
-    }
-
-    ~CRatinalApproximation()
-    {
-
-    }
-
-    void Initial(TArray<Real> parameters)
-    {
-        m_lstA.RemoveAll();
-        m_lstB.RemoveAll();
-        m_uiDegree = parameters.Num() / 2;
-        assert(static_cast<INT>(m_uiDegree * 2 + 1) == parameters.Num());
-        m_fC = parameters[0];
-        for (UINT i = 0; i < m_uiDegree; ++i)
-        {
-            m_lstA.AddItem(parameters[1 + i]);
-            m_lstB.AddItem(parameters[1 + m_uiDegree + i]);
-        }
-    }
+    void Initial(const TArray<Real>& parameters);
 
     /**
      * Test Function
@@ -110,11 +64,67 @@ public:
         return fRet;
     }
 
+    inline UBOOL operator==(const CRatinalApproximation& Other) const
+    {
+        if (m_uiDegree != Other.m_uiDegree)
+        {
+            return FALSE;
+        }
+        if (appAbs(m_fC - Other.m_fC) > _CLG_FLT_MIN_)
+        {
+            return FALSE;
+        }
+        if (m_lstA.Num() != m_lstB.Num())
+        {
+            return FALSE;
+        }
+        for (INT i = 0; i < m_lstA.Num(); ++i)
+        {
+            if (appAbs(m_lstA[i] - Other.m_lstA[i]) > _CLG_FLT_MIN_)
+            {
+                return FALSE;
+            }
+            if (appAbs(m_lstB[i] - Other.m_lstB[i]) > _CLG_FLT_MIN_)
+            {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    }
+
     UINT m_uiDegree;
     Real m_fC;
     TArray<Real> m_lstA;
     TArray<Real> m_lstB;
+    Real* m_pDeviceData;
 };
+
+/**
+* avoid copy of rational approximation parameters when copy the fields
+*/
+class CRatinalApproximationSet
+{
+public:
+    void Quit()
+    {
+        for (INT i = 0; i < m_pRASet.Num(); ++i)
+        {
+            appSafeDelete(m_pRASet[i]);
+        }
+        m_pRASet.RemoveAll();
+    }
+
+    INT Add(const TArray<Real>& ra)
+    {
+        INT ret = m_pRASet.Num();
+        m_pRASet.AddItem(new CRatinalApproximation(ra));
+        return ret;
+    }
+
+    TArray<CRatinalApproximation*> m_pRASet;
+};
+
+extern CLGAPI CRatinalApproximationSet GRASet;
 
 __END_NAMESPACE
 

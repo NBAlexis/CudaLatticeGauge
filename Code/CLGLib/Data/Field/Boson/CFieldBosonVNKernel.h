@@ -5,8 +5,11 @@
 // This is the class for all boson fields
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [07/20/2024 nbale]
 //=============================================================================
+#pragma once
+
 #include "Tools/Math/DeviceTemplates/DeviceInlineUseNoTemplateFunction.h"
 
 #ifndef _CFIELDBOSONVN_KERNEL_H_
@@ -15,18 +18,16 @@
 __BEGIN_NAMESPACE
 
 template<typename deviceDataBoson, typename deviceDataGauge>
+#if _CLG_WIN
 class __DLL_EXPORT CFieldBosonVNKernel
+#else
+class CFieldBosonVNKernel
+#endif
 {
 public:
-    static UINT CheckHermitian(const CFieldBoson* data, UINT uiSiteCount, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson);
+    static UINT CheckHermitian(const CFieldBoson* data, UINT uiSiteCount, INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const CFieldTensor2* const* tensor2Fields);
     static void ForceOnGauge(const deviceDataBoson* data, BYTE byFieldId, BYTE byGaugeFieldId, const deviceDataGauge* gaugedata, deviceDataGauge* force);
     static void DFromSource(const deviceDataBoson* source, deviceDataBoson* target, BYTE byFieldId, BYTE byGaugeFieldId, const deviceDataGauge* gaugedata, EOperatorCoefficientType eCoeffType, Real fCoeffReal, const CLGComplex& cCompCoeff);
-
-    static void DiagnalTerm(
-        deviceDataBoson* pTarget,
-        BYTE byFieldId,
-        const deviceDataBoson* pSource, DOUBLE fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff,
-        EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff);
 
     static void OneLink(
         deviceDataBoson* pTarget,
@@ -36,7 +37,7 @@ public:
         BYTE byGaugeFieldId,
         DOUBLE fCoefficient,
         _deviceCoeffFunctionPointerTwoSites fpCoeff,
-        const INT* pDevicePath,
+        const SCHAR* pDevicePath,
         BYTE pathLength,
         EOperatorCoefficientType eOCT,
         Real fRealCoeff,
@@ -50,7 +51,7 @@ public:
         deviceDataGauge* pForce,
         DOUBLE fCoefficient,
         _deviceCoeffFunctionPointerTwoSites fpCoeff,
-        const INT* pDevicePath,
+        const SCHAR* pDevicePath,
         BYTE pathLength);
 
     static void PartialSq(
@@ -76,9 +77,9 @@ public:
         _deviceCoeffFunctionPointer fpCoeff,
         BYTE idir);
 
-    static void AllocatePathBuffer(INT** pathbuffer);
-    static void FreePathBuffer(INT* pathbuffer);
-    static void CopyPathBuffer(INT* devicepathbuffer, const INT* hostpathbuffer, BYTE length);
+    static void AllocatePathBuffer(SCHAR** pathbuffer);
+    static void FreePathBuffer(SCHAR* pathbuffer);
+    static void CopyPathBuffer(SCHAR* devicepathbuffer, const SCHAR* hostpathbuffer, BYTE length);
 
     #pragma region rotation
 
@@ -101,6 +102,29 @@ public:
 
     #pragma endregion
 };
+
+#if !_CLG_WIN
+extern template class CFieldBosonVNKernel<Real, Real>;
+extern template class CFieldBosonVNKernel<CLGComplex, CLGComplex>;
+extern template class CFieldBosonVNKernel<deviceSU2Vector, deviceSU2>;
+extern template class CFieldBosonVNKernel<deviceSU3Vector, deviceSU3>;
+
+#if _CLG_SU4_BOSON
+extern template class CFieldBosonVNKernel<deviceSU4Vector, deviceSU4>;
+#endif
+#if _CLG_SU5_BOSON
+extern template class CFieldBosonVNKernel<deviceSU5Vector, deviceSU5>;
+#endif
+#if _CLG_SU6_BOSON
+extern template class CFieldBosonVNKernel<deviceSU6Vector, deviceSU6>;
+#endif
+#if _CLG_SU7_BOSON
+extern template class CFieldBosonVNKernel<deviceSU7Vector, deviceSU7>;
+#endif
+#if _CLG_SU8_BOSON
+extern template class CFieldBosonVNKernel<deviceSU8Vector, deviceSU8>;
+#endif
+#endif
 
 __END_NAMESPACE
 

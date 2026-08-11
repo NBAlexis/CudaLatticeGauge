@@ -5,6 +5,7 @@
 // This is the class for GMRES Solver
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [02/12/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -109,18 +110,18 @@ void CSLASolverGMRES::ReleaseBuffers()
 }
 
 UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, 
-    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
     EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
-    assert(0 == m_lstVectors.Num());
+    appAssert(0 == m_lstVectors.Num());
     for (UINT i = 0; i < m_uiMaxDim; ++i)
     {
-        CField* pVectors = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+        CField* pVectors = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
         m_lstVectors.AddItem(pVectors);
     }
 
-    CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pW = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pW = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
     CField* pR = m_lstVectors[0];//appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
 
     //use it to estimate relative error
@@ -156,13 +157,13 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB,
         //v[0] = r.normalize
         //s = x0
         pX->CopyTo(pR); //x0 need to be preserved
-        pR->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //x0 = -A x0
+        pR->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, EOCT_Minus); //x0 = -A x0
         pR->AxpyPlus(pFieldB); //x0 = b-Ax0
 #if !_CLG_DOUBLEFLOAT
-        m_fBeta = _sqrtd(m_lstVectors[0]->Dot(m_lstVectors[0]).x);
+        m_fBeta = _sqrtd(m_lstVectors[0]->GetLength());
         m_lstVectors[0]->ScalarMultply(static_cast<Real>(1.0 / m_fBeta));  //v[0] = (b - A x0).normalize
 #else
-        m_fBeta = _sqrt(m_lstVectors[0]->Dot(m_lstVectors[0]).x);
+        m_fBeta = _sqrt(m_lstVectors[0]->GetLength());
         m_lstVectors[0]->ScalarMultply(F(1.0) / m_fBeta);  //v[0] = (b - A x0).normalize
 #endif
         
@@ -170,7 +171,7 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB,
         {
             //w = A v[j]
             m_lstVectors[j]->CopyTo(pW);
-            pW->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
+            pW->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
             for (UINT k = 0; k <= j; ++k)
             {
 #if !_CLG_DOUBLEFLOAT
@@ -188,7 +189,7 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB,
 
             //h[j + 1, j] = ||w||
 #if !_CLG_DOUBLEFLOAT
-            const DOUBLE fWNorm = _sqrtd(pW->Dot(pW).x);
+            const DOUBLE fWNorm = _sqrtd(pW->GetLength());
             m_h[HIndex(j + 1, j)] = make_cuDoubleComplex(fWNorm, 0.0);
 
             //v[j + 1] = w / ||w||
@@ -198,7 +199,7 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB,
                 pW->CopyTo(m_lstVectors[j + 1]);
             }
 #else
-            const Real fWNorm = _sqrt(pW->Dot(pW).x);
+            const Real fWNorm = _sqrt(pW->GetLength());
             m_h[HIndex(j + 1, j)] = _make_cuComplex(fWNorm, F(0.0));
 
             //v[j + 1] = w / ||w||
@@ -214,7 +215,7 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB,
         //RotateH(m_uiMaxDim);
         RotateH();
 #if !_CLG_DOUBLEFLOAT
-        fLastDiavation = __cuCabsSqfd(m_g[m_uiMaxDim]);
+        fLastDiavation = cuCabsSq(m_g[m_uiMaxDim]);
 #else
         fLastDiavation = __cuCabsSqf(m_g[m_uiMaxDim]);
 #endif
@@ -303,7 +304,7 @@ void CSLASolverGMRES::RotateH(/*UINT uiHeisenbergDim*/)
     {
         const UINT ii = HIndex(i, i);
         const UINT i1i = HIndex(i + 1, i);
-        const DOUBLE denomi = 1.0 / sqrt(__cuCabsSqfd(m_h[ii]) + __cuCabsSqfd(m_h[i1i]));
+        const DOUBLE denomi = 1.0 / sqrt(cuCabsSq(m_h[ii]) + cuCabsSq(m_h[i1i]));
         const cuDoubleComplex cs = cuCmulf_cd(m_h[ii], denomi);
         const cuDoubleComplex sn = cuCmulf_cd(m_h[i1i], denomi);
         const cuDoubleComplex cs_h = cuConj(cs);

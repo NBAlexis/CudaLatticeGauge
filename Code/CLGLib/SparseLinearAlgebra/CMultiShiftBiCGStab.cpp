@@ -5,6 +5,7 @@
 // This is the class for Multi-Shift BiCGStab Solver
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [20/06/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -18,7 +19,6 @@ CMultiShiftBiCGStab::CMultiShiftBiCGStab()
     : CMultiShiftSolver()
     , m_uiDevationCheck(10)
     , m_uiStepCount(20)
-    , m_fAccuracy(F(0.000001))
 {
 
 }
@@ -30,6 +30,8 @@ CMultiShiftBiCGStab::~CMultiShiftBiCGStab()
 
 void CMultiShiftBiCGStab::Configurate(const CParameters& param)
 {
+    CMultiShiftSolver::Configurate(param);
+
     INT iValue;
     
     if (param.FetchValueINT(_T("DiviationStep"), iValue))
@@ -40,24 +42,6 @@ void CMultiShiftBiCGStab::Configurate(const CParameters& param)
     {
         m_uiStepCount = static_cast<UINT>(iValue);
     }
-    if (param.FetchValueINT(_T("AbsoluteAccuracy"), iValue))
-    {
-        m_bAbsoluteAccuracy = (0 != iValue);
-    }
-#if !_CLG_DOUBLEFLOAT
-    DOUBLE dValue;
-    if (param.FetchValueDOUBLE(_T("Accuracy"), dValue))
-    {
-        m_fAccuracy = dValue;
-    }
-#else
-    Real fValue;
-    if (param.FetchValueReal(_T("Accuracy"), fValue))
-    {
-        m_fAccuracy = fValue;
-    }
-#endif
-
 }
 
 void CMultiShiftBiCGStab::AllocateBuffers(const CField*)
@@ -71,9 +55,10 @@ void CMultiShiftBiCGStab::ReleaseBuffers()
 }
 
 UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& cn, const CField* pFieldB, 
-    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
     EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
+    _RECORD(CMultiShiftBiCGStab::Solve);
 #if !_CLG_DOUBLEFLOAT
     //When there is div, we use double instead of float
     appPushLogDate(FALSE);
@@ -96,7 +81,7 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
         alphas.AddItem(make_cuDoubleComplex(0.0, 0.0));
         sl.AddItem(1.0);
 
-        CField* s = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+        CField* s = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
         pFieldB->CopyTo(s);
         pSsigma.AddItem(s);
     }
@@ -104,15 +89,15 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
     DOUBLE fBLength = 1.0;
     if (!m_bAbsoluteAccuracy)
     {
-        fBLength = sqrt(pFieldB->Dot(pFieldB).x);
+        fBLength = sqrt(pFieldB->GetLength());
     }
 
-    CField* pR = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pW = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pW0 = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pS = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pSA = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pWA = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pR = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pW = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pW0 = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pS = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pSA = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pWA = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
 
     pFieldB->CopyTo(pR);
     pFieldB->CopyTo(pW);
@@ -122,12 +107,16 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
     pW->Dagger();
     pW->CopyTo(pW0);
     cuDoubleComplex delta = pW0->Dot(pR);
-    pSA->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
+    {
+        _RECORD2(CMultiShiftBiCGStab::Solve::ApplyOperator, a);
+        pSA->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
+    }
     cuDoubleComplex phi = cuCdiv(pW0->Dot(pSA), delta);
     cuDoubleComplex beta = make_cuDoubleComplex(0.0, 0.0);
     cuDoubleComplex alpha = make_cuDoubleComplex(0.0, 0.0);
 
     UBOOL bDone = FALSE;
+    DOUBLE lasterror = 0.0;
     for (UINT i = 0; i < m_uiStepCount * m_uiDevationCheck; ++i)
     {
         const cuDoubleComplex newbeta = cuCdiv(make_cuDoubleComplex(-1.0, 0.0), phi);
@@ -166,8 +155,11 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
         pR->CopyTo(pW);
         pW->Axpy(_cToFloat(beta), pSA);
         pW->CopyTo(pWA);
-        pWA->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
-        const cuDoubleComplex chi = cuCdivf_cd_host(pWA->Dot(pW), pWA->Dot(pWA).x);
+        {
+            _RECORD2(CMultiShiftBiCGStab::Solve::ApplyOperator, a);
+            pWA->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
+        }
+        const cuDoubleComplex chi = cuCdivf_cd_host(pWA->Dot(pW), pWA->GetLength());
         for (INT n = 0; n < cn.Num(); ++n)
         {
             if (sl[n] < m_fAccuracy * fBLength)
@@ -214,33 +206,41 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
         pS->AxpyPlus(pR);
 
         pS->CopyTo(pSA);
-        pSA->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
+        {
+            _RECORD2(CMultiShiftBiCGStab::Solve::ApplyOperator, a);
+            pSA->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
+        }
         phi = cuCdiv(pW0->Dot(pSA), delta);
 
         if (0 == (i + 1) % m_uiDevationCheck)
         {
-            DOUBLE fMaxErro = _sqrtd(pS->Dot(pS).x);
+            lasterror = _sqrtd(pS->GetLength());
             for (INT n = 0; n < cn.Num(); ++n)
             {
                 if (sl[n] < m_fAccuracy * fBLength)
                 {
                     continue;
                 }
-                sl[n] = sqrt(pSsigma[n]->Dot(pSsigma[n]).x);
-                if (sl[n] > fMaxErro)
+                sl[n] = sqrt(pSsigma[n]->GetLength());
+                if (sl[n] > lasterror)
                 {
-                    fMaxErro = sl[n];
+                    lasterror = sl[n];
                 }
             }
 
-            appParanoiac(_T("CMultiShiftBiCGStab: diviation is %2.20f\n"), fMaxErro);
-            if (fMaxErro < m_fAccuracy * fBLength)
+            appParanoiac(_T("CMultiShiftBiCGStab: diviation is %2.20f (%d)\n"), lasterror, i);
+            if (lasterror < m_fAccuracy * fBLength)
             {
                 appParanoiac(_T("CMultiShiftBiCGStab: Done\n"));
                 bDone = TRUE;
                 break;
             }
         }
+    }
+
+    if (lasterror >= m_fAccuracy * fBLength)
+    {
+        appDetailed(_T("CMultiShiftBiCGStab failed: diviation is %2.20f\n"), lasterror);
     }
 
     for (INT n = 0; n < cn.Num(); ++n)
@@ -276,7 +276,7 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
         alphas.AddItem(_zeroc);
         sl.AddItem(F(1.0));
 
-        CField* s = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+        CField* s = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
         pFieldB->CopyTo(s);
         pSsigma.AddItem(s);
     }
@@ -284,15 +284,15 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
     Real fBLength = F(1.0);
     if (!m_bAbsoluteAccuracy)
     {
-        fBLength = _sqrt(pFieldB->Dot(pFieldB).x);
+        fBLength = _sqrt(pFieldB->GetLength());
     }
 
-    CField* pR = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pW = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pW0 = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pS = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pSA = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pWA = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pR = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pW = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pW0 = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pS = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pSA = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pWA = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
 
     pFieldB->CopyTo(pR);
     pFieldB->CopyTo(pW);
@@ -301,12 +301,13 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
     pW->Dagger();
     pW->CopyTo(pW0);
     CLGComplex delta = pW0->Dot(pR);
-    pSA->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
+    pSA->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
     CLGComplex phi = _cuCdivf(pW0->Dot(pSA), delta);
     CLGComplex beta = _zeroc;
     CLGComplex alpha = _zeroc;
 
     UBOOL bDone = FALSE;
+    Real lasterror = F(0.0);
     for (UINT i = 0; i < m_uiStepCount * m_uiDevationCheck; ++i)
     {
         const CLGComplex newbeta = _cuCdivf(_make_cuComplex(-F(1.0), F(0.0)), phi);
@@ -345,8 +346,8 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
         pR->CopyTo(pW);
         pW->Axpy(beta, pSA);
         pW->CopyTo(pWA);
-        pWA->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
-        const CLGComplex chi = cuCdivf_cr_host(pWA->Dot(pW), pWA->Dot(pWA).x);
+        pWA->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
+        const CLGComplex chi = cuCdivf_cr_host(pWA->Dot(pW), pWA->GetLength());
         for (INT n = 0; n < cn.Num(); ++n)
         {
             if (sl[n] < m_fAccuracy * fBLength)
@@ -393,32 +394,37 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
         pS->AxpyPlus(pR);
 
         pS->CopyTo(pSA);
-        pSA->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
+        pSA->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
         phi = _cuCdivf(pW0->Dot(pSA), delta);
 
         if (0 == (i + 1) % m_uiDevationCheck)
         {
-            Real fMaxErro = _sqrt(pS->Dot(pS).x);
+            lasterror = _sqrt(pS->GetLength());
             for (INT n = 0; n < cn.Num(); ++n)
             {
                 if (sl[n] < m_fAccuracy * fBLength)
                 {
                     continue;
                 }
-                sl[n] = _sqrt(pSsigma[n]->Dot(pSsigma[n]).x);
-                if (sl[n] > fMaxErro)
+                sl[n] = _sqrt(pSsigma[n]->GetLength());
+                if (sl[n] > lasterror)
                 {
-                    fMaxErro = sl[n];
+                    lasterror = sl[n];
                 }
             }
 
-            appParanoiac(_T("CMultiShiftBiCGStab: diviation is %2.20f\n"), fMaxErro);
-            if (fMaxErro < m_fAccuracy * fBLength)
+            appParanoiac(_T("CMultiShiftBiCGStab: diviation is %2.20f\n"), lasterror);
+            if (lasterror < m_fAccuracy * fBLength)
             {
                 bDone = TRUE;
                 break;
             }
         }
+    }
+
+    if (lasterror >= m_fAccuracy * fBLength)
+    {
+        appDetailed(_T("CMultiShiftBiCGStab failed: diviation is %2.20f\n"), lasterror);
     }
 
     for (INT n = 0; n < cn.Num(); ++n)

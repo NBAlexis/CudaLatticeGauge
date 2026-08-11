@@ -145,6 +145,7 @@ TestGaugeFixingCoulombLosAlamos:
         Omega : 1.5
         CheckErrorStep : 200
         MaxIterate : 2000
+        Accuracy : 0.001
 
 TestGaugeFixingCoulombCornellDR:
 
@@ -199,7 +200,7 @@ TestGaugeFixingCoulombCornellDR:
         Omega : 0.2
 
     Action2:
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     GaugeFixing:
@@ -276,7 +277,7 @@ TestGaugeFixingCoulombLosAlamosDR:
         Omega : 0.2
 
     Action2:
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     GaugeFixing:
@@ -352,7 +353,7 @@ TestGaugeFixingCoulombDRChiral:
         Omega : 0.2
 
     Action2:
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     GaugeFixing:
@@ -510,6 +511,330 @@ TestGaugeFixingRotationKS:
         MeasureDist : 0
         ShowResult : 0
 
+
+TestGaugeFixingMAG_SU2:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    TestConfig:
+        ProjectionType : MAG
+        GaugeGroup : SU2
+
+    Gauge:
+
+        ## FieldType = {CFieldGaugeSU2}
+        FieldName : CFieldGaugeSU2
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    GaugeFixing:
+
+        Name : CGaugeFixingMAG
+        Omega : 1.5
+        CheckErrorStep : 10
+        MaxIterate : 2000
+        Accuracy : 0.00001
+
+TestGaugeFixingMAG:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    TestConfig:
+        ProjectionType : MAG
+        GaugeGroup : SU3
+
+    Gauge:
+
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    GaugeFixing:
+
+        Name : CGaugeFixingMAG
+        Omega : 1.5
+        CheckErrorStep : 10
+        MaxIterate : 2000
+        Accuracy : 0.00001
+
+TestGaugeFixingMCGDirect:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    TestConfig:
+        ProjectionType : MCGDirect
+        GaugeGroup : SU3
+
+    Gauge:
+
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    GaugeFixing:
+
+        Name : CGaugeFixingMCGDirect
+        Omega : 1.5
+        CheckErrorStep : 1000
+        MaxIterate : 2000
+        Accuracy : 0.00001
+
+TestGaugeFixingMCGDirect_SU2:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    TestConfig:
+        ProjectionType : MCGDirect
+        GaugeGroup : SU2
+
+    Gauge:
+
+        ## FieldType = {CFieldGaugeSU2}
+        FieldName : CFieldGaugeSU2
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    GaugeFixing:
+
+        Name : CGaugeFixingMCGDirect
+        Omega : 1.0
+        CheckErrorStep : 1000
+        MaxIterate : 2000
+        Accuracy : 0.00001
+
+TestGaugeFixingMCGIndirect:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    TestConfig:
+        ProjectionType : MCGIndirect
+        GaugeGroup : SU3
+
+    Gauge:
+
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    GaugeFixing:
+
+        Name : CGaugeFixingMCGIndirect
+        Omega : 1.5
+        OmegaStage1 : 1.5
+        UseStandardIMCG : 0
+        CheckErrorStep : 1000
+        MaxIterate : 2000
+        Stage1MaxIterate : 2000
+        Accuracy : 0.00001
+
+TestGaugeFixingMCGIndirect_SU2:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    TestConfig:
+        ProjectionType : MCGIndirect
+        GaugeGroup : SU2
+
+    Gauge:
+
+        ## FieldType = {CFieldGaugeSU2}
+        FieldName : CFieldGaugeSU2
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    GaugeFixing:
+
+        Name : CGaugeFixingMCGIndirect
+        Omega : 1.0
+        OmegaStage1 : 1.5
+        UseStandardIMCG : 0
+        CheckErrorStep : 1000
+        MaxIterate : 2000
+        Stage1MaxIterate : 2000
+        Accuracy : 0.00001
+
+TestGaugeFixingMCGIndirect_Standard:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    TestConfig:
+        ProjectionType : MCGIndirect
+        GaugeGroup : SU3
+
+    Gauge:
+
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    GaugeFixing:
+
+        Name : CGaugeFixingMCGIndirect
+        Omega : 1.5
+        OmegaStage1 : 1.5
+        UseStandardIMCG : 1
+        CheckErrorStep : 1000
+        MaxIterate : 2000
+        Stage1MaxIterate : 2000
+        Accuracy : 0.00001
+
+TestGaugeFixingMCGIndirect_Standard_SU2:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    TestConfig:
+        ProjectionType : MCGIndirect
+        GaugeGroup : SU2
+
+    Gauge:
+
+        ## FieldType = {CFieldGaugeSU2}
+        FieldName : CFieldGaugeSU2
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    GaugeFixing:
+
+        Name : CGaugeFixingMCGIndirect
+        Omega : 1.0
+        OmegaStage1 : 1.5
+        UseStandardIMCG : 1
+        CheckErrorStep : 1000
+        MaxIterate : 2000
+        Stage1MaxIterate : 2000
+        Accuracy : 0.00001
 
 TestGaugeFixingRotationKS2:
 

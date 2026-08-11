@@ -87,7 +87,7 @@ __device__ void _deviceMeasure8(const SSmallInt4& site, Real fKappa, Real fOmega
     element = __chiralGamma[GAMMA5].MulWilsonC(element);
 }
 
-__constant__ _deviceMeasureFunc _cMeasureFuncs[CMeasureChargeAndCurrents::_kGammaInInterests] =
+__device__ __constant__ _deviceMeasureFunc _cMeasureFuncs[CMeasureChargeAndCurrents::_kGammaInInterests] =
 { 
     _deviceMeasure0,
     _deviceMeasure1,
@@ -185,11 +185,11 @@ CMeasureChargeAndCurrents::~CMeasureChargeAndCurrents()
     }
     if (NULL != m_pDeviceDataBuffer)
     {
-        checkCudaErrors(cudaFree(m_pDeviceDataBuffer));
+        checkCudaErrors(__cudaFree(m_pDeviceDataBuffer));
     }
     if (NULL != m_pOperatorData)
     {
-        checkCudaErrors(cudaFree(m_pOperatorData));
+        checkCudaErrors(__cudaFree(m_pOperatorData));
     }
     //if (NULL != m_pMeasureFunctions)
     //{
@@ -202,8 +202,8 @@ void CMeasureChargeAndCurrents::Initial(CMeasurementManager* pOwner, CLatticeDat
     CMeasure::Initial(pOwner, pLatticeData, param, byId);
 
     m_pHostDataBuffer = (CLGComplex*)malloc(sizeof(CLGComplex) * _HC_Lx * _kGammaInInterests);
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceDataBuffer, sizeof(CLGComplex) * _HC_Lx * _kGammaInInterests));
-    checkCudaErrors(cudaMalloc((void**)&m_pOperatorData, sizeof(deviceWilsonVectorSU3) * _HC_Lx * _kGammaInInterests));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceDataBuffer, sizeof(CLGComplex) * _HC_Lx * _kGammaInInterests));
+    checkCudaErrors(__cudaMalloc((void**)&m_pOperatorData, sizeof(deviceWilsonVectorSU3) * _HC_Lx * _kGammaInInterests));
 
     Reset();
 }
@@ -216,9 +216,14 @@ void CMeasureChargeAndCurrents::SourceSanningSingleField(const class CFieldGauge
         return;
     }
     deviceWilsonVectorSU3* pDevicePtr[12];
+    DOUBLE fKai = 0.0;
     for (INT i = 0; i < 12; ++i)
     {
         CFieldFermionWilsonSquareSU3* fermionfield = dynamic_cast<CFieldFermionWilsonSquareSU3*>(sources[i]);
+        if (0 == i)
+        {
+            fKai = fermionfield->GetKai();
+        }
         pDevicePtr[i] = fermionfield->m_pDeviceData;
     }
 
@@ -226,7 +231,7 @@ void CMeasureChargeAndCurrents::SourceSanningSingleField(const class CFieldGauge
     dim3 _thread1(12, 1, 1);
 
     deviceWilsonVectorSU3** ppDevicePtr;
-    checkCudaErrors(cudaMalloc((void**)&ppDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12));
+    checkCudaErrors(__cudaMalloc((void**)&ppDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12));
     checkCudaErrors(cudaMemcpy(ppDevicePtr, pDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12, cudaMemcpyHostToDevice));
 
     Real fOmega = F(0.0);
@@ -237,10 +242,10 @@ void CMeasureChargeAndCurrents::SourceSanningSingleField(const class CFieldGauge
     }
     
     //sourceSite.x = 1 to lx - 1
-    _kernel_Gammas << <_blocks, _thread1 >> > (
+    _LAUNCH_KERNEL(_kernel_Gammas, _blocks, _thread1, 
         ppDevicePtr,
         sourceSite,
-        CCommonData::m_fKai,
+        static_cast<Real>(fKai),
         fOmega,
         static_cast<BYTE>(sourceSite.x), //array idx
         GetFermionFieldId(),
@@ -248,14 +253,14 @@ void CMeasureChargeAndCurrents::SourceSanningSingleField(const class CFieldGauge
         m_pOperatorData
         );
 
-    checkCudaErrors(cudaFree(ppDevicePtr));
+    checkCudaErrors(__cudaFree(ppDevicePtr));
 
-    if (sourceSite.x == static_cast<SBYTE>(_HC_Lx) - 1)
+    if (sourceSite.x == static_cast<SCHAR>(_HC_Lx) - 1)
     {
         //all sites calculated
         ++m_uiConfigurationCount;
         dim3 _thread2(_HC_Lx, 1, 1);
-        _kernel_Trace_Gammas << <_blocks, _thread2 >> > (m_pOperatorData, m_pDeviceDataBuffer);
+        _LAUNCH_KERNEL(_kernel_Trace_Gammas, _blocks, _thread2, m_pOperatorData, m_pDeviceDataBuffer);
 
         checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(CLGComplex) * _HC_Lx * _kGammaInInterests, cudaMemcpyDeviceToHost));
 
@@ -264,6 +269,32 @@ void CMeasureChargeAndCurrents::SourceSanningSingleField(const class CFieldGauge
             for (UINT i = 1; i < _HC_Lx; ++i)
             {
                 m_lstAllRes.AddItem(m_pHostDataBuffer[i * _kGammaInInterests + j]);
+            }
+        }
+
+        if (NULL != m_pOwner)
+        {
+            static CCString gammaNames[_kGammaInInterests] =
+            {
+                _T("Chiral"),
+                _T("J1"),
+                _T("J2"),
+                _T("J3"),
+                _T("J4"),
+                _T("Sigma12"),
+                _T("Jx"),
+                _T("Jy"),
+                _T("N5"),
+            };
+
+            for (UINT j = 0; j < _kGammaInInterests; ++j)
+            {
+                TArray<CLGComplex> currentGamma;
+                for (UINT i = 1; i < _HC_Lx; ++i)
+                {
+                    currentGamma.AddItem(m_pHostDataBuffer[i * _kGammaInInterests + j]);
+                }
+                m_pOwner->AddOneConfigurationResult(this, gammaNames[j], currentGamma);
             }
         }
 
@@ -310,7 +341,7 @@ void CMeasureChargeAndCurrents::Report()
 {
     appPushLogDate(FALSE);
 
-    assert(m_uiConfigurationCount * (_HC_Lx - 1) * _kGammaInInterests == static_cast<UINT>(m_lstAllRes.Num()));
+    appAssert(m_uiConfigurationCount * (_HC_Lx - 1) * _kGammaInInterests == static_cast<UINT>(m_lstAllRes.Num()));
     TArray<Real> tmpSum;
 
     appGeneral(_T("\n\n==========================================================================\n"));

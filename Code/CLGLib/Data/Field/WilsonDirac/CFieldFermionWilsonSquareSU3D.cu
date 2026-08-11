@@ -78,9 +78,9 @@ _kernelDFermionWilsonSquareSU3_D(
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
         //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-        deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIdx, idir);
+        deviceSU3 x_Gauge_element = _deviceGetGaugeBCDirT(byGaugeFieldId, pGauge, uiBigIdx, idir);
         //deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
-        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(byGaugeFieldId, pGauge, x_m_mu_Gauge);
+        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCT(byGaugeFieldId, pGauge, x_m_mu_Gauge);
         if (x_m_mu_Gauge.NeedToDagger())
         {
             x_m_mu_Gauge_element.Dagger();
@@ -152,6 +152,8 @@ _kernelDFermionWilsonSquareSU3_D(
     case EOCT_Complex:
         pResultData[uiSiteIndex].MulComp(cCoeff);
         break;
+    default:
+        break;
     }
 }
 
@@ -164,7 +166,7 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelDWilsonForceSU3_D(
     const deviceWilsonVectorSU3* __restrict__ pInverseD,
     const deviceWilsonVectorSU3* __restrict__ pInverseDDdagger,
-    const deviceSU3* __restrict__ pGauge,
+    //const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pFermionMove,
     deviceSU3* pForce,
     Real fKai,
@@ -207,28 +209,20 @@ _kernelDWilsonForceSU3_D(
             //deviceWilsonVectorSU3 x_p_mu_Right = _deviceGetFermionBCWilsonSU3(pInverseD, x_p_mu_Fermion, byFieldId);
             //deviceWilsonVectorSU3 x_p_mu_Left = _deviceGetFermionBCWilsonSU3(pInverseDDdagger, x_p_mu_Fermion, byFieldId);
 
-            deviceSU3 x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
+            //deviceSU3 x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
 
             deviceWilsonVectorSU3 right1(x_p_mu_Right);
             right1.Sub(gammaMu.MulWilsonC(right1));
-            deviceSU3 mid = deviceSU3::makeSU3Contract(x_Left, right1);
+            deviceSU3 mid = deviceSU3::makeSU3Contract(right1, x_Left);
 
             deviceWilsonVectorSU3 right2(x_Right);
             right2.Add(gammaMu.MulWilsonC(right2));
-            mid.Add(deviceSU3::makeSU3Contract(right2, x_p_mu_Left));
+            mid.Add(deviceSU3::makeSU3Contract(x_p_mu_Left, right2));
 
-            deviceSU3 forceOfThisLink = x_Gauge_element.MulC(mid);
-            forceOfThisLink.Ta();
-            if (x_p_mu_Fermion.NeedToOpposite())
-            {
-                forceOfThisLink.MulReal(-fKai);
-            }
-            else
-            {
-                forceOfThisLink.MulReal(fKai);
-            }
-
-            pForce[linkIndex].Add(forceOfThisLink);
+            //deviceSU3 forceOfThisLink = x_Gauge_element.MulC(mid);
+            //forceOfThisLink.Ta();
+            _mul(mid, fKai * (1 - 2 * static_cast<INT>(x_p_mu_Fermion.NeedToOpposite())));
+            pForce[linkIndex].Add(mid);
         }
     }
 }
@@ -245,37 +239,38 @@ void CFieldFermionWilsonSquareSU3D::DOperator(void* pTargetBuffer, const void* p
     const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
 
     preparethread;
-    _kernelDFermionWilsonSquareSU3_D << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDFermionWilsonSquareSU3_D, block, threads,
         pSource,
         pGauge,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         pTarget, 
-        m_fKai, 
+        static_cast<Real>(m_fKai),
         m_byFieldId, 
         byGaugeFieldId,
         bDagger,
         eOCT,
-        fRealCoeff, 
+        fRealCoeff,
         cCmpCoeff);
 
 }
 
-void CFieldFermionWilsonSquareSU3D::DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const
+void CFieldFermionWilsonSquareSU3D::DerivateDOperator(DOUBLE fCoeff, void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const
 {
     deviceSU3* pForceSU3 = (deviceSU3*)pForce;
-    const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
+    //const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
     const deviceWilsonVectorSU3* pDphiBuffer = (deviceWilsonVectorSU3*)pDphi;
     const deviceWilsonVectorSU3* pDDphiBuffer = (deviceWilsonVectorSU3*)pDDphi;
 
     preparethread;
-    _kernelDWilsonForceSU3_D << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDWilsonForceSU3_D, block, threads, 
         pDphiBuffer,
         pDDphiBuffer,
-        pGauge,
+        //pGauge,
         appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         pForceSU3,
-        m_fKai, m_byFieldId);
+        static_cast<Real>(fCoeff),
+        m_byFieldId);
 }
 
 #pragma endregion
@@ -300,7 +295,7 @@ _kernelInitialFermionWilsonSquareSU3ForHMC(
     }
     else
     {
-        pDevicePtr[uiSiteIndex] = deviceWilsonVectorSU3::makeRandomGaussian(_deviceGetFatIndex(uiSiteIndex, 0));
+        pDevicePtr[uiSiteIndex] = deviceWilsonVectorSU3::makeRandomGaussian(_deviceGetLinkIndex(uiSiteIndex, 0));
     }
 }
 
@@ -331,9 +326,9 @@ void CFieldFermionWilsonSquareSU3D::PrepareForHMCS(const CFieldGauge* pGauge)
         return;
     }
     const CFieldGaugeSU3 * pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
-    CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId, _T(__FILE__), __LINE__));
     preparethread;
-    _kernelInitialFermionWilsonSquareSU3ForHMC << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelInitialFermionWilsonSquareSU3ForHMC, block, threads, 
         pPooled->m_pDeviceData,
         m_byFieldId);
 
@@ -366,9 +361,10 @@ void CFieldFermionWilsonSquareSU3D::PrepareForHMCS(const CFieldGauge* pGauge)
 void CFieldFermionWilsonSquareSU3D::PrepareForHMCOnlyRandomize()
 {
     preparethread;
-    _kernelInitialFermionWilsonSquareSU3ForHMC << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelInitialFermionWilsonSquareSU3ForHMC, block, threads,
         m_pDeviceData,
         m_byFieldId);
+    NotifyWritten();
 }
 
 void CFieldFermionWilsonSquareSU3D::PrepareForHMCNotRandomize(const CFieldGauge* pGauge)
@@ -379,8 +375,8 @@ void CFieldFermionWilsonSquareSU3D::PrepareForHMCNotRandomize(const CFieldGauge*
         return;
     }
     const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
-    CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
-    preparethread;
+    CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId, _T(__FILE__), __LINE__));
+    //preparethread;
     checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * _HC_Volume, cudaMemcpyDeviceToDevice));
 
     DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
@@ -409,17 +405,23 @@ void CFieldFermionWilsonSquareSU3D::PrepareForHMCNotRandomize(const CFieldGauge*
     }
 }
 
-void CFieldFermionWilsonSquareSU3D::FixBoundary()
+void CFieldFermionWilsonSquareSU3D::FixBoundary(EFixBoundary eType)
 {
+    if (!appGetLattice()->HasBoundaryField(m_byFieldId))
+    {
+        appWarning(_T("Call fix boundary but without set boundary field!!\n"));
+        return;
+    }
     appDetailed(_T("CFieldFermionWilsonSquareSU3D::FixBoundary()\n"));
 
     preparethread;
-    _kernelFixBoundaryWilsonSU3 << <block, threads >> >(m_pDeviceData, m_byFieldId);
+    _LAUNCH_KERNEL(_kernelFixBoundaryWilsonSU3, block, threads, m_pDeviceData, m_byFieldId);
+    NotifyWritten();
 }
 
-void CFieldFermionWilsonSquareSU3D::CopyTo(CField* U) const
+void CFieldFermionWilsonSquareSU3D::CopyParamTo(CField* U) const
 {
-    CFieldFermionWilsonSquareSU3::CopyTo(U);
+    CFieldFermionWilsonSquareSU3::CopyParamTo(U);
 }
 
 CCString CFieldFermionWilsonSquareSU3D::GetInfos(const CCString &tab) const

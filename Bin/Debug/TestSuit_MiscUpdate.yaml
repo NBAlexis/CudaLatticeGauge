@@ -2,7 +2,7 @@
 # ==============================================
 # Acceleration
 # ==============================================
-
+# TestAccelerationTorus
 TestAccelerationTorus:
 
     DeviceIndex : 0
@@ -107,6 +107,7 @@ TestAccelerationTorus:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestAccelerationDirichletQ
 TestAccelerationDirichletQ:
 
     DeviceIndex : 0
@@ -132,7 +133,7 @@ TestAccelerationDirichletQ:
     ExpectMiss : 2
     ExpectMissDebug : 1
     ExpectedRes : [0.420602]
-    ExpectedResDebug : [0.591390]
+    ExpectedResDebug : [0.376078]
 
     Updator:
 
@@ -218,6 +219,7 @@ TestAccelerationDirichletQ:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestAccelerationTorusQ
 TestAccelerationTorusQ:
 
     DeviceIndex : 0
@@ -243,7 +245,7 @@ TestAccelerationTorusQ:
     ExpectMiss : 2
     ExpectMissDebug : 1
     ExpectedRes : [0.411030]
-    ExpectedResDebug : [0.591390]
+    ExpectedResDebug : [0.360965]
 
     Updator:
 
@@ -308,6 +310,7 @@ TestAccelerationTorusQ:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestAccelerationDirichletMidCenterQ
 TestAccelerationDirichletMidCenterQ:
 
     DeviceIndex : 0
@@ -332,7 +335,7 @@ TestAccelerationDirichletMidCenterQ:
     ExpectMiss : 2
     ExpectMissDebug : 1
     ExpectedRes : [0.411214]
-    ExpectedResDebug : [0.591390]
+    ExpectedResDebug : [0.368986]
 
     Updator:
 
@@ -417,7 +420,7 @@ TestAccelerationDirichletMidCenterQ:
 
         MeasureName : CMeasurePlaqutteEnergy
 
-
+# TestAccelerationTorusMidCenterQ
 TestAccelerationTorusMidCenterQ:
 
     DeviceIndex : 0
@@ -442,7 +445,7 @@ TestAccelerationTorusMidCenterQ:
     ExpectMiss : 2
     ExpectMissDebug : 1
     ExpectedRes : [0.408805]
-    ExpectedResDebug : [0.591390]
+    ExpectedResDebug : [0.357293]
 
     Updator:
 
@@ -527,6 +530,7 @@ TestAccelerationTorusMidCenterQ:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestAcceleration
 TestAcceleration:
 
     Dim : 4
@@ -587,7 +591,7 @@ TestAcceleration:
         AccG : 0.1
 
     Action2:
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Solver:
@@ -627,6 +631,7 @@ TestAcceleration:
         ShowResult : 1
         MeasureDist : 1
 
+# TestAccelerationTorusKSRigidAcc
 TestAccelerationTorusKSRigidAcc:
 
     DeviceIndex : 0
@@ -651,8 +656,8 @@ TestAccelerationTorusKSRigidAcc:
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.411029
-    ExpectedResDebug : 0.591390
+    ExpectedRes : [0.420602]
+    ExpectedResDebug : [0.376078]
 
     Updator:
 
@@ -743,6 +748,7 @@ TestAccelerationTorusKSRigidAcc:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestAccelerationTorusKSRigidAccMidCenter
 TestAccelerationTorusKSRigidAccMidCenter:
 
     DeviceIndex : 0
@@ -766,8 +772,8 @@ TestAccelerationTorusKSRigidAccMidCenter:
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.411029
-    ExpectedResDebug : 0.591390
+    ExpectedRes : [0.420602]
+    ExpectedResDebug : [0.376078]
 
     Updator:
 
@@ -858,6 +864,7 @@ TestAccelerationTorusKSRigidAccMidCenter:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestBoost
 TestBoost:
 
     Dim : 4
@@ -918,7 +925,7 @@ TestBoost:
         Boost : 0.1
 
     Action2:
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Solver:
@@ -963,8 +970,7 @@ TestBoost:
 # Beta gradient
 # ==============================================
 
-
-
+# TestBetaGradient
 TestBetaGradient:
 
     Dim : 4
@@ -979,10 +985,20 @@ TestBetaGradient:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.06
+    # ExpectedRes : 0.06
     CacheStaple : 0
     BeforeEquvibStep : 5
     EquvibStep : 20
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.441013]
+    ExpectedResDebug : [0.375269]
 
     Updator:
 
@@ -1057,11 +1073,157 @@ TestBetaGradient:
 
     Measure1:
 
-        MeasureName : CMeasurePolyakovXY
-        FieldId : 1
-        ShowResult : 0
-        MeasureDist : 1
-        MeasureZ : 1
-        ShiftCenter : 0
-        ZSlice : 1
+        MeasureName : CMeasurePlaqutteEnergy
 
+# TestAtGradient
+TestAtGradient:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    # ExpectedRes : 0.06
+    CacheStaple : 0
+    BeforeEquvibStep : 5
+    EquvibStep : 20
+
+    SkipThermalDebug : 1
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.328364]
+    ExpectedResDebug : [0.288178]
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # IntegratorType : CIntegratorNestedForceGradient
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 30
+        # NestedStep : 5
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 0, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteAtGradient
+        Beta : 5.0
+        Xi : [1.0, 1.1, 1.2, 1.3, 1.3, 1.2, 1.1, 1.0]
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+# TestTemperatureDistriDyanamic
+TestTemperatureDistriDyanamic:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    GaugeFieldCount : 1
+    FermionFieldCount : 0
+    BosonFieldCount : 1
+    MeasureListLength : 1
+
+    # ExpectedRes : 0.06
+    CacheStaple : 0
+    BeforeEquvibStep : 5
+    EquvibStep : 20
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 5
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.412186]
+    ExpectedResDebug : [0.349176]
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan, CIntegratorForceGradient }
+        # IntegratorType : CIntegratorNestedForceGradient
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 30
+        # NestedStep : 5
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    BosonField1:
+
+        FieldName : CFieldBosonRealD_ZSlice
+        FieldInitialType : EFIT_Identity
+        FieldId : 2
+
+        Period : [1, 1, 1, 1]
+
+        ZSliceList : [0, 4]
+        ValueList : [1.0, 0.5]
+        NoGauge : 1
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+   
+        ActionName : CActionTemperatureDistribution
+        Beta : 5.0
+        BosonKinetic : 1.0
+        GaugeFields : [1]
+        BosonFields : [2]
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy

@@ -4,10 +4,11 @@
 # ESR_SimulateQuenched, ESR_SimulateQuenchedU1
 # ESR_SimulateQuenched3D, ESR_SimulateQuenchedU13D
 # ESR_Measure3D, ESR_MeasureU13D
-RotationJob : ESR_Measure
+RotationJob : ESR_SimulateQuenched
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
+# JobSimulate
 JobSimulate:
 
     ## Log options
@@ -18,19 +19,20 @@ JobSimulate:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
+    MaxThreadPerBlock : 128
     # If use double, set to 0 will be faster, if use single point float, use 8
-    ExponentialPrecision : 10
-    BeforeEquvibStep : 5
+    ExponentialPrecision : 6
+    BeforeEquvibStep : 300
     EquvibSkip : 0
-    EquvibStep : 5
+    EquvibStep : 2000
     SaveStartIndex : 0
-    OmegaSep : 1
+    OmegaSep : 16
     OmegaStart : 0
-    MaxOmega : 0.008
+    MaxOmega : 0.128
     # 0 - all has rotation, 1 - gauge zero rotation, 2 - fermion zero rotation, 3 - no rotation
     BindOmega : 0
-    MinNt : 4
-    MaxNt : 4
+    MinNt : 6
+    MaxNt : 6
     SavePrefix : ./RWSRF580018036_
     Additive : 0
 
@@ -39,7 +41,7 @@ JobSimulate:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [6, 6, 6, 4]
+    LatticeLength : [12, 12, 12, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
@@ -64,17 +66,17 @@ JobSimulate:
         ReportMeasure : 0
         Adaptive : 1
         MinMaxStep : [4, 50]
-        GrowReduceThreshold : [-0.3, 0.02]
+        GrowReduceThreshold : [-0.4, 0.03]
         InnerLeapfrog : 1
         DebugForce : 0
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         # CIntegratorNestedOmelyan CIntegratorNested11Stage
-        IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorNestedForceGradient
         ## IntegratorType : CIntegratorOmelyan 
         IntegratorStepLength : 1
-        IntegratorStep : 8
-        NestedStep : 20
+        IntegratorStep : 10
+        NestedStep : 40
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -94,27 +96,20 @@ JobSimulate:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.18
+        Mass : 0.085
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
+        CachedGauge : 1
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
         # This is x^{1/16}
-        # MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
+        MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
 
         # MD is to calculate force
         # This is x^{-1/8}
-        # TMD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
-
-        # MC is to prepare
-        # This is x^{1/8}
-        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
-
-        # MD is to calculate force
-        # This is x^{-1/4}
-        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+        MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
 
     FermionField2:
         
@@ -126,27 +121,20 @@ JobSimulate:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.18
+        Mass : 0.085
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
+        CachedGauge : 1
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
         # This is x^{1/16}
-        # MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
+        MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
 
         # MD is to calculate force
         # This is x^{-1/8}
-        # MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
-
-        # MC is to prepare
-        # This is x^{1/8}
-        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
-
-        # MD is to calculate force
-        # This is x^{-1/4}
-        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+        MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
 
     FermionField3:
         
@@ -158,27 +146,20 @@ JobSimulate:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.18
+        Mass : 0.085
         FieldId : 4
         PoolNumber : 15
         EachSiteEta : 1
+        CachedGauge : 1
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
         # This is x^{1/16}
-        # MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
+        MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
 
         # MD is to calculate force
         # This is x^{-1/8}
-        # MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
-
-        # MC is to prepare
-        # This is x^{1/8}
-        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
-
-        # MD is to calculate force
-        # This is x^{-1/4}
-        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+        MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
 
     FermionField4:
         
@@ -190,20 +171,20 @@ JobSimulate:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        # Mass : 0.4
-        Mass : 0.036
+        Mass : 0.017
         FieldId : 5
         PoolNumber : 15
         EachSiteEta : 1
+        CachedGauge : 1
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
-        # This is (x+0.0384/x)^{-1/4}
-        MC : [0.990577505843871, -0.005956027818373708, 0.010482604242040627]
+        # This is (x+0.0384/x)^{-1/8}
+        MC : [0.9994160468396464, -0.0008106707240948374, 0.0028748887505279834]
 
         # MD is to calculate force
-        # This is (x+0.0384/x)^{1/2}
-        MD : [1.0152096028540707, 0.012843687857573033, 0.00254889085912725]
+        # This is (x+0.0384/x)^{1/4}
+        MD : [1.0011126276534763, 0.0016292352801981862, 0.001701153047153929]
 
 
     Action1:
@@ -212,7 +193,7 @@ JobSimulate:
         # ActionName : CActionGaugePlaquette
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 5.8
+        Beta : 5.3
         Omega : 0.0
 
     Action2:
@@ -265,7 +246,7 @@ JobSimulate:
         SolverForFieldId : 2
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.000001
+        Accuracy : 0.0001
         AbsoluteAccuracy : 1
         # SolverName : CMultiShiftFOM
         # SolverForFieldId : 2
@@ -281,7 +262,7 @@ JobSimulate:
         SolverForFieldId : 3
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.000001
+        Accuracy : 0.0001
         AbsoluteAccuracy : 1
 
     MSSolver3:
@@ -290,7 +271,7 @@ JobSimulate:
         SolverForFieldId : 4
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.000001
+        Accuracy : 0.0001
         AbsoluteAccuracy : 1
 
     MSSolver4:
@@ -301,7 +282,7 @@ JobSimulate:
         # DiviationStep : 20
         DiviationStep : 50
         MaxStep : 500
-        Accuracy : 0.000001
+        Accuracy : 0.00001
         AbsoluteAccuracy : 1
         
         NestedSolver :
@@ -317,7 +298,7 @@ JobSimulate:
             MaxDim : 15
 
             # SolverName : CSLASolverGCRODR
-            Accuracy : 0.0000001
+            Accuracy : 0.00001
             # MDim : 26
             # KDim : 5
             # RecalculateR : 5
@@ -332,23 +313,39 @@ JobSimulate:
         FieldId : 1
         ShowResult : 1
 
+    StapleCache:
+
+        StapleCacheName : CStapleCacheSU3
+        FieldId : 1
+
+        CacheStaples : 0
+        CachePlaquttes : 0
+        CacheFmunu: 0
+        CacheRotationLink : 1
+
+        FermionUpdate : 1
+        GaugeUpdate : 0
+        UseEffectiveGauge : 0
+
+# JobMeasure
 JobMeasure:
 
     ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
-    VerboseLevel : GENERAL
+    VerboseLevel : PARANOIAC
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
+    MaxThreadPerBlock : 128
 
-    FreeFermion : 1
-    GaugeBate : 4.94
-    OmegaRange : 0.128
-    StartOmega : 1
-    EndOmega : 8
+    FreeFermion : 0
+    GaugeBate : 0.2
+    OmegaRange : 7.5
+    StartOmega : 0
+    EndOmega : 30
     # 0 - all has rotation, 1 - gauge zero rotation, 2 - fermion zero rotation, 3 - no rotation
     BindOmega : 0
-    StartN : 101
-    EndN : 200
+    StartN : 201
+    EndN : 3000
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./F494235047_
@@ -362,25 +359,27 @@ JobMeasure:
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, 
     ## EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
     ## EDJKS_DoubleToFloat, EDJKS_Taylor, EDJKS_AngularMomentumDiagnal
-    DistributionJob : EDJKS_ChiralAndFermionMomentum
+    DistributionJob : EDJKS_Polyakov
     FermionMomentum : 0
-    StochasticFieldCount : 100
+    StochasticFieldCount : 20
     CheckGaugeFixing : 0
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\486295059\GFNt4
+    # SubFolderPrefix : I:\StrongCoupling\QD02C\QD020243
+    SubFolderPrefix : QP02/QP0202340
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
     
     # R for most cases, Rotate for only configurations
     MiddleString : R
-    SavePrefix : GFSRF494235047_
-    CSVSavePrefix : ./FFP494235047_
+    SavePrefix : QP0202340_
+    # CSVSavePrefix : I:\StrongCoupling\QD02C\QD020243_
+    CSVSavePrefix : QP02/Polyakov/QP0202340_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 6]
+    LatticeLength : [12, 12, 12, 3]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
@@ -413,11 +412,11 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.235
+        Mass : 0.165
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
-        ShiftCenter : 1
+        CachedGauge : 1
         Period : [1, 1, 1, -1]
 
         RealRotation : 0
@@ -447,11 +446,11 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.047
+        Mass : 0.033
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
-        ShiftCenter : 1
+        CachedGauge : 1
         Period : [1, 1, 1, -1]
 
         RealRotation : 0
@@ -479,14 +478,14 @@ JobMeasure:
         # SolverName : CSLASolverBiCGStab
         # Accuracy : 0.00000001
 
-        DiviationStep : 50
-        MaxStep : 1
+        DiviationStep : 10
+        MaxStep : 50
 
         SolverName : CSLASolverGMRES
-        MaxDim : 15
+        MaxDim : 10
 
         # SolverName : CSLASolverGCRODR
-        Accuracy : 0.000001
+        Accuracy : 0.0001
         # MDim : 26
         # KDim : 5
         # RecalculateR : 5
@@ -503,13 +502,13 @@ JobMeasure:
         # Accuracy : 0.00000001
 
         DiviationStep : 10
-        MaxStep : 1
+        MaxStep : 50
 
         SolverName : CSLASolverGMRES
-        MaxDim : 15
+        MaxDim : 10
 
         # SolverName : CSLASolverGCRODR
-        Accuracy : 0.000001
+        Accuracy : 0.0001
         # MDim : 26
         # KDim : 5
         # RecalculateR : 5
@@ -632,6 +631,20 @@ JobMeasure:
         Cabibbo : 1
         ProjIterate : 15
         HasT : 0
+
+    StapleCache:
+
+        StapleCacheName : CStapleCacheSU3
+        FieldId : 1
+
+        CacheStaples : 0
+        CachePlaquttes : 0
+        CacheFmunu: 0
+        CacheRotationLink : 1
+
+        FermionUpdate : 1
+        GaugeUpdate : 0
+        UseEffectiveGauge : 0
 
 JobGaugeFixing:
 
@@ -1185,7 +1198,7 @@ JobMeasureU1:
 
     Measure3:
 
-        MeasureName : CMeasurePolyakovU1XY
+        MeasureName : CMeasurePolyakovXY
         FieldId : 1
         ShowResult : 0
 
@@ -1814,6 +1827,7 @@ JobMeasureREM:
         ProjIterate : 15
         HasT : 0
 
+# JobSimulateQuenched
 JobSimulateQuenched:
 
     ## Log options
@@ -1825,41 +1839,49 @@ JobSimulateQuenched:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
-    ExponentialPrecision : 10
-    BeforeEquvibStep : 10
+    ExponentialPrecision : 1
+    MaxThreadPerBlock : 256
+    BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 10
+    EquvibStep : 20
     SaveStartIndex : 0
-    OmegaSep : 8
-    OmegaStart : 0
-    MaxOmega : 0.128
-    MinNt : 4
-    MaxNt : 4
-    SavePrefix : ./57Quenched_
+    OmegaSep : 1
+    OmegaStart : 1
+    
+    MinNt : 3
+    MaxNt : 3
+    MaxOmega : 0.0
+    SavePrefix : ./T35_
+    # MaxOmega : 10.0
+    # SavePrefix : ./QP02/QD020230/QP020230_
     Additive : 0
 
+    # 1 - only save the last configuration of each omega; 0 - save every accepted configuration
+    SaveLastConfigOnly : 1
+
     # 53551575Nt4 Omega60 
-    Polyakovs : [0.068154081702, 0.048238586634, 0.125783473253, 0.047594130039, 0.034346383065, 0.054236494005, 0.170299991965]
+    Polyakovs : [2.05507742,2.05468573,2.06470285,2.07031312,2.04568193,2.0571223,2.05479849,2.0703212,2.06856943]
 
     Dim : 4
     Dir : 4
-    LatticeLength : [5, 5, 4, 2]
+    LatticeLength : [12, 12, 12, 4]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
-    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     ActionListLength : 1
     FermionFieldCount : 0
-    MeasureListLength : 1
+    MeasureListLength : 3
     CacheStaple : 0
 
     ## ============================================================
     ## Initial files
     ## ============================================================
-    # Nt4FileName : ./57Quenched_R_Nt4_O0_1000.con
-    # Nt4Polyakov : 0.022946210578
+    # Nt3FileName : ./QP02/QP020233/QP020233_.con
+    # Nt3Polyakov : 0.745865298659
 
     Updator:
 
@@ -1867,8 +1889,8 @@ JobSimulateQuenched:
         Metropolis : 1
         ReportMeasure : 0
         Adaptive : 1
-        MinMaxStep : [4, 50]
-        GrowReduceThreshold : [-0.3, 0.02]
+        MinMaxStep : [4, 80]
+        GrowReduceThreshold : [-0.6, 0.1]
         InnerLeapfrog : 1
         DebugForce : 0
 
@@ -1877,14 +1899,15 @@ JobSimulateQuenched:
         # IntegratorType : CIntegratorNestedOmelyan
         IntegratorType : CIntegratorForceGradient 
         IntegratorStepLength : 1
-        IntegratorStep : 20
+        IntegratorStep : 30
 
     Gauge:
 
-        FieldName : CFieldGaugeSU3D
-        FieldInitialType : EFIT_Random
+        FieldName : CFieldGaugeSU3
+        # FieldInitialType : EFIT_Random
+        FieldInitialType : EFIT_Identity
 
-        Period : [0, 0, 1, 1]
+        Period : [1, 1, 1, 1]
 
     GaugeBoundary:
 
@@ -1893,10 +1916,12 @@ JobSimulateQuenched:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        # CloverEnergy : 1
-        # ShiftCoord : 1
-        Beta : 5.7
+        CloverEnergy : 0
+        ShiftCoord : 0
+        Beta : 3.5
         Omega : 0.0
+        Xi : 1.0
+        Torus : 1
 
     Measure1:
 
@@ -1904,6 +1929,27 @@ JobSimulateQuenched:
         FieldId : 1
         ShowResult : 1
 
+    Measure2:
+
+        MeasureName : CMeasureRotatingAction
+
+    Measure3:
+
+        MeasureName : CMeasureWilsonLoop
+        GaugeSmearing : 1
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingAPEProj
+        AlphaLeft : 2.3
+        AlphaRight : 1
+        Iterate : 26
+        # Cabibbo-Marinani projection is not correctly implemented
+        Cabibbo : 1
+        ProjIterate : 15
+        HasT : 0
+
+# JobSimulateQuenchedU1
 JobSimulateQuenchedU1:
 
     ## Log options
@@ -1986,10 +2032,11 @@ JobSimulateQuenchedU1:
 
     Measure1:
 
-        MeasureName : CMeasurePolyakovU1XY
+        MeasureName : CMeasurePolyakovXY
         FieldId : 1
         ShowResult : 1
 
+# JobSimulateQuenched3D
 JobSimulateQuenched3D:
 
     ## Log options
@@ -2077,6 +2124,7 @@ JobSimulateQuenched3D:
         ShowResult : 1
         U1 : 0
 
+# JobSimulateQuenchedU13D
 JobSimulateQuenchedU13D:
 
     ## Log options
@@ -2164,6 +2212,7 @@ JobSimulateQuenchedU13D:
         ShowResult : 1
         U1 : 1
 
+# JobMeasure3D
 JobMeasure3D:
 
     ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
@@ -2222,6 +2271,7 @@ JobMeasure3D:
         ShowResult : 0
         U1 : 0
 
+# JobMeasureU13D
 JobMeasureU13D:
 
     ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}

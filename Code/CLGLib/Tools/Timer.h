@@ -5,6 +5,7 @@
 // This is the timer for tester use
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/2/2018 nbale]
 //=============================================================================
 
@@ -56,13 +57,13 @@ public:
     }
 
     FLOAT Elapsed(void) const { return m_fElapsed; }
-    DWORD GetCounter() const { return m_dwCounter; }
+    UINT GetCounter() const { return m_dwCounter; }
 
     void Report(const EVerboseLevel vl = GENERAL)
     {
         Stop();
 
-        const DWORD dwCount = GetCounter();
+        const UINT dwCount = GetCounter();
         const FLOAT fElapsed = Elapsed();
         const FLOAT fAverage = (0 != dwCount) ? (fElapsed / dwCount) : 0;
 
@@ -78,7 +79,7 @@ private:
     UBOOL m_bStarted;
     ULONGLONG m_uiStart;
     FLOAT m_fElapsed;
-    DWORD m_dwCounter;
+    UINT m_dwCounter;
     CCString m_sId;
     UBOOL m_bReportOnExit;
 };

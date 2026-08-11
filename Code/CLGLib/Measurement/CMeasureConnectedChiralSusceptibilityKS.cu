@@ -21,20 +21,20 @@ CMeasureConnectedSusceptibilityKS::~CMeasureConnectedSusceptibilityKS()
 
 }
 
-void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const CFieldGauge* const* pStapleField)
+void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, INT tensor2Num, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldTensor2* const* tensor2Fields, const CFieldGauge* const* pStapleField)
 {
-    m_pSourceZero = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
-    CFieldFermion* pSourceZeroCopy = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
+    m_pSourceZero = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId(), _T(__FILE__), __LINE__));
+    CFieldFermion* pSourceZeroCopy = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId(), _T(__FILE__), __LINE__));
     SFermionBosonSource sour;
     sour.m_byColorIndex = 0;
     sour.m_eSourceType = EFS_Point;
     sour.m_sSourcePoint = _HC_Center;//SSmallInt4(0, 0, 0, 0);
     //appGeneral(_T("point1 %d, point2 %d\n"), _hostGetSiteIndex(sour.m_sSourcePoint), _hostGetSiteIndex(CCommonData::m_sCenter));
     m_pSourceZero->InitialAsSource(sour);
-    m_pSourceZero->FixBoundary();
+    m_pSourceZero->FixBoundary(EFB_Field);
     m_pSourceZero->CopyTo(pSourceZeroCopy);
-    m_pSourceZero->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
-    m_pSourceZero->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
+    m_pSourceZero->InverseD(gaugeNum, bosonNum, tensor2Num, pAcceptGauge, pAcceptBoson, tensor2Fields);
+    m_pSourceZero->InverseD(gaugeNum, bosonNum, tensor2Num, pAcceptGauge, pAcceptBoson, tensor2Fields);
 #if !_CLG_DOUBLEFLOAT
     const cuDoubleComplex color1 = pSourceZeroCopy->Dot(m_pSourceZero);
 #else
@@ -43,8 +43,8 @@ void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(INT gaugeNum, IN
     sour.m_byColorIndex = 1;
     m_pSourceZero->InitialAsSource(sour);
     m_pSourceZero->CopyTo(pSourceZeroCopy);
-    m_pSourceZero->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
-    m_pSourceZero->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
+    m_pSourceZero->InverseD(gaugeNum, bosonNum, tensor2Num, pAcceptGauge, pAcceptBoson, tensor2Fields);
+    m_pSourceZero->InverseD(gaugeNum, bosonNum, tensor2Num, pAcceptGauge, pAcceptBoson, tensor2Fields);
 #if !_CLG_DOUBLEFLOAT
     const cuDoubleComplex color2 = pSourceZeroCopy->Dot(m_pSourceZero);
 #else
@@ -54,8 +54,8 @@ void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(INT gaugeNum, IN
     sour.m_byColorIndex = 2;
     m_pSourceZero->InitialAsSource(sour);
     m_pSourceZero->CopyTo(pSourceZeroCopy);
-    m_pSourceZero->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
-    m_pSourceZero->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
+    m_pSourceZero->InverseD(gaugeNum, bosonNum, tensor2Num, pAcceptGauge, pAcceptBoson, tensor2Fields);
+    m_pSourceZero->InverseD(gaugeNum, bosonNum, tensor2Num, pAcceptGauge, pAcceptBoson, tensor2Fields);
 #if !_CLG_DOUBLEFLOAT
     const cuDoubleComplex color3 = pSourceZeroCopy->Dot(m_pSourceZero);
 #else
@@ -63,10 +63,15 @@ void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(INT gaugeNum, IN
 #endif
 
 #if !_CLG_DOUBLEFLOAT
-    UpdateComplexResult(_cToFloat(cuCadd(cuCadd(color1, color2), color3)));
+    const CLGComplex cResult = _cToFloat(cuCadd(cuCadd(color1, color2), color3));
 #else
-    UpdateComplexResult(_cuCaddf(_cuCaddf(color1, color2), color3));
+    const CLGComplex cResult = _cuCaddf(_cuCaddf(color1, color2), color3);
 #endif
+    UpdateComplexResult(cResult);
+    if (NULL != m_pOwner)
+    {
+        m_pOwner->AddOneConfigurationResult(this, _T("ConnectedChiralSusceptibility"), cResult);
+    }
     pSourceZeroCopy->Return();
 
     if (m_bShowResult)

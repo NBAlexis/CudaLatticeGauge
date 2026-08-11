@@ -5,14 +5,16 @@
 // 
 // This has sign problem
 // 
-// gammat (pt+iAt) + (1+gz) gammai (pi + iAi) + g gammaz + (1+gz)m
+// gammat (pt+iAt) + (1+gz) gammai (pi + iAi) + g gammaz/2 + 2(1+gz)m
 //  
 // NOTE: the mass term is not a number but a diagonal, it does NOT support 'nested shift solver', and 'mass preconditioner'
 //
 // REVISION:
 //  [12/27/2023 nbale]
 //=============================================================================
-#include "CFieldFermionKSSU3.h"
+#pragma once
+
+#include "CFieldFermionKST.h"
 
 #ifndef _CFIELDFERMIONKSSU3RIGIDACC_H_
 #define _CFIELDFERMIONKSSU3RIGIDACC_H_
@@ -42,8 +44,8 @@ public:
 
     CCString GetInfos(const CCString& tab) const override;
 
-    UBOOL m_bUseImaginaryGamma3;
-    INT* m_pDevicePathBuffer;
+    //UBOOL m_bUseImaginaryGamma3;
+    SCHAR* m_pDevicePathBuffer;
 
 };
 

@@ -44,6 +44,9 @@
 \usepackage[bookmarks=true,colorlinks=true,linkcolor=blue,unicode=true]{hyperref}
 
 \usepackage{titlesec}
+\usepackage{multirow}
+
+\usepackage[most]{tcolorbox}
 
 \titleclass{\subsubsubsection}{straight}[\subsection]
 
@@ -125,6 +128,22 @@
      morecomment=[l]{-}
  }
 
+ \tcbset{
+    frame code={}
+    center title,
+    left=0pt,
+    right=0pt,
+    top=0pt,
+    bottom=0pt,
+    colback=gray!30,
+    colframe=white,
+    width=\dimexpr\textwidth\relax,
+    enlarge left by=0mm,
+    boxsep=5pt,
+    arc=0pt,outer arc=0pt,
+    fontupper=\fontsize{8pt}{10pt}\selectfont
+    }
+
 \section{\label{sec:data}Data}
 
 \input "data/index.tex"
@@ -144,6 +163,12 @@
 \input "update/rhmcwithdiagonal.tex"
 
 \input "update/bosonandgauge.tex"
+
+\input "update/hisq.tex"
+
+\input "update/cloverWilson.tex"
+
+\input "update/HMCDiagnostics.tex"
 
 \clearpage
 
@@ -188,6 +213,8 @@
 
 \input "Measurement/StaggeredFermiomChargeAndCurrent.tex"
 
+\input "Measurement/GrassmanNumber.tex"
+
 \clearpage
 
 \section{\label{sec:Programming}Programming}
@@ -212,17 +239,33 @@
 
 \input "Applications/ConstantAcceleration.tex"
 
+\input "Applications/PSU3Adjoint.tex"
+
+\input "Applications/Cylinder.tex"
+
+\input "Applications/AnisotropicSymanzik.tex"
+
 \clearpage
 
 \section{\label{sec:SomeResults}Some Results}
 
 \input "Results/MatchingQuench.tex"
 
+\input "Results/MatchingWilsonDirac.tex"
+
 \input "Results/MatchingStaggeredNf2.tex"
 
 \input "Results/ResQuench.tex"
 
 \input "Results/ResStaggeredNf2.tex"
+
+\clearpage
+
+\section{\label{sec:Summaries}Summaries}
+
+\input "Summaries/ActionTable.tex"
+
+\input "Summaries/CaleyHamilton.tex"
 
 \clearpage
 

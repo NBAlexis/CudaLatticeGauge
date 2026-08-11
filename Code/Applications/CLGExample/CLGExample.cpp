@@ -13,7 +13,7 @@
 int main(int argc, char * argv[])
 {
     CParameters params;
-#if _CLG_DEBUG
+#if _CLG_DEBUG && _CLG_WIN
     CYAMLParser::ParseFile(_T("CLGExample.yaml"), params);
 #else
     CYAMLParser::ParseFile(_T("../Debug/CLGExample.yaml"), params);
@@ -21,8 +21,18 @@ int main(int argc, char * argv[])
     appSetupLog(params);
     appInitialCLG(params);
 
-    appGetLattice()->m_pUpdator->SetSaveConfiguration(TRUE, _T("CLGExample"));
-    appGetLattice()->m_pUpdator->UpdateUntileAccept(10, FALSE);
+    //warm up for 5 trajectories
+    appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
+    appGetLattice()->m_pUpdator->SetAutoCorrection(FALSE);
+    appGetLattice()->m_pUpdator->Update(5, FALSE);
+
+    //update for 10 trajectories and save
+    appClearProfiler();
+    appGetLattice()->m_pUpdator->SetSaveConfiguration(TRUE, _T("test"));
+    appGetLattice()->m_pUpdator->SetAutoCorrection(TRUE);
+    appGetLattice()->m_pUpdator->UpdateUntileAccept(20, FALSE);
+
+    appDumpProfiler();
 
     return 0;
 }

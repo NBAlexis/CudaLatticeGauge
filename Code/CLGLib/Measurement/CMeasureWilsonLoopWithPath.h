@@ -21,11 +21,15 @@ class CLGAPI CMeasureWilsonLoopWithPath : public CMeasure
 
 public:
 
+    enum { _kMaxWilsonPathLength = 128 };
+
     CMeasureWilsonLoopWithPath()
         : CMeasure()
         , m_bAllPoint(TRUE)
         , m_pTmpDeviceRes(NULL)
         , m_pDevicePath(NULL)
+        , m_pDevicePath2(NULL)
+        , m_bTwoPathBackForward(FALSE)
     {
 
     }
@@ -39,14 +43,42 @@ public:
     UBOOL IsGaugeOrBosonMeasurement() const override { return TRUE; }
     UBOOL IsSourceScanning() const override { return FALSE; }
 
+    void SetPath(const TArray<TArray<SCHAR>>& sp)
+    {
+        m_lstPath = sp;
+    }
+
+    void Reset() override
+    {
+        CMeasure::Reset();
+        m_lstV.RemoveAll();
+        m_lstDV.RemoveAll();
+    }
+
+    void SetAsTwoPathBackForward(UBOOL bTwoPath, const TArray<TArray<SCHAR>>& path, const TArray<SSmallInt4>& shift)
+    {
+        m_bTwoPathBackForward = bTwoPath;
+        m_lstPath = path;
+        m_sShift = shift;
+    }
+
 protected:
 
-    TArray<INT> m_lstPath;
+    TArray<TArray<SCHAR>> m_lstPath;
     SSmallInt4 m_sPoint;
     UBOOL m_bAllPoint;
-    CLGComplex* m_pTmpDeviceRes;
-    INT* m_pDevicePath;
+    cuDoubleComplex* m_pTmpDeviceRes;
+    SCHAR* m_pDevicePath;
+    SCHAR* m_pDevicePath2;
 
+    UBOOL m_bTwoPathBackForward;
+    TArray<SSmallInt4> m_sShift;
+
+public:
+
+    //every path
+    TArray<TArray<cuDoubleComplex>> m_lstV;
+    TArray<TArray<DOUBLE>> m_lstDV;
 };
 
 

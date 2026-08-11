@@ -5,6 +5,7 @@
 // This is the class read YAML paramters
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/2/2018 nbale]
 //=============================================================================
 
@@ -123,6 +124,8 @@ public:
 
     _FetchFunctionArray(INT)
 
+    _FetchFunctionArray(SCHAR)
+
     _FetchFunctionArray(BYTE)
 
     _FetchFunctionArray(UINT)
@@ -167,6 +170,11 @@ public:
             return TRUE;
         }
         return FALSE;
+    }
+
+    TArray<CCString> GetAllStringKeys() const
+    {
+        return m_pStrings.GetAllKeys();
     }
 
     void Dump(const CCString& indent = "") const;

@@ -5,6 +5,7 @@
 //  try not to depend on other libs
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [1/21/2021 nbale]
 //=============================================================================
 #pragma once
@@ -70,7 +71,7 @@ static QWORD* FoldDataMD5_OLD(UINT& iBlockCount, const BYTE* pInData, UINT iData
 {
     const UINT iLength = (UINT)((INT)(iDataCount >> 6) + 1) * 16; //blocks is parted into every 64 chars, and so 16 DWORDs as a block
     QWORD* retVal = (QWORD*)malloc(sizeof(QWORD) * iLength);
-    assert(retVal);
+    appAssert(retVal);
     memset(retVal, 0, sizeof(QWORD) * iLength);
     iBlockCount = iLength;
 
@@ -86,9 +87,9 @@ static QWORD* FoldDataMD5_OLD(UINT& iBlockCount, const BYTE* pInData, UINT iData
     iFinalCount = iFinalCount < iLength ? iLength - 1 : iFinalCount;
     const UINT iNewLength = ((iFinalCount >> 4) + 1) * 16;
     QWORD* pNewsValue = (QWORD*)malloc(sizeof(QWORD) * iNewLength);
-    assert(NULL != pNewsValue);
+    appAssert(NULL != pNewsValue);
     memset(pNewsValue, 0, sizeof(QWORD) * iNewLength);
-    assert(iLength <= iNewLength);
+    appAssert(iLength <= iNewLength);
     memcpy(pNewsValue, retVal, sizeof(QWORD) * iLength);
     pNewsValue[iDataCount >> 2] |= 128ULL << (8 * (iDataCount & 0x00000003)); //Add length of string to end of array
     pNewsValue[(((iDataCount + 8) >> 6) << 4) + 14] = iDataCount * 8; //Add length of string to end of array why?
@@ -177,14 +178,14 @@ static QWORD* MD5HashFoldeded_OLD(QWORD* pFoldedData, UINT iFoldCount)
     */
 
     QWORD* pOutValue = (QWORD*)malloc(sizeof(QWORD) * 4);
-    assert(pOutValue);
+    appAssert(pOutValue);
 
     pOutValue[0] = 0x67452301;
     pOutValue[1] = 0xefcdab89;
     pOutValue[2] = 0x98badcfe;
     pOutValue[3] = 0x10325476;
 
-    assert((iFoldCount & 0x0000000f) == 0); //iLength must be 16s
+    appAssert((iFoldCount & 0x0000000f) == 0); //iLength must be 16s
 
     for (UINT i = 0; i < (iFoldCount >> 4); ++i)
     {
@@ -352,7 +353,7 @@ static UINT* FoldDataMD5(UINT& iBlockCount, const BYTE* pInData, UINT iDataCount
 {
     const UINT iLength = (UINT)((INT)(iDataCount >> 6) + 1) * 16; //blocks is parted into every 64 chars, and so 16 DWORDs as a block
     UINT* retVal = (UINT*)malloc(sizeof(UINT) * iLength);
-    assert(retVal);
+    appAssert(retVal);
     memset(retVal, 0, sizeof(UINT) * iLength);
     iBlockCount = iLength;
 
@@ -368,9 +369,9 @@ static UINT* FoldDataMD5(UINT& iBlockCount, const BYTE* pInData, UINT iDataCount
     iFinalCount = iFinalCount < iLength ? iLength - 1 : iFinalCount;
     const UINT iNewLength = ((iFinalCount >> 4) + 1) * 16;
     UINT* pNewsValue = (UINT*)malloc(sizeof(UINT) * iNewLength);
-    assert(NULL != pNewsValue);
+    appAssert(NULL != pNewsValue);
     memset(pNewsValue, 0, sizeof(UINT) * iNewLength);
-    assert(iLength <= iNewLength);
+    appAssert(iLength <= iNewLength);
     memcpy(pNewsValue, retVal, sizeof(UINT) * iLength);
     pNewsValue[iDataCount >> 2] |= 128ULL << (8 * (iDataCount & 0x00000003)); //Add length of string to end of array
     pNewsValue[(((iDataCount + 8) >> 6) << 4) + 14] = iDataCount * 8; //Add length of string to end of array why?
@@ -459,14 +460,14 @@ static UINT* MD5HashFoldeded(UINT* pFoldedData, UINT iFoldCount)
     */
 
     UINT* pOutValue = (UINT*)malloc(sizeof(UINT) * 4);
-    assert(pOutValue);
+    appAssert(pOutValue);
 
     pOutValue[0] = 0x67452301;
     pOutValue[1] = 0xefcdab89;
     pOutValue[2] = 0x98badcfe;
     pOutValue[3] = 0x10325476;
 
-    assert((iFoldCount & 0x0000000f) == 0); //iLength must be 16s
+    appAssert((iFoldCount & 0x0000000f) == 0); //iLength must be 16s
 
     for (UINT i = 0; i < (iFoldCount >> 4); ++i)
     {

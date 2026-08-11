@@ -12,7 +12,31 @@
 
 __BEGIN_NAMESPACE
 
-void CMeasurementManager::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple)
+CMeasurementManager::CMeasurementManager(class CLatticeData* pOwner)
+    : m_iAcceptedConfigurationCount(0)
+    , m_pOwner(pOwner)
+    , m_bNeedGaugeSmearing(FALSE)
+    , m_bEverResetted(FALSE)
+{
+    m_MeasureDataMem.Init(64 * 1024);
+}
+
+CMeasurementManager::~CMeasurementManager()
+{
+    TArray<CCString> keys = m_mapMeasureData.GetAllKeys();
+    for (INT i = 0; i < keys.Num(); ++i)
+    {
+        CMeasureData* pData = m_mapMeasureData.GetAt(keys[i]);
+        if (NULL != pData)
+        {
+            pData->~CMeasureData();
+        }
+    }
+    m_mapMeasureData.RemoveAll();
+    m_MeasureDataMem.Reset();
+}
+
+void CMeasurementManager::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, INT tensor2Num, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldTensor2* const* tensor2Fields, const class CFieldGauge* const* pCorrespondingStaple)
 {
     if (!m_bEverResetted && 0 == m_iAcceptedConfigurationCount)
     {
@@ -20,10 +44,12 @@ void CMeasurementManager::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, co
     }
 
     ++m_iAcceptedConfigurationCount;
+    appGeneral(_T("[CMeasurementManager] Configuration accepted: count=%d gaugeNum=%d bosonNum=%d\n"),
+        m_iAcceptedConfigurationCount, gaugeNum, bosonNum);
 
     TArray<const CFieldGauge*> allGauges;
     TArray<const CFieldGauge*> allStaples;
-    if (m_bNeedGaugeSmearing && NULL != appGetGaugeSmearing())
+    if (m_bNeedGaugeSmearing)
     {
         CFieldGauge* pSmearing = NULL;
         CFieldGauge* pSmearingStaple = NULL;
@@ -42,7 +68,7 @@ void CMeasurementManager::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, co
                     pSmearingStaple = dynamic_cast<CFieldGauge*>(pAcceptGauge[i]->GetCopy());
                     pAcceptGauge[i]->CalculateOnlyStaple(pSmearingStaple);
                 }
-                appGetGaugeSmearing()->GaugeSmearing(pSmearing, pSmearingStaple);
+                appGetGaugeSmearing(pAcceptGauge[i]->m_byFieldId)->GaugeSmearing(pSmearing, NULL, pSmearingStaple);
                 allGauges.AddItem(pSmearing);
                 allStaples.AddItem(pSmearingStaple);
             }
@@ -62,8 +88,10 @@ void CMeasurementManager::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, co
             m_lstAllMeasures[i]->OnConfigurationAccepted(
                 gaugeNum,
                 bosonNum,
+                tensor2Num,
                 m_lstAllMeasures[i]->NeedGaugeSmearing() ? allGauges.GetData() : pAcceptGauge,
                 pAcceptBoson,
+                tensor2Fields,
                 m_lstAllMeasures[i]->NeedGaugeSmearing() ? allStaples.GetData() : pCorrespondingStaple);
         }
     }
@@ -83,8 +111,8 @@ void CMeasurementManager::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, co
 
             for (UINT j = 0; j < uiFieldCount; ++j)
             {
-                CFieldFermion* pF1 = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(byFieldIdz4));
-                CFieldFermion* pF2 = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(byFieldIdz4));
+                CFieldFermion* pF1 = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(byFieldIdz4, _T(__FILE__), __LINE__));
+                CFieldFermion* pF2 = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(byFieldIdz4, _T(__FILE__), __LINE__));
                 if (CCommonData::m_bStochasticGaussian)
                 {
                     pF1->InitialField(EFIT_RandomGaussian);
@@ -93,19 +121,21 @@ void CMeasurementManager::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, co
                 {
                     pF1->InitialField(EFIT_RandomZ4);
                 }
-                pF1->FixBoundary();
+                pF1->FixBoundary(EFB_Field);
                 pF1->CopyTo(pF2);
-                pF1->InverseD(gaugeNum, bosonNum, 
+                pF1->InverseD(gaugeNum, bosonNum, tensor2Num,
                     m_bNeedGaugeSmearing ? allGauges.GetData() : pAcceptGauge,
-                    pAcceptBoson);
+                    pAcceptBoson, tensor2Fields);
 
                 for (INT k = 0; k < measures.GetCount(); ++k)
                 {
                     measures[k]->OnConfigurationAcceptedZ4(
                         gaugeNum,
                         bosonNum,
+                        tensor2Num,
                         measures[k]->NeedGaugeSmearing() ? allGauges.GetData() : pAcceptGauge,
                         pAcceptBoson,
+                        tensor2Fields,
                         measures[k]->NeedGaugeSmearing() ? allStaples.GetData() : pCorrespondingStaple,
                         pF2, pF1,
                         0 == j, uiFieldCount == j + 1);
@@ -130,10 +160,10 @@ void CMeasurementManager::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, co
             for (UINT x = 1; x < _HC_Lx; ++x)
             {
                 SSmallInt4 sourceSite;
-                sourceSite.x = static_cast<SBYTE>(x);
-                sourceSite.y = static_cast<SBYTE>(_HC_Centery);
-                sourceSite.z = static_cast<SBYTE>(_HC_Centerz);
-                sourceSite.w = static_cast<SBYTE>(_HC_Centert);
+                sourceSite.x = static_cast<SCHAR>(x);
+                sourceSite.y = static_cast<SCHAR>(_HC_Centery);
+                sourceSite.z = static_cast<SCHAR>(_HC_Centerz);
+                sourceSite.w = static_cast<SCHAR>(_HC_Centert);
 
                 CFieldFermion* pFermion = dynamic_cast<CFieldFermion*>(appGetLattice()->GetFieldById(byFieldId));
                 TArray<CFieldFermion*> sources = pFermion->GetSourcesAtSiteFromPool(
@@ -177,7 +207,7 @@ void CMeasurementManager::OnUpdateFinished(UBOOL bReport)
     {
         if (NULL != m_lstAllMeasures[i])
         {
-            assert(m_iAcceptedConfigurationCount == m_lstAllMeasures[i]->GetConfigurationCount());
+            appAssert(m_iAcceptedConfigurationCount == m_lstAllMeasures[i]->GetConfigurationCount());
             m_lstAllMeasures[i]->Average();
             if (bReport)
             {
@@ -195,6 +225,16 @@ void CMeasurementManager::Reset()
         if (NULL != m_lstAllMeasures[i])
         {
             m_lstAllMeasures[i]->Reset();
+        }
+    }
+
+    TArray<CCString> keys = m_mapMeasureData.GetAllKeys();
+    for (INT i = 0; i < keys.Num(); ++i)
+    {
+        CMeasureData* pData = m_mapMeasureData.GetAt(keys[i]);
+        if (NULL != pData)
+        {
+            pData->Reset();
         }
     }
 
@@ -257,6 +297,21 @@ TArray<Real> CMeasurementManager::LastReals() const
 CMeasure* CMeasurementManager::GetMeasureById(BYTE byId) const
 {
     return m_mapMeasures.GetAt(byId);
+}
+
+CMeasureData* CMeasurementManager::GetMeasureData(const CCString& sKey) const
+{
+    CMeasureData* pData = m_mapMeasureData.GetAt(sKey);
+    if (NULL == pData)
+    {
+        appCrucial(_T("[CMeasurementManager] GetMeasureData: key '%s' not found.\n"), sKey.c_str());
+    }
+    else
+    {
+        appGeneral(_T("[CMeasurementManager] GetMeasureData: key '%s' found (count=%d).\n"),
+            sKey.c_str(), pData->Num());
+    }
+    return pData;
 }
 
 THashMap<BYTE, TArray<CMeasure*>> CMeasurementManager::HasSourceScanning(UBOOL& bHasSourceScanning) const

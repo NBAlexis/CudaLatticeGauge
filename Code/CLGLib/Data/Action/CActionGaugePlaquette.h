@@ -5,8 +5,10 @@
 // This is the class for all fields, gauge, fermion and spin fields are inherent from it
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/4/2018 nbale]
 //=============================================================================
+#pragma once
 
 #ifndef _CACTIONGAUGEPLAQUETTE_H_
 #define _CACTIONGAUGEPLAQUETTE_H_
@@ -32,7 +34,7 @@ public:
 
 protected:
 
-    DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;
+    DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStaple = NULL) override;
     UBOOL CalculateForceOnGaugeSingleField(const class CFieldGauge* pGauge, class CFieldGauge* pForce, class CFieldGauge* pStaple, ESolverPhase ePhase) const override;
     void PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
 

@@ -5,6 +5,7 @@
 // Reproduce the results of PRL
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [02/26/2019 nbale]
 //=============================================================================
 
@@ -50,9 +51,9 @@ for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
     lstName##In.AddItem(measureName->m_lst##lstName##Inner[j]); \
     lstName##All.AddItem(measureName->m_lst##lstName##All[j]); \
 } \
-WriteStringFileRealArray2(sFileNameWrite##lstName, lstName##OverR); \
-WriteStringFileRealArray(sFileNameWrite##lstName##In, lstName##In); \
-WriteStringFileRealArray(sFileNameWrite##lstName##All, lstName##All);
+WriteRealArray2(sFileNameWrite##lstName, lstName##OverR); \
+WriteRealArray(sFileNameWrite##lstName##In, lstName##In); \
+WriteRealArray(sFileNameWrite##lstName##All, lstName##All);
 
 
 enum ECondList
@@ -69,7 +70,7 @@ enum ECondList
 };
 
 
-#define _CLG_EXPORT_CHIRAL(measureName, lstName) \
+#define _CLG_EXPORT_CHIRAL_WD(measureName, lstName) \
 CCString sFileNameWrite##lstName = _T("%s_condensate"); \
 CCString sFileNameWrite##lstName##All = _T("%s_condensate"); \
 sFileNameWrite##lstName = sFileNameWrite##lstName + _T(#lstName) + _T("_Nt%d_O%d.csv"); \
@@ -88,8 +89,8 @@ for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
     lstName##OverR.AddItem(thisConfiguration); \
     lstName##All.AddItem(measureName->m_lstCondAll[lstName][j]); \
 } \
-WriteStringFileComplexArray2(sFileNameWrite##lstName, lstName##OverR); \
-WriteStringFileComplexArray(sFileNameWrite##lstName##All, lstName##All); 
+WriteComplexArray2(sFileNameWrite##lstName, lstName##OverR); \
+WriteComplexArray(sFileNameWrite##lstName##All, lstName##All); 
 
 
 //=============================================================================

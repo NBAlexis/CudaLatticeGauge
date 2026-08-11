@@ -10,6 +10,7 @@
 // REVISION:
 //  [12/08/2019 nbale]
 //=============================================================================
+#pragma once
 
 #ifndef _CFIELDFERMIONKS_H_
 #define _CFIELDFERMIONKS_H_
@@ -26,40 +27,19 @@ public:
         , m_bEachSiteEta(FALSE)
         , m_f2am(F(0.01))
         , m_bDiagonalMass(FALSE)
-        , m_pMDNumerator(NULL)
     {
         
     }
 
     ~CFieldFermionKS()
     {
-        if (NULL != m_pMDNumerator)
-        {
-            checkCudaErrors(cudaFree(m_pMDNumerator));
-            m_pMDNumerator = NULL;
-        }
+
     }
 
     void InitialOtherParameters(CParameters& params) override;
-    void Zero() override { InitialField(EFIT_Zero); }
-    void Identity() override
-    {
-        appCrucial(_T("Not supported for CFieldFermionKS!"));
-    }
-
-    virtual void ApplyGammaKS(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, EGammaMatrix eGamma)
-    {
-        if (SingleField())
-        {
-            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
-            ApplyGammaKSS(pGauge, eGamma);
-            return;
-        }
-        appCrucial(_T("ApplyGammaKS not implemented\n"));
-    }
 
     //================= test anti-hermitian =========
-    virtual UINT TestAntiHermitian(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson) const
+    virtual UINT TestAntiHermitian(INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const CFieldTensor2* const* tensor2Fields) const
     {
         if (SingleField())
         {
@@ -71,31 +51,6 @@ public:
     }
 
     //These are truely D or InverseD etc.
-
-    /**
-     * Use to calculate action, it is (D^+D)^{-1/4}
-     */
-    virtual void D_MD(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson)
-    {
-        RationalApproximation(EFO_F_DDdagger, gaugeNum, bosonNum, gaugeFields, pBoson, &m_rMD);
-    }
-
-    virtual void D0(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson)
-    {
-        if (SingleField())
-        {
-            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
-            D0S(pGauge);
-            return;
-        }
-        appCrucial(_T("D0 not implemented\n"));
-    }
-
-    virtual void D_MC(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson)
-    {
-        RationalApproximation(EFO_F_DDdagger, gaugeNum, bosonNum, gaugeFields, pBoson, &m_rMC);
-    }
-
     void SetMass(Real f2am)
     {
         m_f2am = f2am;
@@ -103,23 +58,16 @@ public:
 
     Real GetMass() const { return m_f2am; }
 
-    void CopyTo(CField* U) const override
+    void CopyParamTo(CField* U) const override
     {
-        CField::CopyTo(U);
+        CFieldFermion::CopyParamTo(U);
         CFieldFermionKS* pField = dynamic_cast<CFieldFermionKS*>(U);
         pField->m_f2am = m_f2am;
         pField->m_bDiagonalMass = m_bDiagonalMass;
-        pField->m_rMC = m_rMC;
-        pField->m_rMD = m_rMD;
         pField->m_bEachSiteEta = m_bEachSiteEta;
-
-        if (NULL != pField->m_pMDNumerator)
-        {
-            checkCudaErrors(cudaFree(pField->m_pMDNumerator));
-        }
-        checkCudaErrors(cudaMalloc((void**)&pField->m_pMDNumerator, sizeof(Real) * m_rMD.m_uiDegree));
-        checkCudaErrors(cudaMemcpy(pField->m_pMDNumerator, m_pMDNumerator, sizeof(Real) * m_rMD.m_uiDegree, cudaMemcpyDeviceToDevice));
     }
+
+    DOUBLE EnergyS(const CFieldGauge* pGauge) const override;
 
 public:
 
@@ -128,7 +76,7 @@ public:
     virtual void OnlyMass(void* pTarget, Real f2am, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const  = 0;
 
     virtual void OneLink(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, void* pTarget, Real fCoefficient,
-        const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx, 
+        const SCHAR* pDevicePath, BYTE pathLength, BYTE byEtaIdx,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const
     {
         if (SingleField())
@@ -141,7 +89,7 @@ public:
     }
 
     virtual void OneLinkForce(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, CFieldGauge* const* pGaugeForce, CFieldBoson* const* pBosonForce, Real fCoefficient,
-        const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx) const
+        const SCHAR* pDevicePath, BYTE pathLength, BYTE byEtaIdx) const
     {
         if (SingleField())
         {
@@ -167,7 +115,6 @@ public:
     //For some strange boundary condition
     //Normally, eta_{\mu}(n+\mu)=eta_{\mu}, so set this = FALSE
     UBOOL m_bEachSiteEta;
-
     Real m_f2am;
 
     //in case mass term is not a number
@@ -177,11 +124,6 @@ protected:
 
 #pragma region single field case
 
-    virtual void ApplyGammaKSS(const CFieldGauge* pGauge, EGammaMatrix eGamma)
-    {
-        appCrucial(_T("ApplyGammaKSS not implemented\n"));
-    }
-
     //================= test anti-hermitian =========
     virtual UINT TestAntiHermitianS(const CFieldGauge* pGauge) const
     {
@@ -190,14 +132,6 @@ protected:
     }
 
     //These are truely D or InverseD etc.
-
-    /**
-     * Use to calculate action, it is (D^+D)^{-1/4}
-     */
-    virtual void D0S(const CField* pGauge)
-    {
-        appCrucial(_T("D0S not implemented\n"));
-    }
 
     //============================
     //Override these two functions for KS
@@ -212,6 +146,12 @@ protected:
         appCrucial(_T("DOperatorKS not implemented\n"));
     }
 
+    virtual void DOperatorKSOnEvenOrOdd(void* pTargetBuffer, const void* pGaugeBuffer, BYTE byGaugeFieldId, UBOOL bEven, Real f2am,
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const
+    {
+        appCrucial(_T("D0OperatorKSOnEvenOrOdd not implemented\n"));
+    }
+
     //============================
 
     /**
@@ -223,32 +163,48 @@ protected:
         DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, byGaugeFieldId, m_f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
     }
 
+    virtual void CalculateForceEvenOddS(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const
+    {
+        appCrucial(_T("CalculateForceEvenOddS not implemented\n"));
+    }
+
+    /**
+    * calculate f0 by using one shift solver
+    */
+    virtual void CalculateForceEvenOddS_SingleTermOfRational(const CFieldGauge* pGauge, const CFieldFermionKS* phi, CFieldGauge* pForce, Real fCoef, INT iRationalTermIndex) const
+    {
+        appCrucial(_T("CalculateForceEvenOddS_SingleTermOfRational not implemented\n"));
+    }
+
+    /**
+    * calculate f0 by using one shift solver
+    */
+    virtual void CalculateForceS_SingleTermOfRational(const CFieldGauge* pGauge, const CFieldFermionKS* phi, const CFieldFermionKS* phid, CFieldGauge* pForce, Real fCoef, INT iRationalTermIndex) const
+    {
+        appCrucial(_T("CalculateForceS_SingleTermOfRational not implemented\n"));
+    }
+
+public:
+
     virtual void OneLinkS(const void* pGuage, BYTE byGaugeFieldId, void* pTarget, Real fCoefficient,
-        const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx,
+        const SCHAR* pDevicePath, BYTE pathLength, BYTE byEtaIdx,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const
     {
         appCrucial(_T("OneLinkS not implemented\n"));
     }
 
     virtual void OneLinkForceS(const void* pGuage, BYTE byGaugeFieldId, void* pForce, Real fCoefficient,
-        const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx) const
+        const SCHAR* pDevicePath, BYTE pathLength, BYTE byEtaIdx) const
     {
         appCrucial(_T("OneLinkForceS not implemented\n"));
     }
 
 #pragma endregion
 
-    // r(x) = x^{1/4} use to prepare for Nf=2
-    // r(x) = x^{3/8} use as s quark for Nf=2+1
-    // r(x) = (x+dm/x)^{-1/4} use as u,d quark for Nf=2+1
-    CRatinalApproximation m_rMC;
+public:
 
-    // r(x) = x^{-1/2} use to calculate force and action for Nf=2
-    // r(x) = x^{-3/4} use to s quark for Nf=2+1 for Nf=2
-    // r(x) = (x+dm/x)^{1/2} use as u,d quark for Nf=2+1
-    CRatinalApproximation m_rMD;
 
-    Real* m_pMDNumerator;
+    //Real* m_pMDNumerator;
 };
 
 __END_NAMESPACE

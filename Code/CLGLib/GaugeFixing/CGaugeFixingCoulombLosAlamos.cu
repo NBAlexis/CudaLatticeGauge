@@ -17,13 +17,13 @@ __BEGIN_NAMESPACE
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateGOdd_S(
     BYTE byFieldId,
-    SBYTE uiT,
+    SCHAR uiT,
     const deviceSU3* __restrict__ pU,
     Real fOmega,
     UBOOL bMixed,
     deviceSU3* pG)
 {
-    intokernalInt4_S;
+    intokernalInt4_S(uiT);
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
@@ -68,13 +68,13 @@ _kernelCalculateGOdd_S(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateGEven_S(
     BYTE byFieldId,
-    SBYTE uiT,
+    SCHAR uiT,
     const deviceSU3* __restrict__ pU,
     Real fOmega,
     UBOOL bMixed,
     deviceSU3* pG)
 {
-    intokernalInt4_S;
+    intokernalInt4_S(uiT);
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
@@ -123,11 +123,11 @@ _kernelCalculateGEven_S(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransformOdd_S(
     BYTE byFieldId,
-    SBYTE uiT,
+    SCHAR uiT,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
 {
-    intokernalInt4_S;
+    intokernalInt4_S(uiT);
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
@@ -167,11 +167,11 @@ _kernelGaugeTransformOdd_S(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransformEven_S(
     BYTE byFieldId,
-    SBYTE uiT,
+    SCHAR uiT,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
 {
-    intokernalInt4_S;
+    intokernalInt4_S(uiT);
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
@@ -211,11 +211,11 @@ _kernelGaugeTransformEven_S(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransform3DTOdd(
     BYTE byFieldId,
-    SBYTE uiT,
+    SCHAR uiT,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
 {
-    intokernalInt4_S;
+    intokernalInt4_S(uiT);
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
@@ -256,11 +256,11 @@ _kernelGaugeTransform3DTOdd(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransform3DTEven(
     BYTE byFieldId,
-    SBYTE uiT,
+    SCHAR uiT,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
 {
-    intokernalInt4_S;
+    intokernalInt4_S(uiT);
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
@@ -302,11 +302,11 @@ _kernelGaugeTransform3DTEven(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransform3Dcpy(
     BYTE byFieldId,
-    SBYTE uiT,
+    SCHAR uiT,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
 {
-    intokernalInt4_S;
+    intokernalInt4_S(uiT);
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
@@ -341,11 +341,11 @@ _kernelGaugeTransform3Dcpy(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransform3DTcpy(
     BYTE byFieldId,
-    SBYTE uiT,
+    SCHAR uiT,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
 {
-    intokernalInt4_S;
+    intokernalInt4_S(uiT);
 
     //const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
@@ -389,7 +389,7 @@ _kernelGaugeTransform3DTcpy(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateASpace_S(
-        SBYTE uiT,
+        SCHAR uiT,
         const deviceSU3* __restrict__ pU,
         Real* pA11,
         CLGComplex* pA12,
@@ -398,7 +398,7 @@ _kernelCalculateASpace_S(
         CLGComplex* pA23,
         BYTE byFieldId)
 {
-    intokernalInt4_S;
+    intokernalInt4_S(uiT);
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
@@ -435,7 +435,7 @@ _kernelCalculateASpace_S(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateCoulombDivation_S(
     BYTE byFieldId,
-    SBYTE uiT,
+    SCHAR uiT,
     DOUBLE* pDeviceRes,
     const Real* __restrict__ pA11,
     const CLGComplex* __restrict__ pA12,
@@ -443,7 +443,7 @@ _kernelCalculateCoulombDivation_S(
     const Real* __restrict__ pA22,
     const CLGComplex* __restrict__ pA23)
 {
-    intokernalInt4_S_Only3D;
+    intokernalInt4_S_Only3D(uiT);
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
@@ -539,7 +539,7 @@ void CGaugeFixingCoulombLosAlamos::Initial(class CLatticeData* pOwner, const CPa
     m_lstDims.AddItem(_HC_Ly);
     m_lstDims.AddItem(_HC_Lz);
 
-    checkCudaErrors(cudaMalloc((void**)& m_pDDecomp, sizeof(UINT) * 6));
+    checkCudaErrors(__cudaMalloc((void**)& m_pDDecomp, sizeof(UINT) * 6));
 
     //========== Initial Settings ==============
     if (!params.FetchValueReal(_T("Omega"), m_fOmega))
@@ -578,12 +578,12 @@ void CGaugeFixingCoulombLosAlamos::Initial(class CLatticeData* pOwner, const CPa
     }
 
     //========== Initial Buffers ==============
-    checkCudaErrors(cudaMalloc((void**)& m_pG, _HC_Volume_xyz * sizeof(deviceSU3)));
-    checkCudaErrors(cudaMalloc((void**)& m_pA11, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(Real)));
-    checkCudaErrors(cudaMalloc((void**)& m_pA12, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(CLGComplex)));
-    checkCudaErrors(cudaMalloc((void**)& m_pA13, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(CLGComplex)));
-    checkCudaErrors(cudaMalloc((void**)& m_pA22, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(Real)));
-    checkCudaErrors(cudaMalloc((void**)& m_pA23, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(CLGComplex)));
+    checkCudaErrors(__cudaMalloc((void**)& m_pG, _HC_Volume_xyz * sizeof(deviceSU3)));
+    checkCudaErrors(__cudaMalloc((void**)& m_pA11, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(Real)));
+    checkCudaErrors(__cudaMalloc((void**)& m_pA12, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(CLGComplex)));
+    checkCudaErrors(__cudaMalloc((void**)& m_pA13, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(CLGComplex)));
+    checkCudaErrors(__cudaMalloc((void**)& m_pA22, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(Real)));
+    checkCudaErrors(__cudaMalloc((void**)& m_pA23, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(CLGComplex)));
 }
 
 DOUBLE CGaugeFixingCoulombLosAlamos::CheckRes(const CFieldGauge* pGauge)
@@ -595,16 +595,51 @@ DOUBLE CGaugeFixingCoulombLosAlamos::CheckRes(const CFieldGauge* pGauge)
     }
 
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+#if _CLG_MULTI_GPU
+    if (NULL != appGetComm() && appGetComm()->Size() > 1)
+    {
+        //P4-2.2: the deviation must be measured on the WHOLE lattice, so gather
+        //again and compute under the global context. Non-root ranks report their
+        //local deviation; the driver only compares rank 0.
+        const UINT uiBytesPerSite = static_cast<UINT>(sizeof(deviceSU3) * _HC_Dir);
+        const UINT uiLocalBytes = static_cast<UINT>(sizeof(deviceSU3) * _HC_LinkCount);
+
+        BYTE* pHostLocal = (BYTE*)malloc(uiLocalBytes);
+        checkCudaErrors(cudaMemcpy(pHostLocal, pGaugeSU3->m_pDeviceData, uiLocalBytes, cudaMemcpyDeviceToHost));
+
+        UINT uiGlobalBytes = 0;
+        BYTE* pGlobal = appGetComm()->GatherFieldToRoot(pHostLocal, uiBytesPerSite, uiGlobalBytes);
+        free(pHostLocal);
+        if (NULL == pGlobal)
+        {
+            return CheckResDeviceBuffer(pGaugeSU3->m_pDeviceData, pGauge->m_byFieldId);
+        }
+
+        deviceSU3* pDevGlobal = NULL;
+        checkCudaErrors(__cudaMalloc((void**)&pDevGlobal, uiGlobalBytes));
+        checkCudaErrors(cudaMemcpy(pDevGlobal, pGlobal, uiGlobalBytes, cudaMemcpyHostToDevice));
+        free(pGlobal);
+
+        MGEnterGlobalFixerContext();
+        ResizeBuffersToGlobal();
+        const DOUBLE fRes = CheckResDeviceBuffer(pDevGlobal, pGauge->m_byFieldId);
+        RestoreLocalBuffers();
+        MGExitGlobalFixerContext();
+
+        checkCudaErrors(__cudaFree(pDevGlobal));
+        return fRes;
+    }
+#endif
     return CheckResDeviceBuffer(pGaugeSU3->m_pDeviceData, pGauge->m_byFieldId);
 }
 
-DOUBLE CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __restrict__ pGauge, BYTE byFieldId)
+DOUBLE CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* pGauge, BYTE byFieldId)
 {
     DOUBLE fRes = 0.0;
     preparethread_S;
-    for (SBYTE uiT = 0; uiT < static_cast<SBYTE>(_HC_Lt); ++uiT)
+    for (SCHAR uiT = 0; uiT < static_cast<SCHAR>(_HC_Lt); ++uiT)
     {
-        _kernelCalculateASpace_S << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelCalculateASpace_S, block3d, threads3d, 
             uiT,
             pGauge,
             m_pA11,
@@ -614,7 +649,7 @@ DOUBLE CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __res
             m_pA23,
             byFieldId);
 
-        _kernelCalculateCoulombDivation_S << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelCalculateCoulombDivation_S, block3d, threads3d, 
             byFieldId,
             uiT,
             _D_RealThreadBuffer,
@@ -628,11 +663,11 @@ DOUBLE CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __res
     return fRes / _HC_Lt;
 }
 
-DOUBLE CGaugeFixingCoulombLosAlamos::CheckResDeviceBufferOnlyT(const deviceSU3* __restrict__ pGauge, SBYTE uiT, BYTE byFieldId)
+DOUBLE CGaugeFixingCoulombLosAlamos::CheckResDeviceBufferOnlyT(const deviceSU3* pGauge, SCHAR uiT, BYTE byFieldId)
 {
     preparethread_S;
 
-    _kernelCalculateASpace_S << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelCalculateASpace_S, block3d, threads3d, 
         uiT,
         pGauge,
         m_pA11,
@@ -642,7 +677,7 @@ DOUBLE CGaugeFixingCoulombLosAlamos::CheckResDeviceBufferOnlyT(const deviceSU3* 
         m_pA23,
         byFieldId);
 
-    _kernelCalculateCoulombDivation_S << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelCalculateCoulombDivation_S, block3d, threads3d, 
         byFieldId,
         uiT,
         _D_RealThreadBuffer,
@@ -664,7 +699,64 @@ void CGaugeFixingCoulombLosAlamos::GaugeFixing(CFieldGauge* pResGauge)
     CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<CFieldGaugeSU3*>(pResGauge);
     deviceSU3* pDeviceBufferPointer = pGaugeSU3->m_pDeviceData;
 
-    for (SBYTE uiT = 0; uiT < static_cast<SBYTE>(_HC_Lt); ++uiT)
+#if _CLG_MULTI_GPU
+    if (NULL != appGetComm() && appGetComm()->Size() > 1)
+    {
+        //P4-2.2: the LosAlamos fixing kernels sweep the whole lattice on a single
+        //GPU (no halo exchange), so on a decomposed lattice we gather the local
+        //links to rank 0, fix there under a temporary GLOBAL lattice context
+        //(constants + index cache + fixing buffers sized to the global lattice),
+        //and scatter the fixed field back.
+        const UINT uiBytesPerSite = static_cast<UINT>(sizeof(deviceSU3) * _HC_Dir);
+        const UINT uiLocalBytes = static_cast<UINT>(sizeof(deviceSU3) * _HC_LinkCount);
+
+        BYTE* pHostLocal = (BYTE*)malloc(uiLocalBytes);
+        checkCudaErrors(cudaMemcpy(pHostLocal, pDeviceBufferPointer, uiLocalBytes, cudaMemcpyDeviceToHost));
+
+        UINT uiGlobalBytes = 0;
+        BYTE* pGlobal = appGetComm()->GatherFieldToRoot(pHostLocal, uiBytesPerSite, uiGlobalBytes);
+        free(pHostLocal);
+
+        if (appGetComm()->IsRoot())
+        {
+            deviceSU3* pDevGlobal = NULL;
+            checkCudaErrors(__cudaMalloc((void**)&pDevGlobal, uiGlobalBytes));
+            checkCudaErrors(cudaMemcpy(pDevGlobal, pGlobal, uiGlobalBytes, cudaMemcpyHostToDevice));
+            free(pGlobal);
+            pGlobal = NULL;
+
+            MGEnterGlobalFixerContext();
+            ResizeBuffersToGlobal();
+            for (SCHAR uiT = 0; uiT < static_cast<SCHAR>(_HC_Lt); ++uiT)
+            {
+                GaugeFixingForT(pDevGlobal, uiT, pResGauge->m_byFieldId);
+            }
+            RestoreLocalBuffers();
+            MGExitGlobalFixerContext();
+
+            pGlobal = (BYTE*)malloc(uiGlobalBytes);
+            checkCudaErrors(cudaMemcpy(pGlobal, pDevGlobal, uiGlobalBytes, cudaMemcpyDeviceToHost));
+            checkCudaErrors(__cudaFree(pDevGlobal));
+        }
+
+        BYTE* pLocalOut = (BYTE*)malloc(uiLocalBytes);
+        appGetComm()->ScatterFieldFromRoot(pGlobal, uiBytesPerSite, pLocalOut);
+        checkCudaErrors(cudaMemcpy(pDeviceBufferPointer, pLocalOut, uiLocalBytes, cudaMemcpyHostToDevice));
+        free(pLocalOut);
+        if (NULL != pGlobal)
+        {
+            free(pGlobal);
+        }
+
+        //Every local link was rewritten by the scatter memcpy, which bypasses
+        //guarded launches; bump the owner handle so the next reader's guard
+        //refills the halo (no-op for an unbound handle).
+        pResGauge->NotifyWritten();
+        return;
+    }
+#endif
+
+    for (SCHAR uiT = 0; uiT < static_cast<SCHAR>(_HC_Lt); ++uiT)
     {
         GaugeFixingForT(pDeviceBufferPointer, uiT, pResGauge->m_byFieldId);
     }
@@ -672,7 +764,7 @@ void CGaugeFixingCoulombLosAlamos::GaugeFixing(CFieldGauge* pResGauge)
     //appGeneral(_T("Gauge fixing failed with last error = %f\n"), fTheta);
 }
 
-void CGaugeFixingCoulombLosAlamos::GaugeFixingForT(deviceSU3* pDeviceBufferPointer, SBYTE uiT, BYTE byFieldId)
+void CGaugeFixingCoulombLosAlamos::GaugeFixingForT(deviceSU3* pDeviceBufferPointer, SCHAR uiT, BYTE byFieldId)
 {
     preparethread_S;
     m_iIterate = 0;
@@ -694,36 +786,84 @@ void CGaugeFixingCoulombLosAlamos::GaugeFixingForT(deviceSU3* pDeviceBufferPoint
             }
         }
 
-        _kernelCalculateGOdd_S << <block, threads >> > (byFieldId, uiT, pDeviceBufferPointer, m_fOmega, m_bMixed, m_pG);
+        _LAUNCH_KERNEL(_kernelCalculateGOdd_S, block3d, threads3d, byFieldId, uiT, pDeviceBufferPointer, m_fOmega, m_bMixed, m_pG);
 
         if (m_bMixed)
         {
-            _kernelGaugeTransform3Dcpy << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
-            _kernelGaugeTransform3DTcpy << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+            _LAUNCH_KERNEL(_kernelGaugeTransform3Dcpy, block3d, threads3d, byFieldId, uiT, m_pG, pDeviceBufferPointer);
+            _LAUNCH_KERNEL(_kernelGaugeTransform3DTcpy, block3d, threads3d, byFieldId, uiT, m_pG, pDeviceBufferPointer);
         }
         else
         {
-            _kernelGaugeTransformOdd_S << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
-            _kernelGaugeTransform3DTOdd << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+            _LAUNCH_KERNEL(_kernelGaugeTransformOdd_S, block3d, threads3d, byFieldId, uiT, m_pG, pDeviceBufferPointer);
+            _LAUNCH_KERNEL(_kernelGaugeTransform3DTOdd, block3d, threads3d, byFieldId, uiT, m_pG, pDeviceBufferPointer);
         }
 
 
-        _kernelCalculateGEven_S << <block, threads >> > (byFieldId, uiT, pDeviceBufferPointer, m_fOmega, m_bMixed, m_pG);
+        _LAUNCH_KERNEL(_kernelCalculateGEven_S, block3d, threads3d, byFieldId, uiT, pDeviceBufferPointer, m_fOmega, m_bMixed, m_pG);
         if (m_bMixed)
         {
-            _kernelGaugeTransform3Dcpy << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
-            _kernelGaugeTransform3DTcpy << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+            _LAUNCH_KERNEL(_kernelGaugeTransform3Dcpy, block3d, threads3d, byFieldId, uiT, m_pG, pDeviceBufferPointer);
+            _LAUNCH_KERNEL(_kernelGaugeTransform3DTcpy, block3d, threads3d, byFieldId, uiT, m_pG, pDeviceBufferPointer);
         }
         else
         {
-            _kernelGaugeTransformEven_S << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
-            _kernelGaugeTransform3DTEven << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+            _LAUNCH_KERNEL(_kernelGaugeTransformEven_S, block3d, threads3d, byFieldId, uiT, m_pG, pDeviceBufferPointer);
+            _LAUNCH_KERNEL(_kernelGaugeTransform3DTEven, block3d, threads3d, byFieldId, uiT, m_pG, pDeviceBufferPointer);
         }
 
 
         ++m_iIterate;
     }
 }
+
+#if _CLG_MULTI_GPU
+void CGaugeFixingCoulombLosAlamos::ResizeBuffersToGlobal()
+{
+    //Called under the temporary GLOBAL lattice context (rank 0 only), where
+    //_HC_Volume_xyz / _HC_Dir are the GLOBAL values: save the local pointers and
+    //re-allocate the fixing buffers to the global 3D volume.
+    m_pSavedG = m_pG;
+    m_pSavedA11 = m_pA11;
+    m_pSavedA12 = m_pA12;
+    m_pSavedA13 = m_pA13;
+    m_pSavedA22 = m_pA22;
+    m_pSavedA23 = m_pA23;
+    const UINT uiVol = _HC_Volume_xyz;
+    const UINT uiDirMinus1 = static_cast<UINT>(_HC_Dir - 1);
+    checkCudaErrors(__cudaMalloc((void**)&m_pG, uiVol * sizeof(deviceSU3)));
+    checkCudaErrors(__cudaMalloc((void**)&m_pA11, uiVol * uiDirMinus1 * sizeof(Real)));
+    checkCudaErrors(__cudaMalloc((void**)&m_pA12, uiVol * uiDirMinus1 * sizeof(CLGComplex)));
+    checkCudaErrors(__cudaMalloc((void**)&m_pA13, uiVol * uiDirMinus1 * sizeof(CLGComplex)));
+    checkCudaErrors(__cudaMalloc((void**)&m_pA22, uiVol * uiDirMinus1 * sizeof(Real)));
+    checkCudaErrors(__cudaMalloc((void**)&m_pA23, uiVol * uiDirMinus1 * sizeof(CLGComplex)));
+}
+
+void CGaugeFixingCoulombLosAlamos::RestoreLocalBuffers()
+{
+    //Free the temporary global buffers and put the local ones back. The
+    //destructor frees whatever is current, so it must always see the local
+    //pointers afterwards.
+    checkCudaErrors(__cudaFree(m_pG));
+    checkCudaErrors(__cudaFree(m_pA11));
+    checkCudaErrors(__cudaFree(m_pA12));
+    checkCudaErrors(__cudaFree(m_pA13));
+    checkCudaErrors(__cudaFree(m_pA22));
+    checkCudaErrors(__cudaFree(m_pA23));
+    m_pG = m_pSavedG;
+    m_pA11 = m_pSavedA11;
+    m_pA12 = m_pSavedA12;
+    m_pA13 = m_pSavedA13;
+    m_pA22 = m_pSavedA22;
+    m_pA23 = m_pSavedA23;
+    m_pSavedG = NULL;
+    m_pSavedA11 = NULL;
+    m_pSavedA12 = NULL;
+    m_pSavedA13 = NULL;
+    m_pSavedA22 = NULL;
+    m_pSavedA23 = NULL;
+}
+#endif
 
 CCString CGaugeFixingCoulombLosAlamos::GetInfos(const CCString& tab) const
 {

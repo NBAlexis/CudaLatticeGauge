@@ -140,8 +140,8 @@ INT Measurement(CParameters& params)
 
     if (EAMJ_Chiral == eJob)
     {
-        pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
-        pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
+        pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+        pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
         //pF1Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
         //pF2Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
     }
@@ -232,10 +232,10 @@ INT Measurement(CParameters& params)
                         {
                             pF1Light->InitialField(EFIT_RandomGaussian);
                         }
-                        pF1Light->FixBoundary();
+                        pF1Light->FixBoundary(EFB_Field);
                         pF1Light->CopyTo(pF2Light);
                         pF1Light->InverseD(_FIELDS);
-                        pF1Light->FixBoundary();
+                        pF1Light->FixBoundary(EFB_Field);
                         if (bSaveFermion)
                         {
                             CCString sFermionFile = "";
@@ -294,45 +294,19 @@ INT Measurement(CParameters& params)
         {
             case EAMJ_Polyakov:
             {
-                CCString sFileNameWrite1;
-                CCString sFileNameWrite2;
-                sFileNameWrite1.Format(_T("%s_%s_polyakov.csv"), sCSVSavePrefix.c_str(), PrefixList[uiOmega].c_str());
-                sFileNameWrite2.Format(_T("%s_%s_polyakov_ZSlice.csv"), sCSVSavePrefix.c_str(), PrefixList[uiOmega].c_str());
-
-                //extract result
-                TArray<CLGComplex> polyOut;
-                TArray<TArray<CLGComplex>> polyakovOmgZSlice;
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    polyOut.AddItem(pPL->m_lstLoop[j]);
-
-                    if (pPL->m_bMeasureZSlice)
-                    {
-                        TArray<CLGComplex> thisConfigurationZSlice;
-                        for (UINT i = 0; i < _HC_Lz; ++i)
-                        {
-                            thisConfigurationZSlice.AddItem(pPL->m_lstPZSlice[j * _HC_Lz + i]);
-                        }
-                        polyakovOmgZSlice.AddItem(thisConfigurationZSlice);
-                    }
-                }
-                WriteComplexArray(sFileNameWrite1, polyOut);
-                if (pPL->m_bMeasureZSlice)
-                {
-                    WriteComplexArray2(sFileNameWrite2, polyakovOmgZSlice);
-                }
+                pPL->Export(sCSVSavePrefix, iStartN, iEndN, PrefixList[uiOmega], uiOmega, iListStart);
             }
             break;
             case EAMJ_Chiral:
             {
-                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
+                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega);
                 
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma5);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma53);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma54);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma34);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma5, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma53, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma54, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma34, uiOmega);
 
             }
             break;

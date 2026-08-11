@@ -1,0 +1,286 @@
+# PSU3WithBoundary test suite
+# Tests for CActionGaugePlaquettePSU3WithBoundary and CFieldTensor2Z3.
+#
+# The action implements the fundamental-lift Wilson/Villain PSU(3) action
+#   S(U,B) = -(Beta/3) * sum_p Re[B_p Tr(U_p)]
+# with a Z3 2-form field B on every plaquette.
+#
+# Blocks:
+#   TestZ3FieldCreate       - CFieldTensor2Z3 creation / init / copy / file IO
+#   TestPSU3Energy          - energy: B=1 agrees with fundamental Wilson
+#   TestPSU3Force           - finite-difference force validation with fixed B
+#   TestPSU3Heatbath        - AllowMonopole=1 conditional distribution (cold U)
+#   TestPSU3FlatSweep       - AllowMonopole=0 link-star + sheet sweeps keep dB=0
+#   TestPSU3CallbackCache   - trajectory callback / post-sweep energy cache
+
+TestZ3FieldCreate:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 0
+    MeasureListLength : 0
+    Save : 0
+
+    Tensor2FieldCount : 1
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    Tensor2Field1:
+        FieldName : CFieldTensor2Z3
+        FieldInitialType : EFIT_Identity
+        FieldId : 3
+        Dynamic : 1
+
+
+TestPSU3Energy:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 1
+    MeasureListLength : 0
+    Save : 0
+
+    Tensor2FieldCount : 1
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    Tensor2Field1:
+        FieldName : CFieldTensor2Z3
+        FieldInitialType : EFIT_Identity
+        FieldId : 3
+        Dynamic : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquettePSU3WithBoundary
+        GaugeFields : [1]
+        BoundaryFieldId : 3
+        Beta : 6.0
+        AllowMonopole : 1
+        Z3Sweeps : 1
+        GlobalTwistSweeps : 0
+        CheckMonopole : 0
+        DiscreteTheta : 0
+        TwistSheetPosition : [0, 0, 0, 0]
+
+
+TestPSU3Force:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 1
+    MeasureListLength : 0
+    Save : 0
+
+    Tensor2FieldCount : 1
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    Tensor2Field1:
+        FieldName : CFieldTensor2Z3
+        FieldInitialType : EFIT_Identity
+        FieldId : 3
+        Dynamic : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquettePSU3WithBoundary
+        GaugeFields : [1]
+        BoundaryFieldId : 3
+        Beta : 6.0
+        AllowMonopole : 1
+        Z3Sweeps : 1
+        GlobalTwistSweeps : 0
+        CheckMonopole : 0
+        DiscreteTheta : 0
+
+    LinkTrials : 4
+    DirTrials : 2
+    Delta : 1.0e-1
+    DeltaLevels : 6
+    TolAbs : 5.0e-3
+    TolRel : 0.30
+
+
+TestPSU3Heatbath:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 1
+    MeasureListLength : 0
+    Save : 0
+
+    Tensor2FieldCount : 1
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+
+    Tensor2Field1:
+        FieldName : CFieldTensor2Z3
+        FieldInitialType : EFIT_Identity
+        FieldId : 3
+        Dynamic : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquettePSU3WithBoundary
+        GaugeFields : [1]
+        BoundaryFieldId : 3
+        Beta : 2.0
+        AllowMonopole : 1
+        Z3Sweeps : 1
+        GlobalTwistSweeps : 0
+        CheckMonopole : 0
+        DiscreteTheta : 0
+
+    HeatbathSweeps : 2000
+    FreqTol : 0.02
+
+
+TestPSU3FlatSweep:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 1
+    MeasureListLength : 0
+    Save : 0
+
+    Tensor2FieldCount : 1
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+
+    Tensor2Field1:
+        FieldName : CFieldTensor2Z3
+        FieldInitialType : EFIT_Identity
+        FieldId : 3
+        Dynamic : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquettePSU3WithBoundary
+        GaugeFields : [1]
+        BoundaryFieldId : 3
+        Beta : 0.5
+        AllowMonopole : 0
+        Z3Sweeps : 1
+        GlobalTwistSweeps : 1
+        CheckMonopole : 1
+        DiscreteTheta : 0
+
+    FlatSweepCount : 100
+    MinNonZero : 16
+
+
+TestPSU3CallbackCache:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 1
+    MeasureListLength : 0
+    Save : 0
+
+    Tensor2FieldCount : 1
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    Tensor2Field1:
+        FieldName : CFieldTensor2Z3
+        FieldInitialType : EFIT_Identity
+        FieldId : 3
+        Dynamic : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquettePSU3WithBoundary
+        GaugeFields : [1]
+        BoundaryFieldId : 3
+        Beta : 6.0
+        AllowMonopole : 1
+        Z3Sweeps : 1
+        GlobalTwistSweeps : 0
+        CheckMonopole : 0
+        DiscreteTheta : 0
+
+    CacheTol : 1.0e-4
+
+TestPSU3Tensor2SaveLoad:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 0
+    MeasureListLength : 0
+    Save : 0
+
+    Tensor2FieldCount : 1
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    Tensor2Field1:
+        FieldName : CFieldTensor2Z3
+        FieldInitialType : EFIT_Identity
+        FieldId : 3
+        Dynamic : 1
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 0.5
+        IntegratorStep : 5

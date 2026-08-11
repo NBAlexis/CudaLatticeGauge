@@ -5,6 +5,7 @@
 // This is the class for GMRES Solver
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [18/06/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -18,7 +19,6 @@ CMultiShiftFOM::CMultiShiftFOM()
     : CMultiShiftSolver()
     , m_uiReStart(3)
     , m_uiMaxDim(20)
-    , m_fAccuracy(F(0.000001))
     , m_bUseCudaForSmallMatrix(FALSE)
     , m_pHelper(NULL)
     , m_pDeviceY(NULL)
@@ -35,8 +35,10 @@ CMultiShiftFOM::~CMultiShiftFOM()
 
 void CMultiShiftFOM::Configurate(const CParameters& param)
 {
+    CMultiShiftSolver::Configurate(param);
+
     INT iValue;
-    Real fValue;
+    //Real fValue;
 
     if (param.FetchValueINT(_T("MaxDim"), iValue))
     {
@@ -57,26 +59,13 @@ void CMultiShiftFOM::Configurate(const CParameters& param)
     if (m_bUseCudaForSmallMatrix && m_uiMaxDim < CLinearAlgebraHelper::_kMaxSmallDim)
     {
         m_pHelper = new CLinearAlgebraHelper(m_uiMaxDim + 1, 1);
-        checkCudaErrors(cudaMalloc((void**)&m_pDeviceHHat, sizeof(CLGComplex) * m_uiMaxDim * m_uiMaxDim));
-        checkCudaErrors(cudaMalloc((void**)&m_pDeviceY, sizeof(CLGComplex) * m_uiMaxDim));
+        checkCudaErrors(__cudaMalloc((void**)&m_pDeviceHHat, sizeof(CLGComplex) * m_uiMaxDim * m_uiMaxDim));
+        checkCudaErrors(__cudaMalloc((void**)&m_pDeviceY, sizeof(CLGComplex) * m_uiMaxDim));
     }
 
     if (param.FetchValueINT(_T("Restart"), iValue))
     {
         m_uiReStart = static_cast<UINT>(iValue);
-    }
-    if (param.FetchValueINT(_T("AbsoluteAccuracy"), iValue))
-    {
-        m_bAbsoluteAccuracy = (0 != iValue);
-    }
-    if (param.FetchValueReal(_T("Accuracy"), fValue))
-    {
-        m_fAccuracy = fValue;
-        if (m_fAccuracy < _CLG_FLT_EPSILON * F(2.0))
-        {
-            m_fAccuracy = _CLG_FLT_EPSILON * F(2.0);
-            appGeneral(_T("Solver accuracy too small (%2.18f), set to be %2.18f\n"), fValue, m_fAccuracy);
-        }
     }
 }
 
@@ -89,25 +78,26 @@ void CMultiShiftFOM::ReleaseBuffers()
 {
     if (NULL != m_pHelper)
     {
-        checkCudaErrors(cudaFree(m_pDeviceY));
-        checkCudaErrors(cudaFree(m_pDeviceHHat));
+        checkCudaErrors(__cudaFree(m_pDeviceY));
+        checkCudaErrors(__cudaFree(m_pDeviceHHat));
     }
 }
 
 UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& cn, const CField* pFieldB, 
-    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
     EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
+    _RECORD(CMultiShiftFOM::Solve);
     appPushLogDate(FALSE);
-    assert(0 == m_lstVectors.Num());
+    appAssert(0 == m_lstVectors.Num());
     for (UINT i = 0; i < m_uiMaxDim; ++i)
     {
-        CField* pVectors = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+        CField* pVectors = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
         m_lstVectors.AddItem(pVectors);
     }
 
-    CField* pW = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pR = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pW = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pR = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
 
     //use it to estimate relative error
 #if !_CLG_DOUBLEFLOAT
@@ -149,9 +139,9 @@ UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& 
         if (0 == i)
         {
 #if !_CLG_DOUBLEFLOAT
-            const Real fBeta = static_cast<Real>(_sqrtd(m_lstVectors[0]->Dot(m_lstVectors[0]).x));
+            const Real fBeta = static_cast<Real>(_sqrtd(m_lstVectors[0]->GetLength()));
 #else
-            const Real fBeta = _sqrt(m_lstVectors[0]->Dot(m_lstVectors[0]).x);
+            const Real fBeta = _sqrt(m_lstVectors[0]->GetLength());
 #endif
             for (INT n = 0; n < cn.Num(); ++n)
             {
@@ -165,7 +155,7 @@ UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& 
         {
             //w = A v[j]
             m_lstVectors[j]->CopyTo(pW);
-            pW->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
+            pW->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
             for (UINT k = 0; k <= j; ++k)
             {
 #if !_CLG_DOUBLEFLOAT
@@ -180,9 +170,9 @@ UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& 
 
             //h[j + 1, j] = ||w||
 #if !_CLG_DOUBLEFLOAT
-            const Real fWNorm = static_cast<Real>(_sqrtd(pW->Dot(pW).x));
+            const Real fWNorm = static_cast<Real>(_sqrtd(pW->GetLength()));
 #else
-            const Real fWNorm = _sqrt(pW->Dot(pW).x);
+            const Real fWNorm = _sqrt(pW->GetLength());
 #endif
             m_h[HIndex(j + 1, j)] = _make_cuComplex(fWNorm, F(0.0));
             //v[j + 1] = w / ||w||
@@ -257,7 +247,7 @@ UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& 
         appParanoiac(_T("CMultiShiftFOM::Solve deviation: ----  last beta = %8.15f\n"), fMaxError);
     }
 
-    appGeneral(_T("CMultiShiftFOM::Solve failed: last divation = %8.15f\n"), fMaxError);
+    appGeneral(_T("CMultiShiftFOM::Solve failed (field id%d): last divation = %8.15f\n"), pFieldB->m_byFieldId, fMaxError);
     pR->Return();
     pW->Return();
     for (UINT i = 0; i < m_uiMaxDim; ++i)

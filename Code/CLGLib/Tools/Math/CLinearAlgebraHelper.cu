@@ -9,6 +9,9 @@
 //=============================================================================
 #include "CLGLib_Private.h"
 
+//The threads of these functions is independent of lattice size, so set launch bounds alone
+#define _CLG_LAUNCH_BOUND_SMALLMTR  __launch_bounds__(1024, 1)
+
 __BEGIN_NAMESPACE
 
 CLinearAlgebraHelper::CLinearAlgebraHelper(UINT uiDim, UINT uiPreAllocate)
@@ -26,12 +29,12 @@ CLinearAlgebraHelper::CLinearAlgebraHelper(UINT uiDim, UINT uiPreAllocate)
         return;
     }
 
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceIntBuffer, sizeof(INT) * m_uiDim));
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceFloatBuffer, sizeof(Real) * m_uiDim));
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceComplexBuffer1, sizeof(CLGComplex) * m_uiDim));
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceComplexBuffer2, sizeof(CLGComplex) * m_uiDim));
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceTmpHouseHolder, sizeof(CLGComplex) * 9));
-    checkCudaErrors(cudaMalloc((void**)&m_pOneDeviceC, sizeof(CLGComplex)));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceIntBuffer, sizeof(INT) * m_uiDim));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceFloatBuffer, sizeof(Real) * m_uiDim));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceComplexBuffer1, sizeof(CLGComplex) * m_uiDim));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceComplexBuffer2, sizeof(CLGComplex) * m_uiDim));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceTmpHouseHolder, sizeof(CLGComplex) * 9));
+    checkCudaErrors(__cudaMalloc((void**)&m_pOneDeviceC, sizeof(CLGComplex)));
 
     //5 is enough
     AddTempMatrix(uiPreAllocate);
@@ -41,31 +44,31 @@ CLinearAlgebraHelper::~CLinearAlgebraHelper()
 {
     if (NULL != m_pDeviceIntBuffer)
     {
-        checkCudaErrors(cudaFree(m_pDeviceIntBuffer));
+        checkCudaErrors(__cudaFree(m_pDeviceIntBuffer));
     }
     if (NULL != m_pDeviceFloatBuffer)
     {
-        checkCudaErrors(cudaFree(m_pDeviceFloatBuffer));
+        checkCudaErrors(__cudaFree(m_pDeviceFloatBuffer));
     }
     if (NULL != m_pDeviceComplexBuffer1)
     {
-        checkCudaErrors(cudaFree(m_pDeviceComplexBuffer1));
+        checkCudaErrors(__cudaFree(m_pDeviceComplexBuffer1));
     }
     if (NULL != m_pDeviceComplexBuffer2)
     {
-        checkCudaErrors(cudaFree(m_pDeviceComplexBuffer2));
+        checkCudaErrors(__cudaFree(m_pDeviceComplexBuffer2));
     }
     if (NULL != m_pDeviceTmpHouseHolder)
     {
-        checkCudaErrors(cudaFree(m_pDeviceTmpHouseHolder));
+        checkCudaErrors(__cudaFree(m_pDeviceTmpHouseHolder));
     }
     if (NULL != m_pOneDeviceC)
     {
-        checkCudaErrors(cudaFree(m_pOneDeviceC));
+        checkCudaErrors(__cudaFree(m_pOneDeviceC));
     }
     for (INT i = 0; i < m_lstTmpMatrix.Num(); ++i)
     {
-        checkCudaErrors(cudaFree(m_lstTmpMatrix[i].m_pMatrix));
+        checkCudaErrors(__cudaFree(m_lstTmpMatrix[i].m_pMatrix));
     }
 }
 
@@ -329,13 +332,13 @@ void CLinearAlgebraHelper::TestSmallMatrix()
 
 #pragma region Initial
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelInitialZero(CLGComplex* R, UINT dy)
 {
     R[threadIdx.x * dy + threadIdx.y] = _make_cuComplex(F(0.0), F(0.0));
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelInitialOne(CLGComplex* R, UINT dy)
 {
     const UINT i = threadIdx.x;
@@ -354,14 +357,14 @@ void CLinearAlgebraHelper::InitialZero(CLGComplex* deviceMatrix, UINT dx, UINT d
 {
     dim3 block(1, 1, 1);
     dim3 thread(dx, dy, 1);
-    _kernelInitialZero << <block, thread >> > (deviceMatrix, dy);
+    _LAUNCH_KERNEL(_kernelInitialZero, block, thread, deviceMatrix, dy);
 }
 
 void CLinearAlgebraHelper::InitialOne(CLGComplex* deviceMatrix, UINT dx)
 {
     dim3 block(1, 1, 1);
     dim3 thread(dx, dx, 1);
-    _kernelInitialOne << <block, thread >> > (deviceMatrix, dx);
+    _LAUNCH_KERNEL(_kernelInitialOne, block, thread, deviceMatrix, dx);
 }
 
 #pragma endregion
@@ -374,7 +377,7 @@ void CLinearAlgebraHelper::InitialOne(CLGComplex* deviceMatrix, UINT dx)
 * Res = X*Z, block(Y,1,1) thread(X,Z,1)
 * leftDim = Y, midDim = Z
 */
-__global__ void 
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelSmallMatrixMult_NN(CLGComplex* res,
     const CLGComplex* __restrict__ left,
     const CLGComplex* __restrict__ right,
@@ -397,7 +400,7 @@ _kernelSmallMatrixMult_NN(CLGComplex* res,
 * Res = X*Z, block(Y,1,1) thread(X,Z,1)
 * leftDim = Y, midDim = Z
 */
-__global__ void 
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelSmallMatrixMult_ND(CLGComplex* res,
     const CLGComplex* __restrict__ left,
     const CLGComplex* __restrict__ right,
@@ -429,7 +432,7 @@ _kernelSmallMatrixMult_ND(CLGComplex* res,
 * Res = X*Z, block(Y,1,1) thread(X,Z,1)
 * leftDim = X, midDim = Z
 */
-__global__ void 
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelSmallMatrixMult_DN(CLGComplex* res,
     const CLGComplex* __restrict__ left,
     const CLGComplex* __restrict__ right,
@@ -445,7 +448,29 @@ _kernelSmallMatrixMult_DN(CLGComplex* res,
     atomicAdd(&res[x * midDim + y].y, toAdd.y);
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+/**
+* Left^+ * Right^+
+* If Left = Y*X (Left^+ = X*Y), Right = Z*Y (Right^+ = Y*Z)
+* Res = X*Z, block(Y,1,1) thread(X,Z,1)
+* leftDim = X, rightDim = Y, midDim = Z
+*/
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
+_kernelSmallMatrixMult_DD(CLGComplex* res,
+    const CLGComplex* __restrict__ left,
+    const CLGComplex* __restrict__ right,
+    UINT leftDim, UINT rightDim, UINT midDim)
+{
+    UINT x = threadIdx.x;
+    UINT y = threadIdx.y;
+    UINT n = blockIdx.x;
+
+    CLGComplex toAdd = _cuCmulf(_cuConjf(left[n * leftDim + x]), _cuConjf(right[y * rightDim + n]));
+
+    atomicAdd(&res[x * midDim + y].x, toAdd.x);
+    atomicAdd(&res[x * midDim + y].y, toAdd.y);
+}
+
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelNormal2(
     const CLGComplex* __restrict__ v,
     const CLGComplex* __restrict__ m,
@@ -471,17 +496,21 @@ void CLinearAlgebraHelper::SmallMatrixMult(
     InitialZero(deviceRes, dLeft, dRight);
     dim3 block(dMid, 1, 1);
     dim3 thread(dLeft, dRight, 1);
-    if (bLeftDagger)
+    if (bLeftDagger && bRightDagger)
     {
-        _kernelSmallMatrixMult_DN << <block, thread >> >(deviceRes, left, right, dLeft, dRight);
+        _LAUNCH_KERNEL(_kernelSmallMatrixMult_DD, block, thread, deviceRes, left, right, dLeft, dMid, dRight);
+    }
+    else if (bLeftDagger)
+    {
+        _LAUNCH_KERNEL(_kernelSmallMatrixMult_DN, block, thread, deviceRes, left, right, dLeft, dRight);
     }
     else if (bRightDagger)
     {
-        _kernelSmallMatrixMult_ND<<<block, thread >>>(deviceRes, left, right, dMid, dRight);
+        _LAUNCH_KERNEL(_kernelSmallMatrixMult_ND, block, thread, deviceRes, left, right, dMid, dRight);
     }
     else
     {
-        _kernelSmallMatrixMult_NN << <block, thread >> > (deviceRes, left, right, dMid, dRight);
+        _LAUNCH_KERNEL(_kernelSmallMatrixMult_NN, block, thread, deviceRes, left, right, dMid, dRight);
     }
 }
 
@@ -489,7 +518,7 @@ void CLinearAlgebraHelper::Normal2(const CLGComplex* v, const CLGComplex* matrix
 {
     dim3 block(1, 1, 1);
     dim3 thread(dm, dm, 1);
-    _kernelNormal2 << <block, thread >> > (v, matrix, devicees, dm);
+    _LAUNCH_KERNEL(_kernelNormal2, block, thread, v, matrix, devicees, dm);
 }
 
 #pragma endregion
@@ -515,7 +544,7 @@ void CLinearAlgebraHelper::Normal2(const CLGComplex* v, const CLGComplex* matrix
 * Assume res is zeroed
 * Y Dir ----->
 */
-__global__ void
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelMatrixBlockMult_LNN(CLGComplex* res, const CLGComplex* __restrict__ left, const CLGComplex* __restrict__ right, UINT iStart, UINT iEnd, UINT dm)
 {
     UINT n = blockIdx.x;
@@ -538,7 +567,7 @@ _kernelMatrixBlockMult_LNN(CLGComplex* res, const CLGComplex* __restrict__ left,
     }
 }
 
-__global__ void
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelMatrixBlockMult_LDN(CLGComplex* res, const CLGComplex* __restrict__ left, const CLGComplex* __restrict__ right, UINT iStart, UINT iEnd, UINT dm)
 {
     UINT n = blockIdx.x;
@@ -561,7 +590,7 @@ _kernelMatrixBlockMult_LDN(CLGComplex* res, const CLGComplex* __restrict__ left,
     }
 }
 
-__global__ void
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelMatrixBlockMult_LND(CLGComplex* res, const CLGComplex* __restrict__ left, const CLGComplex* __restrict__ right, UINT iStart, UINT iEnd, UINT dm)
 {
     UINT n = blockIdx.x;
@@ -572,6 +601,29 @@ _kernelMatrixBlockMult_LND(CLGComplex* res, const CLGComplex* __restrict__ left,
     {
         UINT mid = n + iStart;
         CLGComplex toAdd = _cuCmulf(left[x * dm + mid], _cuConjf(right[y * dm + mid]));
+        atomicAdd(&res[x * dm + y].x, toAdd.x);
+        atomicAdd(&res[x * dm + y].y, toAdd.y);
+    }
+    else
+    {
+        if (0 == n)
+        {
+            res[x * dm + y] = _cuConjf(right[y * dm + x]);
+        }
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
+_kernelMatrixBlockMult_LDD(CLGComplex* res, const CLGComplex* __restrict__ left, const CLGComplex* __restrict__ right, UINT iStart, UINT iEnd, UINT dm)
+{
+    UINT n = blockIdx.x;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
+
+    if (x >= iStart && x < iEnd)
+    {
+        UINT mid = n + iStart;
+        CLGComplex toAdd = _cuCmulf(_cuConjf(left[mid * dm + x]), _cuConjf(right[y * dm + mid]));
         atomicAdd(&res[x * dm + y].x, toAdd.x);
         atomicAdd(&res[x * dm + y].y, toAdd.y);
     }
@@ -603,7 +655,7 @@ _kernelMatrixBlockMult_LND(CLGComplex* res, const CLGComplex* __restrict__ left,
 * Assume res is zeroed
 * Y Dir ----->
 */
-__global__ void
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelMatrixBlockMult_RNN(CLGComplex* res, const CLGComplex* __restrict__ left, const CLGComplex* __restrict__ right, UINT iStart, UINT iEnd, UINT dm)
 {
     UINT n = blockIdx.x;
@@ -626,7 +678,7 @@ _kernelMatrixBlockMult_RNN(CLGComplex* res, const CLGComplex* __restrict__ left,
     }
 }
 
-__global__ void
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelMatrixBlockMult_RDN(CLGComplex* res, const CLGComplex* __restrict__ left, const CLGComplex* __restrict__ right, UINT iStart, UINT iEnd, UINT dm)
 {
     UINT n = blockIdx.x;
@@ -649,7 +701,7 @@ _kernelMatrixBlockMult_RDN(CLGComplex* res, const CLGComplex* __restrict__ left,
     }
 }
 
-__global__ void
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelMatrixBlockMult_RND(CLGComplex* res, const CLGComplex* __restrict__ left, const CLGComplex* __restrict__ right, UINT iStart, UINT iEnd, UINT dm)
 {
     UINT n = blockIdx.x;
@@ -672,6 +724,29 @@ _kernelMatrixBlockMult_RND(CLGComplex* res, const CLGComplex* __restrict__ left,
     }
 }
 
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
+_kernelMatrixBlockMult_RDD(CLGComplex* res, const CLGComplex* __restrict__ left, const CLGComplex* __restrict__ right, UINT iStart, UINT iEnd, UINT dm)
+{
+    UINT n = blockIdx.x;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
+
+    if (y >= iStart && y < iEnd)
+    {
+        UINT mid = n + iStart;
+        CLGComplex toAdd = _cuCmulf(_cuConjf(left[mid * dm + x]), _cuConjf(right[y * dm + mid]));
+        atomicAdd(&res[x * dm + y].x, toAdd.x);
+        atomicAdd(&res[x * dm + y].y, toAdd.y);
+    }
+    else
+    {
+        if (0 == n)
+        {
+            res[x * dm + y] = _cuConjf(left[y * dm + x]);
+        }
+    }
+}
+
 void CLinearAlgebraHelper::BlockMatrixMult(
     CLGComplex * deviceRes,
     const CLGComplex* left,
@@ -685,32 +760,40 @@ void CLinearAlgebraHelper::BlockMatrixMult(
 
     if (bLeft)
     {
-        if (bLeftDagger)
+        if (bLeftDagger && bRightDagger)
         {
-            _kernelMatrixBlockMult_LDN << <block, thread >> >(deviceRes, left, right, uiStart, uiEnd, dDim);
+            _LAUNCH_KERNEL(_kernelMatrixBlockMult_LDD, block, thread, deviceRes, left, right, uiStart, uiEnd, dDim);
+        }
+        else if (bLeftDagger)
+        {
+            _LAUNCH_KERNEL(_kernelMatrixBlockMult_LDN, block, thread, deviceRes, left, right, uiStart, uiEnd, dDim);
         }
         else if (bRightDagger)
         {
-            _kernelMatrixBlockMult_LND << <block, thread >> >(deviceRes, left, right, uiStart, uiEnd, dDim);
+            _LAUNCH_KERNEL(_kernelMatrixBlockMult_LND, block, thread, deviceRes, left, right, uiStart, uiEnd, dDim);
         }
         else
         {
-            _kernelMatrixBlockMult_LNN << <block, thread >> > (deviceRes, left, right, uiStart, uiEnd, dDim);
+            _LAUNCH_KERNEL(_kernelMatrixBlockMult_LNN, block, thread, deviceRes, left, right, uiStart, uiEnd, dDim);
         }
     }
     else
     {
-        if (bLeftDagger)
+        if (bLeftDagger && bRightDagger)
         {
-            _kernelMatrixBlockMult_RDN << <block, thread >> >(deviceRes, left, right, uiStart, uiEnd, dDim);
+            _LAUNCH_KERNEL(_kernelMatrixBlockMult_RDD, block, thread, deviceRes, left, right, uiStart, uiEnd, dDim);
+        }
+        else if (bLeftDagger)
+        {
+            _LAUNCH_KERNEL(_kernelMatrixBlockMult_RDN, block, thread, deviceRes, left, right, uiStart, uiEnd, dDim);
         }
         else if (bRightDagger)
         {
-            _kernelMatrixBlockMult_RND << <block, thread >> >(deviceRes, left, right, uiStart, uiEnd, dDim);
+            _LAUNCH_KERNEL(_kernelMatrixBlockMult_RND, block, thread, deviceRes, left, right, uiStart, uiEnd, dDim);
         }
         else
         {
-            _kernelMatrixBlockMult_RNN << <block, thread >> > (deviceRes, left, right, uiStart, uiEnd, dDim);
+            _LAUNCH_KERNEL(_kernelMatrixBlockMult_RNN, block, thread, deviceRes, left, right, uiStart, uiEnd, dDim);
         }
     }
 }
@@ -722,14 +805,14 @@ void CLinearAlgebraHelper::BlockMatrixMult(
 /**
 * M=M+cI, c is device buffer
 */
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelMatrixAddConstant(CLGComplex* m, CLGComplex* c, UINT dy)
 {
     const UINT i = threadIdx.x;
     m[i * dy + i] = _cuCaddf(m[i * dy + i], c[0]);
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelMatrixTranspose(const CLGComplex* __restrict__ m, CLGComplex* tmpM, UINT dx, UINT dy)
 {
     const UINT x = threadIdx.x;
@@ -738,7 +821,7 @@ _kernelMatrixTranspose(const CLGComplex* __restrict__ m, CLGComplex* tmpM, UINT 
     tmpM[y * dx + x] = m[x * dy + y];
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelMatrixDagger(const CLGComplex* __restrict__ m, CLGComplex* tmpM, UINT dx, UINT dy)
 {
     const UINT x = threadIdx.x;
@@ -760,7 +843,7 @@ void CLinearAlgebraHelper::Transpose(CLGComplex* deviceMatrix, UINT dx, UINT dy)
 
     dim3 block(1, 1, 1);
     dim3 thread(dx, dy, 1);
-    _kernelMatrixTranspose << <block, thread >> > (deviceMatrix, tmpMRes, dx, dy);
+    _LAUNCH_KERNEL(_kernelMatrixTranspose, block, thread, deviceMatrix, tmpMRes, dx, dy);
     checkCudaErrors(cudaMemcpy(deviceMatrix, tmpMRes, sizeof(CLGComplex) * dx * dy, cudaMemcpyDeviceToDevice));
 
     sTmpMRes.Free();
@@ -779,7 +862,7 @@ void CLinearAlgebraHelper::Dagger(CLGComplex* deviceMatrix, UINT dx, UINT dy)
 
     dim3 block(1, 1, 1);
     dim3 thread(dx, dy, 1);
-    _kernelMatrixDagger << <block, thread >> > (deviceMatrix, tmpMRes, dx, dy);
+    _LAUNCH_KERNEL(_kernelMatrixDagger, block, thread, deviceMatrix, tmpMRes, dx, dy);
     checkCudaErrors(cudaMemcpy(deviceMatrix, tmpMRes, sizeof(CLGComplex) * dx * dy, cudaMemcpyDeviceToDevice));
 
     sTmpMRes.Free();
@@ -826,7 +909,7 @@ void CLinearAlgebraHelper::DaggerHost(CLGComplex* hostMatrix, UINT dx, UINT dy)
 /**
 * thread.xy = lx,ly
 */
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelCopyMatrixXY(
     CLGComplex* mtr,
     const CLGComplex* __restrict__ orignal,
@@ -838,7 +921,7 @@ _kernelCopyMatrixXY(
     mtr[x * newdy + y] = orignal[x * olddy + y];
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelMatrixBlockCopy(
     CLGComplex* dest, 
     const CLGComplex* __restrict__ src, 
@@ -855,7 +938,7 @@ void CLinearAlgebraHelper::BlockCopy(CLGComplex* deviceDest, const CLGComplex* d
 {
     dim3 block(1, 1, 1);
     dim3 thread(lengthX, lengthY, 1);
-    _kernelCopyMatrixXY << <block, thread >> > (deviceDest, deviceSrc, dimDest, dimSrc);
+    _LAUNCH_KERNEL(_kernelCopyMatrixXY, block, thread, deviceDest, deviceSrc, dimDest, dimSrc);
 }
 
 #pragma endregion
@@ -889,7 +972,7 @@ void CLinearAlgebraHelper::PrintMatrix(const CLGComplex* mtr, UINT dx, UINT dy)
 
 #pragma region QR Decomposition
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelOneStepHouseHolderQR(
     CLGComplex* Q,
     const CLGComplex* __restrict__ R,
@@ -1036,7 +1119,7 @@ void CLinearAlgebraHelper::QRFactorization(
     InitialOne(Q, dy);
     for (UINT i = 0; i < dy - 1; ++i)
     {
-        _kernelOneStepHouseHolderQR << <block, thread1 >> > (tmpQ, R, i, dy);
+        _LAUNCH_KERNEL(_kernelOneStepHouseHolderQR, block, thread1, tmpQ, R, i, dy);
 
         //left is block
         BlockMatrixMult(tmpM, tmpQ, R, dy, i, dy, TRUE, FALSE, FALSE);
@@ -1081,7 +1164,7 @@ void CLinearAlgebraHelper::ThinQRFactorization(
     dim3 block(1, 1, 1);
     for (UINT i = 0; i < dx - 1; ++i)
     {
-        _kernelOneStepHouseHolderQR << <block, thread2 >> > (tmpQ, tmpR, i, dx);
+        _LAUNCH_KERNEL(_kernelOneStepHouseHolderQR, block, thread2, tmpQ, tmpR, i, dx);
 
         //m = q x r
         BlockMatrixMult(tmpM, tmpQ, tmpR, dx, i, dx, TRUE, FALSE, FALSE);
@@ -1109,7 +1192,7 @@ void CLinearAlgebraHelper::ThinQRFactorization(
 
 #pragma region QR Hensenberg
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelOneStepHouseHolder(
     CLGComplex* U, 
     const CLGComplex* __restrict__ A, 
@@ -1250,7 +1333,7 @@ void CLinearAlgebraHelper::Henssenberg(CLGComplex* T, UINT dx)
 
     for (UINT i = 0; i < dx - 2; ++i)
     {
-        _kernelOneStepHouseHolder << <block, thread1 >> > (tmpU, T, i, dx);
+        _LAUNCH_KERNEL(_kernelOneStepHouseHolder, block, thread1, tmpU, T, i, dx);
         BlockMatrixMult(tmpM, tmpU, T, dx, i + 1, dx, TRUE, FALSE, FALSE);
         BlockMatrixMult(T, tmpM, tmpU, dx, i + 1, dx, FALSE, FALSE, TRUE);
     }
@@ -1262,7 +1345,7 @@ void CLinearAlgebraHelper::Henssenberg(CLGComplex* T, UINT dx)
 
 #pragma region Backward Substitude
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelOneLineReduceBS(
     CLGComplex* y, 
     const CLGComplex* __restrict__ R, 
@@ -1295,12 +1378,12 @@ void CLinearAlgebraHelper::SolveY(CLGComplex* deviceY, const CLGComplex* deviceR
         if (i == static_cast<INT>(dx - 1))
         {
             dim3 thread(1, dk, 1);
-            _kernelOneLineReduceBS << <block, thread >> > (deviceY, deviceR, i, dk, dx);
+            _LAUNCH_KERNEL(_kernelOneLineReduceBS, block, thread, deviceY, deviceR, i, dk, dx);
         }
         else
         {
             dim3 thread(dx - i - 1, dk, 1);
-            _kernelOneLineReduceBS << <block, thread >> > (deviceY, deviceR, i, dk, dx);
+            _LAUNCH_KERNEL(_kernelOneLineReduceBS, block, thread, deviceY, deviceR, i, dk, dx);
         }
     }
 }
@@ -1310,7 +1393,7 @@ void CLinearAlgebraHelper::SolveY(CLGComplex* deviceY, const CLGComplex* deviceR
 
 #pragma region Shift QR Iteration
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelWilkinsonShift(CLGComplex* m, CLGComplex* c, Real fCrit, UINT dim)
 {
     const UINT i = threadIdx.x;
@@ -1364,7 +1447,7 @@ _kernelWilkinsonShift(CLGComplex* m, CLGComplex* c, Real fCrit, UINT dim)
     m[i * dim + i] = _cuCsubf(m[i * dim + i], c[0]);
 }
 
-__global__ void _CLG_LAUNCH_BOUND_SINGLE
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelCheckMatrix(CLGComplex* mtr, INT* decomp, UINT dx, Real fCrit)
 {
     decomp[0] = dx;
@@ -1632,7 +1715,7 @@ _kernelStartStep(const CLGComplex* __restrict__ H, CLGComplex* xyz, UINT dm)
 * k = 2,... tx = dm - k + 1
 * ty = 9
 */
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelStepK_1(
     CLGComplex* H,
     CLGComplex* um,
@@ -1699,7 +1782,7 @@ _kernelStepK_1(
 * k = n-3      tx = dm
 * ty = 9
 */
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelStepK_2(
     CLGComplex* H,
     const CLGComplex* __restrict__ um,
@@ -1738,7 +1821,7 @@ _kernelStepK_2(
     }
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelDoubleShiftFinal(CLGComplex* H, CLGComplex* xyz, UINT dm)
 {
     const UINT x = threadIdx.x;
@@ -1826,7 +1909,7 @@ void CLinearAlgebraHelper::QRIterate(CLGComplex* T, UINT dx, Real fCrit, UINT iC
     for (UINT i = 0; i < iCrit; ++i)
     {
         //find decomp
-        _kernelCheckMatrix << <1, 1 >> > (tmpT, tmpDecomp, iLastDim, fCrit);
+        _LAUNCH_KERNEL(_kernelCheckMatrix, 1, 1, tmpT, tmpDecomp, iLastDim, fCrit);
         checkCudaErrors(cudaMemcpy(endindex, tmpDecomp, sizeof(INT), cudaMemcpyDeviceToHost));
 
         if (endindex[0] < static_cast<INT>(iLastDim))
@@ -1851,7 +1934,7 @@ void CLinearAlgebraHelper::QRIterate(CLGComplex* T, UINT dx, Real fCrit, UINT iC
         //shift
         //T = T - sigma I, tmpDeviceFloat[0] = sigma
         dim3 thread(iLastDim, 1, 1);
-        _kernelWilkinsonShift << <block, thread >> > (tmpT, tmpShift, fCrit, iLastDim);
+        _LAUNCH_KERNEL(_kernelWilkinsonShift, block, thread, tmpT, tmpShift, fCrit, iLastDim);
 
         //QR decompose
         QRFactorization(tmpQ, tmpR, tmpT, iLastDim);
@@ -1859,7 +1942,7 @@ void CLinearAlgebraHelper::QRIterate(CLGComplex* T, UINT dx, Real fCrit, UINT iC
         //Update H
         //T = R Q + sigma I
         SmallMatrixMult(tmpT, tmpR, tmpQ, iLastDim, iLastDim, iLastDim, FALSE, FALSE);
-        _kernelMatrixAddConstant << <block, thread >> > (tmpT, tmpShift, iLastDim);
+        _LAUNCH_KERNEL(_kernelMatrixAddConstant, block, thread, tmpT, tmpShift, iLastDim);
     }
     BlockCopy(tmpT, T, iLastDim, iLastDim, iLastDim, dx);
 #else
@@ -1867,7 +1950,7 @@ void CLinearAlgebraHelper::QRIterate(CLGComplex* T, UINT dx, Real fCrit, UINT iC
     for (UINT i = 0; i < iCrit; ++i)
     {
         //find decomp
-        _kernelCheckMatrixDoubleShift << <1, 1 >> > (T, tmpDecomp, dx, fCrit);
+        _LAUNCH_KERNEL(_kernelCheckMatrixDoubleShift, 1, 1, T, tmpDecomp, dx, fCrit);
 
         checkCudaErrors(cudaMemcpy(endindex, tmpDecomp, sizeof(INT) * 2, cudaMemcpyDeviceToHost));
         INT iLength = endindex[1] - endindex[0];
@@ -1882,18 +1965,18 @@ void CLinearAlgebraHelper::QRIterate(CLGComplex* T, UINT dx, Real fCrit, UINT iC
         }
         else if (2 == iLength)
         {
-            _kernel2By2Eigen << <1, 1 >> > (T, tmpDecomp, dx, fCrit);
+            _LAUNCH_KERNEL(_kernel2By2Eigen, 1, 1, T, tmpDecomp, dx, fCrit);
         }
         else
         {
             dim3 threadCopy(iLength, iLength, 1);
-            _kernelMatrixBlockCopy << <block, threadCopy >> > (tmpT, T,
+            _LAUNCH_KERNEL(_kernelMatrixBlockCopy, block, threadCopy, tmpT, T,
                 endindex[0], endindex[0], 0, 0, dx, iLength);
 
             //shift
             //T = T - sigma I, tmpDeviceFloat[0] = sigma
             dim3 thread(iLength, 1, 1);
-            _kernelWilkinsonShift << <block, thread >> > (tmpT, tmpShift, fCrit, iLength);
+            _LAUNCH_KERNEL(_kernelWilkinsonShift, block, thread, tmpT, tmpShift, fCrit, iLength);
 
             //QR decompose
             QRFactorization(tmpQ, tmpR, tmpT, iLength);
@@ -1901,9 +1984,9 @@ void CLinearAlgebraHelper::QRIterate(CLGComplex* T, UINT dx, Real fCrit, UINT iC
             //Update H
             //T = R Q + sigma I
             SmallMatrixMult(tmpT, tmpR, tmpQ, iLength, iLength, iLength, FALSE, FALSE);
-            _kernelMatrixAddConstant << <block, thread >> > (tmpT, tmpShift, iLength);
+            _LAUNCH_KERNEL(_kernelMatrixAddConstant, block, thread, tmpT, tmpShift, iLength);
 
-            _kernelMatrixBlockCopy << <block, threadCopy >> > (T, tmpT,
+            _LAUNCH_KERNEL(_kernelMatrixBlockCopy, block, threadCopy, T, tmpT,
                 0, 0, endindex[0], endindex[0], iLength, dx);
         }
     }
@@ -1918,21 +2001,21 @@ void CLinearAlgebraHelper::QRIterate(CLGComplex* T, UINT dx, Real fCrit, UINT iC
 void CLinearAlgebraHelper::FrancisQRIterateBlock(CLGComplex* T, CLGComplex * tmpXYZ, UINT uiBlockDim)
 {
     dim3 block(1, 1, 1);
-    _kernelStartStep << <1, 1 >> > (T, tmpXYZ, uiBlockDim);
+    _LAUNCH_KERNEL(_kernelStartStep, 1, 1, T, tmpXYZ, uiBlockDim);
 
     for (UINT k = 0; k <= uiBlockDim - 3; ++k)
     {
         dim3 thread1(k < 2 ? uiBlockDim : (uiBlockDim - k + 1), 9, 1);
-        _kernelStepK_1 << <block, thread1 >> > (T, 
+        _LAUNCH_KERNEL(_kernelStepK_1, block, thread1, T, 
             m_pDeviceTmpHouseHolder, tmpXYZ, k, uiBlockDim);
 
         dim3 thread2((uiBlockDim - 3 == k) ? uiBlockDim : (k + 4), 9, 1);
-        _kernelStepK_2 << <block, thread2 >> > (T, 
+        _LAUNCH_KERNEL(_kernelStepK_2, block, thread2, T, 
             m_pDeviceTmpHouseHolder, tmpXYZ, k, uiBlockDim);
     }
 
     dim3 thread3(uiBlockDim, 1, 1);
-    _kernelDoubleShiftFinal << <block, thread3 >> > (T, tmpXYZ, uiBlockDim);
+    _LAUNCH_KERNEL(_kernelDoubleShiftFinal, block, thread3, T, tmpXYZ, uiBlockDim);
 }
 
 void CLinearAlgebraHelper::FrancisQRIterate(CLGComplex* T, UINT dx, Real fCrit, UINT iCrit)
@@ -1954,7 +2037,7 @@ void CLinearAlgebraHelper::FrancisQRIterate(CLGComplex* T, UINT dx, Real fCrit, 
     for (UINT i = 0; i < iCrit * dx; ++i)
     {
         //find decomp
-        _kernelCheckMatrixDoubleShift << <1, 1 >> > (T, tmpDecomp, dx, fCrit);
+        _LAUNCH_KERNEL(_kernelCheckMatrixDoubleShift, 1, 1, T, tmpDecomp, dx, fCrit);
 
         checkCudaErrors(cudaMemcpy(endindex, tmpDecomp, sizeof(INT) * 2, cudaMemcpyDeviceToHost));
         INT iLength = endindex[1] - endindex[0];
@@ -1967,15 +2050,15 @@ void CLinearAlgebraHelper::FrancisQRIterate(CLGComplex* T, UINT dx, Real fCrit, 
         }
         else if (2 == iLength)
         {
-            _kernel2By2Eigen << <1, 1 >> > (T, tmpDecomp, dx, fCrit);
+            _LAUNCH_KERNEL(_kernel2By2Eigen, 1, 1, T, tmpDecomp, dx, fCrit);
         }
         else
         {
             dim3 threadCopy(iLength, iLength, 1);
-            _kernelMatrixBlockCopy << <block1, threadCopy >> > (tmpT, T,
+            _LAUNCH_KERNEL(_kernelMatrixBlockCopy, block1, threadCopy, tmpT, T,
                 endindex[0], endindex[0], 0, 0, dx, iLength);
             FrancisQRIterateBlock(tmpT, tmpXYZ, iLength);
-            _kernelMatrixBlockCopy << <block1, threadCopy >> > (T, tmpT,
+            _LAUNCH_KERNEL(_kernelMatrixBlockCopy, block1, threadCopy, T, tmpT,
                 0, 0, endindex[0], endindex[0], iLength, dx);
         }
     }
@@ -1988,7 +2071,7 @@ void CLinearAlgebraHelper::FrancisQRIterate(CLGComplex* T, UINT dx, Real fCrit, 
 
 #pragma region Eigen Problem
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelSortEigenValues(const CLGComplex* __restrict__ R,
     CLGComplex* outV, Real* tmpF, INT* tmpO, UINT k, UINT dx)
 {
@@ -2022,7 +2105,7 @@ _kernelSortEigenValues(const CLGComplex* __restrict__ R,
     }
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelSortEigenValuesBig(const CLGComplex* __restrict__ R,
     CLGComplex* outV, Real* tmpF, INT* tmpO, UINT k, UINT dx)
 {
@@ -2056,21 +2139,21 @@ _kernelSortEigenValuesBig(const CLGComplex* __restrict__ R,
     }
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelDaggerVector(CLGComplex* y, const CLGComplex* __restrict__ Q, UINT dx)
 {
     const UINT j = threadIdx.x;
-    y[j] = _cuConjf(Q[j * dx]);
+    y[j] = _cuConjf(Q[j]);
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelInverseIterateShift(CLGComplex* A, const CLGComplex* __restrict__ outV, UINT k, UINT dx)
 {
     const UINT x = threadIdx.x;
     A[x * dx + x] = _cuCsubf(A[x * dx + x], outV[k]);
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelNormVectors(CLGComplex* v, UINT dx)
 {
     const UINT x = threadIdx.y;
@@ -2097,11 +2180,13 @@ _kernelNormVectors(CLGComplex* v, UINT dx)
         fAmp[x] = __div(F(1.0), _sqrt(fAmp[x]));
     }
 
+    __syncthreads();
+
     v[x * dx + y].x = v[x * dx + y].x * fAmp[x];
     v[x * dx + y].y = v[x * dx + y].y * fAmp[x];
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelErrorCheck(Real* outE, CLGComplex* v, const CLGComplex* __restrict__ A, UINT dx)
 {
     const UINT x = threadIdx.x;
@@ -2194,11 +2279,11 @@ void CLinearAlgebraHelper::EigenValueProblem(
 
     if (bSmall)
     {
-        _kernelSortEigenValues << <block, thread1 >> > (tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+        _LAUNCH_KERNEL(_kernelSortEigenValues, block, thread1, tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
     }
     else
     {
-        _kernelSortEigenValuesBig << <block, thread1 >> > (tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+        _LAUNCH_KERNEL(_kernelSortEigenValuesBig, block, thread1, tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
     }
 #if _CLG_QRIterate_Update_EigenValue
     CLGComplex res[1];
@@ -2208,12 +2293,12 @@ void CLinearAlgebraHelper::EigenValueProblem(
     {
         //Inverse Iterate
         checkCudaErrors(cudaMemcpy(tmpH, H, sizeof(CLGComplex) * dm * dm, cudaMemcpyDeviceToDevice));
-        _kernelInverseIterateShift << <block, thread2 >> > (tmpH, outEigenValue, i, dm);
+        _LAUNCH_KERNEL(_kernelInverseIterateShift, block, thread2, tmpH, outEigenValue, i, dm);
 
         QRFactorization(tmpQ, tmpR, tmpH, dm);
 
         //q=tmpM2, r=tmpM3
-        _kernelDaggerVector << <block, thread2 >> > (tmpVector, tmpQ, dm);
+        _LAUNCH_KERNEL(_kernelDaggerVector, block, thread2, tmpVector, tmpQ, dm);
         SolveY(tmpVector, tmpR, 1, dm);
 
         // Sometimes One Iteration is NOT enough!
@@ -2227,7 +2312,7 @@ void CLinearAlgebraHelper::EigenValueProblem(
             checkCudaErrors(cudaMemcpy(tmpF, fErr, sizeof(Real), cudaMemcpyHostToDevice));
 
             //It is normalized in _kernelErrorCheck
-            _kernelErrorCheck << <block, thread1 >> > (tmpF, tmpVector, tmpH, dm);
+            _LAUNCH_KERNEL(_kernelErrorCheck, block, thread1, tmpF, tmpVector, tmpH, dm);
 
             checkCudaErrors(cudaMemcpy(fErr, tmpF, sizeof(Real), cudaMemcpyDeviceToHost));
 
@@ -2246,21 +2331,28 @@ void CLinearAlgebraHelper::EigenValueProblem(
             checkCudaErrors(cudaMemcpy(m_pOneDeviceC, res, sizeof(CLGComplex), cudaMemcpyHostToDevice));
             Normal2(tmpVector, H, m_pOneDeviceC, dm);
             checkCudaErrors(cudaMemcpy(tmpH, H, sizeof(CLGComplex) * dm * dm, cudaMemcpyDeviceToDevice));
-            _kernelInverseIterateShift << <block, thread2 >> > (tmpH, m_pOneDeviceC, 0, dm);
+            _LAUNCH_KERNEL(_kernelInverseIterateShift, block, thread2, tmpH, m_pOneDeviceC, 0, dm);
             QRFactorization(tmpQ, tmpR, tmpH, dm);
 #endif
             //Do the inverse here
             SmallMatrixMult(tmpM, tmpQ, tmpVector, dm, dm, 1, TRUE, FALSE);
             SolveY(tmpM, tmpR, 1, dm);
             checkCudaErrors(cudaMemcpy(tmpVector, tmpM, sizeof(CLGComplex) * dm, cudaMemcpyDeviceToDevice));
+
+            if (j == iMaxEigenIterate - 1)
+            {
+                //last time iterate, not normalized
+                _LAUNCH_KERNEL(_kernelNormVectors, block, thread2, tmpVector, dm);
+            }
         }
+
         sTmpM.Free();
         checkCudaErrors(cudaMemcpy(outEigenVector + dm * i, tmpVector, sizeof(CLGComplex) * dm, cudaMemcpyDeviceToDevice));
     }
 
     //It is normalized in _kernelErrorCheck
     //dim3 thread3(dm, dk, 1);
-    //_kernelNormVectors << <block, thread3 >> > (outEigenVector, dm);
+    //_LAUNCH_KERNEL(_kernelNormVectors, block, thread3, outEigenVector, dm);
 
     sTmpH.Free();
     sTmpQ.Free();
@@ -2303,11 +2395,11 @@ void CLinearAlgebraHelper::EigenValueProblemHessenberg(
 
     if (bSmall)
     {
-        _kernelSortEigenValues << <block, thread1 >> > (tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+        _LAUNCH_KERNEL(_kernelSortEigenValues, block, thread1, tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
     }
     else
     {
-        _kernelSortEigenValuesBig << <block, thread1 >> > (tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+        _LAUNCH_KERNEL(_kernelSortEigenValuesBig, block, thread1, tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
     }
 #if _CLG_QRIterate_Update_EigenValue
     CLGComplex res[1];
@@ -2317,12 +2409,12 @@ void CLinearAlgebraHelper::EigenValueProblemHessenberg(
     {
         //Inverse Iterate
         checkCudaErrors(cudaMemcpy(tmpH, H, sizeof(CLGComplex) * dm * dm, cudaMemcpyDeviceToDevice));
-        _kernelInverseIterateShift << <block, thread2 >> > (tmpH, outEigenValue, i, dm);
+        _LAUNCH_KERNEL(_kernelInverseIterateShift, block, thread2, tmpH, outEigenValue, i, dm);
 
         QRFactorization(tmpQ, tmpR, tmpH, dm);
 
         //q=tmpM2, r=tmpM3
-        _kernelDaggerVector << <block, thread2 >> > (tmpVector, tmpQ, dm);
+        _LAUNCH_KERNEL(_kernelDaggerVector, block, thread2, tmpVector, tmpQ, dm);
         SolveY(tmpVector, tmpR, 1, dm);
 
         // Sometimes One Iteration is NOT enough!
@@ -2335,7 +2427,7 @@ void CLinearAlgebraHelper::EigenValueProblemHessenberg(
             fErr[0] = F(0.0);
             checkCudaErrors(cudaMemcpy(tmpF, fErr, sizeof(Real), cudaMemcpyHostToDevice));
 
-            _kernelErrorCheck << <block, thread1 >> > (tmpF, tmpVector, tmpH, dm);
+            _LAUNCH_KERNEL(_kernelErrorCheck, block, thread1, tmpF, tmpVector, tmpH, dm);
 
             checkCudaErrors(cudaMemcpy(fErr, tmpF, sizeof(Real), cudaMemcpyDeviceToHost));
 
@@ -2354,28 +2446,35 @@ void CLinearAlgebraHelper::EigenValueProblemHessenberg(
             checkCudaErrors(cudaMemcpy(m_pOneDeviceC, res, sizeof(CLGComplex), cudaMemcpyHostToDevice));
             Normal2(tmpVector, H, m_pOneDeviceC, dm);
             checkCudaErrors(cudaMemcpy(tmpH, H, sizeof(CLGComplex) * dm * dm, cudaMemcpyDeviceToDevice));
-            _kernelInverseIterateShift << <block, thread2 >> > (tmpH, m_pOneDeviceC, 0, dm);
+            _LAUNCH_KERNEL(_kernelInverseIterateShift, block, thread2, tmpH, m_pOneDeviceC, 0, dm);
             QRFactorization(tmpQ, tmpR, tmpH, dm);
 #endif
 
             SmallMatrixMult(tmpM, tmpQ, tmpVector, dm, dm, 1, TRUE, FALSE);
             SolveY(tmpM, tmpR, 1, dm);
             checkCudaErrors(cudaMemcpy(tmpVector, tmpM, sizeof(CLGComplex) * dm, cudaMemcpyDeviceToDevice));
+
+            if (j == iMaxEigenIterate - 1)
+            {
+                //last time iterate, not normalized
+                _LAUNCH_KERNEL(_kernelNormVectors, block, thread2, tmpVector, dm);
+            }
         }
+
         sTmpM.Free();
         checkCudaErrors(cudaMemcpy(outEigenVector + dm * i, tmpVector, sizeof(CLGComplex) * dm, cudaMemcpyDeviceToDevice));
     }
 
     //It is normalized in _kernelErrorCheck
     //dim3 thread3(dm, dk, 1);
-    //_kernelNormVectors << <block, thread3 >> > (outEigenVector, dm);
+    //_LAUNCH_KERNEL(_kernelNormVectors, block, thread3, outEigenVector, dm);
 
     sTmpH.Free();
     sTmpQ.Free();
     sTmpR.Free();
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelExchangeOrders(INT* orders)
 {
     const UINT x = threadIdx.x; //0 to dm
@@ -2396,7 +2495,7 @@ _kernelExchangeOrders(INT* orders)
     }
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelInitialE1Vector(CLGComplex* v, UINT dm, UINT x)
 {
     const UINT y = threadIdx.x;
@@ -2410,7 +2509,7 @@ _kernelInitialE1Vector(CLGComplex* v, UINT dm, UINT x)
     }
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelCreateBackshiftProblem(
     const CLGComplex* __restrict__ triangular, const CLGComplex* __restrict__ eigenValue,
     UINT i, UINT iOrder, //the k row, iOrder = k - 1
@@ -2440,7 +2539,7 @@ _kernelCreateBackshiftProblem(
     }
 }
 
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelFinalNorm(
     const CLGComplex* __restrict__ triangular,
     UINT iOrder, //the k row, iOrder = k - 1
@@ -2523,13 +2622,13 @@ void CLinearAlgebraHelper::UpperTriangularEigenVectors(
 
     if (bSmall)
     {
-        _kernelSortEigenValues << <block, thread1 >> > (upperTriangular, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+        _LAUNCH_KERNEL(_kernelSortEigenValues, block, thread1, upperTriangular, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
     }
     else
     {
-        _kernelSortEigenValuesBig << <block, thread1 >> > (upperTriangular, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+        _LAUNCH_KERNEL(_kernelSortEigenValuesBig, block, thread1, upperTriangular, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
     }
-    _kernelExchangeOrders << <block, thread3 >>> (m_pDeviceIntBuffer);
+    _LAUNCH_KERNEL(_kernelExchangeOrders, block, thread3, m_pDeviceIntBuffer);
     INT orders[_kMaxSmallDim];
     checkCudaErrors(cudaMemcpy(orders, m_pDeviceIntBuffer, sizeof(INT) * dk, cudaMemcpyDeviceToHost));
 
@@ -2542,11 +2641,11 @@ void CLinearAlgebraHelper::UpperTriangularEigenVectors(
         if (0 == orders[i])
         {
             //usually it is not 0
-            _kernelInitialE1Vector << <block, thread2 >> > (outEigenVector, dm, i);
+            _LAUNCH_KERNEL(_kernelInitialE1Vector, block, thread2, outEigenVector, dm, i);
         }
         else if (1 == orders[i])
         {
-            _kernelFinalNorm << <block, thread2 >> > (upperTriangular, 1, dm, tmpVector);
+            _LAUNCH_KERNEL(_kernelFinalNorm, block, thread2, upperTriangular, 1, dm, tmpVector);
             checkCudaErrors(cudaMemcpy(outEigenVector + i * dm, tmpVector, sizeof(CLGComplex) * dm, cudaMemcpyDeviceToDevice));
         }
         else
@@ -2556,13 +2655,13 @@ void CLinearAlgebraHelper::UpperTriangularEigenVectors(
             //if it is the number 2 eigen-value, it is the 3rd eigen-value
             //when 3rd eigen-value, we need a 2x2 matrix.
             dim3 thread4(toSolveDim, toSolveDim, 1);
-            _kernelCreateBackshiftProblem << <block, thread4 >> > (upperTriangular, outEigenValue, 
+            _LAUNCH_KERNEL(_kernelCreateBackshiftProblem, block, thread4, upperTriangular, outEigenValue, 
                 i, toSolveDim, dm, tmpR, tmpVector);
 
             //solve back shift
             SolveY(tmpVector, tmpR, 1, toSolveDim);
 
-            _kernelFinalNorm << <block, thread2 >> > (upperTriangular, toSolveDim, dm, tmpVector);
+            _LAUNCH_KERNEL(_kernelFinalNorm, block, thread2, upperTriangular, toSolveDim, dm, tmpVector);
 
             checkCudaErrors(cudaMemcpy(outEigenVector + i * dm, tmpVector, sizeof(CLGComplex) * dm, cudaMemcpyDeviceToDevice));
         }
@@ -2638,7 +2737,7 @@ void CLinearAlgebraHelper::GeneralizedEigenValueProblem(
 * thread.y = dm
 *
 */
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND_SMALLMTR
 _kernelLeftGivenHessenberg(UINT i, UINT j,
     CLGComplex* A, CLGComplex* g, UINT dm)
 {
@@ -2696,7 +2795,7 @@ void CLinearAlgebraHelper::RotateHenssenberg(CLGComplex* H, CLGComplex* Y, UINT 
     for (UINT i = 0; i < dm; ++i)
     {
         dim3 thread(dm - i, 1, 1);
-        _kernelLeftGivenHessenberg << <block, thread >> > (i + 1, i, H, Y, dm);
+        _LAUNCH_KERNEL(_kernelLeftGivenHessenberg, block, thread, i + 1, i, H, Y, dm);
     }
 }
 
@@ -2706,7 +2805,7 @@ void CLinearAlgebraHelper::RotateHenssenberg(CLGComplex* H, CLGComplex* Y, UINT 
     for (UINT i = 0; i < dmY - 1; ++i)
     {
         dim3 thread(dmX - i, 1, 1);
-        _kernelLeftGivenHessenberg << <block, thread >> > (i + 1, i, H, Y, dmX);
+        _LAUNCH_KERNEL(_kernelLeftGivenHessenberg, block, thread, i + 1, i, H, Y, dmX);
     }
 }
 

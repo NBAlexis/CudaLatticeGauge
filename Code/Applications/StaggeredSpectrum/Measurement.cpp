@@ -9,428 +9,126 @@
 
 #include "StaggeredSpectrum.h"
 
-enum { kExportDigital = 20, };
-
-void WriteStringFile(const CCString& sFileName, const CCString& sContent)
+static void SaveComplexMatrixNpyAndCsv(const CCString& sBaseFile, const TArray<TArray<cuDoubleComplex>>& data)
 {
-    appGetFileSystem()->WriteAllText(sFileName, sContent);
-}
-
-void WriteStringFileRealArray(const CCString& sFileName, const TArray<Real>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    std::ofstream file;
-    if (!bAppend)
+    TArray<cuDoubleComplex> flat;
+    for (INT i = 0; i < data.Num(); ++i)
     {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-    TCHAR str[50];
-    for (INT i = 0; i < lst.Num(); ++i)
-    {
-        _gcvt_s(str, 50, lst[i], iDigital);
-        CCString sReal = CCString(str);
-        sReal = sReal.Replace(_T("e"), _T("*^"));
-        file << _T(" ");
-        file << sReal;
-        if (i != lst.GetCount() - 1)
+        for (INT j = 0; j < data[i].Num(); ++j)
         {
-            file << _T(",");
+            flat.AddItem(data[i][j]);
         }
     }
-    file.flush();
-    file.close();
+
+    TArray<INT> shape;
+    shape.AddItem(data.Num());
+    shape.AddItem(data.Num() > 0 ? data[0].Num() : 0);
+    SaveAsNumpyFile<cuDoubleComplex>(sBaseFile + _T(".npy"), flat.GetData(), shape);
+    WriteComplexArray2(sBaseFile + _T(".csv"), data);
 }
 
-void WriteStringFileDoubleColumn(const CCString& sFileName, const TArray<Real>& list1, const TArray<CLGComplex>& list2, UBOOL bAppend = FALSE)
+static void SaveRealMatrixNpyAndCsv(const CCString& sBaseFile, const TArray<TArray<cuDoubleComplex>>& data)
 {
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    std::ofstream file;
-    if (!bAppend)
+    TArray<DOUBLE> flat;
+    TArray<TArray<DOUBLE>> realData;
+    for (INT i = 0; i < data.Num(); ++i)
     {
-        file.open(sFileName.c_str(), std::ios::out);
+        TArray<DOUBLE> oneConf;
+        for (INT j = 0; j < data[i].Num(); ++j)
+        {
+            flat.AddItem(data[i][j].x);
+            oneConf.AddItem(data[i][j].x);
+        }
+        realData.AddItem(oneConf);
     }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-    TCHAR strleft[50];
-    TCHAR strreal[50];
-    TCHAR strimg[50];
-    for (INT i = 0; i < list1.Num(); ++i)
-    {
-        _gcvt_s(strleft, 50, list1[i], iDigital);
-        _gcvt_s(strreal, 50, list2[i].x, iDigital);
-        _gcvt_s(strimg, 50, list2[i].y, iDigital);
-        CCString s1 = CCString(strleft);
-        CCString s2 = CCString(strreal);
-        CCString s3 = CCString(strimg);
-        s1 = s1.Replace(_T("e"), _T("*^"));
-        s2 = s2.Replace(_T("e"), _T("*^"));
-        s3 = s3.Replace(_T("e"), _T("*^"));
-        
-        file << s1;
-        file << _T(", ");
-        file << s2;
 
-        if (s3.Left(1) == _T("-"))
-        {
-            s3 = s3.Right(s3.GetLength() - 1);
-            file << _T(" - ");
-        }
-        else
-        {
-            file << _T(" + ");
-        }
-        file << s3;
-        file << _T(" I");
-    }
-    file.flush();
-    file.close();
+    TArray<INT> shape;
+    shape.AddItem(data.Num());
+    shape.AddItem(data.Num() > 0 ? data[0].Num() : 0);
+    SaveAsNumpyFile<DOUBLE>(sBaseFile + _T(".npy"), flat.GetData(), shape);
+    WriteRealArray2(sBaseFile + _T(".csv"), realData);
 }
 
-void WriteStringFileRealArray2(const CCString& sFileName, const TArray<TArray<Real>>& lst, UBOOL bAppend = FALSE)
+static void SaveMesonPArrays(
+    const CMeasureMesonCorrelatorStaggered* pMC,
+    const CCString& sCSVSavePrefix,
+    UINT uiN)
 {
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    std::ofstream file;
-    if (!bAppend)
+    TArray<INT> shape;
+    shape.AddItem(_HC_Lti);
+    shape.AddItem(8);
+    shape.AddItem(8);
+    shape.AddItem(8);
+
+    CCString sFile;
+    sFile.Format(_T("%s_p_%d.npy"), sCSVSavePrefix.c_str(), uiN);
+    SaveAsNumpyFile<cuDoubleComplex>(sFile, pMC->m_pP2PPArray, shape);
+    sFile.Format(_T("%s_w2w_p_%d.npy"), sCSVSavePrefix.c_str(), uiN);
+    SaveAsNumpyFile<cuDoubleComplex>(sFile, pMC->m_pW2WPArray, shape);
+}
+
+static void SaveMesonCorrelators(
+    const CMeasureMesonCorrelatorStaggered* pMC,
+    const CCString& sCSVSavePrefix)
+{
+    const INT nConf = pMC->m_lstW2WCombinedCorrelator.Num();
+    const INT nt = _HC_Lti;
+
+    for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggered::_kMesonCorrelatorType; ++ty)
     {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-    TCHAR str[50];
-    for (INT i = 0; i < lst.GetCount(); ++i)
-    {
-        for (INT j = 0; j < lst[i].GetCount(); ++j)
+        for (INT sub = 0; sub < pMC->m_nSubChannels[ty]; ++sub)
         {
-            _gcvt_s(str, 50, lst[i][j], iDigital);
-            CCString sReal = CCString(str);
-            sReal = sReal.Replace(_T("e"), _T("*^"));
-            file << _T(" ");
-            file << sReal;
-            if (j != lst[i].GetCount() - 1)
+            TArray<TArray<cuDoubleComplex>> p2pData;
+            TArray<TArray<cuDoubleComplex>> w2wData;
+            for (INT conf = 0; conf < nConf; ++conf)
             {
-                file << _T(",");
+                TArray<cuDoubleComplex> p2pOneConf;
+                TArray<cuDoubleComplex> w2wOneConf;
+                for (INT t = 0; t < nt; ++t)
+                {
+                    p2pOneConf.AddItem(pMC->m_lstP2PCorrelator[conf][ty][sub][t]);
+                    w2wOneConf.AddItem(pMC->m_lstW2WCorrelator[conf][ty][sub][t]);
+                }
+                p2pData.AddItem(p2pOneConf);
+                w2wData.AddItem(w2wOneConf);
             }
-        }
-        file << _T("\n");
-    }
-    file.flush();
-    file.close();
-}
 
-void WriteStringFileComplexArray(const CCString& sFileName, const TArray<CLGComplex>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-    TCHAR str[50];
-    for (INT i = 0; i < lst.Num(); ++i)
-    {
-        _gcvt_s(str, 50, lst[i].x, iDigital);
-        CCString sReal = CCString(str);
-        sReal = sReal.Replace(_T("e"), _T("*^"));
-        _gcvt_s(str, 50, lst[i].y, iDigital);
-        CCString sImg = CCString(str);
-        sImg = sImg.Replace(_T("e"), _T("*^"));
-        CCString sMid = _T(" + ");
-        if (sImg.Left(1) == _T("-"))
-        {
-            sImg = sImg.Right(sImg.GetLength() - 1);
-            sMid = _T(" - ");
+            CCString sFile;
+            sFile.Format(_T("%s_correlationp2p_%d_%d"), sCSVSavePrefix.c_str(), ty, sub);
+            SaveComplexMatrixNpyAndCsv(sFile, p2pData);
+            sFile.Format(_T("%s_correlationw2w_%d_%d"), sCSVSavePrefix.c_str(), ty, sub);
+            SaveComplexMatrixNpyAndCsv(sFile, w2wData);
         }
 
-        file << _T(" ");
-        file << sReal;
-        file << sMid;
-        file << sImg;
-        if (i == lst.GetCount() - 1)
+        TArray<TArray<cuDoubleComplex>> p2pCombined;
+        TArray<TArray<cuDoubleComplex>> w2wCombined;
+        for (INT conf = 0; conf < nConf; ++conf)
         {
-            file << _T(" I");
-        }
-        else
-        {
-            file << _T(" I,");
-        }
-    }
-    file.flush();
-    file.close();
-}
-
-void WriteStringFileComplexArray2(const CCString& sFileName, const TArray<TArray<CLGComplex>>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-
-    TCHAR str[50];
-    for (INT i = 0; i < lst.GetCount(); ++i)
-    {
-        for (INT j = 0; j < lst[i].GetCount(); ++j)
-        {
-            _gcvt_s(str, 50, lst[i][j].x, iDigital);
-            CCString sReal = CCString(str);
-            sReal = sReal.Replace(_T("e"), _T("*^"));
-            _gcvt_s(str, 50, lst[i][j].y, iDigital);
-            CCString sImg = CCString(str);
-            sImg = sImg.Replace(_T("e"), _T("*^"));
-            CCString sMid = _T(" + ");
-            if (sImg.Left(1) == _T("-"))
+            TArray<cuDoubleComplex> p2pOneConf;
+            TArray<cuDoubleComplex> w2wOneConf;
+            for (INT t = 0; t < nt; ++t)
             {
-                sImg = sImg.Right(sImg.GetLength() - 1);
-                sMid = _T(" - ");
+                p2pOneConf.AddItem(pMC->m_lstP2PCombinedCorrelator[conf][ty][t]);
+                w2wOneConf.AddItem(pMC->m_lstW2WCombinedCorrelator[conf][ty][t]);
             }
-            file << _T(" ");
-            file << sReal;
-            file << sMid;
-            file << sImg;
-            if (j == lst[i].GetCount() - 1)
-            {
-                file << _T(" I");
-            }
-            else
-            {
-                file << _T(" I,");
-            }
+            p2pCombined.AddItem(p2pOneConf);
+            w2wCombined.AddItem(w2wOneConf);
         }
-        file << _T("\n");
+
+        CCString sFile;
+        sFile.Format(_T("%s_%d"), sCSVSavePrefix.c_str(), ty);
+        SaveRealMatrixNpyAndCsv(sFile, p2pCombined);
+        sFile.Format(_T("%s_w2w_%d"), sCSVSavePrefix.c_str(), ty);
+        SaveRealMatrixNpyAndCsv(sFile, w2wCombined);
     }
-    file.flush();
-    file.close();
 }
-
-#if !_CLG_DOUBLEFLOAT
-void WriteStringFileRealArray(const CCString& sFileName, const TArray<DOUBLE>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-    TCHAR str[50];
-    for (INT i = 0; i < lst.Num(); ++i)
-    {
-        _gcvt_s(str, 50, lst[i], iDigital);
-        CCString sReal = CCString(str);
-        sReal = sReal.Replace(_T("e"), _T("*^"));
-        file << _T(" ");
-        file << sReal;
-        if (i != lst.GetCount() - 1)
-        {
-            file << _T(",");
-        }
-    }
-    file.flush();
-    file.close();
-}
-
-void WriteStringFileDoubleColumn(const CCString& sFileName, const TArray<DOUBLE>& list1, const TArray<cuDoubleComplex>& list2, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-    TCHAR strleft[50];
-    TCHAR strreal[50];
-    TCHAR strimg[50];
-    for (INT i = 0; i < list1.Num(); ++i)
-    {
-        _gcvt_s(strleft, 50, list1[i], iDigital);
-        _gcvt_s(strreal, 50, list2[i].x, iDigital);
-        _gcvt_s(strimg, 50, list2[i].y, iDigital);
-        CCString s1 = CCString(strleft);
-        CCString s2 = CCString(strreal);
-        CCString s3 = CCString(strimg);
-        s1 = s1.Replace(_T("e"), _T("*^"));
-        s2 = s2.Replace(_T("e"), _T("*^"));
-        s3 = s3.Replace(_T("e"), _T("*^"));
-
-        file << s1;
-        file << _T(", ");
-        file << s2;
-
-        if (s3.Left(1) == _T("-"))
-        {
-            s3 = s3.Right(s3.GetLength() - 1);
-            file << _T(" - ");
-        }
-        else
-        {
-            file << _T(" + ");
-        }
-        file << s3;
-        file << _T(" I");
-    }
-    file.flush();
-    file.close();
-}
-
-void WriteStringFileRealArray2(const CCString& sFileName, const TArray<TArray<DOUBLE>>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-    TCHAR str[50];
-    for (INT i = 0; i < lst.GetCount(); ++i)
-    {
-        for (INT j = 0; j < lst[i].GetCount(); ++j)
-        {
-            _gcvt_s(str, 50, lst[i][j], iDigital);
-            CCString sReal = CCString(str);
-            sReal = sReal.Replace(_T("e"), _T("*^"));
-            file << _T(" ");
-            file << sReal;
-            if (j != lst[i].GetCount() - 1)
-            {
-                file << _T(",");
-            }
-        }
-        file << _T("\n");
-    }
-    file.flush();
-    file.close();
-}
-
-void WriteStringFileComplexArray(const CCString& sFileName, const TArray<cuDoubleComplex>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-    TCHAR str[50];
-    for (INT i = 0; i < lst.Num(); ++i)
-    {
-        _gcvt_s(str, 50, lst[i].x, iDigital);
-        CCString sReal = CCString(str);
-        sReal = sReal.Replace(_T("e"), _T("*^"));
-        _gcvt_s(str, 50, lst[i].y, iDigital);
-        CCString sImg = CCString(str);
-        sImg = sImg.Replace(_T("e"), _T("*^"));
-        CCString sMid = _T(" + ");
-        if (sImg.Left(1) == _T("-"))
-        {
-            sImg = sImg.Right(sImg.GetLength() - 1);
-            sMid = _T(" - ");
-        }
-
-        file << _T(" ");
-        file << sReal;
-        file << sMid;
-        file << sImg;
-        if (i == lst.GetCount() - 1)
-        {
-            file << _T(" I");
-        }
-        else
-        {
-            file << _T(" I,");
-        }
-    }
-    file.flush();
-    file.close();
-}
-
-void WriteStringFileComplexArray2(const CCString& sFileName, const TArray<TArray<cuDoubleComplex>>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-
-    TCHAR str[50];
-    for (INT i = 0; i < lst.GetCount(); ++i)
-    {
-        for (INT j = 0; j < lst[i].GetCount(); ++j)
-        {
-            _gcvt_s(str, 50, lst[i][j].x, iDigital);
-            CCString sReal = CCString(str);
-            sReal = sReal.Replace(_T("e"), _T("*^"));
-            _gcvt_s(str, 50, lst[i][j].y, iDigital);
-            CCString sImg = CCString(str);
-            sImg = sImg.Replace(_T("e"), _T("*^"));
-            CCString sMid = _T(" + ");
-            if (sImg.Left(1) == _T("-"))
-            {
-                sImg = sImg.Right(sImg.GetLength() - 1);
-                sMid = _T(" - ");
-            }
-            file << _T(" ");
-            file << sReal;
-            file << sMid;
-            file << sImg;
-            if (j == lst[i].GetCount() - 1)
-            {
-                file << _T(" I");
-            }
-            else
-            {
-                file << _T(" I,");
-            }
-        }
-        file << _T("\n");
-    }
-    file.flush();
-    file.close();
-}
-
-#endif
 
 void AppendStringFile(const CCString& sFileName, const CCString& sContent)
 {
     appGetFileSystem()->AppendAllText(sFileName, sContent);
 }
 
-#define _CLG_EXPORT_CHIRAL(measureName, lstName) \
+#define _CLG_EXPORT_CHIRAL_SINGLE(measureName, lstName) \
 CCString sFileNameWrite##measureName##lstName = _T("%s_condensate"); \
 CCString sFileNameWrite##measureName##lstName##All = _T("%s_condensate"); \
 CCString sFileNameWrite##measureName##lstName##In = _T("%s_condensate"); \
@@ -454,9 +152,9 @@ for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
     lstName##measureName##All.AddItem(measureName->m_lstCondAll[lstName][j]); \
     lstName##measureName##In.AddItem(measureName->m_lstCondIn[lstName][j]); \
 } \
-WriteStringFileComplexArray2(sFileNameWrite##measureName##lstName, lstName##measureName##OverR); \
-WriteStringFileComplexArray(sFileNameWrite##measureName##lstName##All, lstName##measureName##All); \
-WriteStringFileComplexArray(sFileNameWrite##measureName##lstName##In, lstName##measureName##In); 
+WriteComplexArray2(sFileNameWrite##measureName##lstName, lstName##measureName##OverR); \
+WriteComplexArray(sFileNameWrite##measureName##lstName##All, lstName##measureName##All); \
+WriteComplexArray(sFileNameWrite##measureName##lstName##In, lstName##measureName##In); 
 
 INT Measurement(CParameters& params)
 {
@@ -476,10 +174,6 @@ INT Measurement(CParameters& params)
     iVaule = 1;
     params.FetchValueINT(_T("DoSmearing"), iVaule);
     UBOOL bDoSmearing = (0 != iVaule);
-
-    iVaule = 0;
-    params.FetchValueINT(_T("LoadDouble"), iVaule);
-    UBOOL bLoadDouble = (0 != iVaule);
 
     iVaule = 0;
     params.FetchValueINT(_T("UseZ4"), iVaule);
@@ -513,6 +207,14 @@ INT Measurement(CParameters& params)
     params.FetchStringValue(_T("SubFolderPrefix"), sSubFolderPrefix);
     appGeneral(_T("sub folder prefix: %s\n"), sSubFolderPrefix.c_str());
 
+    CCString sLoadType = _T("EFFT_CLGBin");
+    EFieldFileType eLoadType = EFFT_CLGBin;
+    if (params.FetchStringValue(_T("LoadType"), sLoadType))
+    {
+        eLoadType = __STRING_TO_ENUM(EFieldFileType, sLoadType);
+    }
+    appGeneral(_T("load type: %s\n"), __ENUM_TO_STRING(EFieldFileType, eLoadType).c_str());
+
     if (!appInitialCLG(params))
     {
         appCrucial(_T("Initial Failed!\n"));
@@ -526,7 +228,7 @@ INT Measurement(CParameters& params)
     CMeasureWilsonLoop* pPL = dynamic_cast<CMeasureWilsonLoop*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasurePolyakovXY* pPXY = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
     CMeasureMesonCorrelatorStaggered* pMC = dynamic_cast<CMeasureMesonCorrelatorStaggered*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
-    CMeasureMesonCorrelatorStaggeredSimple* pMCSimple = dynamic_cast<CMeasureMesonCorrelatorStaggeredSimple*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
+    CMeasureMesonCorrelatorStaggeredSimple2* pMCSimple = dynamic_cast<CMeasureMesonCorrelatorStaggeredSimple2*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
     CMeasureChiralCondensateKS* pCCHeavy = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
     pPL->Reset();
@@ -549,17 +251,17 @@ INT Measurement(CParameters& params)
     CFieldFermionKSSU3* pF2Heavy = NULL;
     if (ESSM_All == eJob || ESSM_Chiral == eJob)
     {
-        pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(5));
-        pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(5));
-        pF1Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
-        pF2Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
+        pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(5, _T(__FILE__), __LINE__));
+        pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(5, _T(__FILE__), __LINE__));
+        pF1Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+        pF2Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
     }
 
     for (UINT uiN = iStartN; uiN <= iEndN; ++uiN)
     {
         CCString sFileName;
-        sFileName.Format(_T("%sMatching_%d.con"), sSavePrefix.c_str(), uiN);
-        appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, bLoadDouble ? EFFT_CLGBinDouble : EFFT_CLGBin);
+        sFileName.Format(_T("%s_%d.con"), sSavePrefix.c_str(), uiN);
+        appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, eLoadType);
 
         switch (eJob)
         {
@@ -573,7 +275,7 @@ INT Measurement(CParameters& params)
             if (bDoSmearing)
             {
                 appGetLattice()->m_pGaugeField[0]->CalculateOnlyStaple(pStaple);
-                appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField[0], pStaple);
+                appGetLattice()->m_pGaugeSmearing[appGetLattice()->m_pGaugeField[0]->m_byFieldId]->GaugeSmearing(appGetLattice()->m_pGaugeField[0], NULL, pStaple);
             }
 
             pPL->OnConfigurationAccepted(_FIELDS, NULL);
@@ -586,13 +288,15 @@ INT Measurement(CParameters& params)
                 }
                 CCString sRadiousFile;
                 sRadiousFile.Format(_T("%s_VR_R.csv"), sCSVSavePrefix.c_str());
-                WriteStringFileRealArray(sRadiousFile, lstRadius);
+                WriteRealArray(sRadiousFile, lstRadius);
+                
             }
         }
         break;
         case ESSM_Correlator:
         {
             pMC->OnConfigurationAccepted(_FIELDS, NULL);
+            SaveMesonPArrays(pMC, sCSVSavePrefix, uiN);
         }
         break;
         case ESSM_CorrelatorSimple:
@@ -614,10 +318,10 @@ INT Measurement(CParameters& params)
                     {
                         pF1Light->InitialField(EFIT_RandomGaussian);
                     }
-                    pF1Light->FixBoundary();
+                    pF1Light->FixBoundary(EFB_Field);
                     pF1Light->CopyTo(pF2Light);
                     pF1Light->InverseD(_FIELDS);
-                    pF1Light->FixBoundary();
+                    pF1Light->FixBoundary(EFB_Field);
 
                     pCCLight->OnConfigurationAcceptedZ4(
                         _FIELDS,
@@ -638,10 +342,10 @@ INT Measurement(CParameters& params)
                     {
                         pF1Heavy->InitialField(EFIT_RandomGaussian);
                     }
-                    pF1Heavy->FixBoundary();
+                    pF1Heavy->FixBoundary(EFB_Field);
                     pF1Heavy->CopyTo(pF2Heavy);
                     pF1Heavy->InverseD(_FIELDS);
-                    pF1Heavy->FixBoundary();
+                    pF1Heavy->FixBoundary(EFB_Field);
 
                     pCCHeavy->OnConfigurationAcceptedZ4(
                         _FIELDS,
@@ -657,6 +361,7 @@ INT Measurement(CParameters& params)
         case ESSM_All:
         {
             pMC->OnConfigurationAccepted(_FIELDS, NULL);
+            SaveMesonPArrays(pMC, sCSVSavePrefix, uiN);
             pMCSimple->OnConfigurationAccepted(_FIELDS, NULL);
 
             for (UINT i = 0; i < iFieldCount; ++i)
@@ -669,10 +374,10 @@ INT Measurement(CParameters& params)
                 {
                     pF1Light->InitialField(EFIT_RandomGaussian);
                 }
-                pF1Light->FixBoundary();
+                pF1Light->FixBoundary(EFB_Field);
                 pF1Light->CopyTo(pF2Light);
                 pF1Light->InverseD(_FIELDS);
-                pF1Light->FixBoundary();
+                pF1Light->FixBoundary(EFB_Field);
 
                 pCCLight->OnConfigurationAcceptedZ4(
                     _FIELDS,
@@ -690,10 +395,10 @@ INT Measurement(CParameters& params)
                 {
                     pF1Heavy->InitialField(EFIT_RandomGaussian);
                 }
-                pF1Heavy->FixBoundary();
+                pF1Heavy->FixBoundary(EFB_Field);
                 pF1Heavy->CopyTo(pF2Heavy);
                 pF1Heavy->InverseD(_FIELDS);
-                pF1Heavy->FixBoundary();
+                pF1Heavy->FixBoundary(EFB_Field);
 
                 pCCHeavy->OnConfigurationAcceptedZ4(
                     _FIELDS,
@@ -707,7 +412,7 @@ INT Measurement(CParameters& params)
             if (bDoSmearing)
             {
                 appGetLattice()->m_pGaugeField[0]->CalculateOnlyStaple(pStaple);
-                appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField[0], pStaple);
+                appGetLattice()->m_pGaugeSmearing[appGetLattice()->m_pGaugeField[0]->m_byFieldId]->GaugeSmearing(appGetLattice()->m_pGaugeField[0], NULL, pStaple);
             }
 
             pPL->OnConfigurationAccepted(_FIELDS, NULL);
@@ -720,7 +425,7 @@ INT Measurement(CParameters& params)
                 }
                 CCString sRadiousFile;
                 sRadiousFile.Format(_T("%s_VR_R.csv"), sCSVSavePrefix.c_str());
-                WriteStringFileRealArray(sRadiousFile, lstRadius);
+                WriteRealArray(sRadiousFile, lstRadius);
             }
         }
         break;
@@ -765,14 +470,15 @@ INT Measurement(CParameters& params)
     case ESSM_Polyakov:
     {
         //Write result to file
-        CCString sCSVFile;
-        sCSVFile.Format(_T("%s_polya.csv"), sCSVSavePrefix.c_str());
-        TArray<CLGComplex> polyas;
-        for (INT j = 0; j < pPXY->m_lstLoop.Num(); ++j)
-        {
-            polyas.AddItem(pPXY->m_lstLoop[j]);
-        }
-        WriteStringFileComplexArray(sCSVFile, polyas);
+        //CCString sCSVFile;
+        //sCSVFile.Format(_T("%s_polya.csv"), sCSVSavePrefix.c_str());
+        //TArray<CLGComplex> polyas;
+        //for (INT j = 0; j < pPXY->m_lstLoop.Num(); ++j)
+        //{
+        //    polyas.AddItem(pPXY->m_lstLoop[j]);
+        //}
+        //WriteStringFileComplexArray(sCSVFile, polyas);
+        pPXY->Export(sCSVSavePrefix, iStartN, iEndN, _T(""), 0, 0);
     }
     break;
     case ESSM_Wilson:
@@ -793,62 +499,32 @@ INT Measurement(CParameters& params)
             }
             vrs.AddItem(thisConfiguration);
         }
-        WriteStringFileComplexArray2(sCSVFile, vrs);
+        WriteComplexArray2(sCSVFile, vrs);
     }
     break;
     case ESSM_Correlator:
     {
-        for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggered::_kMesonCorrelatorType; ++ty)
-        {
-            CCString sCSVFile;
-            sCSVFile.Format(_T("%s_meson%d.csv"), sCSVSavePrefix.c_str(), ty);
-#if !_CLG_DOUBLEFLOAT
-            TArray<TArray<DOUBLE>> res;
-#else
-            TArray<TArray<Real>> res;
-#endif
-            for (INT conf = 0; conf < pMC->m_lstResults.Num(); ++conf)
-            {
-#if !_CLG_DOUBLEFLOAT
-                TArray<DOUBLE> oneConf;
-#else
-                TArray<Real> oneConf;
-#endif
-                for (INT t = 0; t < _HC_Lti - 1; ++t)
-                {
-                    oneConf.AddItem(pMC->m_lstResults[conf][ty][t].x);
-                }
-                res.AddItem(oneConf);
-            }
-            WriteStringFileRealArray2(sCSVFile, res);
-        }
+        pMC->Report();
+        SaveMesonCorrelators(pMC, sCSVSavePrefix);
     }
     break;
     case ESSM_CorrelatorSimple:
     {
-        for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple; ++ty)
+        for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggeredSimple2::_kMesonCorrelatorTypeSimple2; ++ty)
         {
             CCString sCSVFile;
             sCSVFile.Format(_T("%s_mesonsimple%d.csv"), sCSVSavePrefix.c_str(), ty);
-#if !_CLG_DOUBLEFLOAT
             TArray<TArray<DOUBLE>> res;
-#else
-            TArray<TArray<Real>> res;
-#endif
             for (INT conf = 0; conf < pMCSimple->m_lstResults.Num(); ++conf)
             {
-#if !_CLG_DOUBLEFLOAT
                 TArray<DOUBLE> oneConf;
-#else
-                TArray<Real> oneConf;
-#endif
-                for (INT t = 0; t < _HC_Lti - 1; ++t)
+                for (INT t = 0; t < _HC_Lti; ++t)
                 {
                     oneConf.AddItem(pMCSimple->m_lstResults[conf][ty][t]);
                 }
                 res.AddItem(oneConf);
             }
-            WriteStringFileRealArray2(sCSVFile, res);
+            WriteRealArray2(sCSVFile, res);
         }
     }
     break;
@@ -856,80 +532,50 @@ INT Measurement(CParameters& params)
     {
 		if (NULL != pF1Light)
 		{
-            _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
-            _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4);
+            _CLG_EXPORT_CHIRAL_SINGLE(pCCLight, ChiralKS);
+            _CLG_EXPORT_CHIRAL_SINGLE(pCCLight, ConnectSusp);
+            _CLG_EXPORT_CHIRAL_SINGLE(pCCLight, CMTKSGamma3);
+            _CLG_EXPORT_CHIRAL_SINGLE(pCCLight, CMTKSGamma4);
 		}
         if (NULL != pF1Heavy)
         {
-            _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4);
+            _CLG_EXPORT_CHIRAL_SINGLE(pCCHeavy, ChiralKS);
+            _CLG_EXPORT_CHIRAL_SINGLE(pCCHeavy, ConnectSusp);
+            _CLG_EXPORT_CHIRAL_SINGLE(pCCHeavy, CMTKSGamma3);
+            _CLG_EXPORT_CHIRAL_SINGLE(pCCHeavy, CMTKSGamma4);
         }
     }
     break;
     case ESSM_All:
     {
-        for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggered::_kMesonCorrelatorType; ++ty)
-        {
-            CCString sCSVFile;
-            sCSVFile.Format(_T("%s_meson%d.csv"), sCSVSavePrefix.c_str(), ty);
-#if !_CLG_DOUBLEFLOAT
-            TArray<TArray<DOUBLE>> res;
-#else
-            TArray<TArray<Real>> res;
-#endif
-            for (INT conf = 0; conf < pMC->m_lstResults.Num(); ++conf)
-            {
-#if !_CLG_DOUBLEFLOAT
-                TArray<DOUBLE> oneConf;
-#else
-                TArray<Real> oneConf;
-#endif
-                for (INT t = 0; t < _HC_Lti - 1; ++t)
-                {
-                    oneConf.AddItem(pMC->m_lstResults[conf][ty][t].x);
-                }
-                res.AddItem(oneConf);
-            }
-            WriteStringFileRealArray2(sCSVFile, res);
-        }
+        pMC->Report();
+        SaveMesonCorrelators(pMC, sCSVSavePrefix);
 
-        for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple; ++ty)
+        for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggeredSimple2::_kMesonCorrelatorTypeSimple2; ++ty)
         {
             CCString sCSVFile;
             sCSVFile.Format(_T("%s_mesonsimple%d.csv"), sCSVSavePrefix.c_str(), ty);
-#if !_CLG_DOUBLEFLOAT
             TArray<TArray<DOUBLE>> res;
-#else
-            TArray<TArray<Real>> res;
-#endif
             for (INT conf = 0; conf < pMCSimple->m_lstResults.Num(); ++conf)
             {
-#if !_CLG_DOUBLEFLOAT
                 TArray<DOUBLE> oneConf;
-#else
-                TArray<Real> oneConf;
-#endif
-                for (INT t = 0; t < _HC_Lti - 1; ++t)
+                for (INT t = 0; t < _HC_Lti; ++t)
                 {
                     oneConf.AddItem(pMCSimple->m_lstResults[conf][ty][t]);
                 }
                 res.AddItem(oneConf);
             }
-            WriteStringFileRealArray2(sCSVFile, res);
+            WriteRealArray2(sCSVFile, res);
         }
 
-        _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
-        _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
-        _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3);
-        _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4);
-        _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS);
-        _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp);
-        _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3);
-        _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4);
+        _CLG_EXPORT_CHIRAL_SINGLE(pCCLight, ChiralKS);
+        _CLG_EXPORT_CHIRAL_SINGLE(pCCLight, ConnectSusp);
+        _CLG_EXPORT_CHIRAL_SINGLE(pCCLight, CMTKSGamma3);
+        _CLG_EXPORT_CHIRAL_SINGLE(pCCLight, CMTKSGamma4);
+        _CLG_EXPORT_CHIRAL_SINGLE(pCCHeavy, ChiralKS);
+        _CLG_EXPORT_CHIRAL_SINGLE(pCCHeavy, ConnectSusp);
+        _CLG_EXPORT_CHIRAL_SINGLE(pCCHeavy, CMTKSGamma3);
+        _CLG_EXPORT_CHIRAL_SINGLE(pCCHeavy, CMTKSGamma4);
 
         //Write result to file
         CCString sCSVFile;
@@ -947,7 +593,7 @@ INT Measurement(CParameters& params)
             }
             vrs.AddItem(thisConfiguration);
         }
-        WriteStringFileComplexArray2(sCSVFile, vrs);
+        WriteComplexArray2(sCSVFile, vrs);
     }
     break;
     default:
@@ -967,5 +613,4 @@ INT Measurement(CParameters& params)
 
     return 0;
 }
-
 

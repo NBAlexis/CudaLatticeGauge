@@ -1,0 +1,76 @@
+\subsection{\label{sec:Cylinder}Cylindrical coordinates}
+
+\subsubsection{\label{sec:CylinderGaugeAction}The gauge action in cylindrical coordinates}
+
+We follow the same convention as the rotating frame. In Euclidean space time, the gauge action is
+\begin{equation}
+\begin{split}
+&S_G=\frac{1}{2g_{YM}^2}\int d^4x {\rm tr}\left[F_{\mu\nu}F_{\mu\nu}\right]\\
+&F_{\mu\nu}=\partial _{\mu}A_{\nu}-\partial _{\nu}A_{\mu}+i[A_{\mu},A_{\nu}]\\
+\end{split}
+\end{equation}
+
+The cylindrical coordinates $(r,\phi,z,t)$ are defined by $x=r\cos\phi$, $y=r\sin\phi$, and the metric is
+\begin{equation}
+\begin{split}
+&g_{\mu\nu}={\rm diag}(1,r^2,1,1),\;\;g^{\mu\nu}={\rm diag}\left(1,\frac{1}{r^2},1,1\right),\;\;\sqrt{\det (g_{\mu\nu})}=r\\
+\end{split}
+\end{equation}
+
+The gauge action in cylindrical coordinates is
+\begin{equation}
+\begin{split}
+&S_G=\frac{1}{2g_{YM}^2}\int drd\phi dzdt \sqrt{\det (g_{\alpha\beta})}g^{\mu\rho}g^{\nu\sigma}{\rm tr}\left[F_{\mu\nu}F_{\rho\sigma}\right]\\
+&=\frac{1}{g_{YM}^2}\int drd\phi dzdt \sum _{\mu<\nu} w_{\mu\nu}(r) {\rm tr}\left[F_{\mu\nu}^2\right]\\
+\end{split}
+\end{equation}
+where the weight of a plaquette plane depends on whether the plane contains the angular direction $\phi$,
+\begin{equation}
+\begin{split}
+&w_{r\phi}=w_{\phi z}=w_{\phi t}=\frac{1}{r}\\
+&w_{rz}=w_{rt}=w_{zt}=r\\
+\end{split}
+\end{equation}
+
+\subsubsection{\label{sec:CylinderLatticeAction}The lattice action}
+
+The lattice directions $0,1,2,3$ (also known as $x,y,z,w$ or $x,y,z,t$) are interpreted as $(r,\phi,z,t)$. The lattice spacing is set to be $a=1$. Since $r=0$ is a coordinate singularity, the radial direction can not start from $r=0$. The radial coordinate of a site $n=(n_0,n_1,n_2,n_3)$ is
+\begin{equation}
+\begin{split}
+&r(n)=r_{start}+n_0,\;\;r_{start}>0,\;\;r_{end}=r_{start}+L_0\\
+\end{split}
+\end{equation}
+and the $r$ direction is Dirichlet by default.
+
+Using ${\rm Re} {\rm tr} [U_{\mu\nu}(n)]\approx N-\frac{1}{2}{\rm tr}[F_{\mu\nu}^2]$, the lattice action with position dependent coupling is
+\begin{equation}
+\begin{split}
+&S_G=\sum _{n}\sum _{\mu<\nu}\bar{\beta}_{\mu\nu}(n)\left(1-\frac{1}{N}{\rm Re} {\rm tr}[U_{\mu\nu}(n)]\right)\\
+&K_{\mu\nu}(n)=\beta (r(n))w_{\mu\nu}(r(n)),\;\;\beta (r)=\frac{2N}{g_{YM}^2}\\
+&\bar{\beta}_{\mu\nu}(n)=\frac{1}{4}\sum _{c\in {\rm corners}(P)}K_{\mu\nu}(r(c))\\
+\end{split}
+\end{equation}
+
+\begin{itemize}
+  \item Since the physical size of a cell depends on $r$, $\beta$ is not a constant but a numeric function $\beta (r)$, configured as an array, one value for each $r$ slice.
+  \item The coupling of one plaquette is the average of the coupling of its $4$ corners. For a plane not containing $r$, the $4$ corners are on the same $r$ slice, so $\bar{\beta}_{\mu\nu}(n)=K_{\mu\nu}(r(n))$. For a plane containing $r$, two corners are at $r$ and the other two are at $r+1$, so $\bar{\beta}_{\mu\nu}(n)=\frac{1}{2}\left(K_{\mu\nu}(r)+K_{\mu\nu}(r+1)\right)$.
+\end{itemize}
+
+\subsubsection{\label{sec:CylinderForce}The force}
+
+The force is calculated using staples. A staple of link $U_{\mu}(n)$ in direction $\nu$ is
+\begin{equation}
+\begin{split}
+&C_{\mu,\nu}(n)=U_{\nu}(n+\mu)U^{\dagger}_{\mu}(n+\nu)U^{\dagger}_{\nu}(n)+U^{\dagger}_{\nu}(n+\mu-\nu)U^{\dagger}_{\mu}(n-\nu)U_{\nu}(n-\nu)\\
+\end{split}
+\end{equation}
+
+With the position dependent coupling, every staple is weighted by $-\frac{1}{2}$ of the corner-averaged coupling of the plaquette,
+\begin{equation}
+\begin{split}
+&F_{\mu}(n)=\sum _{\nu\neq \mu}\left(-\frac{1}{2}\right)\left(\bar{\beta}_{\mu\nu}(n)U_{\mu}(n)C_{\mu,\nu}(n)\right)_{\rm TA}\\
+\end{split}
+\end{equation}
+where $\bar{\beta}_{\mu\nu}$ is defined as above, and ${\rm TA}$ is the traceless anti-Hermitian projection. For a plaquette not containing $r$, $\bar{\beta}_{\mu\nu}=K_{\mu\nu}(r(n))$. For a plaquette containing $r$ with corners at $r_1$ and $r_2=r_1+1$, $\bar{\beta}_{\mu\nu}=\frac{1}{2}\left(K_{\mu\nu}(r_1)+K_{\mu\nu}(r_2)\right)$. This is the same convention as the flat action, where every staple is weighted by $-\frac{\beta}{2N}$.
+
+\clearpage

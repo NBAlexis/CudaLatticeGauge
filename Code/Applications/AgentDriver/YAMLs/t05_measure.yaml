@@ -1,0 +1,64 @@
+Task: Measure
+LoadPrefix: t05_su3_ks_conf
+StartN: 1
+EndN: 1
+
+Outputs:
+    Names: [measure1.Plaquette]
+    Files: [t05_plaquette]
+
+Dim: 4
+Dir: 4
+LatticeLength: [8, 8, 8, 8]
+LatticeIndex: CIndexSquare
+LatticeBoundary: CBoundaryConditionTorusSquare
+ThreadAutoDecompose: 1
+MaxThreadPerBlock: 256
+RandomType: ER_Schrage
+RandomSeed: 1234567
+
+GaugeFieldCount: 1
+FermionFieldCount: 1
+MeasureListLength: 1
+ActionListLength: 2
+
+Gauge:
+    FieldName: CFieldGaugeSU3
+    FieldInitialType: EFIT_ReadFromFile
+    GaugeFileType: EFFT_CLGBin
+    GaugeFileName: t05_su3_ks_conf_1.con
+
+FermionField1:
+    FieldName: CFieldFermionKSSU3
+    FieldInitialType: EFIT_Zero
+    Mass: 0.1
+    FieldId: 2
+
+Solver:
+    SolverName: CSLASolverGMRES
+    SolverForFieldId: 2
+    MaxDim: 20
+    Accuracy: 0.0001
+    Restart: 15
+    AbsoluteAccuracy: 1
+
+MSSolver:
+    SolverName: CMultiShiftBiCGStab
+    SolverForFieldId: 2
+    DiviationStep: 100
+    MaxStep: 50
+    Accuracy: 0.001
+    AbsoluteAccuracy: 1
+
+Action1:
+    ActionName: CActionGaugePlaquette
+    Beta: 5.0
+    GaugeFields: {1}
+
+Action2:
+    ActionName: CActionFermionKS
+    FieldId: 2
+    GaugeFields: {1}
+
+Measure1:
+    MeasureName: CMeasurePlaqutteEnergy

@@ -1,0 +1,32 @@
+Task: Measure
+LoadPrefix: t03_z2_conf
+StartN: 0
+EndN: 4
+
+Outputs:
+    Names: [measure1.Plaquette]
+    Files: [t03_plaquette]
+
+Dim: 4
+Dir: 4
+LatticeLength: [8, 8, 8, 8]
+LatticeIndex: CIndexSquare
+LatticeBoundary: CBoundaryConditionTorusSquare
+ThreadAutoDecompose: 1
+MaxThreadPerBlock: 256
+RandomType: ER_Schrage
+RandomSeed: 1234567
+
+GaugeFieldCount: 1
+MeasureListLength: 1
+ActionListLength: 0
+
+Gauge:
+    FieldName: CFieldGaugeZ2
+    FieldInitialType: EFIT_ReadFromFile
+    GaugeFileType: EFFT_CLGBin
+    GaugeFileName: t03_z2_conf_1.con
+
+Measure1:
+    MeasureName: CMeasurePlaqutteEnergy
+    GaugeFields: [1]

@@ -5,6 +5,7 @@
 // 
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [07/31/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -40,15 +41,15 @@ _kernelEnergy_RigidAcc(
 
     const Real OnePlusGZ = fG * (sSite4.z - sCenter.z) + F(1.0);
     const Real OneOverOnePlusGZ = F(1.0) / (OnePlusGZ * OnePlusGZ);
-    deviceSU3 toSub(_deviceClover(pDeviceData, sSite4, uiBigIdx, 3, 0, byFieldId));
-    toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 3, 1, byFieldId));
-    toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 3, 2, byFieldId));
+    deviceSU3 toSub(_deviceCloverT(pDeviceData, sSite4, uiBigIdx, 3, 0, byFieldId));
+    toSub.Add(_deviceCloverT(pDeviceData, sSite4, uiBigIdx, 3, 1, byFieldId));
+    toSub.Add(_deviceCloverT(pDeviceData, sSite4, uiBigIdx, 3, 2, byFieldId));
 
 
     toSub.MulReal(OneOverOnePlusGZ); //Now this is (1/(1+gz)^2)(U14 + U24 + U34)
-    toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 0, 1, byFieldId));
-    toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 0, 2, byFieldId));
-    toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 1, 2, byFieldId));
+    toSub.Add(_deviceCloverT(pDeviceData, sSite4, uiBigIdx, 0, 1, byFieldId));
+    toSub.Add(_deviceCloverT(pDeviceData, sSite4, uiBigIdx, 0, 2, byFieldId));
+    toSub.Add(_deviceCloverT(pDeviceData, sSite4, uiBigIdx, 1, 2, byFieldId));
     //Now this is U12 + U13 + U23 + (1/(1+gz)^2)(U14 + U24 + U34)
 
     const Real toAdd = F(9.0) * OnePlusGZ + F(9.0) / OnePlusGZ - toSub.ReTr() * F(0.25) * OnePlusGZ;
@@ -62,38 +63,35 @@ _kernelEnergy_RigidAcc_Simplified(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedIndex,
-    BYTE plaqLength, BYTE plaqCount,
+#if !_CLG_ASSUME_SQUARE_LATTICE
+    BYTE plaqLength, BYTE plaqCountPerSite,
+#endif
     Real betaOverN, Real fG,
     UBOOL bDirichlet,
-#if !_CLG_DOUBLEFLOAT
     DOUBLE* results
-#else
-    Real* results
-#endif
 )
 {
     intokernalInt4;
 
-#if !_CLG_DOUBLEFLOAT
     DOUBLE resThisThread = 0.0;
-#else
-    Real resThisThread = F(0.0);
+
+#if !_CLG_ASSUME_SQUARE_LATTICE
+    const UINT plaqCountAllSite = plaqCountPerSite * plaqLength;
 #endif
-    const UINT plaqCountAll = plaqCount * plaqLength;
-    for (BYTE i = 0; i < plaqCount; ++i)
+    for (BYTE i = 0; i < plaqCountPerSite; ++i)
     {
-        SIndex first = pCachedIndex[i * plaqLength + uiSiteIndex * plaqCountAll];
+        SIndex first = pCachedIndex[i * plaqLength + uiSiteIndex * plaqCountAllSite];
         const BYTE mu = first.m_byDir;
-        deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
+        deviceSU3 toAdd(_deviceGetGaugeBCT(byFieldId, pDeviceData, first));
 
         if (first.NeedToDagger())
         {
             toAdd.Dagger();
         }
 
-        first = pCachedIndex[i * plaqLength + 1 + uiSiteIndex * plaqCountAll];
+        first = pCachedIndex[i * plaqLength + 1 + uiSiteIndex * plaqCountAllSite];
         const BYTE nu = first.m_byDir;
-        deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
+        deviceSU3 toMul(_deviceGetGaugeBCT(byFieldId, pDeviceData, first));
         if (first.NeedToDagger())
         {
             toAdd.MulDagger(toMul);
@@ -105,8 +103,8 @@ _kernelEnergy_RigidAcc_Simplified(
 
         for (BYTE j = 2; j < plaqLength; ++j)
         {
-            first = pCachedIndex[i * plaqLength + j + uiSiteIndex * plaqCountAll];
-            toMul = _deviceGetGaugeBCSU3(byFieldId, pDeviceData, first);
+            first = pCachedIndex[i * plaqLength + j + uiSiteIndex * plaqCountAllSite];
+            toMul = _deviceGetGaugeBCT(byFieldId, pDeviceData, first);
             if (first.NeedToDagger())
             {
                 toAdd.MulDagger(toMul);
@@ -146,7 +144,9 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForce4PlaqutteTermSU3_RigidAcc(
     const deviceSU3* __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedIndex,
-    BYTE plaqLength, BYTE plaqCount,
+#if !_CLG_ASSUME_SQUARE_LATTICE
+    BYTE plaqLength, BYTE plaqCountPerLink,
+#endif
     deviceSU3* pForceData,
     Real betaOverN, 
     Real fG,
@@ -159,8 +159,10 @@ _kernelAddForce4PlaqutteTermSU3_RigidAcc(
 
     //Real test_force = F(0.0);
     betaOverN = betaOverN * F(-0.5);
+#if !_CLG_ASSUME_SQUARE_LATTICE
     const UINT plaqLengthm1 = plaqLength - 1;
-    const UINT plaqCountAll = plaqCount * plaqLengthm1;
+    const UINT plaqCountAllLink = plaqCountPerLink * plaqLengthm1;
+#endif
 
     #pragma unroll
     for (UINT idir = 0; idir < 4; ++idir)
@@ -175,9 +177,9 @@ _kernelAddForce4PlaqutteTermSU3_RigidAcc(
         const BYTE mu = idir;
         //there are 6 staples,
         //3 'other directions' each is sum of two plaquttes
-        for (int i = 0; i < plaqCount; ++i)
+        for (int i = 0; i < plaqCountPerLink; ++i)
         {
-            SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
+            SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAllLink];
             const BYTE nu = first.m_byDir;
 
             //if (mu != 2 && nu != 2 && 0 == sSite4.z)
@@ -186,7 +188,7 @@ _kernelAddForce4PlaqutteTermSU3_RigidAcc(
             //    continue;
             //}
 
-            deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
+            deviceSU3 toAdd(_deviceGetGaugeBCT(byFieldId, pDeviceData, first));
             Real fFactorG = F(0.0);
             if (first.NeedToDagger())
             {
@@ -219,8 +221,8 @@ _kernelAddForce4PlaqutteTermSU3_RigidAcc(
 
             for (BYTE j = 1; j < plaqLengthm1; ++j)
             {
-                SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
-                deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, nextlink));
+                SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAllLink];
+                deviceSU3 toMul(_deviceGetGaugeBCT(byFieldId, pDeviceData, nextlink));
 
                 if (nextlink.NeedToDagger())
                 {
@@ -237,13 +239,10 @@ _kernelAddForce4PlaqutteTermSU3_RigidAcc(
         }
 
         //staple calculated
-        deviceSU3 force(pDeviceData[linkIndex]);
-        force.MulDagger(res);
-        force.Ta();
-        force.MulReal(betaOverN);
+        res.MulReal(betaOverN);
 
         //force is additive
-        pForceData[linkIndex].Add(force);
+        pForceData[linkIndex].Add(res);
     }
 }
 
@@ -281,10 +280,10 @@ void CActionGaugePlaquetteRigidAcc::Initial(class CLatticeData* pOwner, const CP
     //if (centerArray.Num() > 3)
     //{
     //    SSmallInt4 sCenter;
-    //    sCenter.x = static_cast<SBYTE>(centerArray[0]);
-    //    sCenter.y = static_cast<SBYTE>(centerArray[1]);
-    //    sCenter.z = static_cast<SBYTE>(centerArray[2]);
-    //    sCenter.w = static_cast<SBYTE>(centerArray[3]);
+    //    sCenter.x = static_cast<SCHAR>(centerArray[0]);
+    //    sCenter.y = static_cast<SCHAR>(centerArray[1]);
+    //    sCenter.z = static_cast<SCHAR>(centerArray[2]);
+    //    sCenter.w = static_cast<SCHAR>(centerArray[3]);
     //    CCommonData::m_sCenter = sCenter;
     //}
     //else
@@ -314,7 +313,8 @@ UBOOL CActionGaugePlaquetteRigidAcc::CalculateForceOnGaugeSingleField(const CFie
 
     preparethread;
 
-    _kernelAddForce4PlaqutteTermSU3_RigidAcc << <block, threads >> >(
+#if !_CLG_ASSUME_SQUARE_LATTICE
+    _LAUNCH_KERNEL(_kernelAddForce4PlaqutteTermSU3_RigidAcc, block, threads, 
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pStappleCache[pGaugeSU3->m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
@@ -324,12 +324,21 @@ UBOOL CActionGaugePlaquetteRigidAcc::CalculateForceOnGaugeSingleField(const CFie
         CCommonData::m_fG,
         m_bDirichlet,
         pGaugeSU3->m_byFieldId);
-
+#else
+    _LAUNCH_KERNEL(_kernelAddForce4PlaqutteTermSU3_RigidAcc, block, threads,
+        pGaugeSU3->m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[pGaugeSU3->m_byFieldId],
+        pForceSU3->m_pDeviceData,
+        m_fBetaOverNR,
+        CCommonData::m_fG,
+        m_bDirichlet,
+        pGaugeSU3->m_byFieldId);
+#endif
     checkCudaErrors(cudaDeviceSynchronize());
     return TRUE;
 }
 
-DOUBLE CActionGaugePlaquetteRigidAcc::EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+DOUBLE CActionGaugePlaquetteRigidAcc::EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStaple)
 {
     if (bBeforeEvolution)
     {
@@ -344,7 +353,7 @@ DOUBLE CActionGaugePlaquetteRigidAcc::EnergySingleField(UBOOL bBeforeEvolution, 
     }
 
     preparethread;
-    //_kernelEnergy_RigidAcc << <block, threads >> > (
+    //_LAUNCH_KERNEL(_kernelEnergy_RigidAcc, block, threads, 
     //        pGaugeSU3->m_pDeviceData,
     //        pGaugeSU3->m_byFieldId,
     //        m_fBetaOverN,
@@ -352,8 +361,8 @@ DOUBLE CActionGaugePlaquetteRigidAcc::EnergySingleField(UBOOL bBeforeEvolution, 
     //        _D_RealThreadBuffer);
 
     //Real fEnergy2 = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
-
-    _kernelEnergy_RigidAcc_Simplified << <block, threads >> > (
+#if !_CLG_ASSUME_SQUARE_LATTICE
+    _LAUNCH_KERNEL(_kernelEnergy_RigidAcc_Simplified, block, threads, 
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
@@ -363,8 +372,21 @@ DOUBLE CActionGaugePlaquetteRigidAcc::EnergySingleField(UBOOL bBeforeEvolution, 
         CCommonData::m_fG,
         m_bDirichlet,
         _D_RealThreadBuffer);
-
+#else
+    _LAUNCH_KERNEL(_kernelEnergy_RigidAcc_Simplified, block, threads,
+        pGaugeSU3->m_byFieldId,
+        pGaugeSU3->m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
+        m_fBetaOverNR,
+        CCommonData::m_fG,
+        m_bDirichlet,
+        _D_RealThreadBuffer);
+#endif
     m_fNewEnergy = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+    //The ThreadBufferSum above reduces only this rank's local sub-lattice; sum
+    //across ranks for the global action (P4-1.4). No-op on a lone rank.
+    appGlobalSum(m_fNewEnergy);
 
     //appParanoiac(_T("E1 = %2.18f, E2 = %2.18f\n"), m_fNewEnergy, fEnergy2);
 

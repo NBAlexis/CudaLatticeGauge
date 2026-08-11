@@ -15,285 +15,13 @@ __DEFINE_ENUM(EDistributionJob,
     EDJ_AngularMomentum,
     EDJ_ChiralAndFermionMomentum,
     EDJ_PlaqutteEnergy,
+    EDJ_RotatingPlaqutteEnergy,
     EDJ_CheckMD5,
     )
 
 
 enum { kExportDigital = 20, };
 
-#if !_CLG_WIN
-
-void _gcvt_s(TCHAR* buff, UINT uiBuffLength, Real fVaule, UINT uiDigit)
-{
-    static TCHAR tmpBuff[10];
-    appSprintf(tmpBuff, 10, _T("%s.%df"), _T("%"), uiDigit);
-    appSprintf(buff, uiBuffLength, tmpBuff, fVaule);
-}
-
-#endif
-
-#if USELESS
-
-CCString ExportComplexArray(const TArray<CLGComplex>& lst)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    CCString sSaveString = _T("");
-    for (INT i = 0; i < lst.GetCount(); ++i)
-    {
-        TCHAR str[50];
-        _gcvt_s(str, 50, lst[i].x, iDigital);
-        CCString sReal = CCString(str);
-        sReal = sReal.Replace(_T("e"), _T("*^"));
-        _gcvt_s(str, 50, lst[i].y, iDigital);
-        CCString sImg = CCString(str);
-        sImg = sImg.Replace(_T("e"), _T("*^"));
-        CCString sMid = _T(" + ");
-        if (sImg.Left(1) == _T("-"))
-        {
-            sImg = sImg.Right(sImg.GetLength() - 1);
-            sMid = _T(" - ");
-        }
-        sSaveString = sSaveString + _T(" ") + sReal + sMid + sImg 
-            + ((i == lst.GetCount() - 1) ? _T(" I") : _T(" I,"));
-    }
-
-    return sSaveString;
-}
-
-CCString ExportComplexArray2(const TArray<TArray<CLGComplex>>& lst)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    CCString sSaveString = _T("");
-    for (INT i = 0; i < lst.GetCount(); ++i)
-    {
-        for (INT j = 0; j < lst[i].GetCount(); ++j)
-        {
-            TCHAR str[50];
-            _gcvt_s(str, 50, lst[i][j].x, iDigital);
-            CCString sReal = CCString(str);
-            sReal = sReal.Replace(_T("e"), _T("*^"));
-            _gcvt_s(str, 50, lst[i][j].y, iDigital);
-            CCString sImg = CCString(str);
-            sImg = sImg.Replace(_T("e"), _T("*^"));
-            CCString sMid = _T(" + ");
-            if (sImg.Left(1) == _T("-"))
-            {
-                sImg = sImg.Right(sImg.GetLength() - 1);
-                sMid = _T(" - ");
-            }
-            sSaveString = sSaveString + _T(" ") + sReal + sMid + sImg
-            + ((j == lst[i].GetCount() - 1) ? _T(" I") : _T(" I,"));
-        }
-        sSaveString = sSaveString + _T("\n");
-    }
-
-    return sSaveString;
-}
-
-CCString ExportRealArray(const TArray<Real>& lst)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    CCString sSaveString = _T("");
-    for (INT i = 0; i < lst.GetCount(); ++i)
-    {
-        TCHAR str[50];
-        _gcvt_s(str, 50, lst[i], iDigital);
-        CCString sReal = CCString(str);
-        sReal = sReal.Replace(_T("e"), _T("*^"));
-        sSaveString = sSaveString + _T(" ") + sReal
-        + ((i == lst.GetCount() - 1) ? _T("") : _T(","));
-    }
-
-    return sSaveString;
-}
-
-CCString ExportRealArray2(const TArray<TArray<Real>>& lst)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    CCString sSaveString = _T("");
-    for (INT i = 0; i < lst.GetCount(); ++i)
-    {
-        for (INT j = 0; j < lst[i].GetCount(); ++j)
-        {
-            TCHAR str[50];
-            _gcvt_s(str, 50, lst[i][j], iDigital);
-            CCString sReal = CCString(str);
-            sReal = sReal.Replace(_T("e"), _T("*^"));
-            sSaveString = sSaveString + _T(" ") + sReal
-                + ((j == lst[i].GetCount() - 1) ? _T("") : _T(","));
-        }
-        sSaveString = sSaveString + _T("\n");
-    }
-    return sSaveString;
-}
-
-#endif
-
-void WriteStringFile(const CCString& sFileName, const CCString& sContent)
-{
-    appGetFileSystem()->WriteAllText(sFileName, sContent);
-}
-
-void WriteStringFileRealArray(const CCString& sFileName, const TArray<Real>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-    TCHAR str[50];
-    for (INT i = 0; i < lst.Num(); ++i)
-    {
-        _gcvt_s(str, 50, lst[i], iDigital);
-        CCString sReal = CCString(str);
-        sReal = sReal.Replace(_T("e"), _T("*^"));
-        file << _T(" ");
-        file << sReal;
-        if (i != lst.GetCount() - 1)
-        {
-            file << _T(",");
-        }
-    }
-    file.flush();
-    file.close();
-}
-
-void WriteStringFileRealArray2(const CCString& sFileName, const TArray<TArray<Real>>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-    TCHAR str[50];
-    for (INT i = 0; i < lst.GetCount(); ++i)
-    {
-        for (INT j = 0; j < lst[i].GetCount(); ++j)
-        {
-            _gcvt_s(str, 50, lst[i][j], iDigital);
-            CCString sReal = CCString(str);
-            sReal = sReal.Replace(_T("e"), _T("*^"));
-            file << _T(" ");
-            file << sReal;
-            if (j != lst[i].GetCount() - 1)
-            {
-                file << _T(",");
-            }
-        }
-        file << _T("\n");
-    }
-    file.flush();
-    file.close();
-}
-
-void WriteStringFileComplexArray(const CCString& sFileName, const TArray<CLGComplex>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-    TCHAR str[50];
-    for (INT i = 0; i < lst.Num(); ++i)
-    {
-        _gcvt_s(str, 50, lst[i].x, iDigital);
-        CCString sReal = CCString(str);
-        sReal = sReal.Replace(_T("e"), _T("*^"));
-        _gcvt_s(str, 50, lst[i].y, iDigital);
-        CCString sImg = CCString(str);
-        sImg = sImg.Replace(_T("e"), _T("*^"));
-        CCString sMid = _T(" + ");
-        if (sImg.Left(1) == _T("-"))
-        {
-            sImg = sImg.Right(sImg.GetLength() - 1);
-            sMid = _T(" - ");
-        }
-
-        file << _T(" ");
-        file << sReal;
-        file << sMid;
-        file << sImg;
-        if (i == lst.GetCount() - 1)
-        {
-            file << _T(" I");
-        }
-        else
-        {
-            file << _T(" I,");
-        }
-    }
-    file.flush();
-    file.close();
-}
-
-void WriteStringFileComplexArray2(const CCString& sFileName, const TArray<TArray<CLGComplex>>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kExportDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-    
-    TCHAR str[50];
-    for (INT i = 0; i < lst.GetCount(); ++i)
-    {
-        for (INT j = 0; j < lst[i].GetCount(); ++j)
-        {
-            _gcvt_s(str, 50, lst[i][j].x, iDigital);
-            CCString sReal = CCString(str);
-            sReal = sReal.Replace(_T("e"), _T("*^"));
-            _gcvt_s(str, 50, lst[i][j].y, iDigital);
-            CCString sImg = CCString(str);
-            sImg = sImg.Replace(_T("e"), _T("*^"));
-            CCString sMid = _T(" + ");
-            if (sImg.Left(1) == _T("-"))
-            {
-                sImg = sImg.Right(sImg.GetLength() - 1);
-                sMid = _T(" - ");
-            }
-            file << _T(" ");
-            file << sReal;
-            file << sMid;
-            file << sImg;
-            if (j == lst[i].GetCount() - 1)
-            {
-                file << _T(" I");
-            }
-            else
-            {
-                file << _T(" I,");
-            }
-        }
-        file << _T("\n");
-    }
-    file.flush();
-    file.close();
-}
-
-void AppendStringFile(const CCString& sFileName, const CCString& sContent)
-{
-    appGetFileSystem()->AppendAllText(sFileName, sContent);
-}
 
 INT MeasurePolyakovDist(CParameters& params)
 {
@@ -398,9 +126,9 @@ INT MeasurePolyakovDist(CParameters& params)
     CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     CMeasureAMomentumStochastic* pJF = dynamic_cast<CMeasureAMomentumStochastic*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
     CMeasureAction * pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
+    CMeasureRotatingAction * pRA = dynamic_cast<CMeasureRotatingAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
     CActionGaugePlaquetteRotating* pAG = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
     CFieldFermionWilsonSquareSU3DR* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3DR*>(appGetLattice()->GetFieldById(2));
-    //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
     appPushLogDate(FALSE);
 
     pJG->m_fBetaOverN = fBeta / 3.0;
@@ -412,8 +140,8 @@ INT MeasurePolyakovDist(CParameters& params)
      || (EDJ_AngularMomentum == eJob && bJF)
      || EDJ_Chiral == eJob)
     {
-        pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
-        pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+        pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+        pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
     }
 
     for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
@@ -433,6 +161,7 @@ INT MeasurePolyakovDist(CParameters& params)
         pJF->Reset();
         pCC->SetFieldCount(iFieldCount);
         pJF->SetFieldCount(iFieldCount);
+        pRA->Reset();
 
 #pragma region Measure
 
@@ -483,10 +212,10 @@ INT MeasurePolyakovDist(CParameters& params)
                         {
                             pF1->InitialField(EFIT_RandomGaussian);
                         }
-                        pF1->FixBoundary();
+                        pF1->FixBoundary(EFB_Field);
                         pF1->CopyTo(pF2);
                         pF1->InverseD(_FIELDS);
-                        pF1->FixBoundary();
+                        pF1->FixBoundary(EFB_Field);
 
                         pCC->OnConfigurationAcceptedZ4(
                             _FIELDS,
@@ -527,7 +256,7 @@ INT MeasurePolyakovDist(CParameters& params)
                             {
                                 pF1->InitialField(EFIT_RandomGaussian);
                             }
-                            pF1->FixBoundary();
+                            pF1->FixBoundary(EFB_Field);
                             pF1->CopyTo(pF2);
                             pF1->InverseD(_FIELDS);
 
@@ -558,7 +287,7 @@ INT MeasurePolyakovDist(CParameters& params)
                             {
                                 pF1->InitialField(EFIT_RandomGaussian);
                             }
-                            pF1->FixBoundary();
+                            pF1->FixBoundary(EFB_Field);
                             pF1->CopyTo(pF2);
                             pF1->InverseD(_FIELDS);
 
@@ -587,6 +316,11 @@ INT MeasurePolyakovDist(CParameters& params)
                     pPE->OnConfigurationAccepted(_FIELDS, NULL);
                 }
                 break;
+                case EDJ_RotatingPlaqutteEnergy:
+                {
+                    pRA->OnConfigurationAccepted(_FIELDS, NULL);
+                }
+                break;
                 default:
                     break;
             }
@@ -611,78 +345,20 @@ INT MeasurePolyakovDist(CParameters& params)
         {
             case EDJ_Polyakov:
             {
-                CCString sFileNameWrite1;
-                CCString sFileNameWrite2;
-                sFileNameWrite1.Format(_T("%s_polyakov_Nt%d_R.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-                sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                
-                //extract result
-                assert(static_cast<INT>(iEndN - iStartN + 1) * pPL->m_lstR.Num() == pPL->m_lstP.Num());
-                
-                if (uiOmega == iStartOmega)
-                {
-                    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                    {
-                        lstR.AddItem(_hostsqrt(static_cast<Real>(pPL->m_lstR[i])));
-                    }
-                    WriteStringFileRealArray(sFileNameWrite1, lstR);
-                }
-
-                TArray<TArray<CLGComplex>> polyakovOmgR;
-                TArray<CLGComplex> polyIn;
-                TArray<CLGComplex> polyOut;
-
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    TArray<CLGComplex> thisConfiguration;
-                    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                    {
-                        thisConfiguration.AddItem(pPL->m_lstP[j * pPL->m_lstR.Num() + i]);
-                    }
-                    polyakovOmgR.AddItem(thisConfiguration);
-                    polyIn.AddItem(pPL->m_lstLoopInner[j]);
-                    polyOut.AddItem(pPL->m_lstLoop[j]);
-                }
-                lstPolyIn.AddItem(polyIn);
-                lstPolyOut.AddItem(polyOut);
-                WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgR);
-
-                if (pPL->m_bMeasureLoopZ)
-                {
-                    CCString sFileNameWrite3;
-                    sFileNameWrite3.Format(_T("%s_polyakovZ_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                    polyakovOmgR.RemoveAll();
-                    polyIn.RemoveAll();
-                    polyOut.RemoveAll();
-
-                    for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                    {
-                        TArray<CLGComplex> thisConfiguration;
-                        for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                        {
-                            thisConfiguration.AddItem(pPL->m_lstPZ[j * pPL->m_lstR.Num() + i]);
-                        }
-                        polyakovOmgR.AddItem(thisConfiguration);
-                        polyIn.AddItem(pPL->m_lstLoopZInner[j]);
-                        polyOut.AddItem(pPL->m_lstLoopZ[j]);
-                    }
-                    lstPolyInZ.AddItem(polyIn);
-                    lstPolyOutZ.AddItem(polyOut);
-                    WriteStringFileComplexArray2(sFileNameWrite3, polyakovOmgR);
-                }
+                pPL->Export(sCSVSavePrefix, iStartN, iEndN, uiOmega, iStartOmega);
             }
             break;
             case EDJ_Chiral:
             {
-                _CLG_EXPORT_CHIRAL(pCC, Chiral);
-                _CLG_EXPORT_CHIRAL(pCC, Gamma1);
-                _CLG_EXPORT_CHIRAL(pCC, Gamma2);
-                _CLG_EXPORT_CHIRAL(pCC, Gamma3);
-                _CLG_EXPORT_CHIRAL(pCC, Gamma4);
-                _CLG_EXPORT_CHIRAL(pCC, Gamma5);
-                _CLG_EXPORT_CHIRAL(pCC, Gamma45);
-                _CLG_EXPORT_CHIRAL(pCC, GammaX);
-                _CLG_EXPORT_CHIRAL(pCC, GammaY);
+                _CLG_EXPORT_CHIRAL_WD(pCC, Chiral);
+                _CLG_EXPORT_CHIRAL_WD(pCC, Gamma1);
+                _CLG_EXPORT_CHIRAL_WD(pCC, Gamma2);
+                _CLG_EXPORT_CHIRAL_WD(pCC, Gamma3);
+                _CLG_EXPORT_CHIRAL_WD(pCC, Gamma4);
+                _CLG_EXPORT_CHIRAL_WD(pCC, Gamma5);
+                _CLG_EXPORT_CHIRAL_WD(pCC, Gamma45);
+                _CLG_EXPORT_CHIRAL_WD(pCC, GammaX);
+                _CLG_EXPORT_CHIRAL_WD(pCC, GammaY);
 
                 if (uiOmega == iStartOmega)
                 {
@@ -693,7 +369,7 @@ INT MeasurePolyakovDist(CParameters& params)
                     }
                     CCString sRadiousFile;
                     sRadiousFile.Format(_T("%s_condensateR.csv"), sCSVSavePrefix.c_str());
-                    WriteStringFileRealArray(sRadiousFile, lstRadius);
+                    WriteRealArray(sRadiousFile, lstRadius);
                 }
             }
             break;
@@ -725,7 +401,7 @@ INT MeasurePolyakovDist(CParameters& params)
                     }
                     CCString sRadiousFile;
                     sRadiousFile.Format(_T("%s_angularR.csv"), sCSVSavePrefix.c_str());
-                    WriteStringFileRealArray(sRadiousFile, lstRadius);
+                    WriteRealArray(sRadiousFile, lstRadius);
                 }
             }
             break;
@@ -750,15 +426,15 @@ INT MeasurePolyakovDist(CParameters& params)
 
                 if (NULL != pCC)
                 {
-                    _CLG_EXPORT_CHIRAL(pCC, Chiral);
-                    _CLG_EXPORT_CHIRAL(pCC, Gamma1);
-                    _CLG_EXPORT_CHIRAL(pCC, Gamma2);
-                    _CLG_EXPORT_CHIRAL(pCC, Gamma3);
-                    _CLG_EXPORT_CHIRAL(pCC, Gamma4);
-                    _CLG_EXPORT_CHIRAL(pCC, Gamma5);
-                    _CLG_EXPORT_CHIRAL(pCC, Gamma45);
-                    _CLG_EXPORT_CHIRAL(pCC, GammaX);
-                    _CLG_EXPORT_CHIRAL(pCC, GammaY);
+                    _CLG_EXPORT_CHIRAL_WD(pCC, Chiral);
+                    _CLG_EXPORT_CHIRAL_WD(pCC, Gamma1);
+                    _CLG_EXPORT_CHIRAL_WD(pCC, Gamma2);
+                    _CLG_EXPORT_CHIRAL_WD(pCC, Gamma3);
+                    _CLG_EXPORT_CHIRAL_WD(pCC, Gamma4);
+                    _CLG_EXPORT_CHIRAL_WD(pCC, Gamma5);
+                    _CLG_EXPORT_CHIRAL_WD(pCC, Gamma45);
+                    _CLG_EXPORT_CHIRAL_WD(pCC, GammaX);
+                    _CLG_EXPORT_CHIRAL_WD(pCC, GammaY);
                 }
 
                 if (uiOmega == iStartOmega)
@@ -770,7 +446,7 @@ INT MeasurePolyakovDist(CParameters& params)
                     }
                     CCString sRadiousFile;
                     sRadiousFile.Format(_T("%s_angularR.csv"), sCSVSavePrefix.c_str());
-                    WriteStringFileRealArray(sRadiousFile, lstRadius);
+                    WriteRealArray(sRadiousFile, lstRadius);
                 }
             }
             break;
@@ -779,6 +455,25 @@ INT MeasurePolyakovDist(CParameters& params)
                 CCString sFileName;
                 sFileName.Format(_T("%s_plaqutte.csv"), sCSVSavePrefix.c_str());
                 pPE->WriteRealListToFile(sFileName);
+            }
+            break;
+            case EDJ_RotatingPlaqutteEnergy:
+            {
+                CCString sFileNameTotal;
+                sFileNameTotal.Format(_T("%s_rotating_plaqutte_O%d.csv"), sCSVSavePrefix.c_str(), uiOmega);
+                pRA->WriteRealListToFile(sFileNameTotal);
+
+                CCString sFileNameS0;
+                sFileNameS0.Format(_T("%s_rotating_plaqutte_S0_O%d.csv"), sCSVSavePrefix.c_str(), uiOmega);
+                WriteRealArray(sFileNameS0, pRA->m_lstS0);
+
+                CCString sFileNameS1;
+                sFileNameS1.Format(_T("%s_rotating_plaqutte_S1_O%d.csv"), sCSVSavePrefix.c_str(), uiOmega);
+                WriteRealArray(sFileNameS1, pRA->m_lstS1);
+
+                CCString sFileNameS2;
+                sFileNameS2.Format(_T("%s_rotating_plaqutte_S2_O%d.csv"), sCSVSavePrefix.c_str(), uiOmega);
+                WriteRealArray(sFileNameS2, pRA->m_lstS2);
             }
             break;
             default:
@@ -796,8 +491,8 @@ INT MeasurePolyakovDist(CParameters& params)
             CCString sFileNameWrite2;
             sFileNameWrite1.Format(_T("%s_polyakov_Nt%d_In.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
             sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_Out.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-            WriteStringFileComplexArray2(sFileNameWrite1, lstPolyIn);
-            WriteStringFileComplexArray2(sFileNameWrite2, lstPolyOut);
+            WriteComplexArray2(sFileNameWrite1, lstPolyIn);
+            WriteComplexArray2(sFileNameWrite2, lstPolyOut);
 
             if (NULL != pPL && pPL->m_bMeasureLoopZ)
             {
@@ -805,8 +500,8 @@ INT MeasurePolyakovDist(CParameters& params)
                 CCString sFileNameWrite4;
                 sFileNameWrite3.Format(_T("%s_polyakovZ_Nt%d_In.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
                 sFileNameWrite4.Format(_T("%s_polyakovZ_Nt%d_Out.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-                WriteStringFileComplexArray2(sFileNameWrite3, lstPolyInZ);
-                WriteStringFileComplexArray2(sFileNameWrite4, lstPolyOutZ);
+                WriteComplexArray2(sFileNameWrite3, lstPolyInZ);
+                WriteComplexArray2(sFileNameWrite4, lstPolyOutZ);
             }
         }
         break;
@@ -833,6 +528,7 @@ INT MeasurePolyakovDist(CParameters& params)
     appPopLogDate();
 
     appGeneral(_T("\n=====================================\n========= finished! ==========\n*)"));
+    
     if (NULL != pF1)
     {
         pF1->Return();

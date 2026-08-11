@@ -1,0 +1,770 @@
+
+# HMC diagnostic suite (HMCDiagnosticsRevise-v3.md)
+# Each block runs two diagnostics:
+#   1. MD reversibility (RunReversibility)
+#   2. Finite-difference force validation per continuous action (RunFiniteDiff)
+#
+# ActionIndices is optional.  Omit it to test every continuous action.
+
+TestHmcDiagnostics_SU3Gauge_KS:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 2
+    MeasureListLength : 0
+    FermionFieldCount : 1
+
+    RunReversibility : 1
+    RunFiniteDiff : 1
+
+    TolAvgU : 1.0e-5
+    TolMaxU : 1.0e-4
+    TolAvgP : 1.0e-4
+    TolMaxP : 1.0e-3
+
+    LinkTrials : 3
+    DirTrials : 2
+    Delta : 1.0e-2
+    DeltaLevels : 3
+    TolAbs : 5.0e-3
+    TolRel : 0.30
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 0
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 0.5
+        IntegratorStep : 10
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    FermionField1:
+        FieldName : CFieldFermionKSSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.1
+        FieldId : 2
+        PoolNumber : 15
+        Period : [1, 1, 1, -1]
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+        EN : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Solver:
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        MaxStep : 50
+        Accuracy : 1.0e-8
+        Restart : 3
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        MaxStep : 100
+        Accuracy : 1.0e-8
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquetteAnisotropic
+        Beta : 5.0
+        Xi : 1.7
+
+    Action2:
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+
+TestHmcDiagnostics_TreeImproved_HISQ:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 2
+    MeasureListLength : 0
+    FermionFieldCount : 1
+
+    RunReversibility : 1
+    RunFiniteDiff : 1
+
+    TolAvgU : 1.0e-5
+    TolMaxU : 1.0e-4
+    TolAvgP : 1.0e-4
+    TolMaxP : 1.0e-3
+
+    LinkTrials : 4
+    DirTrials : 2
+    Delta : 1.0e-2
+    DeltaLevels : 3
+    TolAbs : 5.0e-3
+    TolRel : 0.30
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 0
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 0.025
+        IntegratorStep : 10
+
+    Gauge:
+        FieldName : CFieldGaugeSU3TreeImproved
+        FieldInitialType : EFIT_Random
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Update : 1
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.1
+        FieldId : 2
+        PoolNumber : 15
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+        EN : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Solver:
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        MaxStep : 50
+        Accuracy : 1.0e-8
+        Restart : 3
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        MaxStep : 100
+        Accuracy : 1.0e-8
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquetteAnisotropic
+        Beta : 5.0
+        Xi : 1.7
+
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2]
+
+
+TestHmcDiagnostics_TreeImproved_AnisotropicHISQ:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 2
+    MeasureListLength : 0
+    FermionFieldCount : 1
+
+    RunReversibility : 1
+    RunFiniteDiff : 1
+
+    TolAvgU : 1.0e-5
+    TolMaxU : 1.0e-4
+    TolAvgP : 1.0e-4
+    TolMaxP : 1.0e-3
+
+    LinkTrials : 4
+    DirTrials : 2
+    Delta : 1.0e-2
+    DeltaLevels : 3
+    TolAbs : 5.0e-3
+    TolRel : 0.30
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 0
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 0.025
+        IntegratorStep : 10
+
+    Gauge:
+        FieldName : CFieldGaugeSU3TreeImproved
+        FieldInitialType : EFIT_Random
+        RectOverPlaq : -0.05
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Update : 1
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3Anisotropic
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.1
+        XiF : 1.4
+        FieldId : 2
+        PoolNumber : 15
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+        EN : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Solver:
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        MaxStep : 50
+        Accuracy : 1.0e-8
+        Restart : 3
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        MaxStep : 100
+        Accuracy : 1.0e-8
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2]
+
+
+TestHmcDiagnostics_OneLoop_AnisotropicHISQ:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 2
+    MeasureListLength : 0
+    FermionFieldCount : 1
+
+    RunReversibility : 1
+    RunFiniteDiff : 1
+
+    TolAvgU : 1.0e-5
+    TolMaxU : 1.0e-4
+    TolAvgP : 1.0e-4
+    TolMaxP : 1.0e-3
+
+    LinkTrials : 4
+    DirTrials : 2
+    Delta : 1.0e-2
+    DeltaLevels : 3
+    TolAbs : 5.0e-3
+    TolRel : 0.30
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 0
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 0.025
+        IntegratorStep : 10
+
+    Gauge:
+        FieldName : CFieldGaugeSU3OneLoopImproved
+        FieldInitialType : EFIT_Random
+        Cr : -0.05
+        Ct : -0.01
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Update : 1
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3Anisotropic
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.1
+        XiF : 1.4
+        FieldId : 2
+        PoolNumber : 15
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+        EN : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Solver:
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        MaxStep : 50
+        Accuracy : 1.0e-8
+        Restart : 3
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        MaxStep : 100
+        Accuracy : 1.0e-8
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquetteAnisotropic
+        Beta : 5.0
+        Xi : 1.4
+
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2]
+
+
+TestHmcDiagnostics_AnisotropicChecks:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 4
+    MeasureListLength : 0
+    FermionFieldCount : 2
+
+    CheckTol : 0.001
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 0
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 0.025
+        IntegratorStep : 10
+
+    Gauge:
+        FieldName : CFieldGaugeSU3TreeImproved
+        FieldInitialType : EFIT_Random
+        RectOverPlaq : -0.05
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Update : 1
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3Anisotropic
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.1
+        XiF : 1.4
+        FieldId : 2
+        PoolNumber : 15
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+        EN : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    FermionField2:
+        FieldName : CFieldFermionHISQSU3Anisotropic
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.1
+        XiF : 2.1
+        FieldId : 3
+        PoolNumber : 15
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+        EN : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Solver:
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        MaxStep : 50
+        Accuracy : 1.0e-8
+        Restart : 3
+        AbsoluteAccuracy : 1
+
+    Solver2:
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 10
+        MaxStep : 50
+        Accuracy : 1.0e-8
+        Restart : 3
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        MaxStep : 100
+        Accuracy : 1.0e-8
+        AbsoluteAccuracy : 1
+
+    MSSolver2:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 100
+        MaxStep : 100
+        Accuracy : 1.0e-8
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2]
+
+    Action3:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [3]
+
+    Action4:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2, 3]
+
+
+TestHmcDiagnostics_RotatingHISQEvenOdd:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 2
+    MeasureListLength : 0
+    FermionFieldCount : 2
+
+    RunReversibility : 1
+    RunFiniteDiff : 1
+
+    TolAvgU : 1.0e-5
+    TolMaxU : 1.0e-4
+    TolAvgP : 1.0e-4
+    TolMaxP : 1.0e-3
+
+    LinkTrials : 4
+    DirTrials : 2
+    Delta : 1.0e-2
+    DeltaLevels : 3
+    TolAbs : 5.0e-3
+    TolRel : 0.30
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 0
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 0.025
+        IntegratorStep : 10
+
+    Gauge:
+        FieldName : CFieldGaugeSU3TreeImproved
+        FieldInitialType : EFIT_Random
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Update : 1
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3R
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.5
+        FieldId : 2
+        PoolNumber : 15
+        Even : 1
+        Omega : 0.2
+        CachedGauge : 1
+        Period : [1, 1, 1, -1]
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+        EN : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    FermionField2:
+        FieldName : CFieldFermionHISQSU3R
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.4
+        FieldId : 3
+        PoolNumber : 15
+        Even : 1
+        Omega : 0.2
+        CachedGauge : 1
+        Epsilon : -0.1
+        Period : [1, 1, 1, -1]
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+
+    Solver:
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        MaxStep : 50
+        Accuracy : 1.0e-8
+        Restart : 3
+        AbsoluteAccuracy : 1
+
+    Solver2:
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 10
+        MaxStep : 50
+        Accuracy : 1.0e-8
+        Restart : 3
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        MaxStep : 100
+        Accuracy : 1.0e-8
+        AbsoluteAccuracy : 1
+
+    MSSolver2:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 100
+        MaxStep : 100
+        Accuracy : 1.0e-8
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquetteRotating
+        CloverEnergy : 1
+        Beta : 6.0
+        Omega : 0.2
+        Torus : 1
+        ShiftCoord : 1
+
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2, 3]
+
+
+TestHmcDiagnostics_TreeImproved_StoutCloverWilson:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 2
+    MeasureListLength : 0
+    FermionFieldCount : 1
+
+    RunReversibility : 1
+    RunFiniteDiff : 1
+
+    TolAvgU : 1.0e-5
+    TolMaxU : 1.0e-4
+    TolAvgP : 1.0e-4
+    TolMaxP : 1.0e-3
+
+    LinkTrials : 3
+    DirTrials : 2
+    Delta : 1.0e-2
+    DeltaLevels : 3
+    TolAbs : 5.0e-3
+    TolRel : 0.30
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 0
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 0.5
+        IntegratorStep : 10
+
+    Gauge:
+        FieldName : CFieldGaugeSU3TreeImproved
+        FieldInitialType : EFIT_Random
+
+    StapleCache:
+        StapleCacheName : CStapleCacheSU3
+        FieldId : 1
+        CacheFmunu : 1
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingStoutSU3
+        Update : 1
+
+    FermionField1:
+        FieldName : CFieldFermionWilsonSquareCloverSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.15
+        FieldId : 2
+        PoolNumber : 26
+
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 1.0e-8
+        Restart : 15
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        MaxStep : 100
+        Accuracy : 1.0e-8
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    Action2:
+        ActionName : CActionFermionKSImprove
+        FieldId : 2
+
+
+TestHmcDiagnostics_RigidAcc:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 2
+    MeasureListLength : 0
+    FermionFieldCount : 1
+
+    RunReversibility : 1
+    RunFiniteDiff : 1
+
+    TolAvgU : 1.0e-5
+    TolMaxU : 1.0e-4
+    TolAvgP : 1.0e-4
+    TolMaxP : 1.0e-3
+
+    LinkTrials : 3
+    DirTrials : 2
+    Delta : 1.0e-2
+    DeltaLevels : 3
+    TolAbs : 5.0e-3
+    TolRel : 0.30
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 0
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 0.5
+        IntegratorStep : 10
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    FermionField1:
+        FieldName : CFieldFermionKSSU3RigidAcc
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.1
+        FieldId : 2
+        PoolNumber : 15
+        ImaginaryGamma3 : 1
+        Period : [1, 1, 1, -1]
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+        EN : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Solver:
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        MaxStep : 50
+        Accuracy : 1.0e-8
+        Restart : 3
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        MaxStep : 100
+        Accuracy : 1.0e-8
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquetteRigidAcc
+        Beta : 5.0
+        AccG : 0.1
+        Dirichlet : 0
+
+    Action2:
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+
+TestHmcDiagnostics_PSU3:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 10
+    ActionListLength : 1
+    MeasureListLength : 0
+    FermionFieldCount : 0
+
+    RunReversibility : 1
+    RunFiniteDiff : 1
+
+    TolAvgU : 1.0e-5
+    TolMaxU : 1.0e-4
+    TolAvgP : 1.0e-5
+    TolMaxP : 1.0e-4
+
+    LinkTrials : 3
+    DirTrials : 2
+    Delta : 1.0e-2
+    DeltaLevels : 3
+    TolAbs : 5.0e-3
+    TolRel : 0.30
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 0
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 0.5
+        IntegratorStep : 10
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    Action1:
+        ActionName : CActionGaugePlaquettePSU3
+        Beta : 6.0

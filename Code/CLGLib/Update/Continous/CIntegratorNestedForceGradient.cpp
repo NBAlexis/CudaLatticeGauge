@@ -5,6 +5,7 @@
 // This is the Approximate force gradient integrator for HMC
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [03/05/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -52,18 +53,7 @@ void CIntegratorNestedForceGradient::Evaluate()
         }
 
         // middle step
-        ZeroForce();
-        checkCudaErrors(cudaDeviceSynchronize());
-        for (INT i = 0; i < m_lstActions.Num(); ++i)
-        {
-            //this is accumulate
-            if (m_lstActions[i]->IsFermion())
-            {
-                m_lstActions[i]->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), NULL, ESP_InTrajectory);
-            }
-
-            checkCudaErrors(cudaDeviceSynchronize());
-        }
+        CalcForceOfActions(m_lstActions, EFC_Fermion, ESP_InTrajectory);
 
         PreserveFields();
         AddForceToFieldDirectly(f1Over24EstepSq);
@@ -115,8 +105,8 @@ void CIntegratorNestedForceGradient::NestedEvaluate(UBOOL bLast)
     const Real f2Over3Estep = f1Over3Estep * F(2.0);
     const Real f1Over24EstepSq = m_fNestedStepLength * m_fNestedStepLength * OneOver24;
 
-    appDetailed("  Force Gradient nested sub step 0\n");
-    UpdatePG(f1Over6Estep, FALSE);
+    appParanoiac("  Force Gradient nested sub step 0\n");
+    UpdatePG(f1Over6Estep);
 
     for (UINT uiStep = 1; uiStep < m_uiNestedStep + 1; ++uiStep)
     {
@@ -137,7 +127,7 @@ void CIntegratorNestedForceGradient::NestedEvaluate(UBOOL bLast)
         PreserveFields();
         AddForceToFieldDirectly(f1Over24EstepSq);
 
-        UpdatePG(f2Over3Estep, FALSE);
+        UpdatePG(f2Over3Estep);
 
         //restore U
         RecoverFields();
@@ -145,13 +135,13 @@ void CIntegratorNestedForceGradient::NestedEvaluate(UBOOL bLast)
 
         if (uiStep < m_uiNestedStep)
         {
-            appDetailed("  Force Gradient nested sub step %d\n", uiStep);
-            UpdatePG(f1Over3Estep, FALSE);
+            appParanoiac("  Force Gradient nested sub step %d\n", uiStep);
+            UpdatePG(f1Over3Estep);
         }
         else
         {
-            appDetailed("  Force Gradient nested last step %d\n", uiStep);
-            UpdatePG(f1Over6Estep, bLast);
+            appParanoiac("  Force Gradient nested last step %d\n", uiStep);
+            UpdatePG(f1Over6Estep);
         }
     }
 }

@@ -8,6 +8,7 @@
 // REVISION:
 //  [04/20/2019 nbale]
 //=============================================================================
+#pragma once
 
 #ifndef _CFIELDBOUNDARY_H_
 #define _CFIELDBOUNDARY_H_
@@ -31,12 +32,13 @@ public:
         : m_byFieldId(0)
         , m_pDeviceData(NULL)
     {
-        CCommonKernel<deviceData>::AllocateBuffer(&m_pDeviceData, 8 * _HC_Dir);
+        checkCudaErrors(__cudaMalloc((void**)&m_pDeviceData, 8 * _HC_Dir * sizeof(deviceData)));
     }
 
     ~CFieldBoundary() 
     {
-        CCommonKernel<deviceData>::FreeBuffer(&m_pDeviceData);
+        checkCudaErrors(__cudaFree(m_pDeviceData));
+        m_pDeviceData = NULL;
     }
 
     virtual EFieldType GetFieldType() const = 0;

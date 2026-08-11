@@ -1,0 +1,1882 @@
+#=============================================================================
+# TestSuit_MG.yaml
+#
+# Multi-GPU test suite. Every test here is a decomposition-consistency test:
+# run the SAME test under `./CLGTest MG` (single process, identity
+# decomposition) and under `runtest.sh <Name> <GpuCount>` (mpiexec -n N with
+# per-rank GPU binding), and compare the printed scalars / MD5s / error counts.
+#
+# Driver metadata (Improve-1 I10): each block declares its decomposed run via
+#   MultiGPUTestRankCount : N
+#   MultiGPUTestGrid : [gx, gy, gz, gt]   (product must equal N)
+# These keys are consumed ONLY by the test driver (runtest.sh --mg-config,
+# which injects --gpu-grid / --device-per-node on the mpiexec command line);
+# the library never reads them. Blocks no longer carry GpuGrid/DevicePerNode.
+#
+# Loading: CLGTest.cpp LoadParams parses TestSuit_MG.yaml after
+# TestSuit_FileIO.yaml; the test list is built from paramName presence, so the
+# split does not change any test's parameters -- only the category grouping
+# (`./CLGTest MG` runs exactly this suite).
+#=============================================================================
+
+TestMGGatherScatterRoundTrip:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    ## Multi-GPU gather/scatter round-trip. Ignored by single-GPU build.
+    ## Grid product MUST equal mpiexec -n N, so the committed default is [1,1,1,1]
+    ## (single-process safe; passes in the default -n1 suite). For the -n2
+
+    Gauge:
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialFieldWithFile in the test; value here is a placeholder.
+        FieldInitialType : EFIT_Identity
+
+    MultiGPUTestRankCount : 4
+    MultiGPUTestGrid : [2, 1, 1, 2]
+TestMGHaloSelfExchange:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    ## Multi-GPU halo self-exchange: verify halo slot content == source site after
+    ## RefillHalo. An -n1 run has halo count 0 (trivial pass). Real validation
+    ## runs decomposed
+    ## via runtest.sh (metadata grid below, split t into 2x4, each rank's
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Random gauge field, initialized by the test itself.
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGGaugeForceConsistency:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    ## Multi-GPU pure-gauge stencil (M2): load testGaugeSingle.con_, compute the
+    ## gauge force (boundary sites read neighbour links = exercises the halo), gather
+    ## force to rank 0, print MD5. Identical MD5 for -n1 vs -nN proves the stencil
+    ## halo reads are correct. Decomposed via runtest.sh (metadata grid below).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialFieldWithFile in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGGaugeForceProjectivePlane:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    ## I10-2 boundary kinds (ProjectivePlane reflection on x/y): the [2,2,1,1]
+    ## split makes the rank boundaries cross the projective planes; gathered
+    ## force MD5 compared 1-vs-N as above.
+    MultiGPUTestRankCount : 4
+    MultiGPUTestGrid : [2, 2, 1, 1]
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialFieldWithFile in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+
+
+TestMGWilsonDConsistency:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 1
+    MeasureListLength : 0
+
+    ## Multi-GPU fermion stencil (Wilson D): load testGaugeSingle.con_, apply Wilson
+    ## D twice to a uniform identity spinor (boundary sites read neighbour gauge links
+    ## and neighbour spinor sites = exercises both halos), gather result to rank 0,
+    ## print MD5. Identical MD5 for -n1 vs -nN proves the fermion stencil halo reads
+    ## are correct. Decomposed via runtest.sh (metadata grid below).
+
+    ## How many times to apply D (bisection of the two halo paths). 1 = gauge halo
+    ## only (uniform input); 2 = also stress the input-spinor halo.
+    DApplyCount : 2
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialFieldWithFile in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+
+    FermionField1:
+        FieldName : CFieldFermionWilsonSquareSU3
+        ## Overwritten by InitialField(EFIT_Identity) in the test.
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1355
+        FieldId : 2
+        PoolNumber : 2
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGFermionSaveLoad:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 1
+    MeasureListLength : 0
+
+    ## Multi-GPU P5-1.2 fermion save/load round-trip: random Gaussian spinor
+    ## (global-seeded, identical on -n1 vs -nN) -> save (global gather) -> reload
+    ## through the scatter-aware fermion loader -> save again. Same MD5 proves
+    ## the round-trip is lossless on every rank; the driver compares -n1 vs -nN.
+    ## Previously each rank read the file by its LOCAL site count (silent wrong);
+    ## a cold/identity spinor would be scatter-invariant and blind to it.
+    ## Decomposed runs go through runtest.sh (metadata grid below).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Placeholder; the test only saves/loads the fermion field.
+        FieldInitialType : EFIT_Identity
+
+    FermionField1:
+        FieldName : CFieldFermionWilsonSquareSU3
+        ## Overwritten by InitialField(EFIT_RandomGaussian) in the test.
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1355
+        FieldId : 2
+        PoolNumber : 2
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGStaggeredDConsistency:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 1
+    MeasureListLength : 0
+    ## KS fermion bakes the Naik 3-hop table at init; on a decomposed lattice
+    ## HaloWidth must be >= 3 or the config check fails fast (I8).
+    HaloWidth : 3
+
+    ## Multi-GPU fermion stencil (plain staggered KS D): load testGaugeSingle.con_,
+    ## apply staggered D twice to a uniform identity spinor (boundary sites read
+    ## neighbour gauge links and neighbour spinor sites = exercises both halos),
+    ## gather result to rank 0, print MD5. Identical MD5 for -n1 vs -nN proves the
+    ## staggered fermion stencil halo reads are correct. The decomposed run grid is
+    ## declared via MultiGPUTestRankCount / MultiGPUTestGrid below (driver metadata,
+    ## consumed by runtest.sh --mg-config, not by the library).
+
+    ## How many times to apply D (bisection of the two halo paths). 1 = gauge halo
+    ## only (uniform input); 2 = also stress the input-spinor halo.
+    DApplyCount : 2
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialFieldWithFile in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+
+    FermionField1:
+        FieldName : CFieldFermionKSSU3
+        ## Overwritten by InitialField(EFIT_Identity) in the test.
+        FieldInitialType : EFIT_RandomGaussian
+        ## 2am
+        Mass : 0.2
+        FieldId : 2
+        PoolNumber : 2
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGHISQDConsistency:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    ActionListLength : 0
+    FermionFieldCount : 1
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    ## Multi-GPU HISQ/Naik fermion stencil (widest: Naik reads a 3-hop neighbour).
+    ## Loads testGaugeSingle.con_, triggers the HISQ smearing (fat + Naik links), then
+    ## applies HISQ D twice to a uniform identity spinor and gathers the result to rank
+    ## 0. Identical MD5 for -n1 vs -nN proves the HISQ width-3 halo reads (Naik link +
+    ## fat link + input spinor) AND the halo-aware smearing build are all correct.
+    ## Decomposed runs go through runtest.sh (metadata grid below). The Naik 3-link
+    ## path needs
+    ## a 3-wide halo, so HaloWidth MUST be >= 3 (this overrides the default of 2).
+    HaloWidth : 3
+
+    ## 1 = gauge/Naik halo only (uniform input); 2 = also stress the input-spinor halo.
+    DApplyCount : 2
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialFieldWithFile in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        ## Overwritten by InitialField(EFIT_Identity) in the test.
+        FieldInitialType : EFIT_Zero
+        Mass : 0.22
+        ## Plain HISQ: Epsilon 0 (no L1-effective eps term), only the Naik 3-link term.
+        Epsilon : 0.0
+        Naik : -0.03708333333333333
+        FieldId : 2
+        PoolNumber : 4
+        Period : [1, 1, 1, -1]
+
+    ## HISQ two-level smearing that builds the fat + Naik links the D operator reads.
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Iterate : 1
+        HasT : 1
+        FieldId : 1
+        Update : 1
+        Proj : 1
+        ProjSUN : 0
+        UseCaylayHamilton : 1
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGReductionConsistency:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    ActionListLength : 0
+    FermionFieldCount : 1
+    MeasureListLength : 0
+    CacheStaple : 0
+    ## KS fermion bakes the Naik 3-hop table at init; on a decomposed lattice
+    ## HaloWidth must be >= 3 or the config check fails fast (I8).
+    HaloWidth : 3
+
+    ## Multi-GPU Phase 3 global-reduction consistency. Loads testGaugeSingle.con_,
+    ## computes gauge Dot (real global sum) and, after applying staggered D twice to a
+    ## uniform identity spinor, fermion Dot (complex global sum). The printed scalars
+    ## must match -n1 vs -nN to DOUBLE tolerance (NOT bitwise: MPI sum-tree order
+    ## differs). Missing Allreduce would give ~1/N of the -n1 value.
+    ## Decomposed runs go through runtest.sh (metadata grid below).
+    DApplyCount : 2
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionKSSU3
+        FieldInitialType : EFIT_Zero
+        Mass : 0.22
+        FieldId : 2
+        PoolNumber : 4
+        Period : [1, 1, 1, -1]
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGRngGlobalSeed:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ## Seedable, decomposition-invariant generator (Sobol variants use per-local-index
+    ## direction vectors and CANNOT be made rank-invariant). Fixed seed for repro.
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    ActionListLength : 0
+    FermionFieldCount : 1
+    MeasureListLength : 0
+    CacheStaple : 0
+    ## KS fermion bakes the Naik 3-hop table at init; on a decomposed lattice
+    ## HaloWidth must be >= 3 or the config check fails fast (I8).
+    HaloWidth : 3
+
+    ## Multi-GPU Phase 3 RNG global-coordinate seeding. Fills fermion id 2 with per-site
+    ## Gaussians (the HMC momentum-refresh primitive) and gathers to rank 0. Identical
+    ## MD5 for -n1 vs -nN proves each global site draws the same curand stream regardless
+    ## of decomposition. Decomposed runs go through runtest.sh.
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionKSSU3
+        FieldInitialType : EFIT_Zero
+        Mass : 0.22
+        FieldId : 2
+        PoolNumber : 4
+        Period : [1, 1, 1, -1]
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGLoadCrossPrecision:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    ## Multi-GPU Phase 4 (P5-1.1): cross-precision gauge load 1-vs-N.
+    ## Saves an EFIT_Random config as a DOUBLE file, reloads it via
+    ## EFFT_CLGBinDouble (float build: cross-precision), prints the Dot.
+    ## Decomposed via runtest.sh (metadata grid below).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialField(EFIT_Random) in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 5.35
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGArrayReduce:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    ## Multi-GPU Phase 4 (P4-3.5): array (profile) reduction 1-vs-N unit test.
+    ## x must be un-split (same index set per rank) so the per-rank partials
+    ## can be summed element-wise: the decomposed grid below splits z only.
+    ## Compare the printed total for -n1 vs -nN (DOUBLE tol).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 5.35
+
+
+
+
+#=============================================================================
+# Improve-1 I2: CHaloBufferHandle metadata / pool / version / registry.
+# Normal MG-suite tests (must PASS once I2 lands). Gauge-only blocks; the Meta
+# test also validates fermion/boson fields when a suite provides them.
+# Grid product must equal mpiexec -n N; default [1,1,1,1] is -n1 safe, use
+# [1,1,1,2] + mpiexec -n 2 for the decomposed run (halo counts > 0 there).
+#=============================================================================
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 2, 1]
+TestMGHaloHandleMeta:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGHaloHandlePool:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGHaloHandleVersion:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGHaloHandleRegistry:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+
+
+
+#=============================================================================
+# Improve-1 I3: moved from TestSuit_Improve1KnownFailures.yaml after the
+# SU3_12/U1Real halo allocations and the generic (handle-driven) refill landed.
+# These are normal MG-suite tests now (must PASS, including the deterministic
+# global-index halo content on a decomposed grid). GpuGrid product must equal
+# mpiexec -n 2 for the decomposed run.
+#=============================================================================
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGHaloSU3_12:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGHaloU1Real:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGHaloBoson:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    GaugeFieldCount : 0
+    FermionFieldCount : 0
+    BosonFieldCount : 1
+    MeasureListLength : 0
+
+
+    BosonField1:
+
+        FieldName : CFieldBosonSU3
+        FieldInitialType : EFIT_RandomGaussian
+        FieldId : 2
+        Period : [1, 1, 1, 1]
+
+
+
+
+#=============================================================================
+# Improve-1 I4: moved from TestSuit_Improve1KnownFailures.yaml after the
+# handle-version Ensure/RefillHalo and the uniform host-write NotifyWritten
+# landed (alias cross-talk and write invalidation are fixed). Normal MG-suite
+# tests now (must PASS on a decomposed grid). GpuGrid product must equal
+# mpiexec -n 2 for the decomposed run.
+#=============================================================================
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGHaloBufferAlias:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGHaloWriteVersion:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGBosonConsistency:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    GaugeFieldCount : 1
+    FermionFieldCount : 0
+    BosonFieldCount : 1
+    MeasureListLength : 0
+
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        FieldId : 1
+
+    BosonField1:
+
+        FieldName : CFieldBosonSU3
+        FieldInitialType : EFIT_RandomGaussian
+        FieldId : 2
+        Period : [1, 1, 1, 1]
+
+    Action1:
+
+        ActionName : CActionPhi4
+        Mass : 1.0
+        Lambda : 1.0
+        BosonFields : [2]
+
+
+#=============================================================================
+# Improve-1 I5: automatic launch guard (BeginFromArguments / Commit) and the
+# rank-local variant. Normal MG-suite tests (must PASS once I5 lands).
+# NOTE: TestMGLaunchGuardRankLocal intentionally triggers ONE CRUCIAL log line
+# (the HaloCapable fail-fast negative case) -- expected, not a failure.
+# GpuGrid product must equal mpiexec -n N; default [1,1,1,1] is -n1 safe, use
+# Ensure assertions only activate when the halo site count > 0).
+#=============================================================================
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGLaunchGuardScan:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGLaunchGuardRankLocal:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGLaunchGuardMacro:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGLaunchGuardSet:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    ## Improve-1 I5: buffer-set handle expansion (3.4.1).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGLaunchGuardSingleEval:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    ## Improve-1 I5: single-evaluation probe (3.3). MG-build only; on the raw
+    ## build run this single test by name to prove the <<<>>> lambda path.
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+
+#=============================================================================
+# Improve-1 I6: storage-owner registration of every managed buffer (appendix
+# A.5 dispositions). Normal MG-suite tests (must PASS once I6 lands).
+# GpuGrid product must equal mpiexec -n N; default [1,1,1,1] is -n1 safe, use
+# content check only activates when the halo site count > 0).
+#=============================================================================
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGOwnerCloverBuffer:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    ## Improve-1 I6: clover PhidPhi singleton registration + guard + halo content.
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGOwnerStapleCacheSets:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    ## Improve-1 I6: staple-cache pointer arrays as buffer sets, flat buffers
+    ## LocalOnly.
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGOwnerRationalSet:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    ## Improve-1 I6: rational field pointer array membership re-bind (3.4.1).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGOwnerU1RealFmunu:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    ## Improve-1 I6: lazy U1Real Fmunu owner registration (LocalOnly).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGHaloBakeTables:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    ## Improve-1 I8 gate 1: every halo slot's gather-source SIndex and baked
+    ## 32-bit global coordinate against the analytic mirror; local table
+    ## entries = offset + local coord. Decomposed runs go through runtest.sh
+    ## (metadata grid below).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 4
+    MultiGPUTestGrid : [2, 2, 1, 1]
+TestMGHaloRadiusReject:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    ## Improve-1 I8 gate 2: big-cell SIndex table scan -- a split-direction
+    ## crossing beyond HaloWidth (default 2, bake edge is 4) must be the
+    ## invalid sentinel, never a silent local wrap; in-width crossings land in
+    ## the halo slot range and map back to the correct global site. For real
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGHaloHyperCorner:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    ## Improve-1 I8 gate 4: codimension-4 (hyper-corner) halo. HaloWidth 1
+    ## keeps the slots at exactly one site per side-quad. The real case is the
+    ## four-way split small lattice:
+    ## (16 = MPI rank count; ranks oversubscribe the local device per
+    ## passes.
+    HaloWidth : 1
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 16
+    MultiGPUTestGrid : [2, 2, 2, 2]
+TestMGGlobalCoordinate32:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 160]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+    RequireSplit : 1
+
+    ## Improve-1 I8 gate 3: global-coordinate table with global T = 160 > 127
+    ## (the old SCHAR narrowing path would overflow). The extent is asserted by
+    ## the test. RequireSplit makes the driver skip this test unless the grid
+    ## splits T enough to keep the local extent <= 119 (the baked coordinates
+    ## are 8-bit), i.e. run it decomposed:
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGHmcConsistency:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    ## Seedable, decomposition-invariant generator so momentum refresh is identical
+    ## on -n1 vs -nN. Fixed seed for repro.
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    MeasureListLength : 0
+    ExponentialPrecision : 0
+    GaugeMomentumFactor : 2.0
+
+    ## I9 gate (action): end-to-end pure-gauge HMC 1-vs-N. Loads
+    ## testGaugeSingle.con_, runs TrajCount trajectories. Compare acceptCount
+    ## (exact integer) and rmsHDiff (DOUBLE tol) for -n1 vs -nN. The committed
+    ## Decomposed runs go through runtest.sh (metadata grid below).
+    TrajCount : 4
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorLeapFrog
+        ## Small dt (short trajectory, many steps) keeps leapfrog dH small so most
+        ## trajectories accept -- exercises BOTH Metropolis branches for a meaningful
+        ## 1-vs-N accept-count comparison (the loaded config is cold/identity).
+        IntegratorStepLength : 0.5
+        IntegratorStep : 200
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialFieldWithFile in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 3
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGRotatingActionConsistencyAcc:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 160]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+    CacheStaple : 0
+    RequireSplit : 1
+
+    ## I9 gate (position-dependent action + global coordinate >127): 1-vs-N for
+    ## CActionGaugePlaquetteAcceleration on a global-T = 160 lattice. The g*t and
+    ## g*t^2 weights need the GLOBAL t; before I8/I9 the SCHAR coordinate path
+    ## overflowed above 127. RequireSplit makes the driver skip unless the grid
+    ## splits T enough to keep the local extent <= 119, i.e. run decomposed:
+    ## Compare energy (DOUBLE tol) and force MD5 (bitwise) across decompositions
+    ## (global offset nonzero on rank > 0). EFIT_Random gauge
+    ## (decomposition-invariant).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialField(EFIT_Random) in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquetteAcceleration
+        Beta : 5.0
+        AccG : 0.1
+
+    MultiGPUTestRankCount : 4
+    MultiGPUTestGrid : [1, 1, 1, 4]
+TestMGMeasurePlaq:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## I9 gate (measurement): CMeasurePlaqutteEnergy 1-vs-N. The measurement is
+    ## globalised (CMeasure::GlobalSumReal Allreduce on CalculatePlaqutteEnergy /
+    ## CalculatePlaqutteEnergyOriginal), so the reported plaq is the GLOBAL value
+    ## on every rank. EFIT_Random gauge (decomposition-invariant). Compare the
+    ## printed plaq for -n1 vs -nN (DOUBLE tol). Decomposed via runtest.sh
+    ## (metadata grid below).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialField(EFIT_Random) in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 5.35
+
+    Measure1:
+        MeasureName : CMeasurePlaqutteEnergy
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+TestMGChiralCondensate:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## I9 gate (solver): CMeasureChiralCondensate 1-vs-N. The measurement drives
+    ## one InverseD solve (GCRODR below) whose convergence reductions route
+    ## through the globalised ThreadBufferSum, then the per-rank condensate
+    ## partial is Allreduced and normalized by the GLOBAL volume. Result NOT
+    ## bitwise (CG iteration count can shift with float sum order); compare
+    ## |cond|^2 for -n1 vs -nN to DOUBLE tolerance. Committed grid
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialField(EFIT_Random) in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionWilsonSquareSU3
+        ## Overwritten by InitialField(EFIT_RandomGaussian) in the test.
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.16
+        FieldId : 2
+        PoolNumber : 1
+        Period : [1, 1, 1, 1]
+
+    BoundaryFermionField1:
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 2
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 5.35
+
+    Solver:
+        SolverName : CSLASolverGCRODR
+        SolverForFieldId : 2
+        MDim : 25
+        KDim : 5
+        RecalculateR : 3
+        DeflateSpace : EEDT_SVD
+        Accuracy : 0.00001
+        Restart : 100
+        AbsoluteAccuracy : 1
+
+    Measure1:
+        MeasureName : CMeasureChiralCondensate
+        FieldId : 2
+        FieldCount : 1
+        ShowResult : 0
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+
+#=============================================================================
+# Improve-1 I10-1: restored decomposition-consistency tests. These 13 blocks
+# were parked (registrations commented out) before the four-mode driver; their
+# grids are declared via the driver metadata below (consumed by runtest.sh
+# --mg-config, not by the library). Decomposed runs are oversubscribed on a
+# single GPU -- DevicePerNode is injected by the driver from --device-per-node.
+#=============================================================================
+
+TestMGHmcHISQConsistency:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    ## Seedable, decomposition-invariant generator so momentum refresh AND the
+    ## pseudofermion heatbath draw identical per-site Gaussians on -n1 vs -nN.
+    ## Fixed seed for repro.
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 0
+    CacheStaple : 0
+    ExponentialPrecision : 0
+    GaugeMomentumFactor : 2.0
+
+    ## Multi-GPU Phase 3 (P3-9.1) end-to-end HISQ-fermion HMC 1-vs-N. Loads
+    ## testGaugeSingle.con_, runs TrajCount short trajectories of a HISQ
+    ## pseudofermion (rational multi-shift) + plaquette-gauge HMC. Fermion setup
+    ## mirrors TestFermionUpdatorHISQNoEvenOdd; EvenOdd is OFF because the MG
+    ## Naik width-3 halo refill lives in the non-even-odd D path only.
+    ## Compare for -n1 vs -nN: accept/reject sequence + acceptCount (EXACT --
+    ## Metropolis rand is broadcast, H is globally reduced), rmsHDiff and final
+    ## plaquette energy (DOUBLE tol). Decomposed runs go through runtest.sh
+    ## (metadata grid below). The Naik 3-link path needs HaloWidth >= 3.
+    HaloWidth : 3
+    TrajCount : 4
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorLeapFrog
+        ## Short trajectory (~10 MD steps). Small dt keeps dH moderate so both
+        ## Metropolis branches are exercised on the loaded near-cold config.
+        IntegratorStepLength : 0.1
+        IntegratorStep : 10
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialFieldWithFile in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.3
+        FieldId : 2
+        PoolNumber : 15
+        ## 0 = no even-odd preconditioning (see header comment).
+        Even : 0
+        Epsilon : -0.1
+        Period : [1, 1, 1, -1]
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.0001
+        Restart : 15
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        MaxStep : 200
+        Accuracy : 0.000000001
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    Action2:
+        ActionName : CActionFermionKSImprove
+        FieldId : 2
+        HISQ : 1
+
+    ## HISQ two-level smearing that builds the fat + Naik links; refires on every
+    ## gauge change (Update : 1) during the MD evolution.
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        FieldId : 1
+        Update : 1
+        ProjSUN : 0
+        Proj : 1
+        UseCaylayHamilton : 1
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+
+
+
+TestMGRotatingActionConsistency:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    ## Multi-GPU Phase 4 (P4-1.2) position-dependent action 1-vs-N. The Rotating3D
+    ## Omega terms feed the site coordinate into the physics, so after a lattice
+    ## split every such use must be the GLOBAL coordinate (kernel-top factors via
+    ## __deviceLocalToGlobalInt4; staple-coefficient helpers via the halo-aware
+    ## _deviceSIndexToGlobalInt4; opposite-site test on the global raw
+    ## coordinate). Uses EFIT_Random gauge (decomposition-invariant), evaluates the action energy
+    ## (Allreduced global) and the MD force field (gathered to rank 0, MD5).
+    ## Compare for -n1 vs -nN: energy (DOUBLE tol) and force MD5 (bitwise).
+    ## Decomposed via runtest.sh (metadata grid below). The action
+    ## parameters mirror TestRotationQuenched3D (TestSuit_Rotation.yaml).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialFieldWithFile in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquetteRotating3D
+        CloverEnergy : 1
+        ShiftCoord : 1
+        Beta : 12.0
+        Omega : 0.2
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+
+
+
+TestMGRotatingActionConsistencyRotating:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    ## Multi-GPU Phase 4 (P4-1.3): same 1-vs-N check as
+    ## TestMGRotatingActionConsistency but for CActionGaugePlaquetteRotating
+    ## (live implementation: CActionGaugePlaquetteRotatingT<deviceSU3,3> in
+    ## CActionGaugePlaquetteRotatingT.cu; CActionGaugePlaquetteRotating.cu/.h are
+    ## #if-0 dead files, not in the build). Parameters mirror the production
+    ## torus+shifted config in TestSuit_Rotation.yaml. EFIT_Random gauge
+    ## (global-seeded, decomposition-invariant); a cold config would be blind.
+    ## Compare for -n1 vs -nN: energy (DOUBLE tol) and force MD5 (bitwise).
+    ## Decomposed via runtest.sh (metadata grid below).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialField(EFIT_Random) in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquetteRotating
+        Torus : 1
+        ShiftCoord : 1
+        Beta : 6.0
+        Omega : 0.033
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+
+
+
+TestMGRotatingActionConsistencyRigidAcc:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    ## Multi-GPU Phase 4 (P4-1.4): 1-vs-N for CActionGaugePlaquetteRigidAcc
+    ## (f(n) = 1 + g z needs the GLOBAL z; the z-wrap and Dirichlet surface
+    ## tests in _deviceGnRigidAcc* use the global extent; force path refills
+    ## the gauge halo explicitly; energy is Allreduced). EFIT_Random gauge.
+    ## Compare for -n1 vs -nN: energy (DOUBLE tol) and force MD5 (bitwise).
+    ## Decomposed via runtest.sh (metadata grid below).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialField(EFIT_Random) in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquetteRigidAcc
+        Beta : 5.7
+        AccG : 0.1
+        Dirichlet : 0
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+
+
+
+TestMGRotatingActionConsistencyBoost:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    ## Multi-GPU Phase 4 (P4-1.4): 1-vs-N for CActionGaugePlaquetteBoost. The
+    ## boost factor is coordinate-free (constant), so this covers the energy
+    ## Allreduce and gauge-halo paths only. EFIT_Random gauge. Compare for
+    ## -n1 vs -nN: energy (DOUBLE tol) and force MD5 (bitwise). Decomposed
+    ## via runtest.sh (metadata grid below).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialField(EFIT_Random) in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquetteBoost
+        Beta : 5.0
+        Boost : 0.1
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+
+
+
+TestMGRotatingActionConsistencyCylinder:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    ## Multi-GPU Phase 4 (P4-1.5): 1-vs-N for CActionGaugePlaquetteCylinder.
+    ## The radial coordinate (r = x) and the per-bin beta index must be GLOBAL;
+    ## the beta array is built over the global radial range and the boundary
+    ## logic uses the global extent. EFIT_Random gauge (decomposition-invariant).
+    ## Compare for -n1 vs -nN: energy (DOUBLE tol) and force MD5 (bitwise).
+    ## Decomposed via runtest.sh (metadata grid below).
+    ## RStart/Beta mirror TestUpdatorCylinder
+    ## (TestSuit_Updator.yaml); the Beta list pads to the x extent with the last
+    ## value (all 3 here).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialField(EFIT_Random) in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquetteCylinder
+        RStart : 1.0
+        CloverEnergy : 1
+        Beta : [3, 3, 3, 3]
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [2, 1, 1, 1]
+
+
+
+TestMGRotatingActionMeasureConsistency:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## Multi-GPU Phase 4 (P4-1.6): CMeasureRotatingAction 1-vs-N.
+    ## The measurement forwards to the rotating action energy path (P4-1.3
+    ## globalized: gauge-halo refill + energy Allreduce); S0/S1/S2 are
+    ## Allreduced too (P4-1.6). EFIT_Random gauge (decomposition-invariant).
+    ## Compare for -n1 vs -nN: the four scalars (DOUBLE tol). Decomposed
+    ## via runtest.sh (metadata grid below).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialField(EFIT_Random) in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 5.35
+        Omega : 0.3
+
+    Measure1:
+        MeasureName : CMeasureRotatingAction
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+
+
+
+TestMGPolyakovXY:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## Multi-GPU Phase 4 (P4-3.3): CMeasurePolyakovXY 1-vs-N.
+    ## The T-direction Polyakov chain must be complete per rank, so the grid
+    ## splits Z (not t): the metadata grid below is [1,1,2,1] (z split, t complete).
+    ## P4-3.3 globalized the XY density / loop average / slice reductions.
+    ## Split-x/y (XY distribution) and split-z (Z slice / loopZ) are rejected.
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialField(EFIT_Random) in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 5.35
+
+    Measure1:
+        MeasureName : CMeasurePolyakovXY
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 2, 1]
+
+
+
+TestMGMesonCorrelatorSimple2:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## The KS fermion uses the Naik 3-hop path, which needs a 3-wide halo on a
+    ## decomposed lattice (BakeNaikTable fails fast otherwise, I8 guard).
+    HaloWidth : 3
+
+    ## Multi-GPU Phase 4 (P4-3.6): CMeasureMesonCorrelatorStaggeredSimple2
+    ## 1-vs-N. The test drives the measurement directly; the per-t/x/y slice
+    ## profiles are Allreduced (P4-3.6); split z only (t/x/y complete).
+    ## The metadata grid below splits z.
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorOmelyan
+        IntegratorStepLength : 1
+        IntegratorStep : 5
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        Period : [1, 1, 1, 1]
+
+    FermionField1:
+        FieldName : CFieldFermionKSSU3
+        FieldInitialType : EFIT_RandomGaussian
+        ## 2am
+        Mass : 0.2
+        FieldId : 2
+        PoolNumber : 10
+        Period : [1, 1, 1, -1]
+
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 15
+        Accuracy : 0.000001
+        Restart : 100
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 20
+        MaxStep : 500
+        Accuracy : 0.001
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 5.35
+
+    Action2:
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Measure1:
+        MeasureName : CMeasureMesonCorrelatorStaggeredSimple2
+        ShowResult : 0
+        FieldId : 2
+        Source : EFS_Wall
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 2, 1]
+
+
+
+TestMGPandChiralTalor:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## Multi-GPU Phase 4 (P4-3.7): CMeasurePandChiralTalor 1-vs-N.
+    ## The SingleField path needs only the gauge. The omega kernels use GLOBAL
+    ## coordinates (P4-3.7); the t-loop product is complete when t is not split,
+    ## so the grid splits z: the metadata grid below is [1,1,2,1].
+    ## Compare the printed poly/omega/omegasq scalars for -n1 vs -nN.
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialField(EFIT_Random) in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 5.35
+        Omega : 0.3
+
+    Measure1:
+        MeasureName : CMeasurePandChiralTalor
+        FieldId : 1
+        FieldCount : 1
+        ShowResult : 0
+        MeasureDist : 0
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 2, 1]
+
+
+
+TestMGTopologicChargeXY:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## Multi-GPU Phase 4 (P4-3.8): CMeasureTopologicChargeXY 1-vs-N.
+    ## The charge is the local partial sum; P4-3.8 Allreduces it and the XY
+    ## density (split x/y rejected). The metadata grid below splits z ([1,1,2,1]).
+    ## Compare the printed charge for -n1 vs -nN (DOUBLE tol).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialField(EFIT_Random) in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 5.35
+
+    Measure1:
+        MeasureName : CMeasureTopologicChargeXY
+        ShowResult : 0
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]
+
+
+
+TestMGWilsonLoopWithPath:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## Multi-GPU Phase 4 (P4-3.9): CMeasureWilsonLoopWithPath 1-vs-N.
+    ## Cross-rank paths work via the refilled gauge halo; the path below
+    ## (z+1, z-1, net zero, span 1) crosses the split-z boundary on the
+    ## [1,1,2,1] metadata grid below; default [1,1,1,1] safe (n1 baseline),
+    ## decomposed via runtest.sh.
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialField(EFIT_Random) in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 5.35
+
+    ## The cross-rank walk needs a valid halo (span 1 in z); the default halo
+    ## width is 0 until CLGComm initializes, so set it explicitly.
+    HaloWidth : 2
+
+    Measure1:
+        MeasureName : CMeasureWilsonLoopWithPath
+        ShowResult : 0
+        Path : [3, -3]
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 2, 1]
+
+
+
+TestMGCompressedSaveLoad:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    ## Seedable, decomposition-invariant generator so EFIT_Random draws the
+    ## same global field on -n1 vs -nN. Fixed seed for repro.
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    ## Multi-GPU Phase 4 (P5-1.3): compressed save/load round-trip 1-vs-N.
+    ## EFIT_Random -> compressed save (rank 0 gathers in global-site order) ->
+    ## scatter-aware compressed loader reloads -> save again. The driver
+    ## compares both printed MD5s for -n1 vs -nN; the two MD5s WITHIN one run
+    ## may differ on the float build (StrictLog/StrictExp residual, same as the
+    ## single-GPU TestFileIOCLGCompressed).
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        ## Overwritten by InitialField(EFIT_Random) in the test; placeholder.
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    MultiGPUTestRankCount : 2
+    MultiGPUTestGrid : [1, 1, 1, 2]

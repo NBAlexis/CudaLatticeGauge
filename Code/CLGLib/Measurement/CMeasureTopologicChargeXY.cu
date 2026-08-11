@@ -38,7 +38,7 @@ _kernelTopoChargeClover(
 #endif
     if (!__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
     {
-        fRes = _deviceTopologicalCharge(pDeviceBuffer, byFieldId, sSite4, uiN);
+        fRes = _deviceTopologicalChargeT(pDeviceBuffer, byFieldId, sSite4, uiN);
     }
 
     pResBuffer[uiSiteIndex] = fRes;
@@ -75,7 +75,7 @@ CMeasureTopologicChargeXY::~CMeasureTopologicChargeXY()
 
     if (NULL != m_pXYDeviceDensity)
     {
-        checkCudaErrors(cudaFree(m_pXYDeviceDensity));
+        checkCudaErrors(__cudaFree(m_pXYDeviceDensity));
     }
 }
 
@@ -84,7 +84,7 @@ void CMeasureTopologicChargeXY::Initial(CMeasurementManager* pOwner, CLatticeDat
     CMeasure::Initial(pOwner, pLatticeData, param, byId);
 
     m_pXYHostDensity = (Real*)malloc(sizeof(Real) * _HC_Lx * _HC_Ly);
-    checkCudaErrors(cudaMalloc((void**)&m_pXYDeviceDensity, sizeof(Real) * _HC_Lx * _HC_Ly));
+    checkCudaErrors(__cudaMalloc((void**)&m_pXYDeviceDensity, sizeof(Real) * _HC_Lx * _HC_Ly));
 
     Reset();
 }
@@ -99,18 +99,36 @@ void CMeasureTopologicChargeXY::OnConfigurationAcceptedSingleField(const CFieldG
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
 
     preparethread;
-    _kernelTopoChargeClover << <block, threads >>>(pGaugeSU3->m_pDeviceData, pGaugeSU3->m_byFieldId, _D_RealThreadBuffer);
+    _LAUNCH_KERNEL(_kernelTopoChargeClover, block, threads, pGaugeSU3->m_pDeviceData, pGaugeSU3->m_byFieldId, _D_RealThreadBuffer);
 
     _ZeroXYPlane(m_pXYDeviceDensity);
-    _kernelTopoChargeSumOverZT<<<block, threads>>>(_D_RealThreadBuffer, m_pXYDeviceDensity);
+    _LAUNCH_KERNEL(_kernelTopoChargeSumOverZT, block, threads, _D_RealThreadBuffer, m_pXYDeviceDensity);
 
     checkCudaErrors(cudaMemcpy(m_pXYHostDensity, m_pXYDeviceDensity, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
+#if _CLG_MULTI_GPU
+    //P4-3.8: ThreadBufferSum is the LOCAL partial charge; the XY density holds
+    //per-rank partials over the local z/t extent. Sum both across ranks so the
+    //reported charge/density are global. Requires x/y NOT split (same (x,y)
+    //index set per rank).
+    if (NULL != appGetComm())
+    {
+        if (appGetComm()->GpuGrid()[0] > 1 || appGetComm()->GpuGrid()[1] > 1)
+        {
+            appCrucial(_T("CMeasureTopologicChargeXY: not supported on multi-GPU with a split x/y direction. Rejected.\n"));
+            return;
+        }
+        GlobalSumRealArray(m_pXYHostDensity, _HC_Lx * _HC_Ly);
+    }
+#endif
 
 #if !_CLG_DOUBLEFLOAT
-    const Real fCharge = static_cast<Real>(appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer));
+    Real fCharge = static_cast<Real>(appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer));
 #else
-    const Real fCharge = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+    Real fCharge = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 #endif
+    DOUBLE dCharge = static_cast<DOUBLE>(fCharge);
+    GlobalSumReal(dCharge);
+    fCharge = static_cast<Real>(dCharge);
 
     ++m_uiConfigurationCount;
     if (m_bShowResult)
@@ -139,12 +157,29 @@ void CMeasureTopologicChargeXY::OnConfigurationAcceptedSingleField(const CFieldG
     {
         appDetailed(_T("\n=====================================================\n"), m_uiConfigurationCount);
     }
+
+    if (NULL != m_pOwner)
+    {
+        m_pOwner->AddOneConfigurationResult(this, _T("Charge"), fCharge);
+
+        TArray<TArray<Real>> xyPlaneDensity;
+        for (UINT i = 0; i < _HC_Lx; ++i)
+        {
+            TArray<Real> row;
+            for (UINT j = 0; j < _HC_Ly; ++j)
+            {
+                row.AddItem(m_pXYHostDensity[i * _HC_Ly + j]);
+            }
+            xyPlaneDensity.AddItem(row);
+        }
+        m_pOwner->AddOneConfigurationResult(this, _T("XYPlaneDensity"), xyPlaneDensity);
+    }
 }
 
 void CMeasureTopologicChargeXY::Report()
 {
     Average();
-    assert(m_uiConfigurationCount * (_HC_Lx - 1) * (_HC_Ly - 1) == static_cast<UINT>(m_lstXYDensity.Num()));
+    appAssert(m_uiConfigurationCount * (_HC_Lx - 1) * (_HC_Ly - 1) == static_cast<UINT>(m_lstXYDensity.Num()));
 
     appPushLogDate(FALSE);
 

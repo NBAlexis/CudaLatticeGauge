@@ -6,6 +6,7 @@
 // We assume this is only use for initialize, so we do not care the speed
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/12/2018 nbale]
 //=============================================================================
 
@@ -42,7 +43,7 @@ inline THashMap<CCString, INT> appGetEnumTable(const CCString &inGatheredEnum)
         TArray <INT> inSeps2;
         inSeps2.AddItem(_T('='));
         TArray <CCString> sEnumArray2 = appGetStringList(sEnumArray[i], inSeps2, EGSLF_IgnorTabSpaceInSide | EGSLF_IgnorEmety);
-        assert(1 == sEnumArray2.Num() || 2 == sEnumArray2.Num());
+        appAssert(1 == sEnumArray2.Num() || 2 == sEnumArray2.Num());
         if (2 == sEnumArray2.Num())
             iCurrentNum = appStrToINT(sEnumArray2[1]);
         else
@@ -77,7 +78,7 @@ inline CCString appEnumToStringEabc(Eabc v)
         TArray <INT> inSeps2;
         inSeps2.AddItem(_T('='));
         TArray <CCString> sEnumArray2 = appGetStringList(sEnumArray[i], inSeps2, EGSLF_IgnorTabSpaceInSide | EGSLF_IgnorEmety);
-        assert(1 == sEnumArray2.Num() || 2 == sEnumArray2.Num());
+        appAssert(1 == sEnumArray2.Num() || 2 == sEnumArray2.Num());
         if (2 == sEnumArray2.Num())
         {
             iCurrentNum = appStrToINT(sEnumArray2[1]);
@@ -91,14 +92,14 @@ inline CCString appEnumToStringEabc(Eabc v)
             return sEnumArray2[0];
         }
     }
-    assert(FALSE);
+    appAssert(FALSE);
     return "";
 }
 
 inline Eabc appStringToEnumEabc(const CCString& s)
 {
     THashMap<CCString, INT> theTable = appGetEnumTable(_T("    Ex = 0,\n        Ey,\n        Ec = 0x77, "));
-    assert(theTable.Exist(s));
+    appAssert(theTable.Exist(s));
     return (Eabc)theTable[s];
 }
 
@@ -119,7 +120,7 @@ __END_NAMESPACE
         TArray <INT> inSeps2; \
         inSeps2.AddItem(_T('=')); \
         TArray <CCString> sEnumArray2 = appGetStringList(sEnumArray[i], inSeps2, EGSLF_IgnorTabSpaceInSide | EGSLF_IgnorEmety); \
-        assert(1 == sEnumArray2.Num() || 2 == sEnumArray2.Num()); \
+        appAssert(1 == sEnumArray2.Num() || 2 == sEnumArray2.Num()); \
         if (2 == sEnumArray2.Num()) \
         { \
             iCurrentNum = appStrToINT(sEnumArray2[1]); \
@@ -133,13 +134,13 @@ __END_NAMESPACE
             return sEnumArray2[0]; \
         } \
     } \
-    assert(FALSE); \
+    appAssert(FALSE); \
     return ""; \
 } \
 inline enumname appStringToEnum##enumname(const CCString& s) \
 { \
     THashMap<CCString, INT> theTable = appGetEnumTable(_T(#__VA_ARGS__)); \
-    assert(theTable.Exist(s)); \
+    appAssert(theTable.Exist(s)); \
     return (enumname)theTable[s]; \
 }
 

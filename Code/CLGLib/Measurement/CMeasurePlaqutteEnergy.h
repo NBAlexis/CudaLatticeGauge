@@ -19,13 +19,21 @@ class CLGAPI CMeasurePlaqutteEnergy : public CMeasure
 {
     __CLGDECLARE_CLASS(CMeasurePlaqutteEnergy)
 public:
-    CMeasurePlaqutteEnergy() : CMeasure() {}
+    CMeasurePlaqutteEnergy() 
+        : CMeasure() 
+        , m_bV0(FALSE)
+    {
+    }
 
     void OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
+    void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters& param, BYTE byId) override;
     void Report() override;
 
     UBOOL IsGaugeOrBosonMeasurement() const override { return TRUE; }
     UBOOL IsSourceScanning() const override { return FALSE; }
+
+    UBOOL m_bV0;
+    TArray<DOUBLE> m_lstV0;
 };
 
 __END_NAMESPACE

@@ -5,6 +5,7 @@
 // This is the class for the spin fields
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [07/20/2024 nbale]
 //=============================================================================
 
@@ -90,6 +91,8 @@ _kernelDBosonVN(
     case EOCT_Complex:
         _mul(pResultData[uiSiteIndex], cCmpCoeff);
         break;
+    default:
+        break;
     }
 }
 
@@ -128,15 +131,14 @@ _kernelDBosonForceVN(
 
         const deviceDataBoson& phi_p_mu = pBoson[x_p_mu_Boson.m_uiSiteIndex];
 
-        const deviceDataGauge& x_Gauge_element = pGauge[linkIndex];
+        //const deviceDataGauge& x_Gauge_element = pGauge[linkIndex];
 
         //U phi(n+mu)phi^+(n)
-        deviceDataGauge forceOfThisLink = _makeContract<deviceDataGauge, deviceDataBoson>(phi_dagger, _mulVec<deviceDataGauge, deviceDataBoson>(x_Gauge_element, phi_p_mu));
+        deviceDataGauge forceOfThisLink = _makeContract<deviceDataGauge, deviceDataBoson>(phi_p_mu, phi_dagger);
 
         //TA
         //pForce[linkIndex] = _cuCsubf(pForce[linkIndex], _make_cuComplex(F(0.0), forceOfThisLink.x));
         //pGaugeForce[linkIndex].y = pGaugeForce[linkIndex].y - F(1.0) * forceOfThisLink.y;
-        _ta<deviceDataGauge>(forceOfThisLink);
         _sub(pGaugeForce[linkIndex], forceOfThisLink);
     }
 }
@@ -151,7 +153,7 @@ _kernelBosonOneLink(
     BYTE byGaugeFieldId,
     DOUBLE fCoefficient,
     _deviceCoeffFunctionPointerTwoSites pfcoeff,
-    const INT* __restrict__ path,
+    const SCHAR* __restrict__ path,
     BYTE pathLength,
     EOperatorCoefficientType eCoeff,
     Real fCoeff,
@@ -166,7 +168,7 @@ _kernelBosonOneLink(
         return;
     }
 
-    INT pathBuffer[_kLinkMaxLength];
+    SCHAR pathBuffer[_kLinkMaxLength];
     deviceDataBoson result = _makeZero<deviceDataBoson>();
     SSmallInt4 siten = _deviceSmallInt4OffsetC(sSite4, path, pathLength);
     const SIndex& sn1 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siten)];
@@ -203,6 +205,8 @@ _kernelBosonOneLink(
     case EOCT_Complex:
         _mul(result, cCoeff);
         break;
+    default:
+        break;
     }
 
     _add(pResultData[uiSiteIndex], result);
@@ -218,7 +222,7 @@ _kernelBosonForce_WithLink(
     BYTE byGaugeFieldId,
     DOUBLE fCoefficient,
     _deviceCoeffFunctionPointerTwoSites pfcoeff,
-    const INT* __restrict__ path,
+    const SCHAR* __restrict__ path,
     BYTE pathLength)
 {
     intokernalInt4;
@@ -229,8 +233,8 @@ _kernelBosonForce_WithLink(
         return;
     }
 
-    INT pathLeft[_kLinkMaxLength];
-    INT pathRight[_kLinkMaxLength];
+    SCHAR pathLeft[_kLinkMaxLength];
+    SCHAR pathRight[_kLinkMaxLength];
 
 
     for (BYTE iSeperation = 0; iSeperation <= pathLength; ++iSeperation)
@@ -257,24 +261,32 @@ _kernelBosonForce_WithLink(
 
                 //=================================
                 // 2. Find V(n,n1), V(n,n2)
-                const deviceGauge vnn1 = _deviceLinkT(pGauge, sSite4, LLength, byGaugeFieldId, pathLeft);
-                const deviceGauge vnn2 = _deviceLinkT(pGauge, sSite4, RLength, byGaugeFieldId, pathRight);
-
-                deviceDataBoson phi1 = _mulVec(vnn1, pBoson[sn1.m_uiSiteIndex]);
-                deviceDataBoson phi2 = _mulVec(vnn2, pBoson[sn2.m_uiSiteIndex]);
-
-                deviceGauge res = _makeContract<deviceGauge, deviceDataBoson>(phi1, phi2);
-                _ta(res);
-                _mul(res, fCoeff);
-
                 if (bHasLeft)
                 {
+                    const deviceGauge vnn1 = _deviceLinkTSkipOne(pGauge, sSite4, LLength, byGaugeFieldId, pathLeft);
+                    const deviceGauge vnn2 = _deviceLinkT(pGauge, sSite4, RLength, byGaugeFieldId, pathRight);
+
+                    const deviceDataBoson phi1 = (LLength > 1) ? _mulVec(vnn1, pBoson[sn1.m_uiSiteIndex]) : pBoson[sn1.m_uiSiteIndex];
+                    const deviceDataBoson phi2 = (RLength > 0) ? _mulVec(vnn2, pBoson[sn2.m_uiSiteIndex]) : pBoson[sn2.m_uiSiteIndex];
+
+                    deviceGauge res = _makeContract<deviceGauge, deviceDataBoson>(phi1, phi2);
+                    _mul(res, fCoeff);
+
                     const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, pathLeft[0] - 1);
-                    _add(pForce[linkIndex], res);
+                    _sub(pForce[linkIndex], res);
                 }
 
                 if (bHasRight)
                 {
+                    const deviceGauge vnn1 = _deviceLinkT(pGauge, sSite4, LLength, byGaugeFieldId, pathLeft);
+                    const deviceGauge vnn2 = _deviceLinkTSkipOne(pGauge, sSite4, RLength, byGaugeFieldId, pathRight);
+
+                    const deviceDataBoson phi1 = (LLength > 0) ? _mulVec(vnn1, pBoson[sn1.m_uiSiteIndex]) : pBoson[sn1.m_uiSiteIndex];
+                    const deviceDataBoson phi2 = (RLength > 1) ? _mulVec(vnn2, pBoson[sn2.m_uiSiteIndex]) : pBoson[sn2.m_uiSiteIndex];
+
+                    deviceGauge res = _makeContract<deviceGauge, deviceDataBoson>(phi2, phi1);
+                    _mul(res, fCoeff);
+
                     const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, pathRight[0] - 1);
                     _sub(pForce[linkIndex], res);
                 }
@@ -282,47 +294,6 @@ _kernelBosonForce_WithLink(
         }
     }
 }
-
-/**
-* f(x) phi^*(x)phi(x)
-*/
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelBosonDiagnal(
-    const deviceDataBoson* __restrict__ pDeviceData,
-    deviceDataBoson* pResultData,
-    BYTE byFieldId,
-    DOUBLE fCoefficient,
-    _deviceCoeffFunctionPointer pfcoeff,
-    EOperatorCoefficientType eCoeff,
-    Real fCoeff,
-    CLGComplex cCoeff)
-{
-    intokernalInt4;
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex& sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    if (sIdx.IsDirichlet())
-    {
-        pResultData[uiSiteIndex] = _makeZero<deviceDataBoson>();
-        return;
-    }
-
-    const Real fCoefficient1 = (*pfcoeff)(byFieldId, sSite4, sIdx) * fCoefficient;
-    deviceDataBoson result = _mulC(pDeviceData[uiSiteIndex], fCoefficient1);
-
-    switch (eCoeff)
-    {
-    case EOCT_Real:
-        _mul(result, fCoeff);
-        break;
-    case EOCT_Complex:
-        _mul(result, cCoeff);
-        break;
-    }
-
-    _add(pResultData[uiSiteIndex], result);
-}
-
 
 /**
 * f(n) U_mu(n)phi(n+mu) + f(n-mu) U_{-mu}(n)phi(n-mu)
@@ -343,7 +314,7 @@ _kernelDPartialBosonVN(
     CLGComplex cCmpCoeff,
     BYTE byFieldId)
 {
-    intokernalInt4;
+    intokernalInt4NoConstant;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex& sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (sIdx.IsDirichlet())
@@ -396,6 +367,8 @@ _kernelDPartialBosonVN(
     case EOCT_Complex:
         _mul(result, cCmpCoeff);
         break;
+    default:
+        break;
     }
 
     _add(pResultData[uiSiteIndex], result);
@@ -436,29 +409,28 @@ _kernelDPartialBosonForceVN(
 
     const deviceDataBoson& phi_p_mu = pBoson[x_p_mu_Boson.m_uiSiteIndex];
 
-    const deviceDataGauge& x_Gauge_element = pGauge[linkIndex];
+    //const deviceDataGauge& x_Gauge_element = pGauge[linkIndex];
 
     //U phi(n+mu)phi^+(n)
-    deviceDataGauge forceOfThisLink = _makeContract<deviceDataGauge, deviceDataBoson>(phi_dagger, _mulVec<deviceDataGauge, deviceDataBoson>(x_Gauge_element, phi_p_mu));
+    deviceDataGauge forceOfThisLink = _makeContract<deviceDataGauge, deviceDataBoson>(phi_p_mu, phi_dagger);
     const Real fCoefficient1 = (*pfcoeff)(byFieldId, sSite4, sIdx) * fCoefficient;
     _mul(forceOfThisLink, fCoefficient1);
     //TA
     //pForce[linkIndex] = _cuCsubf(pForce[linkIndex], _make_cuComplex(F(0.0), forceOfThisLink.x));
     //pGaugeForce[linkIndex].y = pGaugeForce[linkIndex].y - F(1.0) * forceOfThisLink.y;
-    _ta<deviceDataGauge>(forceOfThisLink);
     _sub(pGaugeForce[linkIndex], forceOfThisLink);
 }
 
 #pragma endregion
 
 template<typename deviceDataBoson, typename deviceDataGauge>
-UINT CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CheckHermitian(const CFieldBoson* data, UINT uiSiteCount, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson)
+UINT CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CheckHermitian(const CFieldBoson* data, UINT uiSiteCount, INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const CFieldTensor2* const* tensor2Fields)
 {
     const UINT uiVolume = uiSiteCount;
     const UINT uiRealVolume = data->VectorN() * uiVolume;
     CLGComplex* matrixElement = (CLGComplex*)malloc(sizeof(CLGComplex) * uiRealVolume * uiRealVolume);
     deviceDataBoson* hostData = (deviceDataBoson*)malloc(sizeof(deviceDataBoson) * uiVolume);
-    CFieldBosonVN<deviceDataBoson, deviceDataGauge>* v = dynamic_cast<CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(appGetLattice()->GetPooledFieldById(data->m_byFieldId));
+    CFieldBosonVN<deviceDataBoson, deviceDataGauge>* v = dynamic_cast<CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(appGetLattice()->GetPooledFieldById(data->m_byFieldId, _T(__FILE__), __LINE__));
 
     for (UINT i = 0; i < uiVolume; ++i)
     {
@@ -470,7 +442,7 @@ UINT CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CheckHermitian(const
             source.m_eSourceType = EFS_Point;
             source.m_sSourcePoint = point;
             v->InitialAsSource(source);
-            v->D(gaugeNum, bosonNum, gaugeFields, pBoson);
+            v->D(gaugeNum, bosonNum, tensor2Num, gaugeFields, pBoson, tensor2Fields);
 
             checkCudaErrors(cudaMemcpy(hostData, v->m_pDeviceData, sizeof(deviceDataBoson) * uiVolume, cudaMemcpyDeviceToHost));
 
@@ -525,7 +497,7 @@ template<typename deviceDataBoson, typename deviceDataGauge>
 void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::ForceOnGauge(const deviceDataBoson* data, BYTE byFieldId, BYTE byGaugeFieldId, const deviceDataGauge* gaugedata, deviceDataGauge* force)
 {
     preparethread;
-    _kernelDBosonForceVN << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDBosonForceVN TMPARG(deviceDataBoson, deviceDataGauge), block, threads,
         data,
         gaugedata,
         appGetLattice()->m_pIndexCache->m_pMoveCache[byFieldId],
@@ -539,11 +511,11 @@ void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::ForceOnGauge(const d
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::DFromSource(const deviceDataBoson* source, deviceDataBoson* target, BYTE byFieldId, BYTE byGaugeFieldId, const deviceDataGauge* gaugedata, 
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::DFromSource(const deviceDataBoson* source, deviceDataBoson* target, BYTE byFieldId, BYTE byGaugeFieldId, const deviceDataGauge* gaugedata,
     EOperatorCoefficientType eCoeffType, Real fRealCoeff, const CLGComplex& cCompCoeff)
 {
     preparethread;
-    _kernelDBosonVN << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDBosonVN TMPARG(deviceDataBoson, deviceDataGauge), block, threads,
         source,
         gaugedata,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[byFieldId],
@@ -556,26 +528,6 @@ void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::DFromSource(const de
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::DiagnalTerm(
-    deviceDataBoson* pTarget,
-    BYTE byFieldId,
-    const deviceDataBoson* pSource, DOUBLE fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff,
-    EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
-{
-    preparethread;
-    _kernelBosonDiagnal << <block, threads >> > (
-        pSource,
-        pTarget,
-        byFieldId,
-        fCoeffiecient,
-        fpCoeff,
-        eOCT,
-        fRealCoeff,
-        cCmpCoeff
-        );
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
 void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::OneLink(
     deviceDataBoson* pTarget,
     BYTE byFieldId,
@@ -584,15 +536,15 @@ void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::OneLink(
     BYTE byGaugeFieldId,
     DOUBLE fCoefficient,
     _deviceCoeffFunctionPointerTwoSites fpCoeff,
-    const INT* pDevicePath,
+    const SCHAR* pDevicePath,
     BYTE pathLength,
     EOperatorCoefficientType eOCT,
     Real fRealCoeff,
     const CLGComplex& cCmpCoeff)
 {
-    assert(pathLength <= _kLinkMaxLength);
+    appAssert(pathLength <= _kLinkMaxLength);
     preparethread;
-    _kernelBosonOneLink << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelBosonOneLink TMPARG(deviceDataBoson, deviceDataGauge), block, threads,
         pSource,
         pGauge,
         pTarget,
@@ -617,12 +569,12 @@ void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::OneLinkForceGauge(
     deviceDataGauge* pForce,
     DOUBLE fCoefficient,
     _deviceCoeffFunctionPointerTwoSites fpCoeff,
-    const INT* pDevicePath,
+    const SCHAR* pDevicePath,
     BYTE pathLength)
 {
-    assert(pathLength <= _kLinkMaxLength);
+    appAssert(pathLength <= _kLinkMaxLength);
     preparethread;
-    _kernelBosonForce_WithLink << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelBosonForce_WithLink TMPARG(deviceDataBoson, deviceDataGauge), block, threads,
         pGauge,
         pForce,
         pBoson,
@@ -650,7 +602,7 @@ void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::PartialSq(
     const CLGComplex& cCmpCoeff)
 {
     preparethread;
-    _kernelDPartialBosonVN << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDPartialBosonVN TMPARG(deviceDataBoson, deviceDataGauge), block, threads,
         pSource,
         pGauge,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[byFieldId],
@@ -678,7 +630,7 @@ void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::PartialSqForceGauge(
     BYTE idir)
 {
     preparethread;
-    _kernelDPartialBosonForceVN << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDPartialBosonForceVN TMPARG(deviceDataBoson, deviceDataGauge), block, threads,
         pBoson,
         pGauge,
         appGetLattice()->m_pIndexCache->m_pMoveCache[byFieldId],
@@ -692,21 +644,21 @@ void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::PartialSqForceGauge(
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::AllocatePathBuffer(INT** pathbuffer)
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::AllocatePathBuffer(SCHAR** pathbuffer)
 {
-    checkCudaErrors(cudaMalloc((void**)pathbuffer, sizeof(INT) * _kLinkMaxLength));
+    checkCudaErrors(__cudaMalloc((void**)pathbuffer, sizeof(SCHAR) * _kLinkMaxLength));
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::FreePathBuffer(INT* pathbuffer)
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::FreePathBuffer(SCHAR* pathbuffer)
 {
-    checkCudaErrors(cudaFree(pathbuffer));
+    checkCudaErrors(__cudaFree(pathbuffer));
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyPathBuffer(INT* devicepathbuffer, const INT* hostpathbuffer, BYTE length)
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyPathBuffer(SCHAR* devicepathbuffer, const SCHAR* hostpathbuffer, BYTE length)
 {
-    checkCudaErrors(cudaMemcpy(devicepathbuffer, hostpathbuffer, sizeof(INT) * length, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(devicepathbuffer, hostpathbuffer, sizeof(SCHAR) * length, cudaMemcpyHostToDevice));
 }
 
 #pragma region rotation
@@ -1327,14 +1279,26 @@ void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCyS
 
 #pragma endregion
 
+template class CFieldBosonVNKernel<Real, Real>;
 template class CFieldBosonVNKernel<CLGComplex, CLGComplex>;
 template class CFieldBosonVNKernel<deviceSU2Vector, deviceSU2>;
 template class CFieldBosonVNKernel<deviceSU3Vector, deviceSU3>;
+
+#if _CLG_SU4_BOSON
 template class CFieldBosonVNKernel<deviceSU4Vector, deviceSU4>;
+#endif
+#if _CLG_SU5_BOSON
 template class CFieldBosonVNKernel<deviceSU5Vector, deviceSU5>;
+#endif
+#if _CLG_SU6_BOSON
 template class CFieldBosonVNKernel<deviceSU6Vector, deviceSU6>;
+#endif
+#if _CLG_SU7_BOSON
 template class CFieldBosonVNKernel<deviceSU7Vector, deviceSU7>;
+#endif
+#if _CLG_SU8_BOSON
 template class CFieldBosonVNKernel<deviceSU8Vector, deviceSU8>;
+#endif
 
 __END_NAMESPACE
 

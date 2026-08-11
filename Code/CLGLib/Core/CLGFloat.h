@@ -5,6 +5,7 @@
 // Add precsion for floats
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/15/2018 nbale]
 //=============================================================================
 #pragma once
@@ -25,6 +26,7 @@
 #define _hostlog log
 #define _hostlog10 log10
 #define _hostexp exp
+#define _hostexpd exp
 #define _hostsqrt sqrt
 
 #define _atan2 atan2
@@ -139,9 +141,12 @@
 #define _CLG_FLT_RADIX        2                       // exponent radix
 #define _CLG_FLT_TRUE_MIN     1.401298464e-45F        // min positive value
 
+#define _CLG_FLT_EPSILON_DOUBLE_ 2.2204460492503131e-016
+
 #endif
 
 #define _zeroc (_make_cuComplex(F(0.0), F(0.0)))
+#define _zerocd (make_cuDoubleComplex(0.0, 0.0))
 #define _onec (_make_cuComplex(F(1.0), F(0.0)))
 #define _imgc (_make_cuComplex(F(0.0), F(1.0)))
 //Those are constants we are using
@@ -152,6 +157,7 @@
 
 // - 1/4294967296UL
 #define AM (F(0.00000000023283064365386963))
+#define AMD (0.00000000023283064365386963)
 // - _sqrt(2)
 #define SQRT2 (F(1.4142135623730951))
 // - 1 / _sqrt(2), or _sqrt(2)/2
@@ -241,6 +247,18 @@ static __host__ __device__ __inline__ CLGComplex _cToRealC(const cuComplex& c)
 #else
     return c;
 #endif
+}
+
+//std::isnan does not work on some platform
+inline UBOOL is_nan_bitwise_robust(DOUBLE x)
+{
+    ULONGLONG bits;
+    std::memcpy(&bits, &x, sizeof(x));
+
+    const ULONGLONG exponent_mask = 0x7FF0000000000000;
+    const ULONGLONG fraction_mask = 0x000FFFFFFFFFFFFF;
+
+    return ((bits & exponent_mask) == exponent_mask) && ((bits & fraction_mask) != 0);
 }
 
 __END_NAMESPACE

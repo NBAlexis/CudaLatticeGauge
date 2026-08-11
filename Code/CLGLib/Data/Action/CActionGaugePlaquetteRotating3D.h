@@ -9,6 +9,7 @@
 // REVISION:
 //  [27/10/2022 nbale]
 //=============================================================================
+#if 0
 #include "CActionGaugePlaquetteRotating.h"
 
 #ifndef _CACTIONGAUGEPLAQUETTE_ROTATING3D_H_
@@ -36,7 +37,7 @@ protected:
 __END_NAMESPACE
 
 #endif //#ifndef _CACTIONGAUGEPLAQUETTE_ROTATING_H_
-
+#endif
 //=============================================================================
 // END OF FILE
 //=============================================================================

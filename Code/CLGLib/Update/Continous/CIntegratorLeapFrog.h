@@ -5,6 +5,7 @@
 // This is the Leap frog integrator for HMC
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/11/2018 nbale]
 //=============================================================================
 
@@ -27,7 +28,7 @@ public:
     void Evaluate() override
     {
         const Real fHalfPstep = F(0.5) * m_fEStep;
-        UpdateP(fHalfPstep, FALSE, ESP_StartTrajectory);
+        UpdateP(fHalfPstep,  ESP_StartTrajectory);
         appDetailed("  leap frog sub step 0\n");
 
         for (UINT uiStep = 1; uiStep < m_uiStepCount + 1; ++uiStep)
@@ -36,12 +37,12 @@ public:
 
             if (uiStep < m_uiStepCount)
             {
-                UpdateP(m_fEStep, FALSE, ESP_InTrajectory);
+                UpdateP(m_fEStep, ESP_InTrajectory);
                 appDetailed("  leap frog sub step %d\n", uiStep);
             }
             else 
             {
-                UpdateP(fHalfPstep, TRUE, ESP_EndTrajectory);
+                UpdateP(fHalfPstep, ESP_EndTrajectory);
                 appDetailed("  leap frog last step %d\n", uiStep);
             }
         }

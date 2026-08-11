@@ -33,10 +33,10 @@ __DEFINE_ENUM(EDistributionJobKSREM,
         { \
             pF1##ftype->InitialField(EFIT_RandomGaussian); \
         } \
-        pF1##ftype->FixBoundary(); \
+        pF1##ftype->FixBoundary(EFB_Field); \
         pF1##ftype->CopyTo(pF2##ftype); \
         pF1##ftype->InverseD(_FIELDS); \
-        pF1##ftype->FixBoundary(); \
+        pF1##ftype->FixBoundary(EFB_Field); \
         if (bSaveFermion) \
         { \
             CCString sFermionFile = ""; \
@@ -249,12 +249,12 @@ INT MeasurementREM(CParameters& params)
     if (EDJKSR_ChiralAndFermionMomentum == eJob
         || EDJKSR_Chiral == eJob)
     {
-        pF1u = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(2));
-        pF2u = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(2));
-        pF1d = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(3));
-        pF2d = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(3));
-        pF1s = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(4));
-        pF2s = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(4));
+        pF1u = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+        pF2u = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+        pF1d = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(3, _T(__FILE__), __LINE__));
+        pF2d = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(3, _T(__FILE__), __LINE__));
+        pF1s = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(4, _T(__FILE__), __LINE__));
+        pF2s = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(4, _T(__FILE__), __LINE__));
     }
 
     appPushLogDate(FALSE);
@@ -490,65 +490,7 @@ INT MeasurementREM(CParameters& params)
         {
             case EDJKSR_Polyakov:
             {
-                CCString sFileNameWrite1;
-                CCString sFileNameWrite2;
-                sFileNameWrite1.Format(_T("%s_polyakov_Nt%d_R.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-                sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_REM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiListIdx);
-                
-                //extract result
-                assert(static_cast<INT>(iEndN - iStartN + 1) * pPL->m_lstR.Num() == pPL->m_lstP.Num());
-                
-                if (uiListIdx == iListStart)
-                {
-                    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                    {
-                        lstR.AddItem(F(0.5)* _hostsqrt(static_cast<Real>(pPL->m_lstR[i])));
-                    }
-                    WriteStringFileRealArray(sFileNameWrite1, lstR);
-                }
-
-                TArray<TArray<CLGComplex>> polyakovOmgR;
-                TArray<CLGComplex> polyIn;
-                TArray<CLGComplex> polyOut;
-
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    TArray<CLGComplex> thisConfiguration;
-                    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                    {
-                        thisConfiguration.AddItem(pPL->m_lstP[j * pPL->m_lstR.Num() + i]);
-                    }
-                    polyakovOmgR.AddItem(thisConfiguration);
-                    polyIn.AddItem(pPL->m_lstLoopInner[j]);
-                    polyOut.AddItem(pPL->m_lstLoop[j]);
-                }
-                lstPolyIn.AddItem(polyIn);
-                lstPolyOut.AddItem(polyOut);
-                WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgR);
-
-                if (pPL->m_bMeasureLoopZ)
-                {
-                    CCString sFileNameWrite3;
-                    sFileNameWrite3.Format(_T("%s_polyakovZ_Nt%d_REM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiListIdx);
-                    polyakovOmgR.RemoveAll();
-                    polyIn.RemoveAll();
-                    polyOut.RemoveAll();
-
-                    for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                    {
-                        TArray<CLGComplex> thisConfiguration;
-                        for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                        {
-                            thisConfiguration.AddItem(pPL->m_lstPZ[j * pPL->m_lstR.Num() + i]);
-                        }
-                        polyakovOmgR.AddItem(thisConfiguration);
-                        polyIn.AddItem(pPL->m_lstLoopZInner[j]);
-                        polyOut.AddItem(pPL->m_lstLoopZ[j]);
-                    }
-                    lstPolyInZ.AddItem(polyIn);
-                    lstPolyOutZ.AddItem(polyOut);
-                    WriteStringFileComplexArray2(sFileNameWrite3, polyakovOmgR);
-                }
+                pPL->Export(sCSVSavePrefix, iStartN, iEndN, uiListIdx, iListStart);
             }
             break;
             case EDJKSR_Chiral:
@@ -573,79 +515,79 @@ INT MeasurementREM(CParameters& params)
                 _CLG_EXPORT_ANGULAR(pJG, JGSurf, uiListIdx, REM);
                 _CLG_EXPORT_ANGULAR(pJG, JGPot, uiListIdx, REM);
 
-                _CLG_EXPORT_CHIRAL(pCCu, ChiralKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, ChiralKS, uiListIdx);
                 if (pCCu->m_bMeasureConnect)
                 {
-                    _CLG_EXPORT_CHIRAL(pCCu, ConnectSusp, uiListIdx, REM);
+                    _CLG_EXPORT_CHIRAL(pCCu, ConnectSusp, uiListIdx);
                 }
 
 
-                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma1, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma2, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma3, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma4, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma5, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma51, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma52, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma53, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma54, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma13, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma14, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma23, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma24, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma34, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma1, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma2, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma3, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma4, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma5, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma51, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma52, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma53, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma54, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma13, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma14, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma23, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma24, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma34, uiListIdx);
 
-                _CLG_EXPORT_CHIRAL(pCCd, ChiralKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, ChiralKS, uiListIdx);
                 if (pCCd->m_bMeasureConnect)
                 {
-                    _CLG_EXPORT_CHIRAL(pCCd, ConnectSusp, uiListIdx, REM);
+                    _CLG_EXPORT_CHIRAL(pCCd, ConnectSusp, uiListIdx);
                 }
                 
-                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma1, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma2, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma3, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma4, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma5, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma51, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma52, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma53, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma54, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma13, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma14, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma23, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma24, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma34, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma1, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma2, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma3, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma4, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma5, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma51, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma52, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma53, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma54, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma13, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma14, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma23, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma24, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma34, uiListIdx);
 
-                _CLG_EXPORT_CHIRAL(pCCs, ChiralKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCs, ChiralKS, uiListIdx);
                 if (pCCs->m_bMeasureConnect)
                 {
-                    _CLG_EXPORT_CHIRAL(pCCs, ConnectSusp, uiListIdx, REM);
+                    _CLG_EXPORT_CHIRAL(pCCs, ConnectSusp, uiListIdx);
                 }
 
-                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma1, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma2, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma3, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma4, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma5, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma51, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma52, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma53, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma54, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma13, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma14, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma23, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma24, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma34, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma1, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma2, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma3, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma4, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma5, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma51, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma52, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma53, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma54, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma13, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma14, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma23, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma24, uiListIdx);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma34, uiListIdx);
 
-                _CLG_EXPORT_CHIRAL(pFAu, OrbitalKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pFAu, SpinKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pFAu, PotentialKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pFAd, OrbitalKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pFAd, SpinKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pFAd, PotentialKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pFAs, OrbitalKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pFAs, SpinKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pFAs, PotentialKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFAu, OrbitalKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFAu, SpinKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFAu, PotentialKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFAd, OrbitalKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFAd, SpinKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFAd, PotentialKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFAs, OrbitalKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFAs, SpinKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFAs, PotentialKS, uiListIdx, REM);
 
                 if (uiListIdx == iListStart)
                 {

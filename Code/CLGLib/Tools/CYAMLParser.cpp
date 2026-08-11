@@ -5,6 +5,7 @@
 // This is the class read YAML paramters
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/2/2018 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -77,7 +78,7 @@ INT CYAMLParser::ParseStream(const CCString &sName, const CCString& sFileName, I
 {
     INT retv = EXIT_SUCCESS;
 
-    const size_t buf_size = 1024;
+    const size_t buf_size = 32768;
     TCHAR buf[buf_size];
 
     typedef std::pair<CCString, CParameters*> env_t;

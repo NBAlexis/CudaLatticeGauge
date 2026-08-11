@@ -5,6 +5,7 @@
 // This is the class for GMRES Solver
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [15/06/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -46,6 +47,11 @@ void CMultiShiftNested::Configurate(const CParameters& param)
     {
         appCrucial(_T("Solver must be created for a specified field!\n"));
     }
+    CFieldFermionKS* pFieldKS = dynamic_cast<CFieldFermionKS*>(pField);
+    if (NULL != pFieldKS && pFieldKS->m_bDiagonalMass)
+    {
+        appCrucial(_T("CMultiShiftNested does not support diagonal mass fields.\n"));
+    }
 
     CBase* pSolver = appCreate(sSolverName);
     m_pNestedSolver = dynamic_cast<CSLASolver*>(pSolver);
@@ -67,7 +73,7 @@ void CMultiShiftNested::AllocateBuffers(const CField*)
 }
 
 UBOOL CMultiShiftNested::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& cn, const CField* pFieldB, 
-    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
     EFieldOperator uiM, ESolverPhase , const CField* )
 {
     appPushLogDate(FALSE);
@@ -94,8 +100,18 @@ UBOOL CMultiShiftNested::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex
         appCrucial(_T("Operator not supported in nested shift solver!\n"));
         break;
     }
+    //CFieldFermionKS* lastSolution = NULL;
     for (INT i = 0; i < cn.Num(); ++i)
     {
+        //if (NULL == lastSolution)
+        //{
+        //    pFieldX[i]->InitialField(EFIT_Zero);
+        //}
+        //else
+        //{
+        //    lastSolution->CopyTo(pFieldX[i]);
+        //}
+        //pFieldB->CopyTo(pFieldX[i]);
         pFieldX[i]->InitialField(EFIT_Zero);
 
         if (NULL == dynamic_cast<CFieldFermionKS*>(pFieldX[i]))
@@ -138,7 +154,8 @@ UBOOL CMultiShiftNested::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex
         }
 
         CCommonData::m_fShiftedMass = fShiftedMass;
-        m_pNestedSolver->Solve(pFieldKS, pFieldB, gaugeNum, bosonNum, gaugeFields, bosonFields, toSolve, ESP_Once, NULL);
+        m_pNestedSolver->Solve(pFieldKS, pFieldB, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, toSolve, ESP_Once, NULL);
+        //lastSolution = pFieldKS;
     }
     appPopLogDate();
     return TRUE;

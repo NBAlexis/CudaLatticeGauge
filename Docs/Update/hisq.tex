@@ -1,0 +1,914 @@
+\subsection{\label{sec:hisq}\index{HISQ fermion}HISQ Fermion}
+
+\subsubsection{\label{sec:calculate_force_new}Calculate force using contract}
+
+Using
+\begin{equation}
+\begin{split}
+&\{W^{\dagger}\}_{TA}=-\{W\}_{TA}\\
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+&F_{\mu}(n)=\eta _{\mu}(n) \sum _i \left\{\left[\left(U_{\mu}(n)\phi _i(n+\mu)\right)\phi _{i,d}^{\dagger}(n)\right]+\left[\phi _i(n)(U_{\mu}(n)\phi _{i,d}(n+\mu))^{\dagger}\right]\right\}_{TA}
+\end{split}
+\end{equation}
+with
+\begin{equation}
+\begin{split}
+&\phi _i = \frac{\sqrt{\alpha _i} }{(D_{st}^{\dagger}D_{st})+\beta _i} \phi,\;\;\alpha _i,\beta _i \in A^{-\frac{1}{2}}\\
+&\phi _{i,d}=D_{st}\phi _i\\
+\end{split}
+\end{equation}
+can be
+\begin{equation}
+\begin{split}
+&F_{\mu}(n)=\eta _{\mu}(n) \sum _i \left\{U_{\mu}(n)\left[\phi _i(n+\mu)\phi _{i,d}^{\dagger}(n)-\phi _{i,d}(n+\mu)\phi _i^{\dagger}(n)\right]\right\}_{TA}
+\end{split}
+\end{equation}
+note that, $\phi _{i,d}$ can also be $D_{st0}\phi _i$, then let
+\begin{equation}
+\begin{split}
+&\phi _i = \phi _i^e + \phi _i^o\\
+&\phi _{i,d}=D_{st0}\phi _i = D_{st0}\phi _i^o + D_{st0}\phi _i^e\\
+\end{split}
+\end{equation}
+So, if $\phi$ is even field, then $\phi _i$ is even field, and $\phi _{i,d}$ is odd field,
+\begin{equation}
+\begin{split}
+&F_{\mu}(n)=\left\{\begin{array}{cc}\eta _{\mu}(n) \sum _i \left\{-U_{\mu}(n)\left[\phi _{i,d}(n+\mu)\phi _i^{\dagger}(n)\right]\right\}_{TA} & n\in even\\ 
+    \eta _{\mu}(n) \sum _i \left\{U_{\mu}(n)\left[\phi _i(n+\mu)\phi _{i,d}^{\dagger}(n)\right]\right\}_{TA}& n\in odd\end{array}\right.
+\end{split}
+\end{equation}
+
+If $\phi$ is initialed as even field \textbf{to remove doubler}, with $\phi _{i,even} = \phi _i$ and $\phi _{i,odd} = \phi _{i,d}$, then
+\begin{equation}
+\begin{split}
+&F_{\mu}(n)=-(-1)^n\eta _{\mu}(n) \sum _i \left\{U_{\mu}(n)\left[\phi _{i}(n+\mu)\phi _i^{\dagger}(n)\right]\right\}_{TA}
+\end{split}
+\end{equation}
+where $(-1)^n = -1$ if n is odd.
+
+\subsubsection{\label{sec:derivate_on_effective_gauge}Derivate on effective gauge}
+
+\subsubsubsection{\label{sec:derivate_on_effective_gauge_1}Derivate to be calculated}
+
+Considering the term $\phi _x^{\dagger} U_1U_2U_3\phi _y$, if the $D_0$ was anti-Hermitian, there must also be a $-\phi _y^{\dagger} U_3^{\dagger}U_2^{\dagger}U_1^{\dagger}\phi _x$ term.
+If it was $\phi^{\dagger}D_0^{\dagger}D_0\phi$.
+
+We need to calculate
+\begin{equation}
+\begin{split}
+&f=U\frac{\partial S}{\partial U}\\
+\end{split}
+\end{equation}
+to make sure $U$ is $SU(3)$, we do traceless anti-Hermitian at last,
+\begin{equation}
+\begin{split}
+&f=\left\{U\frac{\partial S}{\partial U}\right\}_{TA}\\
+\end{split}
+\end{equation}
+
+then, we consider the derivate, which is,
+\begin{equation}
+\begin{split}
+&\frac{\partial}{\partial U}\left(\phi^{\dagger}D_0^{\dagger}D_0\phi\right)
+\end{split}
+\end{equation}
+
+\subsubsubsection{\label{sec:derivate_on_effective_gauge_2}Some notations}
+
+The derivate on matrix is a tensor, denote,
+\begin{equation}
+\begin{split}
+&(AB){}^i{}_k \to A{}^i{}_jB{}^j{}_k
+\end{split}
+\end{equation}
+using matrix element, the derivate is defined as,
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial f}{\partial A}\right){}^i{}_l = \frac{\partial f}{\partial A{}^l{}_i}\\
+&\left(\frac{\partial B}{\partial A}\right){}^i{}_j{}^k{}_l = \frac{\partial B{}^i{}_l}{\partial A{}^j{}_k}\\
+\end{split}
+\end{equation}
+
+Taking the case of $\phi _x^{\dagger} U\phi _y - \phi _y^{\dagger} U^{\dagger}\phi _x$ as an example, it is, both $D$ and $D^{\dagger}$ contains $U$, and they are anti-Hermitian,
+
+\begin{equation}
+\begin{split}
+&\frac{\partial}{\partial U{}^i{}_l}\left((\phi ^{\dagger}){}_m \left(c+\sum _i\frac{a_i}{(D^{\dagger})  D+b_i}\right){}^m{}_k \phi{}^k\right)\\
+\end{split}
+\end{equation}
+
+\begin{tcolorbox}
+Before move on, we need to check the derivate on matrix, it is known,
+\begin{equation}
+\begin{split}
+&\frac{\partial A^{-1}}{\partial a} = -A^{-1}\frac{\partial A}{\partial a} A^{-1}.
+\end{split}
+\end{equation}
+so,
+\begin{equation}
+\begin{split}
+&\frac{\partial M^{-1}}{\partial A{}^j{}_k} = -M^{-1}\frac{\partial M}{\partial A{}^j{}_k} M^{-1}.
+\end{split}
+\end{equation}
+compare the matrix element of the left and right~(treat $A$ as a number now), it is,
+\begin{equation}
+\begin{split}
+&\frac{\partial M^{-1}{}^i{}_l}{\partial A{}^j{}_k} = -M^{-1}{}^i{}_m\frac{\partial M{}^m{}_n}{\partial A{}^j{}_k} M^{-1}{}^n{}_l.
+\end{split}
+\end{equation}
+and can be written as (now $A$ is a matrix),
+\textcolor[rgb]{1,0,0}{
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial M^{-1}}{\partial A}\right){}^i{}_j{}^k{}_l= -(M^{-1}){}^i{}_m \left(\frac{\partial M}{\partial A}\right){}^m{}_j{}^k{}_n (M^{-1}){}^n{}_l.
+\end{split}
+\end{equation}
+}
+\end{tcolorbox}
+
+now, assume $M=D^{\dagger}D+b$, so
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial M}{\partial U}\right){}^m{}_j{}^k{}_n = \left(\frac{\partial (D^{\dagger}D){}^m{}_n}{\partial U {}^j{}_k}\right)= \left(\frac{\partial (D^{\dagger}{}^m{}_h D{}^h{}_n)}{\partial U {}^j{}_k}\right)\\
+&= \frac{\partial D^{\dagger}{}^m{}_h}{\partial U{}^j{}_k} D{}^h{}_n+D^{\dagger}{}^m{}_h \frac{\partial D{}^h{}_n}{\partial U{}^j{}_k}\\
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial M^{-1}}{\partial A}\right){}^m{}_i{}^l{}_k= -(M^{-1}){}^m{}_p \left(\frac{\partial M}{\partial A}\right){}^p{}_i{}^l{}_q (M^{-1}){}^q{}_k.\\
+&\left(\frac{\partial M}{\partial A}\right){}^p{}_i{}^l{}_q = \frac{\partial D^{\dagger}{}^p{}_h}{\partial U{}^i{}_l} D{}^h{}_q+D^{\dagger}{}^p{}_h \frac{\partial D{}^h{}_q}{\partial U{}^i{}_l}
+\end{split}
+\end{equation}
+
+so,
+\begin{equation}
+\begin{split}
+&\frac{\partial}{\partial U{}^i{}_l}\left((\phi ^{\dagger}){}_m \left(c+\sum _s\frac{a_s}{(D^{\dagger})  D{}+b_s}\right){}^m{}_k \phi{}^k\right)\\
+&=\sum _sa_s\left((\phi ^{\dagger}){}_m \left(\frac{\partial \frac{1}{(D^{\dagger})  D+b_s}}{\partial U}\right){}^m{}_i{}^l{}_k \phi{}^k\right)\\
+&=-\sum _sa_s\phi ^{\dagger}{}_m \left(\frac{1}{D^{\dagger}D+b_s}\right){}^m{}_p\left(\frac{\partial D^{\dagger}{}^p{}_h}{\partial U{}^i{}_l} D{}^h{}_q+D^{\dagger}{}^p{}_h \frac{\partial D{}^h{}_q}{\partial U{}^i{}_l}\right) \left(\frac{1}{D^{\dagger}D+b_s}\right){}^q{}_k\phi{}^k\\
+&=-\sum _sa_s{} \left(\phi ^{\dagger}\frac{1}{D^{\dagger}D+b_s}\right)_p\left(\frac{\partial D^{\dagger}{}^p{}_h}{\partial U{}^i{}_l} D{}^h{}_q+D^{\dagger}{}^p{}_h \frac{\partial D{}^h{}_q}{\partial U{}^i{}_l}\right) \left(\frac{1}{D^{\dagger}D+b_s}\phi\right){}^q{}\\
+\end{split}
+\end{equation}
+
+it is,
+\begin{equation}
+\begin{split}
+&-\sum _sa_s{} \left\{\left(\phi ^{\dagger}\frac{1}{D^{\dagger}D+b_s}\right)_p\left(\frac{\partial D^{\dagger}{}^p{}_h}{\partial U{}^i{}_l} D{}^h{}_q\right) \left(\frac{1}{D^{\dagger}D+b_s}\phi\right){}^q+ 
+\left(\phi ^{\dagger}\frac{1}{D^{\dagger}D+b_s}\right)_p\left(D^{\dagger}{}^p{}_h \frac{\partial D{}^h{}_q}{\partial U{}^i{}_l}\right) \left(\frac{1}{D^{\dagger}D+b_s}\phi\right){}^q\right\}\\
+&=-\sum _sa_s{} \left\{\left(\phi ^{\dagger}\frac{1}{D^{\dagger}D+b_s}\right)_p\left(\frac{\partial D^{\dagger}{}^p{}_h}{\partial U{}^i{}_l} \right) \left(D\frac{1}{D^{\dagger}D+b_s}\phi\right){}^h+ 
+\left(\phi ^{\dagger}\frac{1}{D^{\dagger}D+b_s}D^{\dagger}\right)_h\left(\frac{\partial D{}^h{}_q}{\partial U{}^i{}_l}\right) \left(\frac{1}{D^{\dagger}D+b_s}\phi\right){}^q\right\}
+\end{split}
+\end{equation}
+
+let $\phi  = \frac{1}{D^{\dagger}D+b_s}\phi$, $\phi _d = D\frac{1}{D^{\dagger}D+b_s}\phi$, it is,
+\begin{equation}
+\begin{split}
+&=-\sum _sa_s{} \left\{\phi ^{\dagger}{}_p\left(\frac{\partial D^{\dagger}{}^p{}_h}{\partial U{}^i{}_l} \right) \phi _d {}^h+ 
+\phi _d^{\dagger}{}_h\left(\frac{\partial D{}^h{}_q}{\partial U{}^i{}_l}\right) \phi {}^q\right\}
+\end{split}
+\end{equation}
+
+so we can always start from,
+\textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&\frac{\partial}{\partial U{}^i{}_l}S=-\sum _sa_s{} \left\{\phi ^{\dagger}{}_p\left(\frac{\partial D^{\dagger}{}^p{}_h}{\partial U{}^i{}_l} \right) \phi _d {}^h+ 
+\phi _d^{\dagger}{}_h\left(\frac{\partial D{}^h{}_q}{\partial U{}^i{}_l}\right) \phi {}^q\right\}\\
+\end{split}
+\end{equation}
+}
+
+\begin{equation}
+\begin{split}
+&D=\eta_{\mu}\left(U^{eff}\delta_{n,n+\mu} - U^{eff,\dagger}\delta_{n+\mu,n}\right)\\
+&D^{\dagger}=\eta_{\mu}\left(U^{eff,\dagger}\delta_{n+\mu,n} - U^{eff}\delta_{n,n+\mu}\right)\\
+\end{split}
+\end{equation}
+so,
+\begin{equation}
+\begin{split}
+&\frac{\partial}{\partial U{}^i{}_l(n,\mu)}S=-\sum _sa_s{} \left\{\textcolor[rgb]{0,0.5,0}{\phi ^{\dagger}(n+\mu){}_p\left(\eta_{\mu}\frac{\partial U^{eff,\dagger}{}^p{}_h}{\partial U{}^i{}_l} \right) \phi _d(n) {}^h}+\textcolor[rgb]{0.5,0,0}{\phi ^{\dagger}(n){}_p\left(-\eta_{\mu}\frac{\partial U^{eff}{}^p{}_h}{\partial U{}^i{}_l} \right) \phi _d(n+\mu) {}^h}\right.\\
+&\left.+ \textcolor[rgb]{0,0.5,0}{\eta_{\mu}
+\phi _d^{\dagger}(n){}_h\left(\frac{\partial U^{eff}{}^h{}_q}{\partial U{}^i{}_l}\right) \phi (n+\mu){}^q}+\textcolor[rgb]{0.5,0,0}{\phi _d^{\dagger}(n+\mu){}_p\left(-\eta_{\mu}\frac{\partial U^{eff,\dagger}{}^p{}_h}{\partial U{}^i{}_l} \right) \phi (n) {}^h}\right\}\\
+\end{split}
+\end{equation}
+
+So, with even field, it is,
+\textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&\frac{\partial}{\partial U{}^i{}_l(n,\mu)}S=\frac{\partial U^{eff}{}^p{}_h}{\partial U{}^i{}_l} f_0 {}^h{}_p+ \frac{\partial U^{eff,\dagger}{}^p{}_h}{\partial U{}^i{}_l} (f_0^{\dagger}) {}^h{}_p\\
+&f_0=\left\{\begin{array}{cc} -\eta_{\mu}(n) \phi _d(n+\mu) {}^h \phi ^{\dagger}(n){}_p & n\in even, \\ \eta_{\mu}(n) \phi (n+\mu) {}^h \phi_d ^{\dagger}(n){}_p & n\in odd\end{array}\right.
+\end{split}
+\end{equation}
+}
+
+\subsubsubsection{\label{sec:derivate_on_effective_gauge_3}Derivate on a link}
+
+Now consider $\phi ^{\dagger}(n) U_1U_2U_3^{\dagger}\phi _{d}(n+\mu) - \phi _d^{\dagger}(n+\mu) U_3 U_2^{\dagger}U_1^{\dagger}\phi (n)$ as an example, ($\eta _{\mu}(n)$ is ignored), when $n$ is even, the term contains $U_2$ is,
+\begin{equation}
+\begin{split}
+&(\phi _d^{\dagger}(n)){}_m \frac{\partial D{}^m{}_n}{\partial U_2{}^i{}_l}  \phi(n+\mu){}^n\\
+&=\phi _d^{\dagger}(n){}_m U_1{}^m{}_j\frac{\partial (U_2){}^j{}_k}{\partial U_2{}^i{}_l} U_3^{\dagger}{}^k{}_n  \phi (n+\mu){}^n\\
+&=\phi _d^{\dagger}(n){}_m U_1{}^m{}_j\delta {}^j{}_i \delta {}^l{}_k U_3^{\dagger}{}^k{}_n  \phi (n+\mu){}^n\\
+&=(\phi _d^{\dagger}(n)U_1){}_i (U_3^{\dagger}\phi(n+\mu)){}^l\\
+&=(U_3^{\dagger}\phi(n+\mu)\phi _d^{\dagger}(n)U_1){}^l{}_i\\
+\end{split}
+\end{equation}
+
+\begin{tcolorbox}
+We need to compare with the old method to check whether this is really correct.
+
+For $\phi _x^{\dagger} U_1^{\dagger}U_2U_3\phi _y$, to calculate force on $U_2$, the path is divided into four sets,
+\begin{equation}
+\begin{split}
+p^{\dagger}_{left}=1,\;\;\;&p_{right}=U_1^{\dagger}U_2U_3\\
+p^{\dagger}_{left}=U_1^{\dagger},\;\;\;&p_{right}=U_2U_3\\
+p^{\dagger}_{left}=U_1^{\dagger}U_2,\;\;\;&p_{right}=U_3\\
+p^{\dagger}_{left}=U_1^{\dagger}U_2U_3,\;\;\;&p_{right}=1\\
+\end{split}
+\end{equation}
+
+If the first link of $p_{left}$ is $U_1$, the result is
+\begin{equation}
+\begin{split}
+&\left\{-\left(p_{right}\phi_{y}\right)\left(p_{left}\phi_{x,d}\right)^{\dagger}-\left(p_{left}\phi_{x}\right)\left(p_{right}\phi_{y,d}\right)^{\dagger}\right\}_{TA}
+\end{split}
+\end{equation}
+so, there are three forces,
+\begin{equation}
+\begin{split}
+&\left\{-\left(U_2U_3\phi_{y}\right)\left(U_1\phi_{x,d}\right)^{\dagger}-\left(U_1\phi_{x}\right)\left(U_2U_3\phi_{y,d}\right)^{\dagger}\right\}_{TA}\\
+\end{split}
+\end{equation}
+which is
+\begin{equation}
+\begin{split}
+&\left\{-U_2U_3\phi_{y}\phi_{x,d}^{\dagger}U_1^{\dagger}-U_1\phi_{x}\phi_{y,d}^{\dagger}U_3^{\dagger}U_2^{\dagger}\right\}_{TA}\\
+\end{split}
+\end{equation}
+Using $\{\ldots\}_{TA}$ is anti-Hermitian,
+\begin{equation}
+\begin{split}
+&\{W^{\dagger}\}_{TA}=-\{W\}_{TA}\\
+\end{split}
+\end{equation}
+so,
+\begin{equation}
+\begin{split}
+&\left\{-U_2U_3\phi_{y}\phi_{x,d}^{\dagger}U_1^{\dagger}-U_1\phi_{x}\phi_{y,d}^{\dagger}U_3^{\dagger}U_2^{\dagger}\right\}_{TA}\\
+\end{split}
+\end{equation}
+which is,
+\begin{equation}
+\begin{split}
+&\left\{U_1\phi_{x,d}\phi_{y}^{\dagger}U_3^{\dagger}U_2^{\dagger}-U_1\phi_{x}\phi_{y,d}^{\dagger}U_3^{\dagger}U_2^{\dagger}\right\}_{TA}\\
+\end{split}
+\end{equation}
+if the first link of $p_{right}$ is $U_2$, the force is,
+\begin{equation}
+\begin{split}
+&\left\{\left(p_{right}\phi_{y}\right)\left(p_{left}\phi_{x,d}\right)^{\dagger}+\left(p_{left}\phi_{x}\right)\left(p_{right}\phi_{y,d}\right)^{\dagger}\right\}_{TA}
+\end{split}
+\end{equation}
+the force is the same as $U_1$ but with a minus sign, the result is,
+\begin{equation}
+\begin{split}
+&-\left\{U_1\phi_{x,d}\phi_{y}^{\dagger}U_3^{\dagger}U_2^{\dagger}-U_1\phi_{x}\phi_{y,d}^{\dagger}U_3^{\dagger}U_2^{\dagger}\right\}_{TA}\\
+&=\left\{U_2U_3\phi_{y}\phi_{x,d}^{\dagger}U_1^{\dagger}-U_2U_3\phi_{y,d}\phi_{x}^{\dagger}U_1^{\dagger}\right\}_{TA}\\
+\end{split}
+\end{equation}
+if the first link of $p_{right}$ is $U_2$, the force is,
+\begin{equation}
+\begin{split}
+&\left\{\left(p_{right}\phi_{y}\right)\left(p_{left}\phi_{x,d}\right)^{\dagger}+\left(p_{left}\phi_{x}\right)\left(p_{right}\phi_{y,d}\right)^{\dagger}\right\}_{TA}
+\end{split}
+\end{equation}
+which is
+\begin{equation}
+\begin{split}
+&\left\{\left(U_3\phi_{y}\right)\left(U_2^{\dagger}U_1\phi_{x,d}\right)^{\dagger}+\left(U_2^{\dagger}U_1\phi_{x}\right)\left(U_3\phi_{y,d}\right)^{\dagger}\right\}_{TA}\\
+&=\left\{U_3\phi_{y}\phi_{x,d}^{\dagger}U_1^{\dagger}U_2-U_3\phi_{y,d}\phi_{x}^{\dagger}U_1^{\dagger}U_2\right\}_{TA}
+\end{split}
+\end{equation}
+
+\end{tcolorbox}
+
+\subsubsubsection{\label{sec:derivate_on_effective_gauge_4}Projection}
+
+\textcolor[rgb]{1,0,0}{
+Note that the order of the derivate. Let $f(M)=\bar{\phi}AMA\phi$, $g(M)=BMB$, then
+\begin{equation}
+\begin{split}
+&f(g(M))=ABMBA\\
+&\frac{\partial }{\partial M{}^m{}_n}\bar{\phi}{}_i(ABMBA){}^i{}_l\phi{}^l=\bar{\phi}{}_i(AB){}^i{}_j \frac{\partial M{}^j{}_k}{\partial M{}^m{}_n}(BA){}^k{}_l\phi{}^l\\
+&=(\bar{\phi}AB){}_j \delta {}^j{}_m \delta {}^n{}_k(BA\phi){}^k\\
+&=(\bar{\phi}AB){}_m (BA\phi){}^n\\
+&=(BA\phi \bar{\phi}AB){}^n{}_m
+\end{split}
+\end{equation}
+Note that, it is like $g(f(M))$.
+}
+
+\subsubsection{\label{sec:projection_of_effective_gauge}Projection of effective gauge}
+
+The next step is to project the effective gauge on to $U(3)$ or $SU(3)$.
+It calculates,
+\begin{equation}
+\begin{split}
+&U^R = \frac{U}{\sqrt{U^{\dagger}U}}\\
+&\tilde{U}^R=\frac{1}{\det [U^R]^{\frac{1}{N_C}}}U^R
+\end{split}
+\end{equation}
+So, the main problem is to calculate $\left(U^{\dagger}U\right)^{-1/2}$, which can be calculated using rational approximation,
+\begin{equation}
+\begin{split}
+&\left(U^{\dagger}U\right)^{-1/2}=c_0+\sum _i \frac{a_i}{U^{\dagger}U+b_i}
+\end{split}
+\end{equation}
+
+using,
+\textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial A\left(c+\frac{1}{A^{\dagger}A+b}\right)}{\partial A}\right){}^i{}_j{}^k{}_l= \delta {}^i{}_j  \left(c+\frac{1}{A^{\dagger}A+b}\right){}^k{}_l-\left(A\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^i{}_j  \left(\frac{1}{A^{\dagger}A+b}\right){}^k{}_l\\
+&\left(\frac{\partial \left(c+\frac{1}{A^{\dagger}A+b}\right)A^{\dagger}}{\partial A}\right){}^i{}_j{}^k{}_l=-\left(\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^i{}_j  \left(\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^k{}_l\\
+\end{split}
+\end{equation}
+}
+
+so, let $M=A\left(c+\frac{1}{A^{\dagger}A+b}\right)$ if we want to calculate, let $\phi=\phi(n)$, $\phi_d=\phi_d(n+\mu)$
+\begin{equation}
+\begin{split}
+&f=\frac{\partial}{\partial A{}^i{}_l}\left(\phi ^{\dagger} M^{\dagger}\phi_d + \phi _d^{\dagger} M \phi \right)\\    
+&=\left(\phi ^{\dagger}{}_m \frac{\partial (M^{\dagger}){}^m{}_n}{\partial A{}^i{}_l}  \phi_d{}^n\right)+\left(\phi _d^{\dagger}{}_n \frac{\partial M{}^n{}_{k}  }{\partial A{}^i{}_l}  \phi {}^k\right)\\
+&=-\left(\phi ^{\dagger}{}_m \left(\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^m{}_i  \left(\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^l{}_n  \phi_d{}^n\right)\\
+&+\left(\phi _d^{\dagger}{}_n \left(\delta {}^n{}_i  \left(c+\frac{1}{A^{\dagger}A+b}\right){}^l{}_k-\left(A\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^n{}_i  \left(\frac{1}{A^{\dagger}A+b}\right){}^l{}_k\right)  \phi {}^k\right)\\
+&=-\left(\left(\phi ^{\dagger}\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}_i  \left(\frac{1}{A^{\dagger}A+b}A^{\dagger}\phi_d\right){}^l\right)\\
+&+\left(\phi _d^{\dagger}{}_i  \left(c+\frac{1}{A^{\dagger}A+b}\phi \right){}^l-\left(\phi _d^{\dagger}A\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}_i  \left(\frac{1}{A^{\dagger}A+b}\phi \right){}^l\right)\\
+&=\left(\left(c+\frac{1}{A^{\dagger}A+b}\right)\phi\phi _d^{\dagger}\right){}^l{}_i-\left(\frac{1}{A^{\dagger}A+b}\phi \phi _d^{\dagger}A\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^l{}_i-\left(\frac{1}{A^{\dagger}A+b}A^{\dagger} \phi_d\phi ^{\dagger}\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^l{}_i\\
+&=\left(\left(c+\frac{1}{A^{\dagger}A+b}\right)f_0\right){}^l{}_i-\left(\frac{1}{A^{\dagger}A+b}f_0A\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^l{}_i-\left(\frac{1}{A^{\dagger}A+b}A^{\dagger} f_0^{\dagger}\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^l{}_i
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+&F=f^{\dagger}\\    
+&=\left(f_0^{\dagger}\left(c+\frac{1}{A^{\dagger}A+b}\right)\right){}^l{}_i-\left(A \frac{1}{A^{\dagger}A+b} A^{\dagger}f_0^{\dagger} \frac{1}{A^{\dagger}A+b}\right){}^l{}_i-\left(A \frac{1}{A^{\dagger}A+b} f_0 A \frac{1}{A^{\dagger}A+b}\right){}^l{}_i\\
+&=\left(F_0\left(c+\frac{1}{A^{\dagger}A+b}\right)\right){}^l{}_i-\left(A \frac{1}{A^{\dagger}A+b} A^{\dagger}F_0 \frac{1}{A^{\dagger}A+b}\right){}^l{}_i-\left(A \frac{1}{A^{\dagger}A+b} F_0^{\dagger} A \frac{1}{A^{\dagger}A+b}\right){}^l{}_i\\
+\end{split}
+\end{equation}
+
+\textcolor[rgb]{1,0,0}{\textbf{Note that, the force of projection is calculated in front of effective gauge.}}
+
+\begin{tcolorbox}
+Before move on, we need to check the derivate on determinant, it is known,
+\begin{equation}
+\begin{split}
+&\frac{\partial \det(M)}{\partial M{}^i{}_j}=\det(M)(M^{-1}){}^j{}_i
+\end{split}
+\end{equation}
+so,
+\begin{equation}
+\begin{split}
+&\frac{\partial \det(M)^{-\frac{1}{3}}}{\partial M{}^i{}_j}=-\frac{1}{3}\det(M)^{-\frac{1}{3}}(M^{-1}){}^j{}_i\\
+&\frac{\partial (\det(M))^{-\frac{1}{3}}}{\partial U{}^i{}_j}=\frac{\partial (\det(M))^{-\frac{1}{3}}}{\partial M{}^k{}_l}\frac{\partial M{}^k{}_l}{\partial U{}^i{}_j}=-\frac{1}{3}\det(M)^{-\frac{1}{3}}(M^{-1}){}^l{}_k\left(\frac{\partial M}{\partial U}\right){}^k{}_i{}^j{}_l\\
+\end{split}
+\end{equation}
+also,
+\begin{equation}
+\begin{split}
+&\frac{\partial (\det(M)^*)^{-\frac{1}{3}}}{\partial U{}^i{}_j}=-\frac{1}{3}(\det(M)^*)^{-\frac{1}{3}}({M^{-1}}^{\dagger}){}^l{}_k\left(\frac{\partial M^{\dagger}}{\partial U}\right){}^k{}_i{}^j{}_l\\
+\end{split}
+\end{equation}
+
+\end{tcolorbox}
+
+we calculate the two terms separately,
+\begin{equation}
+\begin{split}
+&\frac{\partial}{\partial A{}^i{}_j}\phi _d^{\dagger} M \det(M)^{-\frac{1}{3}}\phi\\
+&=\det(M)^{-\frac{1}{3}} \frac{\partial}{\partial A{}^i{}_j}\phi _d^{\dagger} M \phi+\phi _d^{\dagger} M\phi \frac{\partial \det(M)^{-\frac{1}{3}}}{\partial A{}^i{}_j}\\
+&=\det(M)^{-\frac{1}{3}} f_1+{\rm tr}\left(Mf_0\right) \left(-\frac{1}{3}\det(M)^{-\frac{1}{3}}(M^{-1}){}^l{}_k\left(\frac{\partial M}{\partial U}\right){}^k{}_i{}^j{}_l\right)\\
+&=\det(M)^{-\frac{1}{3}}\left(f_1-\frac{1}{3}{\rm tr}\left(Mf_0\right) \left((M^{-1}){}^l{}_k\left(\delta {}^k{}_i  \left(c+\frac{1}{A^{\dagger}A+b}\right){}^j{}_l-\left(A\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^k{}_i  \left(\frac{1}{A^{\dagger}A+b}\right){}^j{}_l\right)\right)\right)\\
+&=\det(M)^{-\frac{1}{3}}\left(f_1-\frac{1}{3}{\rm tr}\left(Mf_0\right) \left((M^{-1}) {}^l{}_i  \left(c+\frac{1}{A^{\dagger}A+b}\right){}^j{}_l-\left(A\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^k{}_i  \left(\frac{1}{A^{\dagger}A+b}M^{-1}\right){}^j{}_k\right)\right)\\
+&=\det(M)^{-\frac{1}{3}}\left(f_1-\frac{1}{3}{\rm tr}\left(Mf_0\right) \left(\left(c+\frac{1}{A^{\dagger}A+b}\right)M^{-1}- \left(\frac{1}{A^{\dagger}A+b}M^{-1}A\frac{1}{A^{\dagger}A+b}A^{\dagger}\right)\right)\right)\\
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&\frac{\partial}{\partial A{}^i{}_j}\phi ^{\dagger} M^{\dagger} (\det(M)^*)^{-\frac{1}{3}}\phi _d\\
+&=(\det(M)^*)^{-\frac{1}{3}} \frac{\partial}{\partial A{}^i{}_j}\phi ^{\dagger} M^{\dagger} \phi _d +\phi^{\dagger}  M^{\dagger}\phi _d \frac{\partial (\det(M)^*)^{-\frac{1}{3}}}{\partial A{}^i{}_j}\\
+&=(\det(M)^*)^{-\frac{1}{3}} f_2 +\phi^{\dagger}  M^{\dagger}\phi _d \frac{\partial (\det(M)^*)^{-\frac{1}{3}}}{\partial A{}^i{}_j}\\
+&=(\det(M)^*)^{-\frac{1}{3}} \left(f_2 -\frac{1}{3}{\rm tr}[M^{\dagger}f_0^{\dagger}]  (M^{-1})^{\dagger}{}^l{}_k\left(\frac{\partial M^{\dagger}}{\partial A}\right){}^k{}_i{}^j{}_l\right)\\
+&=(\det(M)^*)^{-\frac{1}{3}} \left(f_2 +\frac{1}{3}{\rm tr}[M^{\dagger}f_0^{\dagger}]  (M^{-1})^{\dagger}{}^l{}_k \left(\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^k{}_i  \left(\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^j{}_l \right)\\
+&=(\det(M)^*)^{-\frac{1}{3}} \left(f_2 +\frac{1}{3}{\rm tr}[M^{\dagger}f_0^{\dagger}]   \left(\frac{1}{A^{\dagger}A+b}A^{\dagger}(M^{-1})^{\dagger}\frac{1}{A^{\dagger}A+b}A^{\dagger}\right) \right)\\
+\end{split}
+\end{equation}
+so, let $R=\frac{1}{3}\det(M)^{-\frac{1}{3}} {\rm tr}\left(Mf_0\right) M^{-1}$, it is
+\begin{equation}
+\begin{split}
+&\frac{\partial}{\partial A{}^i{}_j}\phi _d^{\dagger} M \det(M)^{-\frac{1}{3}}\phi=\det(M)^{-\frac{1}{3}}f_1 - \left(c+\frac{1}{A^{\dagger}A+b}\right) R +\left(\frac{1}{A^{\dagger}A+b}RA\frac{1}{A^{\dagger}A+b}A^{\dagger}\right)\\
+&\frac{\partial}{\partial A{}^i{}_j}\phi ^{\dagger} M^{\dagger} (\det(M)^*)^{-\frac{1}{3}}\phi _d=(\det(M)^*)^{-\frac{1}{3}} f_2 + \left(\frac{1}{A^{\dagger}A+b}A^{\dagger}R^{\dagger}\frac{1}{A^{\dagger}A+b}A^{\dagger}\right) \\
+\end{split}
+\end{equation}
+so,
+\begin{equation}
+\begin{split}
+&F_1=\left(F_0\left(c+\frac{1}{A^{\dagger}A+b}\right)\right)-\left(A \frac{1}{A^{\dagger}A+b} A^{\dagger}F_0 \frac{1}{A^{\dagger}A+b}\right)\\
+&F_2=-\left(A \frac{1}{A^{\dagger}A+b} F_0^{\dagger} A \frac{1}{A^{\dagger}A+b}\right)\\
+&F=(\det(M)^*)^{-\frac{1}{3}}F_1+\det(M)^{-\frac{1}{3}}F_2-R^{\dagger}\left(c+\frac{1}{A^{\dagger}A+b}\right) + A\frac{1}{A^{\dagger}A+b} (RA+A^{\dagger}R^{\dagger})\frac{1}{A^{\dagger}A+b}
+\end{split}
+\end{equation}
+
+Note $R=\frac{1}{3}\det(M)^{-\frac{1}{3}} {\rm tr}\left(Mf_0\right) M^{-1}=\frac{1}{3}\det(M)^{-\frac{1}{3}} {\rm tr}\left(\hat{M}f_0\right) \hat{M}^{-1}$, with $\hat{M}=M\det(M)^{-\frac{1}{3}}$.
+Let $J_0=(\det(M)^*)^{-\frac{1}{3}} F_0$, it is
+\begin{equation}
+\begin{split}
+&F_1=\left(J_0\left(c+\frac{1}{A^{\dagger}A+b}\right)\right)-\left(A \frac{1}{A^{\dagger}A+b} A^{\dagger}J_0 \frac{1}{A^{\dagger}A+b}\right)\\
+&F_2=-\left(A \frac{1}{A^{\dagger}A+b} J_0^{\dagger} A \frac{1}{A^{\dagger}A+b}\right)\\
+&F=F_1+F_2-R^{\dagger}\left(c+\frac{1}{A^{\dagger}A+b}\right) + A\frac{1}{A^{\dagger}A+b} (RA+A^{\dagger}R^{\dagger})\frac{1}{A^{\dagger}A+b}\\
+&R=\frac{1}{3}{\rm tr}\left(\hat{M}J_0^{\dagger}\right) \hat{M}^{-1}
+\end{split}
+\end{equation}
+which is,
+\begin{equation}
+\begin{split}
+&F=(J_0-R^{\dagger})\left(c+\frac{1}{A^{\dagger}A+b}\right) - A\frac{1}{A^{\dagger}A+b} (A^{\dagger}J_0+J_0^{\dagger} A-RA-A^{\dagger}R^{\dagger})\frac{1}{A^{\dagger}A+b}\\
+&R=\frac{1}{3}{\rm tr}\left(\hat{M}J_0^{\dagger}\right) \hat{M}^{-1}
+\end{split}
+\end{equation}
+which is,
+\begin{equation}
+\begin{split}
+&F=K_0\left(c+\frac{1}{A^{\dagger}A+b}\right) - A\frac{1}{A^{\dagger}A+b} (A^{\dagger}K_0+K_0^{\dagger} A)\frac{1}{A^{\dagger}A+b}\\
+&K_0=J_0-R^{\dagger}
+\end{split}
+\end{equation}
+
+\begin{tcolorbox}
+We can do it in another way, consider
+\begin{equation}
+\begin{split}
+&\phi _d^{\dagger}A \det(A)^{-\frac{1}{3}} \phi 
+\end{split}
+\end{equation}
+so,
+\begin{equation}
+\begin{split}
+&\frac{\partial}{\partial A{}^i{}_j} \left(\phi _d^{\dagger}A \det(A)^{-\frac{1}{3}} \phi \right)\\
+&=\det(A)^{-\frac{1}{3}}\frac{\partial}{\partial A{}^i{}_j} \left(\phi _d^{\dagger}A  \phi \right)+\left(\phi _d^{\dagger}A \phi \right)  \frac{\partial}{\partial A{}^i{}_j} \det(A)^{-\frac{1}{3}}\\
+&=\det(A)^{-\frac{1}{3}}\left(\phi \phi _d^{\dagger}\right)-\frac{1}{3}\det(A)^{-\frac{1}{3}} \left(\phi _d^{\dagger}A \phi \right)  (A^{-1})\\
+&=\textcolor[rgb]{0,0,1}{\det(A)^{-\frac{1}{3}}\left(\phi \phi _d^{\dagger}\right)-\frac{1}{3} {\rm tr}\left(\det(A)^{-\frac{1}{3}}\phi \phi _d^{\dagger}A  \right)  (A^{-1})}\\
+\end{split}
+\end{equation}
+this has been checked numerically, by using.
+\begin{equation}
+\begin{split}
+&\frac{\partial f}{\partial A{}^i{}_j}=\{\frac{f(M+\epsilon E{}^j{}_i)-f(M)}{\epsilon}\}
+\end{split}
+\end{equation}
+so,
+\begin{equation}
+\begin{split}
+&j_0=\det(A)^{-\frac{1}{3}}f_0\\
+&f=j_0-\frac{1}{3} {\rm tr}\left(j_0A  \right)  (A^{-1})\\
+&F=j_0^{\dagger}-\frac{1}{3} {\rm tr}\left(A^{\dagger} j_0^{\dagger}  \right)  (A^{-1})^{\dagger}\\
+&=J_0-\frac{1}{3} {\rm tr}\left(A^{\dagger} J_0  \right)  A\\
+&J_0=(\det(A)^{-\frac{1}{3}})^*F_0\\
+\end{split}
+\end{equation}
+
+This result is misleading!
+Consider the full expression,
+\begin{equation}
+\begin{split}
+&F{}^i{}_k=U{}^{i}{}_j\frac{\partial S}{\partial U{}^k{}_j}
+\end{split}
+\end{equation}
+it is
+
+\end{tcolorbox}
+
+\subsubsection{\label{sec:projection_of_effective_gauge_new}Projection of effective gauge}
+
+\begin{tcolorbox}
+
+From arXiv:hep-lat/0403019.
+
+Derivate of a scalar function and a matrix function,    
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial f (A)}{\partial A} \right){}^i{}_j \equiv \frac{\partial f (A)}{\partial A {}^j{}_i} \\
+&\left(\frac{\partial M (A)}{\partial A} \right){}^i{}_j{}^k{}_l \equiv \frac{\partial M (A) {}^i{}_l}{\partial A {}^j{}_k} \\
+\end{split}
+\end{equation}
+
+The chain rule is, \textbf{Eq. (28) of arXiv:hep-lat/0403019 seem wrong!}
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial f }{\partial B} \right){}^i{}_l =  \left(\frac{\partial f }{\partial A} \right){}^j{}_k \left(\frac{\partial A}{\partial B} \right){}^k{}_l{}^i{}_j\\
+\end{split}
+\end{equation}
+
+The reason of the first chain rule,
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial f }{\partial B} \right){}^i{}_l = \left(\frac{\partial f }{\partial B{}^l{}_i} \right)= \left(\frac{\partial f }{\partial A{}^k{}_j} \right)\left(\frac{\partial A{}^k{}_j }{\partial B{}^l{}_i} \right)=\left(\frac{\partial f }{\partial A} \right){}^j{}_k \left(\frac{\partial A}{\partial B} \right){}^k{}_l{}^i{}_j\\
+\end{split}
+\end{equation}
+
+
+\end{tcolorbox}
+
+\begin{tcolorbox}
+
+From arXiv:0710.0737. (and part from arXiv:hep-lat/0403019)
+
+Given $f^{n}$
+\begin{equation}
+\begin{split}
+&\left(f^{n-1}\right) {}^i{}_l= \left(f^{n}\right){}^j{}_k\left(\frac{\partial U^{n}}{\partial U^{n-1}}\right){}^k{}_l{}^i{}_j + \left({f^{n}}^{\dagger}\right){}^j{}_k\left(\frac{\partial {U^{n}}^{\dagger}}{\partial U^{n-1}}\right){}^k{}_l{}^i{}_j
+\end{split}
+\end{equation}
+
+The reason, let $S(U^n, {U^n}^{\dagger})$ be a \textbf{scalar and real} function~(the action) of matrix $U$. And,
+\begin{equation}
+\begin{split}
+&\left(f^{n-1}\right) {}^i{}_l=\left(\frac{\partial S}{\partial U^{n-1}}\right){}^i{}_l= \left(\frac{\partial S}{\partial U^{n}}\right){}^j{}_k\left(\frac{\partial U^{n}}{\partial U^{n-1}}\right){}^k{}_l{}^i{}_j + \left(\frac{\partial S}{\partial {U^{n}}^{\dagger}}\right){}^j{}_k\left(\frac{\partial {U^{n}}^{\dagger}}{\partial U^{n-1}}\right){}^k{}_l{}^i{}_j
+\end{split}
+\end{equation}
+with $f^{n}=\frac{\partial S}{\partial U^{n}}$, ${f^{n}}^{\dagger}=\frac{\partial S^*}{\partial {U^{n}}^{\dagger}}=\frac{\partial S}{\partial {U^{n}}^{\dagger}}$.
+
+\end{tcolorbox}
+
+\subsubsubsection{\label{sec:projection_of_effective_gauge_f0}f0}
+
+I find it difficult to consider objects like $\partial U^{\dagger} / \partial U$, I think the correct way should be considering $U^{\dagger}$ and $U$ as independent variables, but all as functions of $\omega _a$. \textcolor[rgb]{0,0,1}{\textbf{The force is then $F=i\dot{\omega }_aT_a$, where $\dot{\omega}_a=-\partial S/\partial \omega _a$}}.
+
+By using,
+\begin{equation}
+\begin{split}
+&\frac{\partial U_{\mu}}{\partial \omega_{\mu}^a}=iT^aU_{\mu},\;\;\frac{\partial U^{\dagger}_{\mu}}{\partial \omega_{\mu}^a}=-iU^{\dagger}_{\mu}T^a,\\
+\end{split}
+\end{equation}
+
+it is,
+\begin{equation}
+\begin{split}
+&\frac{\partial S}{\partial \omega _a}={\rm tr}\left[\frac{\partial S}{\partial U}\frac{\partial U}{\partial \omega_a}+\frac{\partial S}{\partial U^{\dagger}}\frac{\partial U^{\dagger}}{\partial \omega_a}\right]
+\end{split}
+\end{equation}
+note that $\partial S/\partial \omega _a$ is a scalar, $S,\omega _a$ are both scalars, and both $\frac{\partial S}{\partial U}$ and $\frac{\partial U}{\partial \omega_a}$ are matrices.
+
+So,
+\begin{equation}
+\begin{split}
+&F=-i\frac{\partial S}{\partial \omega _a}T_a=-i{\rm tr}\left[\frac{\partial S}{\partial U}iT^aU-\frac{\partial S}{\partial U^{\dagger}}iU^{\dagger}T^a\right]T_a\\
+&=-i{\rm tr}\left[i\frac{\partial S}{\partial U}T^aU-i\frac{\partial S}{\partial U^{\dagger}}U^{\dagger}T^a\right]T_a\\
+&=-i{\rm tr}\left[i\frac{\partial S}{\partial U}T^aU+\left(i\frac{\partial S}{\partial U}T^aU\right)^{\dagger}\right]T_a\\
+&=-2i{\rm tr}\left[{\rm Re}\left[i\frac{\partial S}{\partial U}T^aU\right]\right]T_a\\
+\end{split}
+\end{equation}
+
+for any matrix \textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&2i \sum _a T_a {\rm Im tr}[T_a M] = -2 i \sum _a T_a {\rm Re tr}[i T_a M] = \{M\}_{TA}\\
+\end{split}
+\end{equation}
+}
+So, \textcolor[rgb]{0,0,1}{as long as $\partial S / \partial U^{\dagger} = \left(\partial S/ \partial U\right)^{\dagger}$,
+\begin{equation}
+\begin{split}
+&F= \{U{}^i{}_j \frac{\partial S}{\partial U{}^k{}_j}\}_{TA}\\
+\end{split}
+\end{equation}
+here, when calculating $\partial S/ \partial U$, the $U^{\dagger}$ is considered as independent of $U$.}
+
+\begin{tcolorbox}
+Before move on, we need to check the derivate on matrix, it is known,
+\begin{equation}
+\begin{split}
+&\frac{\partial A^{-1}}{\partial a} = -A^{-1}\frac{\partial A}{\partial a} A^{-1}.
+\end{split}
+\end{equation}
+so,
+\begin{equation}
+\begin{split}
+&\frac{\partial M^{-1}}{\partial A{}^j{}_k} = -M^{-1}\frac{\partial M}{\partial A{}^j{}_k} M^{-1}.
+\end{split}
+\end{equation}
+compare the matrix element of the left and right~(treat $A$ as a number now), it is,
+\begin{equation}
+\begin{split}
+&\frac{\partial M^{-1}{}^i{}_l}{\partial A{}^j{}_k} = -M^{-1}{}^i{}_m\frac{\partial M{}^m{}_n}{\partial A{}^j{}_k} M^{-1}{}^n{}_l.
+\end{split}
+\end{equation}
+and can be written as (now $A$ is a matrix),
+\textcolor[rgb]{1,0,0}{
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial M^{-1}}{\partial A}\right){}^i{}_j{}^k{}_l= -(M^{-1}){}^i{}_m \left(\frac{\partial M}{\partial A}\right){}^m{}_j{}^k{}_n (M^{-1}){}^n{}_l.
+\end{split}
+\end{equation}
+}
+\end{tcolorbox}
+
+\begin{equation}
+\begin{split}
+&S=(\psi ^{\dagger}){}_m \left(c+\sum _i\frac{a_i}{DD^{\dagger}+b_i}\right){}^m{}_k \psi{}^k\\
+&\left(\frac{\partial \frac{1}{DD^{\dagger}+b_s}}{\partial U}\right){}^i{}_j{}^k{}_l=-\left( \frac{1}{DD^{\dagger}+b_s}\right){}^i{}_m \frac{\partial (DD^{\dagger})}{\partial U{}^j{}_k} \left( \frac{1}{DD^{\dagger}+b_s}\right){}^n{}_l\\
+&\phi  = \frac{1}{DD^{\dagger}+b_s}\psi, \;\;\;\phi _d = D^{\dagger}\frac{1}{DD^{\dagger}+b_s}\psi,\\
+&\frac{\partial}{\partial U{}^i{}_l}S=-\sum _sa_s{} \left\{\phi ^{\dagger}{}_p\left(\frac{\partial D{}^p{}_h}{\partial U{}^i{}_l} \right) \phi _d {}^h+ 
+\phi _d^{\dagger}{}_h\left(\frac{\partial D^{\dagger}{}^h{}_q}{\partial U{}^i{}_l}\right) \phi {}^q\right\}\\
+&\frac{\partial}{\partial U{}^i{}_l}S=-\sum _sa_s{} \left\{\phi ^{\dagger}{}_p\left(\frac{\partial D{}^p{}_h}{\partial U{}^i{}_l} \right) \phi _d {}^h+ 
+\left(\phi ^{\dagger}{}_h\left(\frac{\partial D{}^h{}_q}{\partial U^{\dagger}{}^i{}_l}\right) \phi _d {}^q\right)^{\dagger}\right\}\\
+&\frac{\partial}{\partial U_{\mu}(n){}^i{}_l}S=-\sum _sa_s{} \left\{\eta_{\mu}(n)\phi(n) ^{\dagger}{}_p \delta {}^p{}_i \delta {}^l{}_h \phi _d(n+\mu) {}^h -\left( \eta _{\mu}(n) 
+\phi ^{\dagger}(n+\mu){}_h \delta {}^p{}_i \delta {}^l{}_h \phi _d(n) {}^q\right)^{\dagger}\right\}\\
+&(f_0){}^l{}_i=-\eta_{\mu}(n)\sum _sa_s{} \left\{ \phi _d(n+\mu) {}^l \phi(n) ^{\dagger}{}_i - \phi(n+\mu) {}^l \phi _d^{\dagger}(n){}_i\right\}\\
+\end{split}
+\end{equation}
+
+If pseudofermion is even, then if $n$ is even, $\phi(n+\mu)=\phi_d(n)=0$, if $n$ is odd, $\phi(n)=\phi _d(n+\mu)=0$.
+
+\begin{equation}
+\begin{split}
+&(f_0){}^l{}_i=\left\{\begin{array}{cc}-\eta_{\mu}(n) \phi _d(n+\mu) {}^l \phi(n) ^{\dagger}{}_i & even\\
+                \eta_{\mu}(n)\phi(n+\mu) {}^l \phi _d^{\dagger}(n){}_i  & odd\end{array}\right.
+\end{split}
+\end{equation}
+
+This is Eq.~(2.7) of arXiv:0710.0737.
+
+\subsubsubsection{\label{sec:projection_of_effective_gauge_u3_to_su3}U3 to SU3}
+
+\begin{equation}
+\begin{split}
+&U_1 = \det (U_0)^{-\frac{1}{3}}U_0\\
+&\left(\frac{\partial \det(A)}{\partial A}\right){}^i{}_j = \det (A) (A^{-1}){}^i{}_j\\
+&(f_1){}^i{}_l = (f_0){}^j{}_k \left(\frac{\partial U_1}{\partial U_0}\right){}^k{}_l{}^i{}_j \\
+&= (f_0){}^j{}_k \left(\frac{\partial \det (U_0)^{-\frac{1}{3}}U_0}{\partial U_0}\right){}^k{}_l{}^i{}_j \\
+&= (f_0){}^j{}_k \left(\frac{\partial \det (U_0)^{-\frac{1}{3}}}{\partial (U_0){}^l{}_i}(U_0){}^k{}_j + \det (U_0)^{-\frac{1}{3}} \left(\frac{\partial U_0}{\partial U_0}\right){}^k{}_l{}^i{}_j\right) \\
+&= (f_0){}^j{}_k \left(-\frac{1}{3}\det (U_0)^{-\frac{4}{3}}\frac{\partial \det (U_0)}{\partial (U_0){}^l{}_i}(U_0){}^k{}_j + \det (U_0)^{-\frac{1}{3}} \delta{}^i{}_j{}\delta ^k{}_l\right) \\
+&= (f_0){}^j{}_k \left(-\frac{1}{3}\det (U_0)^{-\frac{4}{3}}\det (U_0) (U_0^{-1}){}^i{}_l(U_0){}^k{}_j + \det (U_0)^{-\frac{1}{3}} \delta{}^i{}_j{}\delta ^k{}_l\right) \\
+&= \det (U_0)^{-\frac{1}{3}}(f_0){}^i{}_l-\frac{1}{3}\det (U_0)^{-\frac{1}{3}} {\rm tr}\left[U_0f_0\right] (U_0^{-1}){}^i{}_l\\
+&=\det (U_0)^{-\frac{1}{3}}\left(f_0 -\frac{1}{3}\det (U_0)^{-\frac{1}{3}} {\rm tr}\left[U_0f_0\right]U_0^{-1}\right)\\
+\end{split}
+\end{equation}
+
+so
+\begin{equation}
+\begin{split}
+&f_1=\det (U_0)^{-\frac{1}{3}}\left(f_0 -\frac{1}{3}{\rm tr}\left[U_0f_0\right]U_0^{-1}\right)\\
+&f_1^{\dagger}=\left(\det (U_0)^{-\frac{1}{3}}\right)^* \left(f_0^{\dagger} -\frac{1}{3}{\rm tr}\left[U_0^{\dagger}f_0^{\dagger}\right](U_0^{-1})^{\dagger}\right)\\
+\end{split}
+\end{equation}
+
+Note that, $U_0$ is unitary, so $U_0^{-1}=U_0^{\dagger}$, and $U_1 = \det (U_0)^{-\frac{1}{3}}U_0$, so ${\rm tr}\left[U_0^{\dagger}f_0^{\dagger}\right](U_0^{-1})^{\dagger}={\rm tr}\left[U_1^{\dagger}f_0^{\dagger}\right](U_1^{-1})^{\dagger}$.
+\begin{equation}
+\begin{split}
+&j_0=\left(\det (U_0)^{-\frac{1}{3}}\right)^* f_0^{\dagger}\\
+&f_1^{\dagger}=\left(j_0 -\frac{1}{3}{\rm tr}\left[U_1^{\dagger}j_0\right]U_1\right)\\
+\end{split}
+\end{equation}
+
+\subsubsubsection{\label{sec:projection_of_effective_gauge_rational_approximation}Rational approximation}
+
+\begin{equation}
+\begin{split}
+&\left(U_0^{\dagger}U_0\right)^{-1/2}=c_0+\sum _i \frac{a_i}{U_0^{\dagger}U_0+b_i}\\
+&U_1 = U_0\left(c_0+\sum _i \frac{a_i}{U_0^{\dagger}U_0+b_i}\right)\\
+&(f_1){}^i{}_l = (f_0){}^j{}_k \left(\frac{\partial U_1}{\partial U_0}\right){}^k{}_l{}^i{}_j +  (f_0)^{\dagger}{}^j{}_k \left(\frac{\partial U_1^{\dagger}}{\partial U_0}\right){}^k{}_l{}^i{}_j\\
+\end{split}
+\end{equation}
+
+\begin{tcolorbox}
+Before move on, we need to check the derivate on matrix, it is known, 
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial M^{-1}}{\partial A}\right){}^i{}_j{}^k{}_l= -(M^{-1}){}^i{}_m \left(\frac{\partial M}{\partial A}\right){}^m{}_j{}^k{}_n (M^{-1}){}^n{}_l.
+\end{split}
+\end{equation}
+
+now, assume $M=A^{\dagger}A+b$, so
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial M}{\partial A}\right){}^m{}_j{}^k{}_n = \left(\frac{\partial (A^{\dagger}A){}^m{}_n}{\partial A {}^j{}_k}\right)= \left(\frac{\partial (A^{\dagger}{}^m{}_h A{}^h{}_n)}{\partial A {}^j{}_k}\right)\\
+&= A^{\dagger}{}^m{}_h \left(\frac{\partial ( A{}^h{}_n)}{\partial A {}^j{}_k}\right)= A^{\dagger}{}^m{}_h \delta {}^h{}_j \delta {}^k {}_n = A^{\dagger}{}^m{}_j \delta {}^k {}_n\\
+\end{split}
+\end{equation}
+so,
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial \left(A^{\dagger}A+b\right)^{-1}}{\partial A}\right){}^i{}_j{}^k{}_l= -\left(\frac{1}{A^{\dagger}A+b}\right){}^i{}_m \left(A^{\dagger}{}^m{}_j \delta {}^k {}_n\right) \left(\frac{1}{A^{\dagger}A+b}\right){}^n{}_l
+ =-\left(\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^i{}_j  \left(\frac{1}{A^{\dagger}A+b}\right){}^k{}_l\\
+\end{split}
+\end{equation}
+Now, consider,
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial A\left(c+\frac{1}{A^{\dagger}A+b}\right)}{\partial A}\right){}^i{}_j{}^k{}_l= \left(\frac{\partial A{}^i{}_m\left(c+\frac{1}{A^{\dagger}A+b}\right){}^m{}_l}{\partial A{}^j{}_k}\right)\\
+&=\frac{\partial A{}^i{}_m}{\partial A{}^j{}_k}\left(c+\frac{1}{A^{\dagger}A+b}\right){}^m{}_l + A{}^i{}_m\frac{\partial \left(c+\frac{1}{A^{\dagger}A+b}\right){}^m{}_l}{\partial A{}^j{}_k}\\
+&=\delta {}^i{}_j \delta {}^k{}_m \left(c+\frac{1}{A^{\dagger}A+b}\right){}^m{}_l+ A{}^i{}_m\left(\frac{\partial \left(A^{\dagger}A+b\right)^{-1}}{\partial A}\right){}^m{}_j{}^k{}_l\\
+&=\delta {}^i{}_j  \left(c+\frac{1}{A^{\dagger}A+b}\right){}^k{}_l-\left(A\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^i{}_j  \left(\frac{1}{A^{\dagger}A+b}\right){}^k{}_l\\
+\end{split}
+\end{equation}
+similarly,
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial \left(c+\frac{1}{A^{\dagger}A+b}A^{\dagger}\right)}{\partial A}\right){}^i{}_j{}^k{}_l= \left(\frac{\partial \left(A^{\dagger}A+b\right)^{-1}}{\partial A}\right){}^i{}_j{}^k{}_m A^{\dagger}{}^m{}_l
+ =-\left(\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^i{}_j  \left(\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^k{}_l
+\end{split}
+\end{equation}
+\end{tcolorbox}
+
+\begin{equation}
+\begin{split}
+&(f_1){}^i{}_l = (f_0){}^j{}_k \left(\delta {}^k{}_l  \left(c+\frac{1}{A^{\dagger}A+b}\right){}^i{}_j-\left(A\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^k{}_l  \left(\frac{1}{A^{\dagger}A+b}\right){}^i{}_j\right) +  (f_0)^{\dagger}{}^j{}_k \left(-\left(\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^k{}_l  \left(\frac{1}{A^{\dagger}A+b}A^{\dagger}\right){}^i{}_j\right)\\
+&=\left(c+\frac{1}{A^{\dagger}A+b}\right)f_0-\left(\frac{1}{A^{\dagger}A+b}f_0A\frac{1}{A^{\dagger}A+b}A^{\dagger}\right)-\left(\frac{1}{A^{\dagger}A+b}A^{\dagger}f_0^{\dagger}\frac{1}{A^{\dagger}A+b}A^{\dagger}\right)\\
+&=\left(c+\frac{1}{A^{\dagger}A+b}\right)f_0-\left(\frac{1}{A^{\dagger}A+b}\left(f_0A+A^{\dagger}f_0^{\dagger}\right)\frac{1}{A^{\dagger}A+b}\right)A^{\dagger}\\
+\end{split}
+\end{equation}
+
+\subsubsubsection{\label{sec:projection_of_effective_gauge_caylayhamilton}Caylay Hamilton}
+
+\begin{equation}
+\begin{split}
+&U_1 = U_0\left(U_0^{\dagger}U_0\right)^{-\frac{1}{2}}\\
+&(f_1){}^i{}_l = (f_0){}^j{}_k \left(\frac{\partial U_1}{\partial U_0}\right){}^k{}_l{}^i{}_j +  (f_0)^{\dagger}{}^j{}_k \left(\frac{\partial U_1^{\dagger}}{\partial U_0}\right){}^k{}_l{}^i{}_j\\
+&=(f_0){}^j{}_k \left(\frac{\partial U_0 {}^k{}_m\left(\left(U_0^{\dagger}U_0\right)^{-\frac{1}{2}}\right){}^m{}_j}{\partial U_0 {}^l{}_i}\right) +  (f_0)^{\dagger}{}^j{}_k \left(\frac{\partial \left(\left(U_0^{\dagger}U_0\right)^{-\frac{1}{2}}\right){}^k{}_m (U_0^{\dagger}){}^m{}_j}{\partial U_0 {}^l{}_i}\right)\\
+&=(f_0){}^j{}_k \left(\frac{\partial U_0 {}^k{}_m}{\partial U_0 {}^l{}_i}\left(\left(U_0^{\dagger}U_0\right)^{-\frac{1}{2}}\right){}^m{}_j+U_0 {}^k{}_m\frac{\partial \left(\left(U_0^{\dagger}U_0\right)^{-\frac{1}{2}}\right){}^m{}_j}{\partial U_0 {}^l{}_i}\right) +  (f_0)^{\dagger}{}^j{}_k \left(\frac{\partial \left(\left(U_0^{\dagger}U_0\right)^{-\frac{1}{2}}\right){}^k{}_m}{\partial U_0 {}^l{}_i}\right) U_0^{\dagger} {}^m{}_j\\
+\end{split}
+\end{equation}
+
+let $Q=U_0^{\dagger}U_0$,
+\begin{equation}
+\begin{split}
+&(f_1){}^i{}_l=(f_0){}^j{}_k \left(\delta{}^k{}_l\delta {}^i{}_m\left(Q^{-\frac{1}{2}}\right){}^m{}_j+U_0 {}^k{}_m\frac{\partial \left(Q^{-\frac{1}{2}}\right){}^m{}_j}{\partial U_0 {}^l{}_i}\right) +  (f_0)^{\dagger}{}^j{}_k \left(\frac{\partial \left(Q^{-\frac{1}{2}}\right){}^k{}_m}{\partial U_0 {}^l{}_i}\right)U_0^{\dagger} {}^m{}_j\\
+&=\left(Q^{-\frac{1}{2}}f_0\right){}^i{}_l+\left(f_0U_0\right) {}^j{}_m\frac{\partial \left(Q^{-\frac{1}{2}}\right){}^m{}_j}{\partial U_0 {}^l{}_i} +  \left(U_0^{\dagger}f_0^{\dagger}\right) {}^m{}_k\frac{\partial \left(Q^{-\frac{1}{2}}\right){}^k{}_m}{\partial U_0 {}^l{}_i}\\
+\end{split}
+\end{equation}
+
+\begin{tcolorbox}
+
+Chain rule of matrix function,
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial M (A)}{\partial A} \right){}^i{}_j{}^k{}_l \equiv \frac{\partial M (A) {}^i{}_l}{\partial A {}^j{}_k} \\
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial M }{\partial B} \right){}^i{}_j{}^k{}_l =  \frac{\partial M {}^i{}_l}{\partial B {}^j{}_k} = \frac{\partial M {}^i{}_l}{\partial A {}^m{}_n} \frac{\partial A {}^m{}_n}{\partial B {}^j{}_k}\\
+&=\left(\frac{\partial M}{\partial A} \right){}^i{}_m{}^n{}_l \left(\frac{\partial A}{\partial B} \right){}^m{}_j{}^k{}_n
+\end{split}
+\end{equation}
+
+\end{tcolorbox}
+
+\begin{equation}
+\begin{split}
+&(f_1){}^i{}_l=\left(Q^{-\frac{1}{2}}f_0\right){}^i{}_l+\left(f_0U_0+U_0^{\dagger}f_0^{\dagger}\right) {}^j{}_m \left(\frac{\partial \left(Q^{-\frac{1}{2}}\right)}{\partial U_0 }\right){}^m{}_l{}^i{}_j \\
+&=\left(Q^{-\frac{1}{2}}f_0\right){}^i{}_l+\left(f_0U_0+U_0^{\dagger}f_0^{\dagger}\right) {}^j{}_m \left(\frac{\partial \left(Q^{-\frac{1}{2}}\right)}{\partial Q }\right){}^m{}_p{}^q{}_j \left(\frac{\partial Q}{\partial U_0 }\right){}^p{}_l{}^i{}_q \\
+\end{split}
+\end{equation}
+
+Using,
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial Q}{\partial U_0}\right){}^p{}_l{}^i{}_q=\left(\frac{\partial U_0^{\dagger}{}^p{}_t U_0{}^t{}_q}{\partial U_0{}^l{}_i}\right)=U_0^{\dagger}{}^p{}_t \delta {}^t{}_l \delta {}^i{}_q=U_0^{\dagger}{}^p{}_l \delta {}^i{}_q\\
+\end{split}
+\end{equation}
+
+The remaining thing is,
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial \left(F_0+F_1Q+F_2Q^2\right)}{\partial Q}\right) {}^m{}_p{}^q{}_j\\
+&=\frac{\partial F_0}{\partial Q{}^p{}_q}\delta {}^m{}_j + \frac{\partial F_1}{\partial Q{}^p{}_q} Q{}^m{}_j + \frac{\partial F_2}{\partial Q{}^p{}_q} (Q^2){}^m{}_j + F_1 \delta {}^m{}_p \delta {}^q{}_j + F_2 \frac{\partial Q{}^m{}_t Q{}^t{}_j}{\partial Q{}^p{}_q}\\
+&=\frac{\partial F_0}{\partial Q{}^p{}_q}\delta {}^m{}_j + \frac{\partial F_1}{\partial Q{}^p{}_q} Q{}^m{}_j + \frac{\partial F_2}{\partial Q{}^p{}_q} (Q^2){}^m{}_j + F_1 \delta {}^m{}_p \delta {}^q{}_j + F_2 \left(\delta {}^m{}_pQ{}^q{}_j+Q {}^m{}_p\delta {}^q{}_j\right)\\
+\end{split}
+\end{equation}
+
+Then, we need to know,
+\begin{equation}
+\begin{split}
+&\frac{\partial F_i}{\partial Q{}^p{}_q} = \sum _j \frac{\partial F_i}{\partial c_j}\frac{\partial c_j}{\partial Q{}^p{}_q}\\
+\end{split}
+\end{equation}
+
+\begin{tcolorbox}
+
+From definition, $\frac{\partial {\rm tr}[M]}{\partial M{}^k{}_j} = \delta {}^j{}_k$, this leads to,
+\begin{equation}
+\begin{split}
+&\frac{\partial {\rm tr}[\frac{1}{n}Q^n]}{\partial Q} = Q^{n-1}\\
+\end{split}
+\end{equation}
+
+\end{tcolorbox}
+
+Since $c_j = \frac{1}{j+1}{\rm tr}[Q^{j+1}]$, and define $b_{ij} = \frac{\partial F_i}{\partial c_j}$
+\begin{equation}
+\begin{split}
+&\frac{\partial F_i}{\partial Q{}^p{}_q} = \sum _j \frac{\partial F_i}{\partial c_j}\frac{\partial c_j}{\partial Q{}^p{}_q} = \sum _j b_{ij} (Q^j) {}^q{}_p\\
+\end{split}
+\end{equation}
+
+And,
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial \left(F_0+F_1Q+F_2Q^2\right)}{\partial Q}\right) {}^m{}_p{}^q{}_j\\
+&=\sum _s b_{0s} (Q^s) {}^q{}_p\delta {}^m{}_j + \sum _s b_{1s} (Q^s) {}^q{}_p Q{}^m{}_j + \sum _s b_{2s} (Q^s) {}^q{}_p (Q^2){}^m{}_j + F_1 \delta {}^m{}_p \delta {}^q{}_j + F_2 \left(\delta {}^m{}_pQ{}^q{}_j+Q {}^m{}_p\delta {}^q{}_j\right)\\
+\end{split}
+\end{equation}
+
+Define $B$ matrix $B_n = b_{n0}+b_{n1}Q+b_{n2}Q^2$,
+
+\begin{equation}
+\begin{split}
+&\left(\frac{\partial \left(F_0+F_1Q+F_2Q^2\right)}{\partial Q}\right) {}^m{}_p{}^q{}_j=B_0{}^q{}_p\delta {}^m{}_j + B_1 {}^q{}_p Q{}^m{}_j + B_2 {}^q{}_p (Q^2){}^m{}_j + F_1 \delta {}^m{}_p \delta {}^q{}_j + F_2 \left(\delta {}^m{}_pQ{}^q{}_j+Q {}^m{}_p\delta {}^q{}_j\right)\\
+&\left(\frac{\partial Q}{\partial U_0}\right){}^p{}_l{}^i{}_q=U_0^{\dagger}{}^p{}_l \delta {}^i{}_q\\
+&\left(\frac{\partial \left(Q^{-\frac{1}{2}}\right)}{\partial Q }\right){}^m{}_p{}^q{}_j \left(\frac{\partial Q}{\partial U_0 }\right){}^p{}_l{}^i{}_q=\left(B_0U_0^{\dagger}\right){}^i{}_l\delta {}^m{}_j + \left(B_1 U_0^{\dagger}\right){}^i{}_l Q{}^m{}_j + \left(B_2 U_0^{\dagger}\right){}^i{}_l (Q^2){}^m{}_j + F_1 U_0^{\dagger} {}^m{}_l \delta {}^i{}_j + F_2 \left(U_0^{\dagger} {}^m{}_lQ{}^i{}_j+\left(Q U_0^{\dagger}\right){}^m{}_l\delta {}^i{}_j\right)\\
+\end{split}
+\end{equation}
+
+go back to,
+\begin{equation}
+\begin{split}
+&(f_1){}^i{}_l=\left(\left(Q^{-\frac{1}{2}}f_0\right){}^i{}_l+\left(f_0U_0+U_0^{\dagger}f_0^{\dagger}\right) {}^j{}_m \left(\frac{\partial \left(Q^{-\frac{1}{2}}\right)}{\partial Q }\right){}^m{}_p{}^q{}_j \left(\frac{\partial Q}{\partial U_0 }\right){}^p{}_l{}^i{}_q\right)\\
+\end{split}
+\end{equation}
+
+Note, $B_n^{\dagger}=B_n$, define,
+\begin{equation}
+\begin{split}
+&M=f_0U_0+U_0^{\dagger}f_0^{\dagger}\\
+&a_n={\rm tr}\left[MQ^n\right],\\
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+&(f_1){}^i{}_l=Q^{-\frac{1}{2}}f_0 + \sum a_n B_nU_0^{\dagger} + F_1 M U_0^{\dagger} + F_2 Q M U_0^{\dagger} + F_2 M Q U_0^{\dagger}\\
+\end{split}
+\end{equation}
+Note: $M$, and $Q^n$ are Hermitian, and therefore ${\rm tr}[MQ^n]$ is real.
+\begin{equation}
+\begin{split}
+&f_1^{\dagger}=f_0^{\dagger}(Q^{-\frac{1}{2}})^{\dagger} + U_0(\sum a_n B_n) + F_1 U_0M + F_2 U_0(QM+MQ)\\
+\end{split}
+\end{equation}
+
+The final task is to calculate, $b_{ij}=\frac{\partial f_i}{\partial c_j}$.
+To do this, we need to calculate $\frac{\partial u,v,w}{\partial c_j}$. (denote $u_{0,1,2}=u,v,w$).
+To do this, we need to calculate $\frac{\partial u_i}{\partial g_j}$ and $\frac{\partial g_i}{\partial c_j}$.
+
+\begin{equation}
+\begin{split}
+&c_0=g_0+g_1+g_2\\
+&c_1=\frac{1}{2}(g_0^2+g_1^2+g_2^2)\\
+&c_2=\frac{1}{3}(g_0^3+g_1^3+g_2^3)\\
+&u=\sqrt{g_0}+\sqrt{g_1}+\sqrt{g_2}\\
+&v=\sqrt{g_0g_1}+\sqrt{g_0g_2}+\sqrt{g_1g_2}\\
+&w=\sqrt{g_0g_1g_2}\\
+\end{split}
+\end{equation}
+It can be verified,
+\begin{equation}
+\begin{split}
+&c_0=u^2-2v\\
+&c_1=\frac{1}{2}(u^4-4u^2v+4uw+2v^2)\\
+&c_2=\frac{1}{3}(u^6-6u^4v+6u^3w+9u^2v^2-12uvw-2v^3+3w^2)\\
+&\frac{\partial C}{\partial U} = \begin{pmatrix}
+    2u & -2 & 0\\
+    2u^3-4uv+2w & -2u^2+2v & 2u \\
+    2u^5-8u^3v+6u^2w+6uv^2-4vw & -2u^4+6u^2v-4uw-2v^2 & 2u^3-4uv +2w
+\end{pmatrix}\\
+\end{split}
+\end{equation}
+
+And, use $f_i$ in Eq.~(30) of hep-lat/0702028,
+\begin{equation}
+\begin{split}
+&\frac{\partial f}{\partial c}=\frac{\partial f}{\partial U} \left(\frac{\partial c}{\partial U}\right)^{-1}\\
+&=\left(
+\begin{array}{ccc}
+ \frac{1}{2} \left(\frac{4 u^3}{(w-u v)^2}+\frac{u^4 \left(u^2+v\right)}{(w-u v)^3}+\frac{3 u v}{w^2}+\frac{2}{w-u v}-\frac{v^3}{w^3}-\frac{3}{w}\right) & \frac{w^3 \left(-5 u^4+10 u^2 v+2 v^2\right)-u^2 v^2 w \left(u^4+u^2 v-6 v^2\right)+u^3 v^4 \left(u^2-2 v\right)-u w^2 \left(u^6-6 u^4 v+6 u^2 v^2+6 v^3\right)-3 u w^4}{2 w^3 (u v-w)^3} & \frac{-u^3 v^4+u^2 v^2 w \left(u^2+3 v\right)+w^3 \left(4 u^2+v\right)+u w^2 \left(u^4-4 u^2 v-3 v^2\right)}{2 w^3 (u v-w)^3} \\
+ \frac{w^3 \left(-5 u^4+10 u^2 v+2 v^2\right)-u^2 v^2 w \left(u^4+u^2 v-6 v^2\right)+u^3 v^4 \left(u^2-2 v\right)-u w^2 \left(u^6-6 u^4 v+6 u^2 v^2+6 v^3\right)-3 u w^4}{2 w^3 (u v-w)^3} & -\frac{3 w^3 \left(u^2-v\right)+u w^2 \left(u^2-2 v\right) \left(5 u^2-6 v\right)+u^3 v^2 \left(u^2-2 v\right)^2+w \left(u^2-3 v\right) \left(u^3-2 u v\right)^2}{2 w^3 (u v-w)^3} & \frac{2 u w^2 \left(2 u^2-3 v\right)+u^2 w \left(u^4-5 u^2 v+6 v^2\right)+u^3 v^2 \left(u^2-2 v\right)+w^3}{2 w^3 (u v-w)^3} \\
+ \frac{-u^3 v^4+u^2 v^2 w \left(u^2+3 v\right)+w^3 \left(4 u^2+v\right)+u w^2 \left(u^4-4 u^2 v-3 v^2\right)}{2 w^3 (u v-w)^3} & \frac{2 u w^2 \left(2 u^2-3 v\right)+u^2 w \left(u^4-5 u^2 v+6 v^2\right)+u^3 v^2 \left(u^2-2 v\right)+w^3}{2 w^3 (u v-w)^3} & \frac{u \left(u^3 w+u^2 v^2-3 u v w+3 w^2\right)}{2 w^3 (w-u v)^3} \\
+\end{array}
+\right)
+\end{split}
+\end{equation}
+
+The equation in hep-lat/0702028 is checked and OK.
+
+

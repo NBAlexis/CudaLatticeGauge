@@ -1,0 +1,43 @@
+Task: Simulate
+WarmUp: 10
+ConfigurationNumber: 10
+SaveStartIndex: 0
+SavePrefix: t07_su3_only_last_conf
+SaveConfiguration: 0
+
+Outputs:
+    Names: [measure1.PolyakovT]
+    Files: [t07_polyakov_t]
+
+Dim: 4
+Dir: 4
+LatticeLength: [8, 8, 8, 8]
+LatticeIndex: CIndexSquare
+LatticeBoundary: CBoundaryConditionTorusSquare
+ThreadAutoDecompose: 1
+MaxThreadPerBlock: 256
+RandomType: ER_Schrage
+RandomSeed: 1234567
+
+ActionListLength: 1
+GaugeFieldCount: 1
+MeasureListLength: 1
+
+Updator:
+    UpdatorType: CHMC
+    Metropolis: 1
+    IntegratorType: CIntegratorLeapFrog
+    IntegratorStepLength: 1
+    IntegratorStep: 60
+
+Gauge:
+    FieldName: CFieldGaugeSU3
+    FieldInitialType: EFIT_Random
+
+Action1:
+    ActionName: CActionGaugePlaquette
+    Beta: 5.5
+
+Measure1:
+    MeasureName: CMeasurePolyakovXY
+    MeasureDist: 0

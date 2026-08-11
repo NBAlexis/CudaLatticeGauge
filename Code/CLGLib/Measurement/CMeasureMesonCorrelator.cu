@@ -203,7 +203,7 @@ void CMeasureMesonCorrelator::Initial(CMeasurementManager* pOwner, CLatticeData*
     m_uiConfigurationCount = 0;
 }
 
-void CMeasureMesonCorrelator::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const CFieldGauge* const* pStaples)
+void CMeasureMesonCorrelator::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, INT tensor2Num, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldTensor2* const* tensor2Fields, const CFieldGauge* const* pStaples)
 {
     CalculateCorrelator(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson, pStaples);
 }
@@ -223,11 +223,11 @@ void CMeasureMesonCorrelator::Report()
 
     appPushLogDate(FALSE);
 
-    assert(m_lstResults.Num() == m_lstGammas.Num());
+    appAssert(m_lstResults.Num() == m_lstGammas.Num());
     appGeneral(_T("CMeasureMesonCorrelator final report: Number of configurations = %d\n"), m_uiConfigurationCount);
     for (INT i = 0; i < m_lstResults.Num(); ++i)
     {
-        assert(m_lstResults[i].Num() == static_cast<INT>(m_uiLt));
+        appAssert(m_lstResults[i].Num() == static_cast<INT>(m_uiLt));
         appGeneral(_T("CMeasureMesonCorrelator final report Gamma = %s, C(nt=0 to %d)=\n"),
             __ENUM_TO_STRING(EGammaMatrix, m_lstGammas[i]).c_str(),
             m_lstResults[i].Num() - 1);
@@ -274,23 +274,23 @@ void CMeasureMesonCorrelator::CalculateCorrelator(INT gaugeNum, INT bosonNum, co
     //const CFieldGauge* pGaugeField = NULL;
     TArray<const CFieldGauge*> gauges;
     TArray<CFieldGauge*> returngauges;
-    if (m_bNeedSmearing && NULL != appGetGaugeSmearing())
+    if (m_bNeedSmearing)
     {
         for (INT i = 0; i < gaugeNum; ++i)
         {
-            CFieldGauge* pCopyGauge = dynamic_cast<CFieldGauge*>(appGetLattice()->GetPooledCopy(pAcceptGauge[i]));
+            CFieldGauge* pCopyGauge = dynamic_cast<CFieldGauge*>(appGetLattice()->GetPooledCopy(pAcceptGauge[i], _T(__FILE__), __LINE__));
             returngauges.AddItem(pCopyGauge);
             CFieldGauge* pCopyStaple = NULL;
             if (NULL != pStaple)
             {
-                pCopyStaple = dynamic_cast<CFieldGauge*>(appGetLattice()->GetPooledCopy(pStaple[i]));
+                pCopyStaple = dynamic_cast<CFieldGauge*>(appGetLattice()->GetPooledCopy(pStaple[i], _T(__FILE__), __LINE__));
             }
             else
             {
-                pCopyStaple = dynamic_cast<CFieldGauge*>(appGetLattice()->GetPooledFieldById(pStaple[i]->m_byFieldId));
+                pCopyStaple = dynamic_cast<CFieldGauge*>(appGetLattice()->GetPooledFieldById(pStaple[i]->m_byFieldId, _T(__FILE__), __LINE__));
                 pCopyGauge->CalculateOnlyStaple(pCopyStaple);
             }
-            appGetGaugeSmearing()->GaugeSmearing(pCopyGauge, pCopyStaple);
+            appGetGaugeSmearing(pAcceptGauge[i]->m_byFieldId)->GaugeSmearing(pCopyGauge, NULL, pCopyStaple);
             gauges.AddItem(pCopyGauge);
             pCopyStaple->Return();
         }
@@ -306,7 +306,7 @@ void CMeasureMesonCorrelator::CalculateCorrelator(INT gaugeNum, INT bosonNum, co
     CFieldFermionWilsonSquareSU3* pFermionSources[12];
     for (UINT i = 0; i < 12; ++i)
     {
-        pFermionSources[i] = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
+        pFermionSources[i] = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId(), _T(__FILE__), __LINE__));
         if (NULL == pFermionSources[i])
         {
             appCrucial(_T("Meson correlator only implemented with Wilson SU3\n"));
@@ -334,19 +334,19 @@ void CMeasureMesonCorrelator::CalculateCorrelator(INT gaugeNum, INT bosonNum, co
             {
                 pFermionSources[s * 3 + c]->m_fLength = pFermionSources[s * 3 + c]->Dot(pFermionSources[s * 3 + c]).x;
             }
-            pFermionSources[s * 3 + c]->InverseD(gaugeNum, bosonNum, gauges.GetData(), pAcceptBoson);
+            pFermionSources[s * 3 + c]->InverseD(gaugeNum, bosonNum, 0, gauges.GetData(), pAcceptBoson, NULL);
             pDevicePtr[s * 3 + c] = pFermionSources[s * 3 + c]->m_pDeviceData;
         }
     }
 
     deviceWilsonVectorSU3** ppDevicePtr;
-    checkCudaErrors(cudaMalloc((void**)&ppDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12));
+    checkCudaErrors(__cudaMalloc((void**)&ppDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12));
     checkCudaErrors(cudaMemcpy(ppDevicePtr, pDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12, cudaMemcpyHostToDevice));
 
     preparethread;
     for (INT i = 0; i < m_lstGammas.Num(); ++i)
     {
-        _kernelCalculateCorrelatorSU3 << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelCalculateCorrelatorSU3, block, threads, 
             (const deviceWilsonVectorSU3**)ppDevicePtr, 
             m_lstGammas[i],
             _D_RealThreadBuffer);
@@ -381,6 +381,21 @@ void CMeasureMesonCorrelator::CalculateCorrelator(INT gaugeNum, INT bosonNum, co
 #endif
         }
         appParanoiac(_T("\n"));
+
+        if (NULL != m_pOwner)
+        {
+#if !_CLG_DOUBLEFLOAT
+            TArray<DOUBLE> thisConfigCorrelator;
+#else
+            TArray<Real> thisConfigCorrelator;
+#endif
+            for (UINT j = 0; j < m_uiLt; ++j)
+            {
+                thisConfigCorrelator.AddItem(sumSpatial[j]);
+            }
+            m_pOwner->AddOneConfigurationResult(this, _T("Correlator_") + __ENUM_TO_STRING(EGammaMatrix, m_lstGammas[i]), thisConfigCorrelator);
+        }
+
         //anverage
         if (m_uiConfigurationCount == 0)
         {
@@ -398,7 +413,7 @@ void CMeasureMesonCorrelator::CalculateCorrelator(INT gaugeNum, INT bosonNum, co
         }
         else
         {
-            assert(m_lstResults[i].Num() == static_cast<INT>(m_uiLt));
+            appAssert(m_lstResults[i].Num() == static_cast<INT>(m_uiLt));
             for (UINT j = 0; j < m_uiLt; ++j)
             {
                 m_lstResultsLastConf[i][j] = sumSpatial[j];
@@ -413,7 +428,7 @@ void CMeasureMesonCorrelator::CalculateCorrelator(INT gaugeNum, INT bosonNum, co
     {
         pFermionSources[i]->Return();
     }
-    checkCudaErrors(cudaFree(ppDevicePtr));
+    checkCudaErrors(__cudaFree(ppDevicePtr));
 
     for (INT i = 0; i < returngauges.Num(); ++i)
     {

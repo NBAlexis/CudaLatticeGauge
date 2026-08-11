@@ -19,6 +19,13 @@ __CLGIMPLEMENT_CLASS(CMeasureAMomentumJG)
 
 
 /**
+* Multi-GPU (P4-1.6): in every kernel below the angular-momentum lever arms
+* (x - _DC_Centerx) and (y - _DC_Centery) that enter the PHYSICS are computed
+* from GLOBAL coordinates (_deviceSIndexToGlobalInt4, identity on single-GPU:
+* offsets 0). The pBuffer[ x * _DC_Ly + y ] binning keeps LOCAL x, y on purpose
+* (per-rank xy-plane distribution; its cross-rank reduction is P4-3).
+*/
+/**
 * calculate momentum, and sum over y and z
 */
 __global__ void _CLG_LAUNCH_BOUND
@@ -28,7 +35,7 @@ _kernelCalculateAngularMomentumJG(
     Real betaOverN,
     BYTE byFieldId)
 {
-    intokernalOnlyInt4;
+    intokernalInt4;
 
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
     Real fRes = F(0.0);
@@ -39,25 +46,28 @@ _kernelCalculateAngularMomentumJG(
         //4-chair terms except for the last one
         betaOverN = F(0.125) * betaOverN;
 
-        const Real fX = (sSite4.x - _DC_Centerx);
+        const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
+        const INT iXg = sSite4G.x;
+        const INT iYg = sSite4G.y;
+        const Real fX = (iXg - _DC_Centerx);
 
         //===============
         //+x Omega V412
-        const Real fV412 = fX * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 0, 1, uiN);
+        const Real fV412 = fX * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 0, 1, uiN);
 
         //===============
         //+x Omega V432
-        const Real fV432 = fX * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
+        const Real fV432 = fX * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
 
-        const Real fY = -(sSite4.y - _DC_Centery);
+        const Real fY = -(iYg - _DC_Centery);
 
         //===============
         //-y Omega V421
-        const Real fV421 = fY * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 1, 0, uiN);
+        const Real fV421 = fY * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 1, 0, uiN);
 
         //===============
         //-y Omega V431
-        const Real fV431 = fY * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
+        const Real fV431 = fY * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
 
         fRes = (fV412 + fV432 + fV421 + fV431) * betaOverN;
     }
@@ -76,7 +86,7 @@ _kernelCalculateAngularMomentumS2(
     Real betaOverN,
     BYTE byFieldId)
 {
-    intokernalOnlyInt4;
+    intokernalInt4;
 
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
     Real fRes = F(0.0);
@@ -84,29 +94,32 @@ _kernelCalculateAngularMomentumS2(
     if (!__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
     {
         const Real betaOverN1over8 = F(0.125) * betaOverN;
-        const Real fXYOmega2 = -(sSite4.x - _DC_Centerx) * (sSite4.y - _DC_Centery);
+        const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
+        const INT iXg = sSite4G.x;
+        const INT iYg = sSite4G.y;
+        const Real fXYOmega2 = -(iXg - _DC_Centerx) * (iYg - _DC_Centery);
 
         //===============
         //-Omega^2 xy V132
-        const Real fV132 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
+        const Real fV132 = fXYOmega2 * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
 
         fRes = fV132 * betaOverN1over8;
 
-        Real fXSq = (sSite4.x - _DC_Centerx);
+        Real fXSq = (iXg - _DC_Centerx);
         fXSq = fXSq * fXSq;
-        Real fYSq = (sSite4.y - _DC_Centery);
+        Real fYSq = (iYg - _DC_Centery);
         fYSq = fYSq * fYSq;
 
         //======================================================
         //4-plaqutte terms
         //Omega^2 x^2 Retr[1 - U_2,3]
-        const Real fU23 = fXSq * _device4PlaqutteTerm(pDeviceData, 1, 2, uiN, sSite4, byFieldId);
+        const Real fU23 = fXSq * _device4PlaqutteTermT(pDeviceData, 1, 2, uiN, sSite4, byFieldId);
 
         //Omega^2 y^2 Retr[1 - U_1,3]
-        const Real fU13 = fYSq * _device4PlaqutteTerm(pDeviceData, 0, 2, uiN, sSite4, byFieldId);
+        const Real fU13 = fYSq * _device4PlaqutteTermT(pDeviceData, 0, 2, uiN, sSite4, byFieldId);
 
         //Omega^2 (x^2 + y^2) Retr[1 - U_1,2]
-        const Real fU12 = (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 0, 1, uiN, sSite4, byFieldId);
+        const Real fU12 = (fXSq + fYSq) * _device4PlaqutteTermT(pDeviceData, 0, 1, uiN, sSite4, byFieldId);
 
         fRes += (fU23 + fU13 + fU12) * betaOverN;
     }
@@ -126,7 +139,7 @@ _kernelCalculateAngularMomentumJGProjectivePlane(
     Real betaOverN,
     BYTE byFieldId)
 {
-    intokernalOnlyInt4;
+    intokernalInt4;
 
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
     Real fRes = F(0.0);
@@ -137,25 +150,28 @@ _kernelCalculateAngularMomentumJGProjectivePlane(
         //4-chair terms except for the last one
         betaOverN = F(0.125) * betaOverN;
 
-        const Real fX = (sSite4.x - _DC_Centerx + F(0.5));
+        const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
+        const INT iXg = sSite4G.x;
+        const INT iYg = sSite4G.y;
+        const Real fX = (iXg - _DC_Centerx + F(0.5));
 
         //===============
         //+x Omega V412
-        const Real fV412 = fX * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 0, 1, uiN);
+        const Real fV412 = fX * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 0, 1, uiN);
 
         //===============
         //+x Omega V432
-        const Real fV432 = fX * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
+        const Real fV432 = fX * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
 
-        const Real fY = -(sSite4.y - _DC_Centery + F(0.5));
+        const Real fY = -(iYg - _DC_Centery + F(0.5));
 
         //===============
         //-y Omega V421
-        const Real fV421 = fY * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 1, 0, uiN);
+        const Real fV421 = fY * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 1, 0, uiN);
 
         //===============
         //-y Omega V431
-        const Real fV431 = fY * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
+        const Real fV431 = fY * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
 
         fRes = (fV412 + fV432 + fV421 + fV431) * betaOverN;
     }
@@ -170,7 +186,7 @@ _kernelCalculateAngularMomentumS2ProjectivePlane(
     Real betaOverN,
     BYTE byFieldId)
 {
-    intokernalOnlyInt4;
+    intokernalInt4;
 
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
     Real fRes = F(0.0);
@@ -178,29 +194,32 @@ _kernelCalculateAngularMomentumS2ProjectivePlane(
     if (!__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
     {
         const Real betaOverN1over8 = -F(0.125) * betaOverN;
-        const Real fXYOmega2 = (sSite4.x - _DC_Centerx + F(0.5)) * (sSite4.y - _DC_Centery + F(0.5));
+        const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
+        const INT iXg = sSite4G.x;
+        const INT iYg = sSite4G.y;
+        const Real fXYOmega2 = (iXg - _DC_Centerx + F(0.5)) * (iYg - _DC_Centery + F(0.5));
 
         //===============
         //-Omega^2 xy V132
-        const Real fV132 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
+        const Real fV132 = fXYOmega2 * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
 
         fRes = fV132 * betaOverN1over8;
 
-        Real fXSq = (sSite4.x - _DC_Centerx + F(0.5));
+        Real fXSq = (iXg - _DC_Centerx + F(0.5));
         fXSq = fXSq * fXSq;
-        Real fYSq = (sSite4.y - _DC_Centery + F(0.5));
+        Real fYSq = (iYg - _DC_Centery + F(0.5));
         fYSq = fYSq * fYSq;
 
         //======================================================
         //4-plaqutte terms
         //Omega^2 x^2 Retr[1 - U_2,3]
-        const Real fU23 = fXSq * _device4PlaqutteTerm(pDeviceData, 1, 2, uiN, sSite4, byFieldId);
+        const Real fU23 = fXSq * _device4PlaqutteTermT(pDeviceData, 1, 2, uiN, sSite4, byFieldId);
 
         //Omega^2 y^2 Retr[1 - U_1,3]
-        const Real fU13 = fYSq * _device4PlaqutteTerm(pDeviceData, 0, 2, uiN, sSite4, byFieldId);
+        const Real fU13 = fYSq * _device4PlaqutteTermT(pDeviceData, 0, 2, uiN, sSite4, byFieldId);
 
         //Omega^2 (x^2 + y^2) Retr[1 - U_1,2]
-        const Real fU12 = (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 0, 1, uiN, sSite4, byFieldId);
+        const Real fU12 = (fXSq + fYSq) * _device4PlaqutteTermT(pDeviceData, 0, 1, uiN, sSite4, byFieldId);
 
         fRes += (fU23 + fU13 + fU12) * betaOverN;
     }
@@ -246,7 +265,7 @@ _kernelCalculateJGSurf(
     Real* pBuffer,
     Real fBetaOverN)
 {
-    intokernalOnlyInt4;
+    intokernalInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
@@ -255,8 +274,11 @@ _kernelCalculateJGSurf(
     {
         //const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
         //const BYTE uiDir2 = uiDir * 2;
-        const Real fY = static_cast<Real>(sSite4.y - _DC_Centery);
-        const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx);
+        const SInt4 sSite4G = _deviceSIndexToGlobalInt4(site);
+        const INT iXg = sSite4G.x;
+        const INT iYg = sSite4G.y;
+        const Real fY = static_cast<Real>(iYg - _DC_Centery);
+        const Real fX = static_cast<Real>(iXg - _DC_Centerx);
 
         Real fRes = F(0.0);
         for (BYTE dir = 0; dir < 3; ++dir)
@@ -270,14 +292,14 @@ _kernelCalculateJGSurf(
             //x p_i A_y : U_i(n) A_y(n+i) U_i^+(n)
             //- y p_i A_x : U_i(n) A_x(n+i) U_i^+(n)
             //U_i(n) [x A_y(n+i) - y A_x(n+i)] U_i^+(n)
-            deviceSU3 u(_deviceGetGaugeBCSU3DirOne(byFieldId, pGauge, uiBigIdx, dir));
+            deviceSU3 u(_deviceGetGaugeBCDirOneT(byFieldId, pGauge, uiBigIdx, dir));
             deviceSU3 a(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_i_y_idx));
             a.MulReal(fX);
             a.Sub(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_i_x_idx).MulRealC(fY));
             a.MulDagger(u);
             u.Mul(a);
             //E_i (x p_i A_y  - y p_i A_x)
-            u = _deviceGetGaugeBCSU3DirZero(byFieldId, pE, uiBigIdx, dir).MulC(u);
+            u = _deviceGetGaugeBCDirZeroT(byFieldId, pE, uiBigIdx, dir).MulC(u);
             fRes += u.ReTr();
 
             //x p_i A_y : -U_i^+(n-i) A_y(n-i) U_i(n-i)
@@ -292,10 +314,10 @@ _kernelCalculateJGSurf(
             u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(u);
             fRes -= u.ReTr();
             */
-            a = _deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 1);
+            a = _deviceGetGaugeBCDirZeroT(byFieldId, pAphys, uiBigIdx, 1);
             a.MulReal(fX);
-            a.Sub(_deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 0).MulRealC(fY));
-            u = _deviceGetGaugeBCSU3DirZero(byFieldId, pE, uiBigIdx, dir).MulC(a);
+            a.Sub(_deviceGetGaugeBCDirZeroT(byFieldId, pAphys, uiBigIdx, 0).MulRealC(fY));
+            u = _deviceGetGaugeBCDirZeroT(byFieldId, pE, uiBigIdx, dir).MulC(a);
             fRes -= u.ReTr();
         }
 
@@ -317,7 +339,7 @@ _kernelCalculateJGSurfProjectivePlane(
     Real* pBuffer,
     Real fBetaOverN)
 {
-    intokernalOnlyInt4;
+    intokernalInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
@@ -326,8 +348,11 @@ _kernelCalculateJGSurfProjectivePlane(
     {
         //const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
         //const BYTE uiDir2 = uiDir * 2;
-        const Real fY = static_cast<Real>(sSite4.y - _DC_Centery + F(0.5));
-        const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx + F(0.5));
+        const SInt4 sSite4G = _deviceSIndexToGlobalInt4(site);
+        const INT iXg = sSite4G.x;
+        const INT iYg = sSite4G.y;
+        const Real fY = static_cast<Real>(iYg - _DC_Centery + F(0.5));
+        const Real fX = static_cast<Real>(iXg - _DC_Centerx + F(0.5));
 
         Real fRes = F(0.0);
         #pragma unroll
@@ -342,14 +367,14 @@ _kernelCalculateJGSurfProjectivePlane(
             //x p_i A_y : U_i(n) A_y(n+i) U_i^+(n)
             //- y p_i A_x : U_i(n) A_x(n+i) U_i^+(n)
             //U_i(n) [x A_y(n+i) - y A_x(n+i)] U_i^+(n)
-            deviceSU3 u(_deviceGetGaugeBCSU3DirOne(byFieldId, pGauge, uiBigIdx, dir));
+            deviceSU3 u(_deviceGetGaugeBCDirOneT(byFieldId, pGauge, uiBigIdx, dir));
             deviceSU3 a(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_i_y_idx));
             a.MulReal(fX);
             a.Sub(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_i_x_idx).MulRealC(fY));
             a.MulDagger(u);
             u.Mul(a);
             //E_i (x p_i A_y  - y p_i A_x)
-            u = _deviceGetGaugeBCSU3DirZero(byFieldId, pE, uiBigIdx, dir).MulC(u);
+            u = _deviceGetGaugeBCDirZeroT(byFieldId, pE, uiBigIdx, dir).MulC(u);
             fRes += u.ReTr();
 
             //x p_i A_y : -U_i^+(n-i) A_y(n-i) U_i(n-i)
@@ -364,10 +389,10 @@ _kernelCalculateJGSurfProjectivePlane(
             u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(u);
             fRes -= u.ReTr();
             */
-            a = _deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 1);
+            a = _deviceGetGaugeBCDirZeroT(byFieldId, pAphys, uiBigIdx, 1);
             a.MulReal(fX);
-            a.Sub(_deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 0).MulRealC(fY));
-            u = _deviceGetGaugeBCSU3DirZero(byFieldId, pE, uiBigIdx, dir).MulC(a);
+            a.Sub(_deviceGetGaugeBCDirZeroT(byFieldId, pAphys, uiBigIdx, 0).MulRealC(fY));
+            u = _deviceGetGaugeBCDirZeroT(byFieldId, pE, uiBigIdx, dir).MulC(a);
             fRes -= u.ReTr();
         }
 
@@ -388,20 +413,23 @@ _kernelCalculateJGPot(
     Real* pBuffer,
     Real fBetaOverN)
 {
-    intokernalOnlyInt4;
+    intokernalInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const UINT uiNablaE = _deviceGetLinkIndex(site.m_uiSiteIndex, 3);
     if (!site.IsDirichlet())
     {
-        const Real fY = static_cast<Real>(sSite4.y - _DC_Centery);
-        const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx);
+        const SInt4 sSite4G = _deviceSIndexToGlobalInt4(site);
+        const INT iXg = sSite4G.x;
+        const INT iYg = sSite4G.y;
+        const Real fY = static_cast<Real>(iYg - _DC_Centery);
+        const Real fX = static_cast<Real>(iXg - _DC_Centerx);
 
         deviceSU3 nablaE(pE[uiNablaE]);
-        deviceSU3 a(_deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 1));
+        deviceSU3 a(_deviceGetGaugeBCDirZeroT(byFieldId, pAphys, uiBigIdx, 1));
         a.MulReal(fX);
-        a.Sub(_deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 0).MulRealC(fY));
+        a.Sub(_deviceGetGaugeBCDirZeroT(byFieldId, pAphys, uiBigIdx, 0).MulRealC(fY));
         nablaE.Mul(a);
 
         //atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes * fBetaOverN * F(0.5));
@@ -420,20 +448,23 @@ _kernelCalculateJGPotProjectivePlane(
     Real* pBuffer,
     Real fBetaOverN)
 {
-    intokernalOnlyInt4;
+    intokernalInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const UINT uiNablaE = _deviceGetLinkIndex(site.m_uiSiteIndex, 3);
     if (!site.IsDirichlet())
     {
-        const Real fY = static_cast<Real>(sSite4.y - _DC_Centery + F(0.5));
-        const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx + F(0.5));
+        const SInt4 sSite4G = _deviceSIndexToGlobalInt4(site);
+        const INT iXg = sSite4G.x;
+        const INT iYg = sSite4G.y;
+        const Real fY = static_cast<Real>(iYg - _DC_Centery + F(0.5));
+        const Real fX = static_cast<Real>(iXg - _DC_Centerx + F(0.5));
 
         deviceSU3 nablaE(pE[uiNablaE]);
-        deviceSU3 a(_deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 1));
+        deviceSU3 a(_deviceGetGaugeBCDirZeroT(byFieldId, pAphys, uiBigIdx, 1));
         a.MulReal(fX);
-        a.Sub(_deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 0).MulRealC(fY));
+        a.Sub(_deviceGetGaugeBCDirZeroT(byFieldId, pAphys, uiBigIdx, 0).MulRealC(fY));
         nablaE.Mul(a);
 
         //atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes * fBetaOverN * F(0.5));
@@ -453,13 +484,16 @@ _kernelMomemtumJGChenApprox(
     Real* pBuffer,
     Real fBetaOverN)
 {
-    intokernalOnlyInt4;
+    intokernalInt4;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    const Real fmY = -static_cast<Real>(sSite4.y - _DC_Centery);
-    const Real fmX = -static_cast<Real>(sSite4.x - _DC_Centerx);
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(site);
+    const INT iXg = sSite4G.x;
+    const INT iYg = sSite4G.y;
+    const Real fmY = -static_cast<Real>(iYg - _DC_Centery);
+    const Real fmX = -static_cast<Real>(iXg - _DC_Centerx);
 
     CLGComplex res = _zeroc;
     if (!site.IsDirichlet())
@@ -472,7 +506,7 @@ _kernelMomemtumJGChenApprox(
             deviceSU3 DyAphys = _deviceDPureMu(pAphys, pApure, sSite4, uiBigIdx, 1, dir, byFieldId);
             DyAphys.MulReal(fmX);
             DyAphys.Sub(DxAphys);
-            res = _cuCaddf(res, _deviceGetGaugeBCSU3DirZero(byFieldId, pE, uiBigIdx, dir).MulC(DyAphys).Tr());
+            res = _cuCaddf(res, _deviceGetGaugeBCDirZeroT(byFieldId, pE, uiBigIdx, dir).MulC(DyAphys).Tr());
         }
 
         res = cuCmulf_cr(res, -fBetaOverN);
@@ -489,13 +523,16 @@ _kernelMomemtumJGChenApprox2(
     Real* pBuffer,
     Real fBetaOverN)
 {
-    intokernalOnlyInt4;
+    intokernalInt4;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    const Real fmY = -static_cast<Real>(sSite4.y - _DC_Centery);
-    const Real fmX = -static_cast<Real>(sSite4.x - _DC_Centerx);
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(site);
+    const INT iXg = sSite4G.x;
+    const INT iYg = sSite4G.y;
+    const Real fmY = -static_cast<Real>(iYg - _DC_Centery);
+    const Real fmX = -static_cast<Real>(iXg - _DC_Centerx);
 
     CLGComplex res = _zeroc;
     if (!site.IsDirichlet())
@@ -508,7 +545,7 @@ _kernelMomemtumJGChenApprox2(
             deviceSU3 DyAphys = _deviceDPureMu2(pAphys, pApure, sSite4, uiBigIdx, 1, dir, byFieldId);
             DyAphys.MulReal(fmX);
             DyAphys.Sub(DxAphys);
-            res = _cuCaddf(res, _deviceGetGaugeBCSU3DirZero(byFieldId, pE, uiBigIdx, dir).MulC(DyAphys).Tr());
+            res = _cuCaddf(res, _deviceGetGaugeBCDirZeroT(byFieldId, pE, uiBigIdx, dir).MulC(DyAphys).Tr());
         }
 
         res = cuCmulf_cr(res, -fBetaOverN);
@@ -540,7 +577,7 @@ _kernelMomemtumJGChen(
         #pragma unroll
         for (BYTE dir = 0; dir < 3; ++dir)
         {
-            deviceSU3 beforeTrace = _deviceGetGaugeBCSU3DirZero(byFieldId, pE, uiBigIdx, dir);
+            deviceSU3 beforeTrace = _deviceGetGaugeBCDirZeroT(byFieldId, pE, uiBigIdx, dir);
             beforeTrace.Mul(pXcrossDpureA[_deviceGetLinkIndex(uiSiteIndex, dir)]);
             res += beforeTrace.ReTr(); // _cuCaddf(res, beforeTrace.Tr());
         }
@@ -567,8 +604,11 @@ _kernelMomentumJGChenDpureA(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
-    const Real fmY = -static_cast<Real>(sSite4.y - _DC_Centery);
-    const Real fmX = -static_cast<Real>(sSite4.x - _DC_Centerx);
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
+    const INT iXg = sSite4G.x;
+    const INT iYg = sSite4G.y;
+    const Real fmY = -static_cast<Real>(iYg - _DC_Centery);
+    const Real fmX = -static_cast<Real>(iXg - _DC_Centerx);
 
 
     const SSmallInt4 x_p_x_site = _deviceSmallInt4OffsetC(sSite4, 1);
@@ -587,11 +627,12 @@ _kernelMomentumJGChenDpureA(
         const SIndex& x_p_y_idir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_y_bi4 + idir];
 
         //U_x(n) A_dir(n+x)U_x^+(n)
-        deviceSU3 u(_deviceGetGaugeBCSU3DirOne(byFieldId, pGauge, uiBigIdx, 0));
+        deviceSU3 u(_deviceGetGaugeBCDirOneT(byFieldId, pGauge, uiBigIdx, 0));
         deviceSU3 a(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_x_idir));
         a.MulDagger(u);
         u.Mul(a);
         u.MulReal(fmY);
+        // -y U_x A_i(n+x) U_x^+
         pXcrossDpureA[uiLinkIndex].Add(u);
 
         //U_x^+(n-x) A_dir(n-x) U_x(n-x)
@@ -601,25 +642,26 @@ _kernelMomentumJGChenDpureA(
         //u.DaggerMul(a);
         //u.MulReal(fmY);
         //pXcrossDpureA[uiLinkIndex].Sub(u);
-        a = _deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, idir);
+        a = _deviceGetGaugeBCDirZeroT(byFieldId, pAphys, uiBigIdx, idir);
         a.MulReal(fmY - fmX);
+        //-(x-y)A_i(n)
         pXcrossDpureA[uiLinkIndex].Sub(a);
 
         //U_y(n) A_dir(n+y)U_y^+(n)
-        u = _deviceGetGaugeBCSU3DirOne(byFieldId, pGauge, uiBigIdx, 1);
+        u = _deviceGetGaugeBCDirOneT(byFieldId, pGauge, uiBigIdx, 1);
         a = _deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_y_idir);
         a.MulDagger(u);
         u.Mul(a);
         u.MulReal(fmX);
+        //-(-x U_y A_i(n+y) U_y^+)
         pXcrossDpureA[uiLinkIndex].Sub(u);
 
-        //U_y^+(n-y) A_dir(n-y) U_y(n-y)
-        //u = _deviceGetGaugeBCSU3DirOne(pGauge, x_m_y_Gauge, 1);
-        //a = _deviceGetGaugeBCSU3DirZero(pAphys, x_m_y_Gauge, idir);
-        //a.Mul(u);
-        //u.DaggerMul(a);
-        //u.MulReal(fmX);
-        //pXcrossDpureA[uiLinkIndex].Add(u);
+        //So, this is:
+        //  -y U_x A_i(n+x) U_x^+ -(x-y)A_i(n) + x U_y A_i(n+y) U_y^+
+        //= x U_y A_i(n+y) U_y^+ - x A_i(n) -y U_x A_i(n+x) U_x^+ + y A_i(n)
+        //= x [U_y A_i(n+y) U_y^+ - A_i(n)] - y [U_x A_i(n+x) U_x^+ - A_i(n)]
+        //= x A_{y,i} -y A_{x,i}
+
     }
 }
 
@@ -638,8 +680,11 @@ _kernelMomentumJGChenDpureAProjectivePlane(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
-    const Real fmY = -static_cast<Real>(sSite4.y - _DC_Centery + F(0.5));
-    const Real fmX = -static_cast<Real>(sSite4.x - _DC_Centerx + F(0.5));
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
+    const INT iXg = sSite4G.x;
+    const INT iYg = sSite4G.y;
+    const Real fmY = -static_cast<Real>(iYg - _DC_Centery + F(0.5));
+    const Real fmX = -static_cast<Real>(iXg - _DC_Centerx + F(0.5));
 
 
     const SSmallInt4 x_p_x_site = _deviceSmallInt4OffsetC(sSite4, 1);
@@ -659,7 +704,7 @@ _kernelMomentumJGChenDpureAProjectivePlane(
         const SIndex& x_p_y_idir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_y_bi4 + idir];
 
         //U_x(n) A_dir(n+x)U_x^+(n)
-        deviceSU3 u(_deviceGetGaugeBCSU3DirOne(byFieldId, pGauge, uiBigIdx, 0));
+        deviceSU3 u(_deviceGetGaugeBCDirOneT(byFieldId, pGauge, uiBigIdx, 0));
         deviceSU3 a(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_x_idir));
         a.MulDagger(u);
         u.Mul(a);
@@ -673,12 +718,12 @@ _kernelMomentumJGChenDpureAProjectivePlane(
         //u.DaggerMul(a);
         //u.MulReal(fmY);
         //pXcrossDpureA[uiLinkIndex].Sub(u);
-        a = _deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, idir);
+        a = _deviceGetGaugeBCDirZeroT(byFieldId, pAphys, uiBigIdx, idir);
         a.MulReal(fmY - fmX);
         pXcrossDpureA[uiLinkIndex].Sub(a); //this is (y-x)A_j
 
         //U_y(n) A_dir(n+y)U_y^+(n)
-        u = _deviceGetGaugeBCSU3DirOne(byFieldId, pGauge, uiBigIdx, 1);
+        u = _deviceGetGaugeBCDirOneT(byFieldId, pGauge, uiBigIdx, 1);
         a = _deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_y_idir);
         a.MulDagger(u);
         u.Mul(a);
@@ -705,17 +750,17 @@ CMeasureAMomentumJG::~CMeasureAMomentumJG()
     }
     if (NULL != m_pDeviceDataBuffer)
     {
-        checkCudaErrors(cudaFree(m_pDeviceDataBuffer));
+        checkCudaErrors(__cudaFree(m_pDeviceDataBuffer));
     }
 
     if (NULL != m_pDistributionR)
     {
-        checkCudaErrors(cudaFree(m_pDistributionR));
+        checkCudaErrors(__cudaFree(m_pDistributionR));
     }
 
     if (NULL != m_pDistributionJG)
     {
-        checkCudaErrors(cudaFree(m_pDistributionJG));
+        checkCudaErrors(__cudaFree(m_pDistributionJG));
     }
 
     if (NULL != m_pHostDistributionR)
@@ -737,7 +782,7 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
     CMeasure::Initial(pOwner, pLatticeData, param, byId);
 
     m_pHostDataBuffer = (Real*)malloc(sizeof(Real) * _HC_Lx * _HC_Ly);
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceDataBuffer, sizeof(Real) * _HC_Lx * _HC_Ly));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceDataBuffer, sizeof(Real) * _HC_Lx * _HC_Ly));
     Reset();
 
     INT iValue = 1;
@@ -781,8 +826,8 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
         //m_uiEdgeR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1);
         SetMaxAndEdge(&m_uiMaxR, &m_uiEdgeR, m_bProjectivePlane);
 
-        checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
-        checkCudaErrors(cudaMalloc((void**)&m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1)));
+        checkCudaErrors(__cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
+        checkCudaErrors(__cudaMalloc((void**)&m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1)));
 
         m_pHostDistributionR = (UINT*)malloc(sizeof(UINT) * (m_uiMaxR + 1));
         m_pHostDistributionJG = (Real*)malloc(sizeof(Real) * (m_uiMaxR + 1));
@@ -810,7 +855,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
 
     if (m_bProjectivePlane)
     {
-        _kernelCalculateAngularMomentumJGProjectivePlane << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelCalculateAngularMomentumJGProjectivePlane, block, threads, 
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
             static_cast<Real>(m_fBetaOverN),
@@ -818,7 +863,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
     }
     else
     {
-        _kernelCalculateAngularMomentumJG << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelCalculateAngularMomentumJG, block, threads, 
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
             static_cast<Real>(m_fBetaOverN),
@@ -831,7 +876,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
 
     if (m_bMeasureDistribution)
     {
-        XYDataToRdistri_R(m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
+        XYDataToRdistri(m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
             m_uiMaxR, TRUE, GetGaugeFieldIdSingleField());
 
         checkCudaErrors(cudaGetLastError());
@@ -839,7 +884,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
         //extract res
         checkCudaErrors(cudaMemcpy(m_pHostDistributionR, m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
         checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
-        FillDataWithR_R(
+        FillDataWithR(
             m_lstJG, &m_lstJGInner, m_lstJGAll, m_lstR, 
             m_pHostDistributionJG, m_pHostDistributionR, 
             m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR,
@@ -879,13 +924,21 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
         appDetailed(_T("\n"));
     }
 
+    if (NULL != m_pOwner)
+    {
+        TArray<Real> configJG;
+        configJG.SetSize(_HC_Lx * _HC_Ly);
+        appCopyElements<Real>(configJG.GetData(), m_pHostDataBuffer, _HC_Lx * _HC_Ly);
+        m_pOwner->AddOneConfigurationResult(this, _T("JG"), configJG);
+    }
+
 #pragma region measure s2
 
     _ZeroXYPlane(m_pDeviceDataBuffer);
 
     if (m_bProjectivePlane)
     {
-        _kernelCalculateAngularMomentumS2ProjectivePlane << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelCalculateAngularMomentumS2ProjectivePlane, block, threads, 
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
             static_cast<Real>(m_fBetaOverN),
@@ -893,7 +946,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
     }
     else
     {
-        _kernelCalculateAngularMomentumS2 << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelCalculateAngularMomentumS2, block, threads, 
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
             static_cast<Real>(m_fBetaOverN),
@@ -914,16 +967,24 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
 
     if (m_bMeasureDistribution)
     {
-        XYDataToRdistri_R(
+        XYDataToRdistri(
             m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
             m_uiMaxR, FALSE, GetGaugeFieldIdSingleField());
 
         checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
-        FillDataWithR_R(
+        FillDataWithR(
             m_lstJGS2, &m_lstJGS2Inner, m_lstJGS2All, m_lstR,
             m_pHostDistributionJG, m_pHostDistributionR,
             m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, F(1.0), FALSE
         );
+    }
+
+    if (NULL != m_pOwner)
+    {
+        TArray<Real> configS2;
+        configS2.SetSize(_HC_Lx * _HC_Ly);
+        appCopyElements<Real>(configS2.GetData(), m_pHostDataBuffer, _HC_Lx * _HC_Ly);
+        m_pOwner->AddOneConfigurationResult(this, _T("S2"), configS2);
     }
 
 #pragma endregion
@@ -946,7 +1007,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
         {
 #pragma region Spin
 
-            _kernelCalculateGaugeSpin << <block, threads >> > (
+            _LAUNCH_KERNEL(_kernelCalculateGaugeSpin, block, threads, 
                 pESU3->m_byFieldId,
                 pESU3->m_pDeviceData, 
                 pAphysSU3->m_pDeviceData, 
@@ -968,16 +1029,24 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
 
             if (m_bMeasureDistribution)
             {
-                XYDataToRdistri_R(
+                XYDataToRdistri(
                     m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
                     m_uiMaxR, FALSE, GetGaugeFieldIdSingleField());
                 
                 checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
-                FillDataWithR_R(
+                FillDataWithR(
                     m_lstJGS, &m_lstJGSInner, m_lstJGSAll, m_lstR,
                     m_pHostDistributionJG, m_pHostDistributionR,
                     m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, F(1.0), FALSE
                 );
+            }
+
+            if (NULL != m_pOwner)
+            {
+                TArray<Real> configJGS;
+                configJGS.SetSize(_HC_Lx * _HC_Ly);
+                appCopyElements<Real>(configJGS.GetData(), m_pHostDataBuffer, _HC_Lx * _HC_Ly);
+                m_pOwner->AddOneConfigurationResult(this, _T("JGS"), configJGS);
             }
 
 #pragma endregion
@@ -987,7 +1056,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
             _ZeroXYPlane(m_pDeviceDataBuffer);
             if (m_bProjectivePlane)
             {
-                _kernelCalculateJGSurfProjectivePlane << <block, threads >> > (
+                _LAUNCH_KERNEL(_kernelCalculateJGSurfProjectivePlane, block, threads, 
                     GetGaugeFieldIdSingleField(),
                     pGaugeSU3->m_pDeviceData,
                     pESU3->m_pDeviceData,
@@ -998,7 +1067,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
             }
             else
             {
-                _kernelCalculateJGSurf << <block, threads >> > (
+                _LAUNCH_KERNEL(_kernelCalculateJGSurf, block, threads, 
                     GetGaugeFieldIdSingleField(),
                     pGaugeSU3->m_pDeviceData,
                     pESU3->m_pDeviceData,
@@ -1022,16 +1091,24 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
 
             if (m_bMeasureDistribution)
             {
-                XYDataToRdistri_R(
+                XYDataToRdistri(
                     m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
                     m_uiMaxR, FALSE, GetGaugeFieldIdSingleField());
 
                 checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
-                FillDataWithR_R(
+                FillDataWithR(
                     m_lstJGSurf, &m_lstJGSurfInner, m_lstJGSurfAll, m_lstR,
                     m_pHostDistributionJG, m_pHostDistributionR,
                     m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, F(1.0), FALSE
                 );
+            }
+
+            if (NULL != m_pOwner)
+            {
+                TArray<Real> configJGSurf;
+                configJGSurf.SetSize(_HC_Lx * _HC_Ly);
+                appCopyElements<Real>(configJGSurf.GetData(), m_pHostDataBuffer, _HC_Lx * _HC_Ly);
+                m_pOwner->AddOneConfigurationResult(this, _T("JGSurf"), configJGSurf);
             }
 
 #pragma endregion
@@ -1042,7 +1119,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
 
             if (m_bProjectivePlane)
             {
-                _kernelMomentumJGChenDpureAProjectivePlane << <block, threads >> > (
+                _LAUNCH_KERNEL(_kernelMomentumJGChenDpureAProjectivePlane, block, threads, 
                     pDpureA->m_pDeviceData,
                     pGaugeSU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
@@ -1051,7 +1128,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
             }
             else
             {
-                _kernelMomentumJGChenDpureA << <block, threads >> > (
+                _LAUNCH_KERNEL(_kernelMomentumJGChenDpureA, block, threads, 
                     pDpureA->m_pDeviceData,
                     pGaugeSU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
@@ -1059,7 +1136,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
                     );
             }
 
-            _kernelMomemtumJGChen << <block, threads >> > (
+            _LAUNCH_KERNEL(_kernelMomemtumJGChen, block, threads, 
                 pGaugeSU3->m_byFieldId,
                 pESU3->m_pDeviceData,
                 pDpureA->m_pDeviceData,
@@ -1081,19 +1158,27 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
 
             if (m_bMeasureDistribution)
             {
-                XYDataToRdistri_R(
+                XYDataToRdistri(
                     m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
                     m_uiMaxR, FALSE, GetGaugeFieldIdSingleField());
 
                 //extract res
                 checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
-                FillDataWithR_R(
+                FillDataWithR(
                     m_lstJGChen, &m_lstJGChenInner, m_lstJGChenAll, m_lstR,
                     m_pHostDistributionJG, m_pHostDistributionR,
                     m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, F(1.0), FALSE
                 );
 
                 checkCudaErrors(cudaGetLastError());
+            }
+
+            if (NULL != m_pOwner)
+            {
+                TArray<Real> configJGChen;
+                configJGChen.SetSize(_HC_Lx * _HC_Ly);
+                appCopyElements<Real>(configJGChen.GetData(), m_pHostDataBuffer, _HC_Lx * _HC_Ly);
+                m_pOwner->AddOneConfigurationResult(this, _T("JGChen"), configJGChen);
             }
 
 #pragma endregion
@@ -1106,7 +1191,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
             _ZeroXYPlane(m_pDeviceDataBuffer);
             if (m_bProjectivePlane)
             {
-                _kernelCalculateJGPotProjectivePlane << <block, threads >> > (
+                _LAUNCH_KERNEL(_kernelCalculateJGPotProjectivePlane, block, threads, 
                     GetGaugeFieldIdSingleField(),
                     pESU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
@@ -1116,7 +1201,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
             }
             else
             {
-                _kernelCalculateJGPot << <block, threads >> > (
+                _LAUNCH_KERNEL(_kernelCalculateJGPot, block, threads, 
                     GetGaugeFieldIdSingleField(),
                     pESU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
@@ -1139,16 +1224,24 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
 
             if (m_bMeasureDistribution)
             {
-                XYDataToRdistri_R(
+                XYDataToRdistri(
                     m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
                     m_uiMaxR, FALSE, GetGaugeFieldIdSingleField());
 
                 checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
-                FillDataWithR_R(
+                FillDataWithR(
                     m_lstJGPot, &m_lstJGPotInner, m_lstJGPotAll, m_lstR,
                     m_pHostDistributionJG, m_pHostDistributionR,
                     m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, F(1.0), FALSE
                 );
+            }
+
+            if (NULL != m_pOwner)
+            {
+                TArray<Real> configJGPot;
+                configJGPot.SetSize(_HC_Lx * _HC_Ly);
+                appCopyElements<Real>(configJGPot.GetData(), m_pHostDataBuffer, _HC_Lx * _HC_Ly);
+                m_pOwner->AddOneConfigurationResult(this, _T("JGPot"), configJGPot);
             }
 
 #pragma endregion
@@ -1167,7 +1260,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
 
                 _ZeroXYPlane(m_pDeviceDataBuffer);
 
-                _kernelMomemtumJGChenApprox << <block, threads >> > (
+                _LAUNCH_KERNEL(_kernelMomemtumJGChenApprox, block, threads, 
                     pAphysSU3->m_byFieldId,
                     pESU3->m_pDeviceData,
                     pDpureA->m_pDeviceData,
@@ -1190,13 +1283,13 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
 
                 if (m_bMeasureDistribution)
                 {
-                    XYDataToRdistri_R(
+                    XYDataToRdistri(
                         FALSE, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
                         m_uiMaxR, FALSE, GetGaugeFieldIdSingleField());
 
                     //extract res
                     checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
-                    FillDataWithR_R(
+                    FillDataWithR(
                         m_lstJGChenApprox, &m_lstJGChenApproxInner, m_lstJGChenApproxAll, m_lstR,
                         m_pHostDistributionJG, m_pHostDistributionR,
                         m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, F(1.0), FALSE
@@ -1204,9 +1297,17 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
                     checkCudaErrors(cudaGetLastError());
                 }
 
+                if (NULL != m_pOwner)
+                {
+                    TArray<Real> configJGChenApprox;
+                    configJGChenApprox.SetSize(_HC_Lx * _HC_Ly);
+                    appCopyElements<Real>(configJGChenApprox.GetData(), m_pHostDataBuffer, _HC_Lx * _HC_Ly);
+                    m_pOwner->AddOneConfigurationResult(this, _T("JGChenApprox"), configJGChenApprox);
+                }
+
                 _ZeroXYPlane(m_pDeviceDataBuffer);
 
-                _kernelMomemtumJGChenApprox2 << <block, threads >> > (
+                _LAUNCH_KERNEL(_kernelMomemtumJGChenApprox2, block, threads, 
                     pAphysSU3->m_byFieldId,
                     pESU3->m_pDeviceData,
                     pDpureA->m_pDeviceData,
@@ -1229,18 +1330,26 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
 
                 if (m_bMeasureDistribution)
                 {
-                    XYDataToRdistri_R(
+                    XYDataToRdistri(
                         FALSE, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
                         m_uiMaxR, FALSE, GetGaugeFieldIdSingleField());
 
                     //extract res
                     checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
-                    FillDataWithR_R(
+                    FillDataWithR(
                         m_lstJGChenApprox2, &m_lstJGChenApprox2Inner, m_lstJGChenApprox2All, m_lstR,
                         m_pHostDistributionJG, m_pHostDistributionR,
                         m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, F(1.0), FALSE
                     );
                     checkCudaErrors(cudaGetLastError());
+                }
+
+                if (NULL != m_pOwner)
+                {
+                    TArray<Real> configJGChenApprox2;
+                    configJGChenApprox2.SetSize(_HC_Lx * _HC_Ly);
+                    appCopyElements<Real>(configJGChenApprox2.GetData(), m_pHostDataBuffer, _HC_Lx * _HC_Ly);
+                    m_pOwner->AddOneConfigurationResult(this, _T("JGChenApprox2"), configJGChenApprox2);
                 }
             }
         }
@@ -1257,7 +1366,7 @@ void CMeasureAMomentumJG::Report()
     appGeneral(_T("=========== Angular Momentum JG of sites ==========\n"), _HC_Centerx);
     appGeneral(_T("===================================================\n"));
 
-    ReportDistributionXY_R(m_uiConfigurationCount, m_lstRes);
+    ReportDistributionXY(m_uiConfigurationCount, m_lstRes);
 
     appGeneral(_T("===================================================\n"));
 
@@ -1265,7 +1374,7 @@ void CMeasureAMomentumJG::Report()
     appGeneral(_T("=========== Angular Momentum S2 of sites ==========\n"), _HC_Centerx);
     appGeneral(_T("===================================================\n"));
 
-    ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGS2);
+    ReportDistributionXY(m_uiConfigurationCount, m_lstResJGS2);
 
     if (m_bMeasureSpin)
     {
@@ -1273,25 +1382,25 @@ void CMeasureAMomentumJG::Report()
         appGeneral(_T("=========== Angular Momentum JGS of sites ==========\n"), _HC_Centerx);
         appGeneral(_T("===================================================\n"));
 
-        ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGS);
+        ReportDistributionXY(m_uiConfigurationCount, m_lstResJGS);
 
         appGeneral(_T("\n===================================================\n"));
         appGeneral(_T("=========== Angular Momentum JGSurf of sites ==========\n"), _HC_Centerx);
         appGeneral(_T("===================================================\n"));
 
-        ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGSurf);
+        ReportDistributionXY(m_uiConfigurationCount, m_lstResJGSurf);
 
         appGeneral(_T("\n===================================================\n"));
         appGeneral(_T("=========== Angular Momentum JG Chen of sites ==========\n"), _HC_Centerx);
         appGeneral(_T("===================================================\n"));
 
-        ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGChen);
+        ReportDistributionXY(m_uiConfigurationCount, m_lstResJGChen);
 
         appGeneral(_T("\n===================================================\n"));
         appGeneral(_T("=========== Angular Momentum JGPot of sites ==========\n"), _HC_Centerx);
         appGeneral(_T("===================================================\n"));
 
-        ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGPot);
+        ReportDistributionXY(m_uiConfigurationCount, m_lstResJGPot);
 
         if (m_bMeasureApprox)
         {
@@ -1299,13 +1408,13 @@ void CMeasureAMomentumJG::Report()
             appGeneral(_T("=========== Angular Momentum JG Chen Approx of sites ==========\n"), _HC_Centerx);
             appGeneral(_T("========================================================\n"));
 
-            ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGChenApprox);
+            ReportDistributionXY(m_uiConfigurationCount, m_lstResJGChenApprox);
 
             appGeneral(_T("\n========================================================\n"));
             appGeneral(_T("=========== Angular Momentum JG Chen Approx 2 of sites ==========\n"), _HC_Centerx);
             appGeneral(_T("========================================================\n"));
 
-            ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGChenApprox2);
+            ReportDistributionXY(m_uiConfigurationCount, m_lstResJGChenApprox2);
         }
     }
 

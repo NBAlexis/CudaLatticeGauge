@@ -45,6 +45,7 @@ using ISTRINGSTREAM = std::wistringstream;
 using STDSTRING = std::wstring;
 #define COUT std::wcout
 #define CIN std::wcin
+#define CERR std::wcerr
 
 #else
 
@@ -56,6 +57,7 @@ using ISTRINGSTREAM = std::istringstream;
 using STDSTRING = std::string;
 #define COUT std::cout
 #define CIN std::cin
+#define CERR std::cerr
 
 #endif
 

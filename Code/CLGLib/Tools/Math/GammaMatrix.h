@@ -63,9 +63,9 @@ extern "C" {
 
         __device__ __inline__ void Set(UINT x, UINT y, UINT b)
         {
-            assert(x < 4);
-            assert(y < 4);
-            assert(b < 4);
+            appAssert(x < 4);
+            appAssert(y < 4);
+            appAssert(b < 4);
 
             UINT uiShift = x << 1;
             UINT uiIndex = y << (uiShift + 8);
@@ -222,9 +222,9 @@ extern "C" {
 
         __device__ __inline__ void Set(BYTE x, BYTE y, BYTE b)
         {
-            assert(x < 4);
-            assert(y < 4);
-            assert(b < 4);
+            appAssert(x < 4);
+            appAssert(y < 4);
+            appAssert(b < 4);
 
             m_uiIndex[x] = y;
             m_byZ4[x] = b;
@@ -251,12 +251,9 @@ extern "C" {
         }
 
         /*
-        * We are on device. Do not use thie function...
-        * this is on device, so use print
-        * If you want to debug it again, copy the result to host and print
-        * Do not call this
+        * Copy the gamma matrix to host to print
         */
-        __device__ __inline__ void Print() const
+        __host__ __inline__ void Print() const
         {
             //#pragma unroll
             for (BYTE row = 0; row < 4; ++row)
@@ -265,23 +262,27 @@ extern "C" {
                 const BYTE byNoneZero = m_uiIndex[row];
                 if (byNoneZero == 0)
                 {
-                    printf("(%2f,%2f) 0     0     0\n",
+                    appGeneral("(%2f,%2f) 0     0     0\n",
                         cv.x, cv.y);
                 }
                 else if (byNoneZero == 1)
                 {
-                    printf("0     (%2f,%2f) 0     0\n",
+                    appGeneral("0     (%2f,%2f) 0     0\n",
                         cv.x, cv.y);
                 }
                 else if (byNoneZero == 2)
                 {
-                    printf("0     0     (%2f,%2f) 0\n",
+                    appGeneral("0     0     (%2f,%2f) 0\n",
                         cv.x, cv.y);
                 }
                 else if (byNoneZero == 3)
                 {
-                    printf("0     0     0     (%2f,%2f)\n",
+                    appGeneral("0     0     0     (%2f,%2f)\n",
                         cv.x, cv.y);
+                }
+                else
+                {
+                    appGeneral(_T("byNoneZero is not from 0 to 3!\n"));
                 }
             }
         }
@@ -466,6 +467,10 @@ public:
             //gmarray[GAMMA4].Set(1, 3, 2);
             //gmarray[GAMMA4].Set(2, 0, 2);
             //gmarray[GAMMA4].Set(3, 1, 2);
+            // 0 0 1 0
+            // 0 0 0 1
+            // 1 0 0 0
+            // 0 1 0 0
             gmarray[GAMMA4].Set(0, 2, 0);
             gmarray[GAMMA4].Set(1, 3, 0);
             gmarray[GAMMA4].Set(2, 0, 0);
@@ -487,14 +492,17 @@ public:
         gmarray[GAMMA35] = gmarray[GAMMA3]._mult(gmarray[GAMMA5]);
         gmarray[GAMMA45] = gmarray[GAMMA4]._mult(gmarray[GAMMA5]);
 
+        //Minkovski sigma
         gmarray[SIGMA12] = gmarray[GAMMA2]._mult_i(gmarray[GAMMA1]);
         gmarray[SIGMA23] = gmarray[GAMMA3]._mult_i(gmarray[GAMMA2]);
         gmarray[SIGMA31] = gmarray[GAMMA1]._mult_i(gmarray[GAMMA3]);
 
+        //Euclidian sigma
         gmarray[SIGMA12E] = gmarray[GAMMA1]._mult_i(gmarray[GAMMA2]);
         gmarray[SIGMA23E] = gmarray[GAMMA2]._mult_i(gmarray[GAMMA3]);
         gmarray[SIGMA31E] = gmarray[GAMMA3]._mult_i(gmarray[GAMMA1]);
 
+        //Minus Euclidian sigma?...
         gmarray[SIGMA41] = gmarray[GAMMA1]._mult_i(gmarray[GAMMA4]);
         gmarray[SIGMA42] = gmarray[GAMMA2]._mult_i(gmarray[GAMMA4]);
         gmarray[SIGMA43] = gmarray[GAMMA3]._mult_i(gmarray[GAMMA4]);

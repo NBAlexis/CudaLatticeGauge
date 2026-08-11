@@ -77,7 +77,7 @@ TestDirichletBoundary:
         Using4Plaqutte : 1
 
     Action2:
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Measure1:
@@ -155,7 +155,7 @@ TestProjectivePlaneBoundary:
         CloverEnergy : 1
 
     Action2:
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Measure1:
@@ -269,7 +269,7 @@ TestBoundaryMapping:
         CloverEnergy : 1
 
     Action2:
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Action3:

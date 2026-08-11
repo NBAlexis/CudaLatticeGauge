@@ -5,6 +5,7 @@
 // This is the class for GMRES Solver
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [03/15/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -50,6 +51,7 @@ CSLASolverGCRODR::CSLASolverGCRODR()
 
     , m_fBeta(F(0.0))
     , m_fDiviation(F(0.0))
+    , m_fLastDiviation(0.0)
 
     , m_pFieldMatrix(NULL)
     
@@ -125,17 +127,17 @@ void CSLASolverGCRODR::Configurate(const CParameters& param)
 */
 void CSLASolverGCRODR::AllocateBuffers(const CField* pFieldB)
 {
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceHm, sizeof(CLGComplex) * m_uiMDim * m_uiMDim));
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceEigenValue, sizeof(CLGComplex) * m_uiKDim));
-    checkCudaErrors(cudaMalloc((void**)&m_pDevicePk, sizeof(CLGComplex) * m_uiKDim * m_uiMDim));
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceHmGm, sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiMDim));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceHm, sizeof(CLGComplex) * m_uiMDim * m_uiMDim));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceEigenValue, sizeof(CLGComplex) * m_uiKDim));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDevicePk, sizeof(CLGComplex) * m_uiKDim * m_uiMDim));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceHmGm, sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiMDim));
 
     
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceTmpQ, sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiKDim));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceTmpQ, sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiKDim));
 
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceALeft, sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiMDim));
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceA, sizeof(CLGComplex) * m_uiMDim * m_uiMDim));
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceB, sizeof(CLGComplex) * m_uiMDim * m_uiMDim));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceALeft, sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiMDim));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceA, sizeof(CLGComplex) * m_uiMDim * m_uiMDim));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceB, sizeof(CLGComplex) * m_uiMDim * m_uiMDim));
 
     m_pHostHmGm = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiMDim);
     m_pHostHmGmToRotate = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiMDim);
@@ -170,15 +172,15 @@ void CSLASolverGCRODR::ReleaseBuffers()
 
     if (NULL != m_pDeviceHm)
     {
-        checkCudaErrors(cudaFree(m_pDeviceHm));
-        checkCudaErrors(cudaFree(m_pDeviceEigenValue));
-        checkCudaErrors(cudaFree(m_pDevicePk));
-        checkCudaErrors(cudaFree(m_pDeviceHmGm));
-        checkCudaErrors(cudaFree(m_pDeviceTmpQ));
+        checkCudaErrors(__cudaFree(m_pDeviceHm));
+        checkCudaErrors(__cudaFree(m_pDeviceEigenValue));
+        checkCudaErrors(__cudaFree(m_pDevicePk));
+        checkCudaErrors(__cudaFree(m_pDeviceHmGm));
+        checkCudaErrors(__cudaFree(m_pDeviceTmpQ));
         
-        checkCudaErrors(cudaFree(m_pDeviceALeft));
-        checkCudaErrors(cudaFree(m_pDeviceA));
-        checkCudaErrors(cudaFree(m_pDeviceB));
+        checkCudaErrors(__cudaFree(m_pDeviceALeft));
+        checkCudaErrors(__cudaFree(m_pDeviceA));
+        checkCudaErrors(__cudaFree(m_pDeviceB));
 
         free(m_pHostHmGm);
         free(m_pHostHmGmToRotate);
@@ -194,7 +196,7 @@ void CSLASolverGCRODR::ReleaseBuffers()
 }
 
 UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, 
-    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
     EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
     //use it to estimate relative error
@@ -210,9 +212,9 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB,
     GetPooledFields(pFieldB);
 
     //set initial gauss x0 = b or pStart
-    CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
     CField* pR = m_lstV[0];//appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pW = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pW = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
 
     if (NULL == pStart)
     {
@@ -227,11 +229,11 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB,
     //Is it the first time of trajectory? (Do we have Yk?)
     if (ESP_InTrajectory == ePhase || ESP_EndTrajectory == ePhase)
     {
-        GenerateCUFirstTime(pX, pR, pFieldB, gaugeNum, bosonNum, gaugeFields, bosonFields, uiM);
+        GenerateCUFirstTime(pX, pR, pFieldB, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, uiM);
     }
     else
     {
-        FirstTimeGMERESSolve(pX, pW, pFieldB, gaugeNum, bosonNum, gaugeFields, bosonFields, uiM);
+        FirstTimeGMERESSolve(pX, pW, pFieldB, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, uiM);
 
         //We have m_pHostHmGm set
         //No matter whether converge, we need Yk for next time solve
@@ -264,9 +266,9 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB,
         //vk+1=r0/|r0|
         //pR->CopyTo(GetW(m_uiKDim));
 #if !_CLG_DOUBLEFLOAT
-        m_fDiviation = static_cast<Real>(_hostsqrtd(pR->Dot(pR).x));
+        m_fDiviation = static_cast<Real>(_hostsqrtd(pR->GetLength()));
 #else
-        m_fDiviation = _hostsqrt(pR->Dot(pR).x);
+        m_fDiviation = _hostsqrt(pR->GetLength());
 #endif
         GetW(m_uiKDim)->ScalarMultply(F(1.0) / m_fDiviation);
         //Arnoldi
@@ -276,7 +278,7 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB,
             CField* vjp1 = GetW(j + 1);
             vj->CopyTo(pW);
             //w = A v[j]
-            pW->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
+            pW->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
             pW->CopyTo(vjp1);
             for (UINT k = 0; k < m_uiKDim; ++k)
             {
@@ -305,9 +307,9 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB,
 
             //h[j + 1, j] = ||w||
 #if !_CLG_DOUBLEFLOAT
-            const Real fWNorm = static_cast<Real>(_hostsqrtd(vjp1->Dot(vjp1).x));
+            const Real fWNorm = static_cast<Real>(_hostsqrtd(vjp1->GetLength()));
 #else
-            const Real fWNorm = _hostsqrt(vjp1->Dot(vjp1).x);
+            const Real fWNorm = _hostsqrt(vjp1->GetLength());
 #endif
             m_pHostHmGm[(j + 1) * m_uiMDim + j] = _make_cuComplex(fWNorm, F(0.0));
             //v[j + 1] = w / ||w||
@@ -342,14 +344,11 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB,
         {
             //============== This is the accurate result, though, slower and not stable =================
             pX->CopyTo(pW);
-            pW->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //x0 = -A x0
+            pW->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, EOCT_Minus); //x0 = -A x0
             pW->AxpyPlus(pFieldB); //x0 = b-Ax0
-#if !_CLG_DOUBLEFLOAT
-            m_cLastDiviation = _cToFloat(pW->Dot(pW));
-#else
-            m_cLastDiviation = pW->Dot(pW);
-#endif
-            m_fDiviation = _hostsqrt(m_cLastDiviation.x);
+            m_fLastDiviation = pW->GetLength();
+
+            m_fDiviation = _hostsqrt(static_cast<Real>(m_fLastDiviation));
         }
         else
         {
@@ -360,12 +359,9 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB,
             {
                 pW->Axpy(_make_cuComplex(-m_pHostY[j].x, -m_pHostY[j].y), GetW(j));
             }
-#if !_CLG_DOUBLEFLOAT
-            m_cLastDiviation = _cToFloat(pW->Dot(pW));
-#else
-            m_cLastDiviation = pW->Dot(pW);
-#endif
-            m_fDiviation = _hostsqrt(m_cLastDiviation.x);
+            m_fLastDiviation = pW->GetLength();
+
+            m_fDiviation = _hostsqrt(static_cast<Real>(m_fLastDiviation));
         }
 
         FindPk2();
@@ -398,7 +394,7 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB,
 }
 
 void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField* pFieldB, 
-    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
     EFieldOperator uiM)
 {
     appParanoiac(_T("-- GCRODR::Solve operator: %s-- Fisrt GMRES step ----\n"), __ENUM_TO_STRING(EFieldOperator, uiM).c_str());
@@ -409,12 +405,12 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
 
     CField* v0 = GetW(0);
     pX->CopyTo(v0); //x0 need to be preserved
-    v0->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //x0 = -A x0
+    v0->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, EOCT_Minus); //x0 = -A x0
     v0->AxpyPlus(pFieldB); //x0 = b-Ax0
 #if !_CLG_DOUBLEFLOAT
-    m_fBeta = static_cast<Real>(_hostsqrtd(v0->Dot(v0).x));
+    m_fBeta = static_cast<Real>(_hostsqrtd(v0->GetLength()));
 #else
-    m_fBeta = _hostsqrt(v0->Dot(v0).x);
+    m_fBeta = _hostsqrt(v0->GetLength());
 #endif
     v0->ScalarMultply(F(1.0) / m_fBeta);  //v[0] = (b - A x0).normalize
     memcpy(m_pHostHmGm, m_pHostZeroMatrix, sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiMDim);
@@ -426,7 +422,7 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
         CField* vjp1 = GetW(j + 1);
         vj->CopyTo(vjp1);
         //w = A v[j]
-        vjp1->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
+        vjp1->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
         
         for (UINT k = 0; k <= j; ++k)
         {
@@ -443,9 +439,9 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
 
         //h[j + 1, j] = ||w||
 #if !_CLG_DOUBLEFLOAT
-        const Real fWNorm = static_cast<Real>(_sqrtd(vjp1->Dot(vjp1).x));
+        const Real fWNorm = static_cast<Real>(_sqrtd(vjp1->GetLength()));
 #else
-        const Real fWNorm = _sqrt(vjp1->Dot(vjp1).x);
+        const Real fWNorm = _sqrt(vjp1->GetLength());
 #endif
         m_pHostHmGm[(j + 1) * m_uiMDim + j] = _make_cuComplex(fWNorm, F(0.0));
         //v[j + 1] = w / ||w||
@@ -475,30 +471,23 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
         {
             pR->Axpy(_make_cuComplex(-m_pHostY[j].x, -m_pHostY[j].y), GetW(j));
         }
-#if !_CLG_DOUBLEFLOAT
-        m_cLastDiviation = _cToFloat(pR->Dot(pR));
-#else
-        m_cLastDiviation = pR->Dot(pR);
-#endif
-        m_fDiviation = _hostsqrt(m_cLastDiviation.x);
+
+        m_fLastDiviation = pR->GetLength();
+        m_fDiviation = _hostsqrt(static_cast<Real>(m_fLastDiviation));
     }
     else
     {
         pX->CopyTo(pR);
-        pR->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //x0 = -A x0
+        pR->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, EOCT_Minus); //x0 = -A x0
         pR->AxpyPlus(pFieldB); //x0 = b-Ax0
-#if !_CLG_DOUBLEFLOAT
-        m_cLastDiviation = _cToFloat(pR->Dot(pR));
-#else
-        m_cLastDiviation = pR->Dot(pR);
-#endif
-        m_fDiviation = _hostsqrt(m_cLastDiviation.x);
+        m_fLastDiviation = pR->GetLength();
+        m_fDiviation = _hostsqrt(static_cast<Real>(m_fLastDiviation));
     }
 
     appParanoiac(_T("-- GCRODR::Solve operator: After Fisrt GMRES step |residue|=%1.12f ----\n"), m_fDiviation);
 }
 
-void CSLASolverGCRODR::QRFactorAY(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, EFieldOperator uiM)
+void CSLASolverGCRODR::QRFactorAY(INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields, EFieldOperator uiM)
 {
     for (UINT i = 0; i < m_uiKDim; ++i)
     {
@@ -509,16 +498,16 @@ void CSLASolverGCRODR::QRFactorAY(INT gaugeNum, INT bosonNum, const CFieldGauge*
 
         //transform Y to AY
         m_lstU[i]->CopyTo(m_lstC[i]);
-        m_lstC[i]->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
+        m_lstC[i]->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
     }
 
     //QR of AY
     for (UINT i = 0; i < m_uiKDim; ++i)
     {
 #if !_CLG_DOUBLEFLOAT
-        const Real fLength = static_cast<Real>(_hostsqrtd(m_lstC[i]->Dot(m_lstC[i]).x));
+        const Real fLength = static_cast<Real>(_hostsqrtd(m_lstC[i]->GetLength()));
 #else
-        const Real fLength = _hostsqrt(m_lstC[i]->Dot(m_lstC[i]).x);
+        const Real fLength = _hostsqrt(m_lstC[i]->GetLength());
 #endif
         m_pHostTmpR[i * m_uiKDim + i] = _make_cuComplex(fLength, F(0.0));
         m_lstC[i]->ScalarMultply(F(1.0) / fLength);
@@ -815,10 +804,10 @@ void CSLASolverGCRODR::GenerateCU(UBOOL bUpdateCk, UBOOL bJustAfterGMRES)
 * We have Yk, (which is Uk), QR is QR of AYk
 */
 void CSLASolverGCRODR::GenerateCUFirstTime(CField* pX, CField* pR, const CField* pFieldB, 
-    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
     EFieldOperator uiM)
 {
-    QRFactorAY(gaugeNum, bosonNum, gaugeFields, bosonFields, uiM);
+    QRFactorAY(gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, uiM);
 
     //Uk = Uk R-1
     FieldSolveY(m_lstU, m_pHostTmpR, m_uiKDim);
@@ -826,15 +815,11 @@ void CSLASolverGCRODR::GenerateCUFirstTime(CField* pX, CField* pR, const CField*
     //CField* v0 = m_lstV[0];
 
     pX->CopyTo(pR);
-    pR->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //r0 = -A x0
+    pR->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, EOCT_Minus); //r0 = -A x0
     pR->AxpyPlus(pFieldB); //r0 = b-Ax0
 
-#if !_CLG_DOUBLEFLOAT
-    m_cLastDiviation = _cToFloat(pR->Dot(pR));
-#else
-    m_cLastDiviation = pR->Dot(pR);
-#endif
-    m_fDiviation = _hostsqrt(__cuCabsSqf(m_cLastDiviation));
+    m_fLastDiviation = pR->GetLength();
+    m_fDiviation = _hostsqrt(static_cast<Real>(m_fLastDiviation));
 }
 
 /**
@@ -876,16 +861,16 @@ void CSLASolverGCRODR::OrthognalXR(CField* pX, CField* pR, CField* pTmp)
 
 void CSLASolverGCRODR::GetPooledFields(const CField* pFieldB)
 {
-    assert(0 == m_lstV.Num());
-    assert(0 == m_lstC.Num());
+    appAssert(0 == m_lstV.Num());
+    appAssert(0 == m_lstC.Num());
     for (UINT i = 0; i < m_uiKDim; ++i)
     {
-        CField* pVectors = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+        CField* pVectors = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
         m_lstC.AddItem(pVectors);
     }
     for (UINT i = 0; i < m_uiMDim - m_uiKDim + 1; ++i)
     {
-        CField* pVectors = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+        CField* pVectors = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
         m_lstV.AddItem(pVectors);
     }
 }

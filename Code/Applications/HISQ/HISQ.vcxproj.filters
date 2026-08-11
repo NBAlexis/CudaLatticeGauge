@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="GaugeFixing.cpp" />
+    <ClCompile Include="Measure.cpp" />
+    <ClCompile Include="HISQ.cpp" />
+    <ClCompile Include="Simulate.cpp" />
+    <ClCompile Include="SimulateTest.cpp" />
+    <ClCompile Include="Task7Mom.cpp" />
+    <ClCompile Include="TaskRotD.cpp" />
+    <ClCompile Include="TaskRotFinalForce.cpp" />
+    <ClCompile Include="TaskRotGaugeForce.cpp" />
+    <ClCompile Include="DebugSU3_12.cpp" />
+    <ClCompile Include="CompareHISQ.cpp" />
+    <ClCompile Include="Task1EO.cpp" />
+    <ClCompile Include="Task1Full.cpp" />
+    <ClCompile Include="Task2EO.cpp" />
+    <ClCompile Include="Task2Full.cpp" />
+    <ClCompile Include="Task3EO.cpp" />
+    <ClCompile Include="Task4Action.cpp" />
+    <ClCompile Include="Task5Plaq.cpp" />
+    <ClCompile Include="Task6FermionAction.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HISQ.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Bin\Debug\HISQ.yaml" />
+    <None Include="..\..\..\OtherProgram\HisqTest\task1.py">
+      <Filter>TestPythonScripts</Filter>
+    </None>
+    <None Include="..\..\..\OtherProgram\HisqTest\task2.py">
+      <Filter>TestPythonScripts</Filter>
+    </None>
+    <None Include="..\..\..\OtherProgram\HisqTest\task4.py">
+      <Filter>TestPythonScripts</Filter>
+    </None>
+    <None Include="..\..\..\OtherProgram\HisqTest\task5.py">
+      <Filter>TestPythonScripts</Filter>
+    </None>
+    <None Include="..\..\..\OtherProgram\HisqTest\task6.py">
+      <Filter>TestPythonScripts</Filter>
+    </None>
+    <None Include="..\..\..\OtherProgram\HisqTest\task3_testA.py">
+      <Filter>TestPythonScripts</Filter>
+    </None>
+    <None Include="..\..\..\OtherProgram\HisqTest\task3_testB.py">
+      <Filter>TestPythonScripts</Filter>
+    </None>
+    <None Include="..\..\..\OtherProgram\HisqTest\task7.py">
+      <Filter>TestPythonScripts</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="TestPythonScripts">
+      <UniqueIdentifier>{7e04e3ac-a1b1-4e7b-afe4-5cb91bf6a6c4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

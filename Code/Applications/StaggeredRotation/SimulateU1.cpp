@@ -104,7 +104,7 @@ INT SimulateStaggeredRotationU1(CParameters& params)
             return 1;
         }
 
-        CMeasurePolyakovU1XY* pPE = dynamic_cast<CMeasurePolyakovU1XY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+        CMeasurePolyakovXY* pPE = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
         TArray<CLGComplex> polykov;
 
         CActionGaugePlaquetteRotatingU1* pGaugeRotation = dynamic_cast<CActionGaugePlaquetteRotatingU1*>(appGetLattice()->GetActionById(1));
@@ -123,7 +123,7 @@ INT SimulateStaggeredRotationU1(CParameters& params)
         {
             appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sOldFileNames[uiNt - iMinNt], EFFT_CLGBin);
             pPE->OnConfigurationAccepted(_FIELDS, NULL);
-            const Real fError = _cuCabsf(pPE->m_lstLoop[0]) - fOldFilePolyakov[uiNt - iMinNt];
+            const Real fError = static_cast<Real>(appAbs(cuCabs(pPE->m_lstLoop[0]) - fOldFilePolyakov[uiNt - iMinNt]));
 #if _CLG_DOUBLEFLOAT
             if (fError < F(1E-07))
 #else
@@ -136,7 +136,7 @@ INT SimulateStaggeredRotationU1(CParameters& params)
             else
             {
                 appGeneral(_T("\n ================ have the initial file, but not matching.... %2.12f, %2.12f, diff=%f ===========\n"),
-                    _cuCabsf(pPE->m_lstLoop[0]), fOldFilePolyakov[uiNt - iMinNt], fError);
+                    cuCabs(pPE->m_lstLoop[0]), fOldFilePolyakov[uiNt - iMinNt], fError);
             }
         }
 
@@ -176,7 +176,7 @@ INT SimulateStaggeredRotationU1(CParameters& params)
             appGeneral(_T("\n Plaq ={\n"));
             for (INT i = 0; i < pPE->m_lstLoop.Num(); ++i)
             {
-                appGeneral(_T("{%f, %f},\n"), _cuCabsf(pPE->m_lstLoop[i]), __cuCargf(pPE->m_lstLoop[i]));
+                appGeneral(_T("{%f, %f},\n"), cuCabs(pPE->m_lstLoop[i]), cuCarg(pPE->m_lstLoop[i]));
             }
             appGeneral(_T("}\n"));
             appPopLogDate();
@@ -217,7 +217,7 @@ INT SimulateStaggeredRotationU1(CParameters& params)
                 sFileName.Format(_T("%sR_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, iSaveStartIndex);
                 appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, EFFT_CLGBin);
                 pPE->OnConfigurationAccepted(_FIELDS, NULL);
-                const Real fError = _cuCabsf(pPE->m_lstLoop[0]) - fPlaqOld;
+                const Real fError = static_cast<Real>(appAbs(cuCabs(pPE->m_lstLoop[0]) - fPlaqOld));
 #if _CLG_DOUBLEFLOAT
                 if (fError < F(1E-07))
 #else
@@ -229,7 +229,7 @@ INT SimulateStaggeredRotationU1(CParameters& params)
                 else
                 {
                     appGeneral(_T("\n ================ have the initial file, but not matching.... %2.12f, %2.12f, diff=%f ===========\n"),
-                        _cuCabsf(pPE->m_lstLoop[0]), fPlaqOld, fError);
+                        cuCabs(pPE->m_lstLoop[0]), fPlaqOld, fError);
                     appFailQuitCLG();
                     return 1;
                 }

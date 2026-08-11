@@ -15,6 +15,9 @@ __BEGIN_NAMESPACE
 CFieldGauge::CFieldGauge()
     : CField()
     , m_uiLinkeCount(_HC_Volume * _HC_Dir)
+    //Set for real at allocation time by the concrete subclass (it knows the
+    //element type). 0 keeps single-GPU / unsplit builds unchanged.
+    , m_uiHaloLinkCount(0)
 {
 
 }

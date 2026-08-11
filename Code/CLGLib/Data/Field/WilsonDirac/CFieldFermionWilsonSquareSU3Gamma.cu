@@ -67,6 +67,8 @@ _kernelApplyGammaSU3Gamma(
     case EOCT_Complex:
         result.MulComp(cCoeff);
         break;
+    default:
+        break;
     }
 
     pResult[uiSiteIndex].Add(result);
@@ -133,8 +135,8 @@ _kernelApplyGammaSU3GammaExp(
     //Assuming periodic
     //get U(x,mu), U^{dagger}(x-mu), 
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-    const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIdx, 3);
-    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(byGaugeFieldId, pGauge, x_m_mu_Gauge);
+    const deviceSU3& x_Gauge_element = _deviceGetGaugeBCDirT(byGaugeFieldId, pGauge, uiBigIdx, 3);
+    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCT(byGaugeFieldId, pGauge, x_m_mu_Gauge);
     if (x_m_mu_Gauge.NeedToDagger())
     {
         x_m_mu_Gauge_element.Dagger();
@@ -227,6 +229,8 @@ _kernelApplyGammaSU3GammaExp(
     case EOCT_Complex:
         result.MulComp(cCoeff);
         break;
+    default:
+        break;
     }
     // -kappa, so it is sub
     pResultData[uiSiteIndex].Sub(result);
@@ -239,7 +243,7 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelForceGammaExp(
     const deviceWilsonVectorSU3* __restrict__ pInverseD,
     const deviceWilsonVectorSU3* __restrict__ pInverseDDdagger,
-    const deviceSU3* __restrict__ pGauge,
+    //const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pFermionMove,
     UINT uiGamma,
     deviceSU3* pForce,
@@ -273,7 +277,7 @@ _kernelForceGammaExp(
     deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
     const deviceWilsonVectorSU3& x_p_mu_Left = pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex];
 
-    const deviceSU3& x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
+    //const deviceSU3& x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
 
     const Real fFac = (x_p_mu_Fermion.NeedToOpposite() ? F(-1.0) : F(1.0)) * fKai;
     const Real fCos = fFac * _cos(fCoeff);
@@ -292,7 +296,7 @@ _kernelForceGammaExp(
     x_p_mu_Right = gamma.MulWilsonC(x_p_mu_Right);
     x_p_mu_Right_real.Add(x_p_mu_Right);
     x_p_mu_Right_real = gamma4.MulWilsonC(x_p_mu_Right_real);
-    deviceSU3 mid = deviceSU3::makeSU3Contract(x_Left, x_p_mu_Right_real);
+    deviceSU3 mid = deviceSU3::makeSU3Contract(x_p_mu_Right_real, x_Left);
 
     //-kappa (exp(Gamma)) U_t phi(n+t) = -exp(Gamma) phi(n+t)
     deviceWilsonVectorSU3 x_Right_real = x_Right.MulRealC(fCos);
@@ -307,11 +311,12 @@ _kernelForceGammaExp(
     x_Right = gamma.MulWilsonC(x_Right);
     x_Right_real.Add(x_Right);
     x_Right_real = gamma4.MulWilsonC(x_Right_real);
-    mid.Sub(deviceSU3::makeSU3Contract(x_Right_real, x_p_mu_Left));
+    mid.Sub(deviceSU3::makeSU3Contract(x_p_mu_Left, x_Right_real));
 
-    deviceSU3 forceOfThisLink = x_Gauge_element.MulC(mid);
-    forceOfThisLink.Ta();
-    pForce[linkIndex].Add(forceOfThisLink);
+    //deviceSU3 forceOfThisLink = x_Gauge_element.MulC(mid);
+    //forceOfThisLink.Ta();
+    //pForce[linkIndex].Add(forceOfThisLink);
+    pForce[linkIndex].Add(mid);
 }
 
 #pragma endregion
@@ -341,7 +346,7 @@ void CFieldFermionWilsonSquareSU3Gamma::appApplyGammaExp(
 
     if (bExp)
     {
-        _kernelApplyGammaSU3GammaExp << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelApplyGammaSU3GammaExp, block, threads, 
             pSource,
             pGauge,
             pGaugeMove,
@@ -360,7 +365,7 @@ void CFieldFermionWilsonSquareSU3Gamma::appApplyGammaExp(
     }
     else
     {
-        _kernelApplyGammaSU3Gamma << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelApplyGammaSU3Gamma, block, threads, 
             pSource,
             pTarget,
             static_cast<UINT>(eGamma),
@@ -394,13 +399,13 @@ void CFieldFermionWilsonSquareSU3Gamma::GammaForceExp(
 
         const deviceWilsonVectorSU3* pInverseD = (const deviceWilsonVectorSU3*)InverseD;
         const deviceWilsonVectorSU3* pInverseDDagger = (const deviceWilsonVectorSU3*)InverseDDagger;
-        const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
+        //const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
         deviceSU3* pForceSU3 = (deviceSU3*)pForce;
 
-        _kernelForceGammaExp << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelForceGammaExp, block, threads, 
             pInverseD,
             pInverseDDagger,
-            pGauge,
+            //pGauge,
             pFermionMove,
             static_cast<UINT>(eGamma),
             pForceSU3,
@@ -423,28 +428,28 @@ void CFieldFermionWilsonSquareSU3Gamma::DOperator(void* pTargetBuffer, const voi
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer, 
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            GAMMA1, bDagger, m_bExpGamma, m_fCoeffGamma1, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            GAMMA1, bDagger, m_bExpGamma, m_fCoeffGamma1, static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffGamma2) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            GAMMA2, bDagger, m_bExpGamma, m_fCoeffGamma2, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            GAMMA2, bDagger, m_bExpGamma, m_fCoeffGamma2, static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffGamma3) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            GAMMA3, bDagger, m_bExpGamma, m_fCoeffGamma3, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            GAMMA3, bDagger, m_bExpGamma, m_fCoeffGamma3, static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffGamma4) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            GAMMA4, bDagger, m_bExpGamma, m_fCoeffGamma4, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            GAMMA4, bDagger, m_bExpGamma, m_fCoeffGamma4, static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
 
     if (abs(m_fCoeffSigma12) > _CLG_FLT_EPSILON)
@@ -452,42 +457,42 @@ void CFieldFermionWilsonSquareSU3Gamma::DOperator(void* pTargetBuffer, const voi
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            SIGMA12, bDagger, m_bExpGamma, m_fCoeffSigma12, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            SIGMA12, bDagger, m_bExpGamma, m_fCoeffSigma12, static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffSigma13) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            SIGMA31, bDagger, m_bExpGamma, m_fCoeffSigma13 * F(-1.0), m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            SIGMA31, bDagger, m_bExpGamma, m_fCoeffSigma13 * F(-1.0), static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffSigma14) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            SIGMA41, bDagger, m_bExpGamma, m_fCoeffSigma14 * F(-1.0), m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            SIGMA41, bDagger, m_bExpGamma, m_fCoeffSigma14 * F(-1.0), static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffSigma23) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            SIGMA23, bDagger, m_bExpGamma, m_fCoeffSigma23, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            SIGMA23, bDagger, m_bExpGamma, m_fCoeffSigma23, static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffSigma24) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            SIGMA42, bDagger, m_bExpGamma, m_fCoeffSigma24 * F(-1.0), m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            SIGMA42, bDagger, m_bExpGamma, m_fCoeffSigma24 * F(-1.0), static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffSigma34) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            SIGMA43, bDagger, m_bExpGamma, m_fCoeffSigma34 * F(-1.0), m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            SIGMA43, bDagger, m_bExpGamma, m_fCoeffSigma34 * F(-1.0), static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
 
     if (abs(m_fCoeffGamma51) > _CLG_FLT_EPSILON)
@@ -495,28 +500,28 @@ void CFieldFermionWilsonSquareSU3Gamma::DOperator(void* pTargetBuffer, const voi
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            GAMMA51, bDagger, m_bExpGamma, m_fCoeffGamma51, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            GAMMA51, bDagger, m_bExpGamma, m_fCoeffGamma51, static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffGamma52) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            GAMMA52, bDagger, m_bExpGamma, m_fCoeffGamma52, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            GAMMA52, bDagger, m_bExpGamma, m_fCoeffGamma52, static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffGamma53) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            GAMMA53, bDagger, m_bExpGamma, m_fCoeffGamma53, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            GAMMA53, bDagger, m_bExpGamma, m_fCoeffGamma53, static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffGamma54) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            GAMMA54, bDagger, m_bExpGamma, m_fCoeffGamma54, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            GAMMA54, bDagger, m_bExpGamma, m_fCoeffGamma54, static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
 
     if (abs(m_fCoeffGamma5) > _CLG_FLT_EPSILON)
@@ -524,14 +529,14 @@ void CFieldFermionWilsonSquareSU3Gamma::DOperator(void* pTargetBuffer, const voi
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-            GAMMA5, bDagger, m_bExpGamma, m_fCoeffGamma5, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+            GAMMA5, bDagger, m_bExpGamma, m_fCoeffGamma5, static_cast<Real>(m_fKai), eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
 }
 
-void CFieldFermionWilsonSquareSU3Gamma::DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const
+void CFieldFermionWilsonSquareSU3Gamma::DerivateDOperator(DOUBLE fCoeff, void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const
 {
-    preparethread;
-    CFieldFermionWilsonSquareSU3D::DerivateDOperator(pForce, pDphi, pDDphi, pGaugeBuffer, byGaugeFieldId);
+    //preparethread;
+    CFieldFermionWilsonSquareSU3D::DerivateDOperator(fCoeff, pForce, pDphi, pDDphi, pGaugeBuffer, byGaugeFieldId);
 
     if (m_bExpGamma)
     {
@@ -539,105 +544,105 @@ void CFieldFermionWilsonSquareSU3Gamma::DerivateDOperator(void* pForce, const vo
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffGamma1, m_fKai, GAMMA1, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffGamma1, static_cast<Real>(fCoeff), GAMMA1, m_byFieldId, byGaugeFieldId);
         }
 
         if (abs(m_fCoeffGamma2) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffGamma2, m_fKai, GAMMA2, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffGamma2, static_cast<Real>(fCoeff), GAMMA2, m_byFieldId, byGaugeFieldId);
         }
 
         if (abs(m_fCoeffGamma3) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffGamma3, m_fKai, GAMMA3, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffGamma3, static_cast<Real>(fCoeff), GAMMA3, m_byFieldId, byGaugeFieldId);
         }
 
         if (abs(m_fCoeffGamma4) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffGamma4, m_fKai, GAMMA4, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffGamma4, static_cast<Real>(fCoeff), GAMMA4, m_byFieldId, byGaugeFieldId);
         }
 
         if (abs(m_fCoeffSigma12) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffSigma12, m_fKai, SIGMA12, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffSigma12, static_cast<Real>(fCoeff), SIGMA12, m_byFieldId, byGaugeFieldId);
         }
 
         if (abs(m_fCoeffSigma13) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffSigma13 * F(-1.0), m_fKai, SIGMA31, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffSigma13 * F(-1.0), static_cast<Real>(fCoeff), SIGMA31, m_byFieldId, byGaugeFieldId);
         }
 
         if (abs(m_fCoeffSigma14) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffSigma14 * F(-1.0), m_fKai, SIGMA41, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffSigma14 * F(-1.0), static_cast<Real>(fCoeff), SIGMA41, m_byFieldId, byGaugeFieldId);
         }
 
         if (abs(m_fCoeffSigma23) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffSigma23, m_fKai, SIGMA23, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffSigma23, static_cast<Real>(fCoeff), SIGMA23, m_byFieldId, byGaugeFieldId);
         }
 
         if (abs(m_fCoeffSigma24) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffSigma24 * F(-1.0), m_fKai, SIGMA42, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffSigma24 * F(-1.0), static_cast<Real>(fCoeff), SIGMA42, m_byFieldId, byGaugeFieldId);
         }
 
         if (abs(m_fCoeffSigma34) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffSigma34 * F(-1.0), m_fKai, SIGMA43, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffSigma34 * F(-1.0), static_cast<Real>(fCoeff), SIGMA43, m_byFieldId, byGaugeFieldId);
         }
 
         if (abs(m_fCoeffGamma51) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffGamma51, m_fKai, GAMMA51, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffGamma51, static_cast<Real>(fCoeff), GAMMA51, m_byFieldId, byGaugeFieldId);
         }
 
         if (abs(m_fCoeffGamma52) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffGamma52, m_fKai, GAMMA52, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffGamma52, static_cast<Real>(fCoeff), GAMMA52, m_byFieldId, byGaugeFieldId);
         }
 
         if (abs(m_fCoeffGamma53) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffGamma53, m_fKai, GAMMA53, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffGamma53, static_cast<Real>(fCoeff), GAMMA53, m_byFieldId, byGaugeFieldId);
         }
 
         if (abs(m_fCoeffGamma54) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffGamma54, m_fKai, GAMMA54, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffGamma54, static_cast<Real>(fCoeff), GAMMA54, m_byFieldId, byGaugeFieldId);
         }
 
         if (abs(m_fCoeffGamma5) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
                 appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-                TRUE, m_fCoeffGamma5, m_fKai, GAMMA5, m_byFieldId, byGaugeFieldId);
+                TRUE, m_fCoeffGamma5, static_cast<Real>(fCoeff), GAMMA5, m_byFieldId, byGaugeFieldId);
         }
     }
 }
@@ -744,9 +749,9 @@ void CFieldFermionWilsonSquareSU3Gamma::InitialOtherParameters(CParameters & par
     }
 }
 
-void CFieldFermionWilsonSquareSU3Gamma::CopyTo(CField* U) const
+void CFieldFermionWilsonSquareSU3Gamma::CopyParamTo(CField* U) const
 {
-    CFieldFermionWilsonSquareSU3D::CopyTo(U);
+    CFieldFermionWilsonSquareSU3D::CopyParamTo(U);
     CFieldFermionWilsonSquareSU3Gamma* pOther = dynamic_cast<CFieldFermionWilsonSquareSU3Gamma*>(U);
 
     pOther->m_bExpGamma = m_bExpGamma;
@@ -769,7 +774,7 @@ void CFieldFermionWilsonSquareSU3Gamma::CopyTo(CField* U) const
 
 CCString CFieldFermionWilsonSquareSU3Gamma::GetInfos(const CCString& tab) const
 {
-    CCString sRet = CFieldFermionWilsonSquareSU3::GetInfos(tab);
+    CCString sRet = CFieldFermionWilsonSquareSU3D::GetInfos(tab);
 
     sRet = sRet + tab + _T("ExpGamma : ") + (m_bExpGamma ? _T("1") : _T("0")) + _T("\n");
 

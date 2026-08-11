@@ -5,8 +5,10 @@
 // (nabla phi)*(nabla phi) + m phi* phi + lambda (phi*phi)^2
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [06/13/2024 nbale]
 //=============================================================================
+#pragma once
 
 #ifndef _CACTIONPHI4_H_
 #define _CACTIONPHI4_H_
@@ -31,13 +33,15 @@ public:
 
     void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) override;
 
-    DOUBLE Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldGauge* const* stableFields) override;
+    DOUBLE Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields, const CFieldGauge* const* stapleFields) override;
 
     UBOOL CalculateForce(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
         CFieldGauge* const* gaugeForces, CFieldBoson* const* bosonForces,
         CFieldGauge* const* stapleFields, ESolverPhase ePhase) const override;
 
     void PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, UINT iUpdateIterate) override;
+
+    CCString GetInfos(const CCString& tab) const override;
 
     Real m_fM;
     Real m_fLambda;

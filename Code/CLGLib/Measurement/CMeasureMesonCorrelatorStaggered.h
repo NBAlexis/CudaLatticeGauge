@@ -2,10 +2,13 @@
 // FILENAME : CMeasureMesonCorrelatorStaggered.h
 // 
 // DESCRIPTION:
-// This is the class for one measurement
+// This is the class for staggered meson correlator measurement.
+// Supports 20 meson channels with up to 3 SO3-degenerate sub-channels each.
+// Computes both wall-to-wall (W2W) and point-to-point (P2P) contractions.
 //
 // REVISION:
 //  [02/22/2019 nbale]
+//  [06/08/2026 nbale] Added SO3 sub-channels and P2P contraction
 //=============================================================================
 
 #ifndef _CMEASUREMESONCORRELATORSTAGGERED_H_
@@ -21,81 +24,131 @@ class CLGAPI CMeasureMesonCorrelatorStaggered : public CMeasure
 public:
 
     enum { _kMesonCorrelatorType = 20 };
+    enum { _kMaxSubChannels = 3 };
 
     CMeasureMesonCorrelatorStaggered() : CMeasure()
-        , m_bSimpleVersion(FALSE)
         , m_pDeviceW1(NULL)
         , m_pDeviceW2(NULL)
-        , m_pDeviceSignTable(NULL)
-        , m_pDeviceDeltaTable(NULL)
-        , m_pDevicePropogators(NULL)
-        , m_pDevicePropogatorsEveryTimeSlice(NULL)
-        , m_pResPropogators(NULL)
+        , m_pDeviceKernelBuffer(NULL)
+        , m_pDeviceKernelEveryTimeSlice(NULL)
+        , m_pW2WCorrelator(NULL)
+        , m_pP2PCorrelator(NULL)
+        , m_pW2WPArray(NULL)
+        , m_pP2PPArray(NULL)
         , m_bGaugeFixing(FALSE)
     {
-        
+        memset(m_pSignTable, 0, sizeof(m_pSignTable));
+        memset(m_pDeltaTable, 0, sizeof(m_pDeltaTable));
+        memset(m_nSubChannels, 0, sizeof(m_nSubChannels));
     }
     ~CMeasureMesonCorrelatorStaggered();
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
 
-    void OnConfigurationAccepted(INT gn, INT bn, const CFieldGauge* const* gs, const CFieldBoson* const* bs, const CFieldGauge* const* stp) override;
+    void OnConfigurationAccepted(INT gn, INT bn, INT tensor2Num, const CFieldGauge* const* gs, const CFieldBoson* const* bs, const CFieldTensor2* const* tensor2Fields, const CFieldGauge* const* stp) override;
     void Report() override;
     void Reset() override;
 
     UBOOL IsGaugeOrBosonMeasurement() const override { return TRUE; }
     UBOOL IsSourceScanning() const override { return FALSE; }
 
+    static void InitialSignTable(
+        BYTE signtable[_kMesonCorrelatorType][_kMaxSubChannels][8],
+        BYTE deltatable[_kMesonCorrelatorType][_kMaxSubChannels],
+        BYTE nsubchannels[_kMesonCorrelatorType]);
+
 protected:
 
-    UBOOL m_bSimpleVersion;
-    //This is a 20 x 8 table
-    BYTE m_pSignTable[_kMesonCorrelatorType * 8];
-    //This is a 20 x 1 table
-    BYTE m_pDeltaTable[_kMesonCorrelatorType];
-    void InitialSignTable();
+    // Sign table: [type][sub-channel][A], values 0 or 1
+    // Sign contribution = m_pSignTable[type][sub][A], even=+1, odd=-1
+    BYTE m_pSignTable[_kMesonCorrelatorType][_kMaxSubChannels][8];
+    // Delta table: [type][sub-channel], values 0-7 (spatial displacement index)
+    BYTE m_pDeltaTable[_kMesonCorrelatorType][_kMaxSubChannels];
 
+    // 24 wall-source fermion fields: 8 shifts x 3 colors
     CFieldFermionKSSU3* m_pW1[24];
     CFieldFermionKSSU3* m_pW2[24];
-    deviceSU3Vector** m_pDeviceW1;
-    deviceSU3Vector** m_pDeviceW2;
+    // Device pointer arrays: 24 field pointers each (W2W/P2P shared)
+    deviceSU3Vector** m_pDeviceW1;   // DSource (D^-1)
+    deviceSU3Vector** m_pDeviceW2;   // DdSource (Dd^-1)
     void CalculateSources(INT gn, INT bn, const CFieldGauge* const* gs, const CFieldBoson* const* bs);
 
-    //uiSite
-    void CalculatePropogators();
-    void SimplerVersion();
+    // W2W contraction: two kernel calls per (A,B) + CPU combination
+    void CalculateW2W();
+    // P2P contraction: one kernel call per (A,B,delta)
+    void CalculateP2P();
+    // Shared projection: C_d(t) = sum_{A,B} sign(A)sign(B) p(t,A,B,d)
+    void ProjectPArray(const cuDoubleComplex* pArray, cuDoubleComplex* correlator);
 
-    BYTE* m_pDeviceSignTable;
-    BYTE* m_pDeviceDeltaTable;
-    CLGComplex* m_pDevicePropogators;
-#if !_CLG_DOUBLEFLOAT
-    cuDoubleComplex* m_pDevicePropogatorsEveryTimeSlice;
-    cuDoubleComplex* m_pResPropogators;
-#else
-    CLGComplex* m_pDevicePropogatorsEveryTimeSlice;
-    CLGComplex* m_pResPropogators;
-#endif
+    // GPU buffers (per-site, shared by W2W and P2P)
+    cuDoubleComplex* m_pDeviceKernelBuffer;         // Volume * 9
+    cuDoubleComplex* m_pDeviceKernelEveryTimeSlice; // Volume_xyz
 
-    //This is 20 x (Lt - 2)
-    
+    // Host per-config correlator buffers
+    cuDoubleComplex* m_pW2WCorrelator;   // 20 * 3 * Lt
+    cuDoubleComplex* m_pP2PCorrelator;   // 20 * 3 * Lt
 
     void InitialBuffers();
 
 public:
 
-#if !_CLG_DOUBLEFLOAT
+    // Per-config p arrays (overwritten each config)
+    cuDoubleComplex* m_pW2WPArray;       // Lt * 8 * 8 * 8
+    cuDoubleComplex* m_pP2PPArray;       // Lt * 8 * 8 * 8
+
     TArray<TArray<DOUBLE>> m_lstAverageResults;
 
-    //m_lstResults[conf][type][t]
-    TArray<TArray<TArray<cuDoubleComplex>>> m_lstResults;
-#else
-    TArray<TArray<Real>> m_lstAverageResults;
-
-    //m_lstResults[conf][type][t]
-    TArray<TArray<TArray<CLGComplex>>> m_lstResults;
-#endif
+    // W2W per-sub-channel correlator: [conf][type][sub][t]
+    TArray<TArray<TArray<TArray<cuDoubleComplex>>>> m_lstW2WCorrelator;
+    // W2W SO3 combined correlator: [conf][type][t]
+    TArray<TArray<TArray<cuDoubleComplex>>> m_lstW2WCombinedCorrelator;
+    // P2P per-sub-channel correlator: [conf][type][sub][t]
+    TArray<TArray<TArray<TArray<cuDoubleComplex>>>> m_lstP2PCorrelator;
+    // P2P SO3 combined correlator: [conf][type][t]
+    TArray<TArray<TArray<cuDoubleComplex>>> m_lstP2PCombinedCorrelator;
 
     UBOOL m_bGaugeFixing;
+    // Number of SO3-degenerate sub-channels per type (1 or 3)
+    BYTE m_nSubChannels[_kMesonCorrelatorType];
 };
+
+/**
+ * Even: 1, Odd: -1
+ */
+static inline INT __eta(INT x, INT y, INT z, INT i)
+{
+    switch (i)
+    {
+    case 1:
+        return 0;
+    case 2:
+        return x;
+    case 3:
+        return x + y;
+    case 4:
+        return x + y + z;
+    default:
+        break;
+    }
+    return x + y + z;
+}
+
+static inline INT __xi(INT x, INT y, INT z, INT i)
+{
+    switch (i)
+    {
+    case 1:
+        return y + z;
+    case 2:
+        return z;
+    case 3:
+        return 1;
+    case 4:
+        return 1;
+    default:
+        break;
+    }
+    return x + y + z;
+}
 
 __END_NAMESPACE
 

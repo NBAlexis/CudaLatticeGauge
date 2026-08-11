@@ -3,6 +3,7 @@ RotatingJob : ERJ_Thermal
 VerboseLevel : PARANOIAC
 VerboseOutput : datetime
 
+# JobThermal
 JobThermal:
 
     ## Log options
@@ -13,18 +14,30 @@ JobThermal:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 10
+    BeforeEquvibStep : 500
     EquvibSkip : 0
-    EquvibStep : 300
+    EquvibStep : 5200
     SaveStartIndex : 0
-    OmegaSep : 8
+    OmegaSep : 10
     OmegaStart : 0
-    MaxOmega : 0.128
-    MinNt : 3
-    MaxNt : 3
-    SavePrefix : ./NC49010_
+    MaxOmega : 0.0585
+    MinNt : 6
+    MaxNt : 6
+    SavePrefix : NCQ535/NCQ535_
     Additive : 0
-    ExponentialPrecision : 0
+    # ExponentialPrecision : 0
+    MaxThreadPerBlock : 256
+
+    ReplenishMode : 0
+    ReplenishSubFolder : 1
+    ReplenishSubFolderPrefix : L:\47816\Nt3
+    ReplenishLoadFile : NC47816_
+
+    # ReplenishIndex0 : [10126, 10214, 10282, 10412, 10657, 10839, 10854, 10899, 11565, 11902, 11912, 11915, 12096, 12149, 12227, 12470, 12550, 12564, 12662, 12892, 12919, 13044, 13072, 13120, 13236, 13324, 13376, 13511, 13565, 13605, 13716, 13788, 13832, 13837, 13897, 13909, 14167, 14418, 14436, 14471, 14476, 14506, 14532, 14663, 14751, 14876]
+    ReplenishIndex1 : []
+    ReplenishIndex2 : [13169]
+    # ReplenishIndex3 : [10075, 10263, 10422, 10477, 10551, 10625, 10626, 10788, 10810, 10852, 10883, 10906, 10976, 11094, 11107, 11219, 11238, 11295, 11302, 11316, 11616, 11658, 11684, 11774, 12168, 12186, 12680, 12849, 12881, 12897, 13025, 13228, 13258, 13473, 13568, 13698, 13724, 13813, 14100, 14439, 14645, 14660, 14911]
+    # ReplenishIndex4 : [10149, 10211, 10696, 10862, 10995, 11003, 11182, 11226, 11234, 11479, 11761, 12063, 12071, 12093, 12105, 12196, 12211]
 
     # 53551575Nt4 Omega60 
     # Polyakovs : [0.2548793495166105009, 0.2674676527142243465, 0.28727804358433550130, 0.36891834544115924644, 0.3714890358030488316, 0.4434429554952389631, 0.5203437138701659326, 0.6383689173717348941, 0.7112141902124326872, 0.8122419471662560913, 0.9025054366091994723]
@@ -37,14 +50,14 @@ JobThermal:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 3]
+    LatticeLength : [26, 26, 12, 6]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
-    ActionListLength : 2
+    ActionListLength : 1
     FermionFieldCount : 1
     MeasureListLength : 1
     CacheStaple : 0
@@ -53,8 +66,8 @@ JobThermal:
     ## Initial files
     ## ============================================================
     # 5016
-    # Nt3FileName : ./48416/NC48416_Rotate_Nt3_O1_8841.con
-    # Nt3Polyakov : 0.819180846214
+    # Nt3FileName : ./NC2020/NC2020_Rotate_Nt3_O1_2000.con
+    # Nt3Polyakov : 0.903573453426
 
     # 55150
     # Nt6FileName : ./NC535161_Rotate_Nt6_O1_2501.con
@@ -79,13 +92,13 @@ JobThermal:
         ReportMeasure : 0
         Adaptive : 1
         MinMaxStep : [4, 50]
-        GrowReduceThreshold : [-0.3, 0.02]
+        GrowReduceThreshold : [-0.3, 0.03]
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        IntegratorType : CIntegratorNestedForceGradient
-        ## IntegratorType : CIntegratorForceGradient
+        ## IntegratorType : CIntegratorNestedForceGradient
+        IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 5
+        IntegratorStep : 25
         NestedStep : 5
         Omelyan2Lambda : 0.38636665500756728
 
@@ -104,7 +117,7 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.1
+        Hopping : 0.21
         FieldId : 2
         PoolNumber : 2
         Period : [0, 0, 1, -1]
@@ -119,18 +132,19 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 4.9
+        Beta : 5.35
         Omega : 0.0
 
     Action2:
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Solver:
+
         SolverForFieldId : 2
 
         # SolverName : CSLASolverBiCGStab
-        Accuracy : 0.00001
+        Accuracy : 0.0000001
 
         DiviationStep : 50
         MaxStep : 1
@@ -161,6 +175,7 @@ JobThermal:
         FieldCount : 1
         ShowResult : 0
 
+# JobPolyakovDist
 JobPolyakovDist:
 
     ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
@@ -168,16 +183,17 @@ JobPolyakovDist:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
+    MaxThreadPerBlock : 256
 
-    FreeFermion : 1
-    GaugeBate : 4.82
-    OmegaRange : 0.14
+    FreeFermion : 0
+    GaugeBate : 5.35
+    OmegaRange : 0.0585
     StartOmega : 0
-    EndOmega : 7
-    StartN : 101
-    EndN : 1100
-    ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum, EDJ_PlaqutteEnergy
-    DistributionJob : EDJ_ChiralAndFermionMomentum
+    EndOmega : 10
+    StartN : 201
+    EndN : 210
+    ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum, EDJ_PlaqutteEnergy, EDJ_RotatingPlaqutteEnergy
+    DistributionJob : EDJ_RotatingPlaqutteEnergy
     FermionMomentum : 0
     StochasticFieldCount : 16
     StochasticGaussian : 1
@@ -185,15 +201,15 @@ JobPolyakovDist:
     UseZ4 : 0
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : H:\configs\newresf\47516\Nt3
+    SubFolderPrefix : H:\RotationWD\535161Nt6\Nt6
     # SubFolderPrefix : G:\configs\newresf\49916\Nt3
 
     # SavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Nt3/NC38161_
     # CSVSavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Polyakov/NC38161_
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
-    SavePrefix : NC47516_
-    CSVSavePrefix : FNC48216_
+    SavePrefix : NC535161_
+    CSVSavePrefix : NC535161_
     # CSVSavePrefix : G:\configs\Extrapolation\502161Nt4\Polyakov\NC502161_
 
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
@@ -206,14 +222,14 @@ JobPolyakovDist:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 3]
+    LatticeLength : [26, 26, 12, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 1
-    MeasureListLength : 5
+    MeasureListLength : 6
     CacheStaple : 0
 
     Gauge:
@@ -230,7 +246,7 @@ JobPolyakovDist:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.16
+        Hopping : 0.21
         FieldId : 2
         PoolNumber : 5
         Period : [0, 0, 1, -1]
@@ -310,18 +326,23 @@ JobPolyakovDist:
         MeasureName : CMeasureAction
         FermiomFieldCount : 9
 
-    # Action is only needed for CMeasureAction measurement
-    # ActionListLength : 1
-    # Action1:
+    Measure6:
+
+        MeasureName : CMeasureRotatingAction
+
+    # Action is needed for CMeasureAction/CMeasureRotatingAction measurement
+    ActionListLength : 1
+    Action1:
    
-    #    ActionName : CActionGaugePlaquetteRotating
-    #    Beta : 5.35
-    #    Omega : 0.0234
+       ActionName : CActionGaugePlaquetteRotating
+       Beta : 5.35
+       Omega : 0.0
 
     # Action2:
-    #     ActionName : CActionFermionWilsonNf2
+    #     ActionName : CActionFermionKS
     #     FieldId : 2
 
+# JobGaugeFixing
 JobGaugeFixing:
 
     # VerboseLevel : DETAILED
@@ -462,7 +483,7 @@ JobRotationTest:
         Omega : 0.1
 
     Action2:
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Solver:
@@ -583,7 +604,7 @@ JobAugular:
         Omega : 0.06
 
     Action2:
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Solver:

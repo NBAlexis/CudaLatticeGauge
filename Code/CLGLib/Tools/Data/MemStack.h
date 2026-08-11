@@ -5,6 +5,7 @@
 // This is a pool, maybe use boost::pool instead?
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [3/13/2018 nbale]
 //=============================================================================
 #ifndef _MEMSTACK_H_
@@ -53,9 +54,9 @@ public:
             Align = m_iDefaultAlignment;
 
         // Debug checks.
-        assert(AllocSize>=0);
-        assert((Align&(Align-1))==0);
-        assert(m_pTop<=m_pEnd);
+        appAssert(AllocSize>=0);
+        appAssert((Align&(Align-1))==0);
+        appAssert(m_pTop<=m_pEnd);
 
         // Try to get memory from the current chunk.
         BYTE* pResult = (BYTE *)(((PTRINT)(m_pTop)+(Align-1))&~(Align-1));

@@ -1,0 +1,52 @@
+\subsection{\label{CayleyHamilton}Cayley-Hamilton method and some results}
+
+Cayley-Hamilton method is widely used in the calculation of smearing, here is some results.
+
+\subsubsection{\label{CayleyHamiltonMethod}Cayley-Hamilton method}
+
+Cayley-Hamilton theory demonstrated, for square matrices,
+\begin{equation}
+\begin{split}
+&p(M)=0,
+\end{split}
+\end{equation}
+where, $p(x)=0$ is the characteristic equation, i.e., $p(x)=\det(M-x I)$ (`p' means polynomial).
+
+It is used to calculate the function of a $N\times N$ matrix, 
+\begin{equation}
+\begin{split}
+&f(M)=\sum _{i=0}^{N-1} f_i M^i,
+\end{split}
+\end{equation}
+
+To determine the coefficients, note that, when $\lambda _j$ is eigen-value of $M$, $f(\lambda _j)$ is eigen-value of $f(M)$. So, we can,
+
+(1) Calculate $f(\lambda _j)$ use $f$.
+
+(2) Calculate $f(\lambda _j)$ use $f(M)=\sum _{i=0}^{N-1} f_i M^i$ with TBD coefficients, $f_i$.
+
+(3) Solve the equation $f(\lambda _j)=\sum _{i=0}^{N-1} f_i \lambda _j^i$ to determine $f_i$.
+
+
+\subsubsection{\label{CayleyHamilton3by3}3 x 3 matrix}
+
+\begin{equation}
+\begin{split}
+&f(Q)=f_0+f_1Q+f_2Q^2,
+\end{split}
+\end{equation}
+with,
+\begin{equation}
+\begin{split}
+&f(\lambda_0)=f_0+f_1\lambda_0+f_2\lambda_0^2,\\
+&f(\lambda_1)=f_0+f_1\lambda_1+f_2\lambda_1^2,\\
+&f(\lambda_2)=f_0+f_1\lambda_2+f_2\lambda_2^2,\\
+\end{split}
+\end{equation}
+where $\lambda_{0,1,2}$ are eigen-values of $Q$.
+
+
+\subsubsection{\label{CayleyHamiltonExponetial}Exponential}
+
+
+\subsubsection{\label{CayleyHamiltonSqrt}Sqrt}

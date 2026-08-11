@@ -5,6 +5,7 @@
 // This is the Approximate force gradient integrator for HMC
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [08/18/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -44,7 +45,6 @@ void CIntegratorMultiLevelOmelyan::NestedEvaluate(INT iLevel, Real fNestedStepLe
 
     UpdateP(m_f2Lambda * fHalfEstep, iLevel,
         bFirst ? ESP_StartTrajectory : ESP_InTrajectory,
-        FALSE,
         TRUE);
 
     if (m_bDebugForce)
@@ -75,8 +75,7 @@ void CIntegratorMultiLevelOmelyan::NestedEvaluate(INT iLevel, Real fNestedStepLe
         }
 
         appDetailed("  Omelyan nested level %d step %d P Middle\n", iLevel, uiStep);
-        UpdateP(fNestedStepLength * (F(1.0) - m_f2Lambda), iLevel, 
-            ESP_InTrajectory, FALSE, TRUE);
+        UpdateP(fNestedStepLength * (F(1.0) - m_f2Lambda), iLevel, ESP_InTrajectory, TRUE);
 
         if (m_bDebugForce)
         {
@@ -105,12 +104,12 @@ void CIntegratorMultiLevelOmelyan::NestedEvaluate(INT iLevel, Real fNestedStepLe
         if (uiStep < uiStepAll)
         {
             appDetailed("  Omelyan nested level %d step %d P\n", iLevel, uiStep);
-            UpdateP(fNestedStepLength * m_f2Lambda, iLevel, ESP_InTrajectory, FALSE, TRUE);
+            UpdateP(fNestedStepLength * m_f2Lambda, iLevel, ESP_InTrajectory, TRUE);
         }
         else
         {
             appDetailed("  Omelyan nested level %d last step %d\n", iLevel, uiStep);
-            UpdateP(m_f2Lambda * fHalfEstep, iLevel, bLast ? ESP_EndTrajectory : ESP_InTrajectory, bLast, TRUE);
+            UpdateP(m_f2Lambda * fHalfEstep, iLevel, bLast ? ESP_EndTrajectory : ESP_InTrajectory, TRUE);
         }
         if (m_bDebugForce)
         {

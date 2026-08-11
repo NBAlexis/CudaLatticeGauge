@@ -5,6 +5,7 @@
 // This is the class for TFQMR solver
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [20/06/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -71,16 +72,16 @@ void CSolverTFQMR::ReleaseBuffers()
 }
 
 UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB, 
-    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
     EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
-    CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pD = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pV = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pAU = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pU = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pW = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pRh = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pD = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pV = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pAU = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pU = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pW = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pRh = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
 
     //use it to estimate relative error
     Real fBLength = F(1.0);
@@ -113,22 +114,18 @@ UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB,
     UBOOL bDone = FALSE;
     for (UINT i = 0; i < m_uiReTry; ++i)
     {
-        pV->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //-A x_0
+        pV->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, EOCT_Minus); //-A x_0
         pV->AxpyPlus(pFieldB); //pR->AxpyPlus(pB); //b - A x_0
         pV->CopyTo(pRh);
         pRh->Dagger();
 
         pV->CopyTo(pU);
         pV->CopyTo(pW);
-        pV->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields); //v0 = A u0
+        pV->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields); //v0 = A u0
         pV->CopyTo(pAU);
 
         Real thetaSq = F(0.0);
-#if !_CLG_DOUBLEFLOAT
-        Real tau = static_cast<Real>(_sqrtd(pU->Dot(pU).x));
-#else
-        Real tau = _sqrt(pU->Dot(pU).x);
-#endif
+        Real tau = _sqrt(static_cast<Real>(pU->GetLength()));
 
 #if !_CLG_DOUBLEFLOAT
         CLGComplex rho = _cToFloat(pRh->Dot(pU));
@@ -173,9 +170,9 @@ UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB,
                 pD->AxpyPlus(pU);
             }
 #if !_CLG_DOUBLEFLOAT
-            thetaSq = static_cast<Real>(pW->Dot(pW).x / (tau * tau));
+            thetaSq = static_cast<Real>(pW->GetLength() / (tau * tau));
 #else
-            thetaSq = pW->Dot(pW).x / (tau * tau);
+            thetaSq = pW->GetLength() / (tau * tau);
 #endif
             const Real cSq = F(1.0) / (1 + thetaSq);
             tau = tau * _sqrt(thetaSq * cSq);
@@ -200,7 +197,7 @@ UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB,
                 pV->ScalarMultply(beta); //v = beta (Au(m) + beta v(m))
 
                 pU->CopyTo(pAU);
-                pAU->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
+                pAU->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
                 pV->AxpyPlus(pAU); //v = Au(m+1) + beta (Au(m) + beta v(m))
 
             }
@@ -208,7 +205,7 @@ UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB,
             {
                 pU->Axpy(_make_cuComplex(-alpha.x, -alpha.y), pV);
                 pU->CopyTo(pAU);
-                pAU->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
+                pAU->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
             }
 
             if (0 == (j + 1) % m_uiDevationCheck)

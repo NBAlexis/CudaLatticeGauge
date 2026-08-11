@@ -17,8 +17,297 @@ __DEFINE_ENUM(EBetaScanMeasureJob,
     EBSMJ_Meson,
     EBSMJ_MesonSimple,
     EBSMJ_DoubleToFloat,
+    EBSMJ_WilsonPath,
+    EBSMJ_WilsonPathTwoPath,
     )
 
+
+/**
+* read text file line-by-line
+* ignore # started lines
+* for each line, change string 1, 2, 3, 4 to TArray<INT>
+*/
+TArray<TArray<INT>> ParseWilsonPath(const CCString& sFileName)
+{
+    TArray<TArray<INT>> ret;
+    CCString sFileContent = appGetFileSystem()->ReadAllText(sFileName);
+    TArray<CCString> sLines = appGetStringList(sFileContent, _T('\n'), 15);
+    for (INT i = 0; i < sLines.Num(); ++i)
+    {
+        if (!sLines[i].IsEmpty() && sLines[i].GetAt(0) != _T('#'))
+        {
+            TArray<CCString> sNumbers = appGetStringList(sLines[i], _T(','), 15);
+            TArray<INT> iNumbers;
+            for (INT j = 0; j < sNumbers.Num(); ++j)
+            {
+                iNumbers.AddItem(appStrToINT(sNumbers[j]));
+            }
+            ret.AddItem(iNumbers);
+        }
+    }
+    return ret;
+}
+
+/**
+* 1 - up
+* 2 - down
+* 3 - right
+* 4 - left
+*/
+TArray<SCHAR> GetOnePath(const TArray<INT>& dirs, SCHAR mu, SCHAR nu)
+{
+    TArray<SCHAR> ret;
+    for (INT i = 0; i < dirs.Num(); ++i)
+    {
+        if (1 == dirs[i])
+        {
+            ret.AddItem(-nu);
+        }
+        else if (2 == dirs[i])
+        {
+            ret.AddItem(nu);
+        }
+        else if (3 == dirs[i])
+        {
+            ret.AddItem(mu);
+        }
+        else if (4 == dirs[i])
+        {
+            ret.AddItem(-mu);
+        }
+    }
+    return ret;
+}
+
+/**
+* 1 - up
+* 2 - down
+* 3 - right
+* 4 - left
+* 5 - in
+* 6 - out
+*/
+TArray<SCHAR> GetOnePath3D(const TArray<INT>& dirs, SCHAR mu, SCHAR nu, SCHAR rho)
+{
+    TArray<SCHAR> ret;
+    for (INT i = 0; i < dirs.Num(); ++i)
+    {
+        if (1 == dirs[i])
+        {
+            ret.AddItem(-nu);
+        }
+        else if (2 == dirs[i])
+        {
+            ret.AddItem(nu);
+        }
+        else if (3 == dirs[i])
+        {
+            ret.AddItem(mu);
+        }
+        else if (4 == dirs[i])
+        {
+            ret.AddItem(-mu);
+        }
+        else if (5 == dirs[i])
+        {
+            ret.AddItem(rho);
+        }
+        else if (6 == dirs[i])
+        {
+            ret.AddItem(-rho);
+        }
+    }
+    return ret;
+}
+
+void GetTwoPath(INT maxK, INT maxL, TArray<TArray<SCHAR>> &path, TArray<SSmallInt4>& shift)
+{
+    SCHAR mulst[3] = {1, 1, 2};
+    SCHAR nulst[3] = {2, 3, 3};
+    SCHAR shiftlst[3] = {3, 2, 1};
+    for (INT k = 1; k <= maxK; ++k)
+    {
+        for (INT mu = 0; mu < 3; ++mu)
+        {
+            TArray<SCHAR> onePath;
+            for (INT p = 0; p < k; ++p)
+            {
+                onePath.AddItem(mulst[mu]);
+            }
+            for (INT p = 0; p < k; ++p)
+            {
+                onePath.AddItem(nulst[mu]);
+            }
+            for (INT p = 0; p < k; ++p)
+            {
+                onePath.AddItem(-mulst[mu]);
+            }
+            for (INT p = 0; p < k; ++p)
+            {
+                onePath.AddItem(-nulst[mu]);
+            }
+
+            //2D shift
+            for (INT shiftx = 0; shiftx <= maxL; ++shiftx)
+            {
+                for (INT shifty = 0; shifty <= maxL; ++shifty)
+                {
+                    if (shiftx >= k || shifty >= k)
+                    {
+                        path.AddItem(onePath);
+                        SSmallInt4 sShift;
+                        sShift.m_byData4[0] = 0;
+                        sShift.m_byData4[1] = 0;
+                        sShift.m_byData4[2] = 0;
+                        sShift.m_byData4[3] = 0;
+                        sShift.m_byData4[mulst[mu] - 1] = static_cast<SCHAR>(shiftx);
+                        sShift.m_byData4[nulst[mu] - 1] = static_cast<SCHAR>(shifty);
+                        shift.AddItem(sShift);
+                    }
+                }
+            }
+
+            //3D shift
+            for (INT shiftz = 1; shiftz <= maxL; ++shiftz)
+            {
+                path.AddItem(onePath);
+                SSmallInt4 sShift;
+                sShift.m_byData4[0] = 0;
+                sShift.m_byData4[1] = 0;
+                sShift.m_byData4[2] = 0;
+                sShift.m_byData4[3] = 0;
+                sShift.m_byData4[shiftlst[mu] - 1] = static_cast<SCHAR>(shiftz);
+                shift.AddItem(sShift);
+            }
+        }
+    }
+}
+
+static CCString MesonOutputBase(const CCString& sCSVSavePrefix, const CCString& sBetaPrefix)
+{
+    CCString sBase;
+    sBase.Format(_T("%s_%s"), sCSVSavePrefix.c_str(), sBetaPrefix.c_str());
+    return sBase;
+}
+
+static void SaveComplexMatrixNpyAndCsv(const CCString& sBaseFile, const TArray<TArray<cuDoubleComplex>>& data)
+{
+    TArray<cuDoubleComplex> flat;
+    for (INT i = 0; i < data.Num(); ++i)
+    {
+        for (INT j = 0; j < data[i].Num(); ++j)
+        {
+            flat.AddItem(data[i][j]);
+        }
+    }
+
+    TArray<INT> shape;
+    shape.AddItem(data.Num());
+    shape.AddItem(data.Num() > 0 ? data[0].Num() : 0);
+    SaveAsNumpyFile<cuDoubleComplex>(sBaseFile + _T(".npy"), flat.GetData(), shape);
+    WriteComplexArray2(sBaseFile + _T(".csv"), data);
+}
+
+static void SaveRealMatrixNpyAndCsv(const CCString& sBaseFile, const TArray<TArray<cuDoubleComplex>>& data)
+{
+    TArray<DOUBLE> flat;
+    TArray<TArray<DOUBLE>> realData;
+    for (INT i = 0; i < data.Num(); ++i)
+    {
+        TArray<DOUBLE> oneConf;
+        for (INT j = 0; j < data[i].Num(); ++j)
+        {
+            flat.AddItem(data[i][j].x);
+            oneConf.AddItem(data[i][j].x);
+        }
+        realData.AddItem(oneConf);
+    }
+
+    TArray<INT> shape;
+    shape.AddItem(data.Num());
+    shape.AddItem(data.Num() > 0 ? data[0].Num() : 0);
+    SaveAsNumpyFile<DOUBLE>(sBaseFile + _T(".npy"), flat.GetData(), shape);
+    WriteRealArray2(sBaseFile + _T(".csv"), realData);
+}
+
+static void SaveMesonPArrays(
+    const CMeasureMesonCorrelatorStaggered* pMC,
+    const CCString& sCSVSavePrefix,
+    const CCString& sBetaPrefix,
+    UINT uiN)
+{
+    TArray<INT> shape;
+    shape.AddItem(_HC_Lti);
+    shape.AddItem(8);
+    shape.AddItem(8);
+    shape.AddItem(8);
+
+    const CCString sBase = MesonOutputBase(sCSVSavePrefix, sBetaPrefix);
+    CCString sFile;
+    sFile.Format(_T("%s_p_%d.npy"), sBase.c_str(), uiN);
+    SaveAsNumpyFile<cuDoubleComplex>(sFile, pMC->m_pP2PPArray, shape);
+    sFile.Format(_T("%s_w2w_p_%d.npy"), sBase.c_str(), uiN);
+    SaveAsNumpyFile<cuDoubleComplex>(sFile, pMC->m_pW2WPArray, shape);
+}
+
+static void SaveMesonCorrelators(
+    const CMeasureMesonCorrelatorStaggered* pMC,
+    const CCString& sCSVSavePrefix,
+    const CCString& sBetaPrefix)
+{
+    const INT nConf = pMC->m_lstW2WCombinedCorrelator.Num();
+    const INT nt = _HC_Lti;
+    const CCString sBase = MesonOutputBase(sCSVSavePrefix, sBetaPrefix);
+
+    for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggered::_kMesonCorrelatorType; ++ty)
+    {
+        for (INT sub = 0; sub < pMC->m_nSubChannels[ty]; ++sub)
+        {
+            TArray<TArray<cuDoubleComplex>> p2pData;
+            TArray<TArray<cuDoubleComplex>> w2wData;
+            for (INT conf = 0; conf < nConf; ++conf)
+            {
+                TArray<cuDoubleComplex> p2pOneConf;
+                TArray<cuDoubleComplex> w2wOneConf;
+                for (INT t = 0; t < nt; ++t)
+                {
+                    p2pOneConf.AddItem(pMC->m_lstP2PCorrelator[conf][ty][sub][t]);
+                    w2wOneConf.AddItem(pMC->m_lstW2WCorrelator[conf][ty][sub][t]);
+                }
+                p2pData.AddItem(p2pOneConf);
+                w2wData.AddItem(w2wOneConf);
+            }
+
+            CCString sFile;
+            sFile.Format(_T("%s_correlationp2p_%d_%d"), sBase.c_str(), ty, sub);
+            SaveComplexMatrixNpyAndCsv(sFile, p2pData);
+            sFile.Format(_T("%s_correlationw2w_%d_%d"), sBase.c_str(), ty, sub);
+            SaveComplexMatrixNpyAndCsv(sFile, w2wData);
+        }
+
+        TArray<TArray<cuDoubleComplex>> p2pCombined;
+        TArray<TArray<cuDoubleComplex>> w2wCombined;
+        for (INT conf = 0; conf < nConf; ++conf)
+        {
+            TArray<cuDoubleComplex> p2pOneConf;
+            TArray<cuDoubleComplex> w2wOneConf;
+            for (INT t = 0; t < nt; ++t)
+            {
+                p2pOneConf.AddItem(pMC->m_lstP2PCombinedCorrelator[conf][ty][t]);
+                w2wOneConf.AddItem(pMC->m_lstW2WCombinedCorrelator[conf][ty][t]);
+            }
+            p2pCombined.AddItem(p2pOneConf);
+            w2wCombined.AddItem(w2wOneConf);
+        }
+
+        CCString sFile;
+        sFile.Format(_T("%s_%d"), sBase.c_str(), ty);
+        SaveRealMatrixNpyAndCsv(sFile, p2pCombined);
+        sFile.Format(_T("%s_w2w_%d"), sBase.c_str(), ty);
+        SaveRealMatrixNpyAndCsv(sFile, w2wCombined);
+    }
+}
+    
 INT MeasurementBetaScan(CParameters& params)
 {
 
@@ -65,6 +354,14 @@ INT MeasurementBetaScan(CParameters& params)
     CCString sCSVSavePrefix;
     params.FetchStringValue(_T("CSVSavePrefix"), sCSVSavePrefix);
     appGeneral(_T("csv save prefix: %s\n"), sCSVSavePrefix.c_str());
+
+    CCString sWilsonPathFile;
+    params.FetchStringValue(_T("WilsonPathFile"), sWilsonPathFile);
+    appGeneral(_T("Wilson Path File: %s\n"), sWilsonPathFile.c_str());
+
+    iVaule = 3;
+    params.FetchValueINT(_T("WilsonPathType"), iVaule);
+    const UINT iWilsonPathDim = static_cast<UINT>(iVaule);
 
     iVaule = 0;
     params.FetchValueINT(_T("ListStart"), iVaule);
@@ -139,7 +436,9 @@ INT MeasurementBetaScan(CParameters& params)
     CActionGaugePlaquette* pAG = dynamic_cast<CActionGaugePlaquette*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
 
     CMeasureMesonCorrelatorStaggered* pMC = dynamic_cast<CMeasureMesonCorrelatorStaggered*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
-    CMeasureMesonCorrelatorStaggeredSimple* pMCSimple = dynamic_cast<CMeasureMesonCorrelatorStaggeredSimple*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
+    CMeasureMesonCorrelatorStaggeredSimple2* pMCSimple = dynamic_cast<CMeasureMesonCorrelatorStaggeredSimple2*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
+
+    CMeasureWilsonLoopWithPath* pWilsonPath = dynamic_cast<CMeasureWilsonLoopWithPath*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
 
     CFieldFermionKSSU3* pF1Light = NULL;
     CFieldFermionKSSU3* pF2Light = NULL;
@@ -149,10 +448,89 @@ INT MeasurementBetaScan(CParameters& params)
 
     if (EBSMJ_Chiral == eJob)
     {
-        pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
-        pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
+        pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+        pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
         //pF1Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
         //pF2Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
+    }
+
+    if (EBSMJ_WilsonPath == eJob)
+    {
+        TArray<TArray<SCHAR>> wilsonPaths;
+        TArray<TArray<INT>> measurePathes = ParseWilsonPath(sWilsonPathFile);
+        for (INT i = 0; i < measurePathes.Num(); ++i)
+        {
+            if (2 == iWilsonPathDim)
+            {
+                for (SCHAR mu = 1; mu <= 4; ++mu)
+                {
+                    for (SCHAR nu = mu + 1; nu <= 4; ++nu)
+                    {
+                        wilsonPaths.AddItem(GetOnePath(measurePathes[i], mu, nu));
+                    }
+                }
+            }
+            else if (3 == iWilsonPathDim)
+            {
+                for (SCHAR skip = 1; skip <= 4; ++skip)
+                {
+                    for (SCHAR mu = 1; mu <= 4; ++mu)
+                    {
+                        if (mu == skip)
+                        {
+                            continue;
+                        }
+                        for (SCHAR nu = 1; nu <= 4; ++nu)
+                        {
+                            if (nu == skip || nu == mu)
+                            {
+                                continue;
+                            }
+                            for (SCHAR rho = 1; rho <= 4; ++rho)
+                            {
+                                if (rho == skip || rho == mu || rho == nu)
+                                {
+                                    continue;
+                                }
+                                wilsonPaths.AddItem(GetOnePath3D(measurePathes[i], mu, nu, rho));
+                            }
+                        }
+                    }
+                }
+            }
+            else if (4 == iWilsonPathDim)
+            {
+                wilsonPaths.AddItem(GetOnePath(measurePathes[i], 1, 2));
+                wilsonPaths.AddItem(GetOnePath(measurePathes[i], 2, 3));
+                wilsonPaths.AddItem(GetOnePath(measurePathes[i], 1, 3));
+            }
+            else if (5 == iWilsonPathDim)
+            {
+                wilsonPaths.AddItem(GetOnePath3D(measurePathes[i], 1, 2, 3));
+                wilsonPaths.AddItem(GetOnePath3D(measurePathes[i], 1, 3, 2));
+                //wilsonPaths.AddItem(GetOnePath3D(measurePathes[i], 2, 1, 3));
+                wilsonPaths.AddItem(GetOnePath3D(measurePathes[i], 2, 3, 1));
+                //wilsonPaths.AddItem(GetOnePath3D(measurePathes[i], 3, 1, 2));
+                //wilsonPaths.AddItem(GetOnePath3D(measurePathes[i], 3, 2, 1));
+            }
+            else if (6 == iWilsonPathDim)
+            {
+                wilsonPaths.AddItem(GetOnePath(measurePathes[i], 1, 2));
+                wilsonPaths.AddItem(GetOnePath(measurePathes[i], 2, 1));
+                wilsonPaths.AddItem(GetOnePath(measurePathes[i], 2, 3));
+                wilsonPaths.AddItem(GetOnePath(measurePathes[i], 3, 2));
+                wilsonPaths.AddItem(GetOnePath(measurePathes[i], 1, 3));
+                wilsonPaths.AddItem(GetOnePath(measurePathes[i], 3, 1));
+            }
+        }
+        pWilsonPath->SetPath(wilsonPaths);
+    }
+    else if (EBSMJ_WilsonPathTwoPath == eJob)
+    {
+        TArray<TArray<SCHAR>> wilsonPaths;
+        TArray<SSmallInt4> shifts;
+        GetTwoPath(_HC_Lx / 4, _HC_Lx / 2, wilsonPaths, shifts);
+        pWilsonPath->SetAsTwoPathBackForward(TRUE, wilsonPaths, shifts);
     }
 
     appPushLogDate(FALSE);
@@ -180,6 +558,7 @@ INT MeasurementBetaScan(CParameters& params)
 
         pMC->Reset();
         pMCSimple->Reset();
+        pWilsonPath->Reset();
 
 #pragma region Measure
 
@@ -242,7 +621,7 @@ INT MeasurementBetaScan(CParameters& params)
                 case EBSMJ_Wilson:
                 {
                     appGetLattice()->m_pGaugeField[0]->CalculateOnlyStaple(pStaple);
-                    appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField[0], pStaple);
+                    appGetLattice()->m_pGaugeSmearing[appGetLattice()->m_pGaugeField[0]->m_byFieldId]->GaugeSmearing(appGetLattice()->m_pGaugeField[0], NULL, pStaple);
                     pWL->OnConfigurationAccepted(_FIELDS, NULL);
                     if (uiN == iStartN)
                     {
@@ -253,7 +632,7 @@ INT MeasurementBetaScan(CParameters& params)
                         }
                         CCString sRadiousFile;
                         sRadiousFile.Format(_T("%s_VR_R.csv"), sCSVSavePrefix.c_str());
-                        WriteStringFileRealArray(sRadiousFile, lstRadius);
+                        WriteRealArray(sRadiousFile, lstRadius);
                     }
                 }
                 break;
@@ -269,10 +648,10 @@ INT MeasurementBetaScan(CParameters& params)
                         {
                             pF1Light->InitialField(EFIT_RandomGaussian);
                         }
-                        pF1Light->FixBoundary();
+                        pF1Light->FixBoundary(EFB_Field);
                         pF1Light->CopyTo(pF2Light);
                         pF1Light->InverseD(_FIELDS);
-                        pF1Light->FixBoundary();
+                        pF1Light->FixBoundary(EFB_Field);
                         if (bSaveFermion)
                         {
                             CCString sFermionFile = "";
@@ -357,11 +736,22 @@ INT MeasurementBetaScan(CParameters& params)
                 case EBSMJ_Meson:
                     {
                         pMC->OnConfigurationAccepted(_FIELDS, NULL);
+                        SaveMesonPArrays(pMC, sCSVSavePrefix, PrefixList[uiOmega], uiN);
                     }
                     break;
                 case EBSMJ_MesonSimple:
                     {
                         pMCSimple->OnConfigurationAccepted(_FIELDS, NULL);
+                    }
+                    break;
+                case EBSMJ_WilsonPath:
+                    {
+                        pWilsonPath->OnConfigurationAccepted(_FIELDS, NULL);
+                    }
+                    break;
+                case EBSMJ_WilsonPathTwoPath:
+                    {
+                        pWilsonPath->OnConfigurationAccepted(_FIELDS, NULL);
                     }
                     break;
                 default:
@@ -386,49 +776,30 @@ INT MeasurementBetaScan(CParameters& params)
 
 #pragma endregion
 
+        // Call Report() for meson correlator text log output
+        if (EBSMJ_Meson == eJob)
+        {
+            pMC->Report();
+            SaveMesonCorrelators(pMC, sCSVSavePrefix, PrefixList[uiOmega]);
+        }
+
         switch (eJob)
         {
             case EBSMJ_Polyakov:
             {
-                CCString sFileNameWrite1;
-                CCString sFileNameWrite2;
-                sFileNameWrite1.Format(_T("%s_%s_polyakov.csv"), sCSVSavePrefix.c_str(), PrefixList[uiOmega].c_str());
-                sFileNameWrite2.Format(_T("%s_%s_polyakov_ZSlice.csv"), sCSVSavePrefix.c_str(), PrefixList[uiOmega].c_str());
-
-                //extract result
-                TArray<CLGComplex> polyOut;
-                TArray<TArray<CLGComplex>> polyakovOmgZSlice;
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    polyOut.AddItem(pPL->m_lstLoop[j]);
-
-                    if (pPL->m_bMeasureZSlice)
-                    {
-                        TArray<CLGComplex> thisConfigurationZSlice;
-                        for (UINT i = 0; i < _HC_Lz; ++i)
-                        {
-                            thisConfigurationZSlice.AddItem(pPL->m_lstPZSlice[j * _HC_Lz + i]);
-                        }
-                        polyakovOmgZSlice.AddItem(thisConfigurationZSlice);
-                    }
-                }
-                WriteStringFileComplexArray(sFileNameWrite1, polyOut);
-                if (pPL->m_bMeasureZSlice)
-                {
-                    WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgZSlice);
-                }
+                pPL->Export(sCSVSavePrefix, iStartN, iEndN, PrefixList[uiOmega], uiOmega, iListStart);
             }
             break;
             case EBSMJ_Chiral:
             {
-                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
+                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega);
                 if (pCCLight->m_bMeasureConnect)
                 {
-                    _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
+                    _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega);
                 }
                 
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega);
 
                 /*
                 _CLG_EXPORT_CHIRAL_SCAN(pCCHeavy, ChiralKS);
@@ -445,7 +816,7 @@ INT MeasurementBetaScan(CParameters& params)
             case EBSMJ_Wilson:
             {
                 CCString sCSVFile;
-                sCSVFile.Format(_T("%s_VR_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
+                sCSVFile.Format(_T("%s_VR_Nt%d_%s.csv"), sCSVSavePrefix.c_str(), _HC_Lt, PrefixList[uiOmega].c_str());
                 TArray<TArray<CLGComplex>> vrs;
                 for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
                 {
@@ -459,7 +830,7 @@ INT MeasurementBetaScan(CParameters& params)
                     }
                     vrs.AddItem(thisConfiguration);
                 }
-                WriteStringFileComplexArray2(sCSVFile, vrs);
+                WriteComplexArray2(sCSVFile, vrs);
             }
             break;
             case EBSMJ_Angular:
@@ -472,62 +843,43 @@ INT MeasurementBetaScan(CParameters& params)
                     _CLG_EXPORT_ANGULAR(pAMJG, JGPot, uiOmega, O);
                 }
                 break;
-            case EBSMJ_Meson:
-            {
-                for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggered::_kMesonCorrelatorType; ++ty)
-                {
-                    CCString sCSVFile;
-                    sCSVFile.Format(_T("%s_meson%d.csv"), sCSVSavePrefix.c_str(), ty);
-#if !_CLG_DOUBLEFLOAT
-                    TArray<TArray<DOUBLE>> res;
-#else
-                    TArray<TArray<Real>> res;
-#endif
-                    for (INT conf = 0; conf < pMC->m_lstResults.Num(); ++conf)
-                    {
-#if !_CLG_DOUBLEFLOAT
-                        TArray<DOUBLE> oneConf;
-#else
-                        TArray<Real> oneConf;
-#endif
-                        for (INT t = 0; t < _HC_Lti - 1; ++t)
-                        {
-                            oneConf.AddItem(pMC->m_lstResults[conf][ty][t].x);
-                        }
-                        res.AddItem(oneConf);
-                    }
-                    WriteStringFileRealArray2(sCSVFile, res);
-                }
-            }
-            break;
             case EBSMJ_MesonSimple:
             {
-                for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple; ++ty)
+                for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggeredSimple2::_kMesonCorrelatorTypeSimple2; ++ty)
                 {
                     CCString sCSVFile;
-                    sCSVFile.Format(_T("%s_mesonsimple%d.csv"), sCSVSavePrefix.c_str(), ty);
-#if !_CLG_DOUBLEFLOAT
+                    sCSVFile.Format(_T("%s_mesonsimple%d_%s.csv"), sCSVSavePrefix.c_str(), ty, PrefixList[uiOmega].c_str());
                     TArray<TArray<DOUBLE>> res;
-#else
-                    TArray<TArray<Real>> res;
-#endif
                     for (INT conf = 0; conf < pMCSimple->m_lstResults.Num(); ++conf)
                     {
-#if !_CLG_DOUBLEFLOAT
                         TArray<DOUBLE> oneConf;
-#else
-                        TArray<Real> oneConf;
-#endif
-                        for (INT t = 0; t < _HC_Lti - 1; ++t)
+                        for (INT t = 0; t < _HC_Lti; ++t)
                         {
                             oneConf.AddItem(pMCSimple->m_lstResults[conf][ty][t]);
                         }
                         res.AddItem(oneConf);
                     }
-                    WriteStringFileRealArray2(sCSVFile, res);
+                    WriteRealArray2(sCSVFile, res);
                 }
             }
             break;
+            case EBSMJ_WilsonPath:
+                {
+                    CCString sCSVFile;
+                    sCSVFile.Format(_T("%s_%s_wilsonloops.csv"), sCSVSavePrefix.c_str(), PrefixList[uiOmega].c_str());
+                    WriteComplexArray2(sCSVFile, pWilsonPath->m_lstV);
+                }
+                break;
+            case EBSMJ_WilsonPathTwoPath:
+                {
+                    CCString sCSVFile;
+                    sCSVFile.Format(_T("%s_%s_wilsonloops_c.csv"), sCSVSavePrefix.c_str(), PrefixList[uiOmega].c_str());
+                    WriteComplexArray2(sCSVFile, pWilsonPath->m_lstV);
+
+                    sCSVFile.Format(_T("%s_%s_wilsonloops_d.csv"), sCSVSavePrefix.c_str(), PrefixList[uiOmega].c_str());
+                    WriteRealArray2(sCSVFile, pWilsonPath->m_lstDV);
+                }
+                break;
             default:
                 break;
         }
@@ -553,5 +905,3 @@ INT MeasurementBetaScan(CParameters& params)
 
     return 0;
 }
-
-

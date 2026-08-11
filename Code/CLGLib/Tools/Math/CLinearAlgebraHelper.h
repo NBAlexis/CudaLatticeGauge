@@ -27,17 +27,17 @@
 #endif
 //If after 10 iteration, it is not converged, it is not about to converge
 #if _CLG_DOUBLEFLOAT
-#define _CLG_DEFAULT_QR_VECTOR_ITE 20
+#define _CLG_DEFAULT_QR_VECTOR_ITE 30
 #else
-#define _CLG_DEFAULT_QR_VECTOR_ITE 10
+#define _CLG_DEFAULT_QR_VECTOR_ITE 20
 #endif
 #else
 #define _CLG_DEFAULT_QR_CRIT F(0.0000000001)
 #define _CLG_DEFAULT_QR_VECTOR_CRIT F(0.000001)
 #if _CLG_DOUBLEFLOAT
-#define _CLG_DEFAULT_QR_VECTOR_ITE 20
+#define _CLG_DEFAULT_QR_VECTOR_ITE 30
 #else
-#define _CLG_DEFAULT_QR_VECTOR_ITE 10
+#define _CLG_DEFAULT_QR_VECTOR_ITE 20
 #endif
 #endif
 
@@ -256,11 +256,6 @@ protected:
         {
             return FALSE;
         }
-
-        inline UBOOL operator!=(const STmpMatrix& ) const
-        {
-            return TRUE;
-        }
     };
 
     STmpMatrix GetTmpMatrix()
@@ -275,7 +270,7 @@ protected:
         }
 
         CLGComplex * newM = NULL;
-        checkCudaErrors(cudaMalloc((void**)&newM, sizeof(CLGComplex) * m_uiDim * m_uiDim));
+        checkCudaErrors(__cudaMalloc((void**)&newM, sizeof(CLGComplex) * m_uiDim * m_uiDim));
         STmpMatrix newone(this, m_lstTmpMatrix.Num(), newM);
         newone.m_bUsing = TRUE;
         m_lstTmpMatrix.AddItem(newone);
@@ -288,7 +283,7 @@ protected:
         for (UINT i = 0; i < uiNum; ++i)
         {
             CLGComplex * newM = NULL;
-            checkCudaErrors(cudaMalloc((void**)&newM, sizeof(CLGComplex) * m_uiDim * m_uiDim));
+            checkCudaErrors(__cudaMalloc((void**)&newM, sizeof(CLGComplex) * m_uiDim * m_uiDim));
             STmpMatrix newone(this, m_lstTmpMatrix.Num(), newM);
             newone.m_bUsing = FALSE;
             m_lstTmpMatrix.AddItem(newone);

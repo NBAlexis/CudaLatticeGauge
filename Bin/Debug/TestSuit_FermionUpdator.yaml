@@ -1,4 +1,5 @@
 
+# TestFermionUpdator
 TestFermionUpdator:
 
     Dim : 4
@@ -70,7 +71,7 @@ TestFermionUpdator:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
         ## MultiStep : 2
 
@@ -78,6 +79,7 @@ TestFermionUpdator:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestFermionUpdatorOmelyan
 TestFermionUpdatorOmelyan:
 
     Dim : 4
@@ -124,16 +126,17 @@ TestFermionUpdatorOmelyan:
         ActionName : CActionGaugePlaquette
         Beta : 5.5
     Action2:
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
     Measure1:
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestFermionUpdatorForceGradient
 TestFermionUpdatorForceGradient:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [4, 4, 4, 8]
+    LatticeLength : [8, 8, 8, 8]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
@@ -143,10 +146,11 @@ TestFermionUpdatorForceGradient:
     FermionFieldCount : 1
     MeasureListLength : 1
 
-    ExpectedResDebug : [0.535]
+    SkipThermalDebug : 1
+    ExpectedResDebug : [0.421047]
     ExpectedRes : [0.462846]
     BeforeMetropolis : 3
-    BeforeMetropolisDebug : 1
+    BeforeMetropolisDebug : 2
     Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 1
@@ -158,7 +162,7 @@ TestFermionUpdatorForceGradient:
         Metropolis : 1
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 6
+        IntegratorStep : 8
 
     Gauge:
         FieldName : CFieldGaugeSU3
@@ -183,11 +187,12 @@ TestFermionUpdatorForceGradient:
         ActionName : CActionGaugePlaquette
         Beta : 5.5
     Action2:
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
     Measure1:
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestFermionUpdatorNestedLeapFrog
 TestFermionUpdatorNestedLeapFrog:
 
     Dim : 4
@@ -241,13 +246,14 @@ TestFermionUpdatorNestedLeapFrog:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestFermionUpdatorNestedOmelyan
 TestFermionUpdatorNestedOmelyan:
 
     Dim : 4
@@ -301,18 +307,19 @@ TestFermionUpdatorNestedOmelyan:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+#TestFermionUpdatorNestedForceGradient
 TestFermionUpdatorNestedForceGradient:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [4, 4, 4, 8]
+    LatticeLength : [8, 8, 8, 8]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
@@ -321,11 +328,13 @@ TestFermionUpdatorNestedForceGradient:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
+    ExponentialPrecision : 8
+    GaugeMomentumFactor : 2.0
 
-    ExpectedResDebug : [0.535]
-    ExpectedRes : [0.462846]
+    ExpectedResDebug : [0.271170]
+    ExpectedRes : [0.345890]
     BeforeMetropolis : 3
-    BeforeMetropolisDebug : 1
+    BeforeMetropolisDebug : 0
     Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 1
@@ -336,8 +345,9 @@ TestFermionUpdatorNestedForceGradient:
         Metropolis : 1
         IntegratorType : CIntegratorNestedForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 5
-        NestedStep : 3
+        IntegratorStep : 15
+        NestedStep : 10
+        InnerLeapfrog : 0
 
     Gauge:
     
@@ -358,24 +368,25 @@ TestFermionUpdatorNestedForceGradient:
         SolverName : CSLASolverGMRES
         SolverForFieldId : 2
         MaxDim : 20
-        Accuracy : 0.00005
+        Accuracy : 0.00001
         Restart : 20
         AbsoluteAccuracy : 1
 
     Action1:
    
         ActionName : CActionGaugePlaquette
-        Beta : 5.5
+        Beta : 4.5
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestFermionUpdatorOmelyanGCRODR
 TestFermionUpdatorOmelyanGCRODR:
 
     Dim : 4
@@ -444,13 +455,14 @@ TestFermionUpdatorOmelyanGCRODR:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestFermionUpdatorOmelyanGMRESMDR
 TestFermionUpdatorOmelyanGMRESMDR:
 
     Dim : 4
@@ -467,6 +479,7 @@ TestFermionUpdatorOmelyanGMRESMDR:
     CacheStaple : 0
     CacheSolution : 0
 
+    SkipThermalDebug : 1
     ExpectedResDebug : [0.535]
     ExpectedRes : [0.462846]
     BeforeMetropolis : 3
@@ -519,13 +532,14 @@ TestFermionUpdatorOmelyanGMRESMDR:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestFermionUpdatorLargeScale
 TestFermionUpdatorLargeScale:
     ## Should be about 1100 - 1350s
     ## Update: on RTX3070 of my laptop, it was 952s
@@ -635,7 +649,7 @@ TestFermionUpdatorLargeScale:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Measure1:
@@ -643,6 +657,7 @@ TestFermionUpdatorLargeScale:
         MeasureName : CMeasurePlaqutteEnergy
 
 
+# TestFermionUpdatorLargeScaleFloat
 TestFermionUpdatorLargeScaleFloat:
     ## Should be about 1100 - 1350s
 
@@ -700,7 +715,6 @@ TestFermionUpdatorLargeScaleFloat:
         IntegratorStepLength : 1
         IntegratorStep : 12
         NestedStep : 8
-        InnerLeapfrog : 1
 
     Gauge:
     
@@ -752,13 +766,14 @@ TestFermionUpdatorLargeScaleFloat:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestFermionUpdatorWithMesonCorrelator
 TestFermionUpdatorWithMesonCorrelator:
 
     Dim : 4
@@ -832,7 +847,7 @@ TestFermionUpdatorWithMesonCorrelator:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
         ## MultiStep : 2
 
@@ -842,6 +857,7 @@ TestFermionUpdatorWithMesonCorrelator:
         GammaMatrix : [ UNITY ]
         FieldId : 2
 
+# TestFermionUpdatorWithMesonCorrelatorRelease
 TestFermionUpdatorWithMesonCorrelatorRelease:
 
     Dim : 4
@@ -915,7 +931,7 @@ TestFermionUpdatorWithMesonCorrelatorRelease:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
         ## MultiStep : 2
 
@@ -926,7 +942,7 @@ TestFermionUpdatorWithMesonCorrelatorRelease:
         FieldId : 2
 
 
-
+# TestBerryPhase
 TestBerryPhase:
 
     Dim : 4
@@ -942,7 +958,7 @@ TestBerryPhase:
     ActionListLength : 3
     FermionFieldCount : 2
     MeasureListLength : 1
-    ExpectedResD : 4.529835250228643417
+    ExpectedResD : 5.382369
     ExpectedResR : 18.858618176011638923
 
     Updator:
@@ -1117,7 +1133,7 @@ TestBerryPhase:
         ShowRes : 1
 
 
-
+# TestFermionUpdatorWilsonDiracGamma1
 TestFermionUpdatorWilsonDiracGamma1:
 
     Dim : 4
@@ -1132,10 +1148,11 @@ TestFermionUpdatorWilsonDiracGamma1:
     FermionFieldCount : 1
     MeasureListLength : 1
 
+    SkipThermalDebug : 1
     ExpectedResDebug : [0.535]
     ExpectedRes : [0.53]
     BeforeMetropolis : 4
-    BeforeMetropolisDebug : 1
+    BeforeMetropolisDebug : 3
     Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 1
@@ -1199,13 +1216,14 @@ TestFermionUpdatorWilsonDiracGamma1:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+# TestFermionUpdatorWilsonDiracGamma2
 TestFermionUpdatorWilsonDiracGamma2:
 
     Dim : 4
@@ -1220,10 +1238,11 @@ TestFermionUpdatorWilsonDiracGamma2:
     FermionFieldCount : 1
     MeasureListLength : 1
 
-    ExpectedResDebug : [0.535]
+    SkipThermalDebug : 1
+    ExpectedResDebug : [0.378709]
     ExpectedRes : [0.53]
     BeforeMetropolis : 4
-    BeforeMetropolisDebug : 1
+    BeforeMetropolisDebug : 3
     Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 1
@@ -1287,9 +1306,1007 @@ TestFermionUpdatorWilsonDiracGamma2:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
+
+#TestFermionUpdatorNestedForceGradientRHMC
+TestFermionUpdatorNestedForceGradientRHMC:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+
+    ExpectedResDebug : [0.389027]
+    ExpectedRes : [0.462846]
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorNestedForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 4
+        NestedStep : 15
+        InnerLeapfrog : 0
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        
+    FermionField1:
+        
+        FieldName : CFieldFermionWilsonSquareSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1575
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+        Rational : ER_AllRational
+        # 1/4, for Nf=1
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        # -1/2, for Nf=1
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.00001
+        Restart : 20
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 50
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0001
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.5
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+# TestFermionUpdatorWilsonDiracEM
+TestFermionUpdatorWilsonDiracEM:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 3
+    GaugeFieldCount : 2
+    FermionFieldCount : 2
+    MeasureListLength : 1
+    CacheSolution : 0
+
+    SkipThermalDebug : 1
+    ExpectedResDebug : [0.459758]
+    ExpectedRes : [0.53]
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 0
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 8
+        NestedStep : 8
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3TreeImproved
+        # FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    Gauge2:
+
+        FieldName : CFieldGaugeU1Real
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_U1Real
+        FieldId : 4
+        Period : [1, 1, 1, 1]
+        EzType : EURT_E_t
+        EzValue : 0.3
+        Dynamic : 0
+        
+    FermionField1:
+        
+        FieldName : CFieldFermionWilsonSquareSU3EM
+
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.16
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+        Charge : 0.66666666666
+        EMFieldID : 4
+
+        Rational : ER_AllRational
+        # 1/4, for Nf=1
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        # -1/2, for Nf=1
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+
+    FermionField2:
+        
+        FieldName : CFieldFermionWilsonSquareSU3EM
+
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.16
+        FieldId : 3
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+        Charge : -0.3333333333
+        EMFieldID : 4
+
+        Rational : ER_AllRational
+        # 1/4, for Nf=1
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        # -1/2, for Nf=1
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 50
+        Accuracy : 0.000001
+        Restart : 50
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 50
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0001
+        AbsoluteAccuracy : 1
+
+    Solver2:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 3
+        MaxDim : 50
+        Accuracy : 0.000001
+        Restart : 50
+        AbsoluteAccuracy : 1
+
+    MSSolver2:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 50
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0001
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 6.5
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Action3:
+
+        ActionName : CActionFermionKS
+        FieldId : 3
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+# TestFermionUpdatorCloverWilsonNf2p1
+TestFermionUpdatorCloverWilsonNf2p1:
+    Dim : 4
+    Dir : 4
+    LatticeLengthDebug : [8, 8, 8, 8]
+    LatticeLength : [12, 12, 12, 12]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 3
+    GaugeFieldCount : 1
+    FermionFieldCount : 2
+    MeasureListLength : 1
+    CacheSolution : 0
+    ExponentialPrecision : 1
+
+    SkipThermalDebug : 1
+    ExpectedResDebug : [0.485977]
+    ExpectedRes : [0.53]
+    BeforeMetropolis : 0
+    BeforeMetropolisDebug : 0
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 10
+        NestedStep : 20
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3TreeImproved
+        # FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        RectOverPlaq : -0.05
+        
+    FermionField1:
+        
+        FieldName : CFieldFermionWilsonSquareCloverSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1575
+        Csw : 1.0
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+    FermionField2:
+        
+        FieldName : CFieldFermionWilsonSquareCloverSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1575
+        Csw : 1.0
+        FieldId : 3
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+        Rational : ER_AllRational
+        # 1/4, for Nf=1
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        # -1/2, for Nf=1
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 50
+        Accuracy : 0.000000001
+        Restart : 50
+        AbsoluteAccuracy : 1
+
+    Solver2:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 3
+        MaxDim : 50
+        Accuracy : 0.000000001
+        Restart : 50
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 50
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0001
+        AbsoluteAccuracy : 1
+
+    MSSolver2:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 50
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0001
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 7.0
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Action3:
+
+        ActionName : CActionFermionKS
+        FieldId : 3
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+    StapleCache:
+
+        StapleCacheName : CStapleCacheSU3
+        FieldId : 1
+
+# TestFermionUpdatorStoutLinkCloverWilsonNf2p1
+TestFermionUpdatorStoutLinkCloverWilsonNf2p1:
+    Dim : 4
+    Dir : 4
+    LatticeLengthDebug : [8, 8, 8, 8]
+    LatticeLength : [12, 12, 12, 12]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    GaugeFieldCount : 1
+    FermionFieldCount : 2
+    MeasureListLength : 1
+    CacheSolution : 0
+    ExponentialPrecision : 1
+
+    SkipThermalDebug : 1
+    ExpectedResDebug : [0.515057]
+    ExpectedRes : [0.53]
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 20
+        NestedStep : 10
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3TreeImproved
+        # FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        RectOverPlaq : -0.05
+        
+    FermionField1:
+        
+        FieldName : CFieldFermionWilsonSquareCloverSU3
+        # FieldName : CFieldFermionWilsonSquareSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.14
+        Csw : 1.0
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+    FermionField2:
+        
+        FieldName : CFieldFermionWilsonSquareCloverSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.14
+        Csw : 1.0
+        FieldId : 3
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+        Rational : ER_AllRational
+        # 1/4, for Nf=1
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        # -1/2, for Nf=1
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.0000001
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    Solver2:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 3
+        MaxDim : 20
+        Accuracy : 0.0000001
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 500
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0001
+        AbsoluteAccuracy : 1
+
+    MSSolver2:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 500
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0001
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 7.0
+
+    Action2:
+
+        ActionName : CActionFermionKSImproveCombined
+        FieldIds : [2, 3]
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingStoutSU3
+        # SmearingName : CGaugeSmearingASQTADSU3
+        Iterate : 1
+        HasT : 1
+        FieldId : 1
+        Update : 1
+        rhojk : 0.25
+        rho4mu : 0.2
+
+    StapleCache:
+
+        StapleCacheName : CStapleCacheSU3
+        FieldId : 1
+
+# TestFermionUpdatorStoutLinkCloverWilsonEMNf2
+TestFermionUpdatorStoutLinkCloverWilsonEMNf2:
+    Dim : 4
+    Dir : 4
+    LatticeLengthDebug : [8, 8, 8, 8]
+    LatticeLength : [12, 12, 12, 12]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    GaugeFieldCount : 2
+    FermionFieldCount : 2
+    MeasureListLength : 1
+    CacheSolution : 0
+    ExponentialPrecision : 1
+
+    SkipThermalDebug : 1
+    ExpectedResDebug : [0.522875]
+    ExpectedRes : [0.53]
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 20
+        NestedStep : 10
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3TreeImproved
+        # FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        RectOverPlaq : -0.05
+
+    Gauge2:
+
+        FieldName : CFieldGaugeU1Real
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_U1Real
+        FieldId : 4
+        Period : [1, 1, 1, 1]
+        EzType : EURT_E_t
+        EzValue : 0.3
+        Dynamic : 0
+        
+    FermionField1:
+        
+        FieldName : CFieldFermionWilsonSquareCloverEMSU3
+        # FieldName : CFieldFermionWilsonSquareSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.14
+        Csw : 1.0
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+        Charge : 0.66666666666
+        EMFieldID : 4
+
+        Rational : ER_AllRational
+        # 1/4, for Nf=1
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        # -1/2, for Nf=1
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+
+    FermionField2:
+        
+        FieldName : CFieldFermionWilsonSquareCloverEMSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.14
+        Csw : 1.0
+        FieldId : 3
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+        Charge : -0.3333333333
+        EMFieldID : 4
+
+        Rational : ER_AllRational
+        # 1/4, for Nf=1
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        # -1/2, for Nf=1
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.0000001
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    Solver2:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 3
+        MaxDim : 20
+        Accuracy : 0.0000001
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 500
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0001
+        AbsoluteAccuracy : 1
+
+    MSSolver2:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 500
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0001
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 7.0
+
+    Action2:
+
+        ActionName : CActionFermionKSImproveCombined
+        FieldIds : [2, 3]
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingStoutSU3
+        # SmearingName : CGaugeSmearingASQTADSU3
+        Iterate : 1
+        HasT : 1
+        FieldId : 1
+        Update : 1
+        rhojk : 0.25
+        rho4mu : 0.2
+
+    StapleCache:
+
+        StapleCacheName : CStapleCacheSU3
+        FieldId : 1
+
+# TestFermionUpdatorStoutLinkCloverWilsonDNf2p1
+TestFermionUpdatorStoutLinkCloverWilsonDNf2p1:
+
+    Dim : 4
+    Dir : 4
+    LatticeLengthDebug : [8, 8, 8, 8]
+    LatticeLength : [12, 12, 12, 12]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    GaugeFieldCount : 1
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    CacheSolution : 0
+    ExponentialPrecision : 1
+
+    SkipThermalDebug : 1
+    ExpectedResDebug : [0.518841]
+    ExpectedRes : [0.53]
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 2
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 18
+        NestedStep : 10
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3TreeImprovedD
+        # FieldName : CFieldGaugeSU3D
+        FieldInitialType : EFIT_Random
+        RectOverPlaq : -0.05
+
+        Period : [1, 1, 0, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+        
+    FermionField1:
+        
+        # FieldName : CFieldFermionWilsonSquareCloverSU3D
+        FieldName : CFieldFermionWilsonSquareSU3D
+
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.14
+        Csw : 1.0
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 0, -1]
+
+    FermionField2:
+        
+        # FieldName : CFieldFermionWilsonSquareCloverSU3D
+        FieldName : CFieldFermionWilsonSquareSU3D
+
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.14
+        Csw : 1.0
+        FieldId : 3
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+        Rational : ER_AllRational
+        # 1/4, for Nf=1
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        # -1/2, for Nf=1
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+
+    BoundaryFermionField1:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 2
+
+    BoundaryFermionField2:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 3
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.0000001
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    Solver2:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 3
+        MaxDim : 20
+        Accuracy : 0.0000001
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 500
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0001
+        AbsoluteAccuracy : 1
+
+    MSSolver2:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 500
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0001
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        CloverEnergy : 1
+        Beta : 7.0
+
+    Action2:
+
+        ActionName : CActionFermionKSImproveCombined
+        # ActionName : CActionFermionKSCombined
+        # FieldIds : [2, 3]
+        FieldIds : [2]
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingStoutSU3
+        # SmearingName : CGaugeSmearingASQTADSU3
+        Iterate : 1
+        # HasT : 1
+        FieldId : 1
+        Update : 1
+        # rhojk : 0.25
+        # rho4mu : 0.2
+        rho : 0.2
+
+    StapleCache:
+
+        StapleCacheName : CStapleCacheSU3
+        FieldId : 1
+#TestFermionUpdatorCG
+TestFermionUpdatorCG:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExponentialPrecision : 8
+    GaugeMomentumFactor : 2.0
+
+    ExpectedResDebug : [0.271170]
+    ExpectedRes : [0.345890]
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 0
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorNestedForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 15
+        NestedStep : 10
+        InnerLeapfrog : 0
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        
+    FermionField1:
+        
+        FieldName : CFieldFermionWilsonSquareSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1575
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+    Solver:
+
+        SolverName : CSLASolverCG
+        SolverForFieldId : 2
+        MaxStep : 5000
+        Accuracy : 0.00001
+        Restart : 20
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 4.5
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+
+#TestFermionUpdatorDeflatedCG
+TestFermionUpdatorDeflatedCG:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExponentialPrecision : 8
+    GaugeMomentumFactor : 2.0
+
+    ExpectedResDebug : [0.271170]
+    ExpectedRes : [0.345890]
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 0
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorNestedForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 15
+        NestedStep : 10
+        InnerLeapfrog : 0
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        
+    FermionField1:
+        
+        FieldName : CFieldFermionWilsonSquareSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1575
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+    Solver:
+
+        SolverName : CSLASolverDeflatedCG
+        SolverForFieldId : 2
+        MaxStep : 5000
+        DeflateDim : 16
+        Deflate : 8
+        ReDeflateInterval : 0
+        Accuracy : 0.00001
+        Restart : 20
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 4.5
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+

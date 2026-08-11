@@ -17,7 +17,7 @@ __BEGIN_NAMESPACE
 static __device__ __inline__ Real _deviceLinkU1ArgSum(
     const CLGComplex* __restrict__ pDeviceData,
     SSmallInt4 sStartSite, BYTE byLength, BYTE byFieldId,
-    const INT* __restrict__ pDir)
+    const SCHAR* __restrict__ pDir)
 {
     //length can be 0
     Real sRet = F(0.0);
@@ -97,7 +97,7 @@ public:
     ~CMeasureBerryPhase();
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
-    void OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const class CFieldGauge* const* pCorrespondingStaple = NULL) override;
+    void OnConfigurationAccepted(INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const class CFieldTensor2* const* tensor2Fields, const class CFieldGauge* const* pCorrespondingStaple = NULL) override;
     void Report() override;
     void Reset() override;
 
@@ -117,10 +117,7 @@ public:
     TArray<TArray<DOUBLE>> m_lstData;
     TArray<TArray<DOUBLE>> m_lstDataXY;
     TArray<TArray<DOUBLE>> m_lstDataXZ;
-    TArray<TArray<DOUBLE>> m_lstDataXT;
     TArray<TArray<DOUBLE>> m_lstDataYZ;
-    TArray<TArray<DOUBLE>> m_lstDataYT;
-    TArray<TArray<DOUBLE>> m_lstDataZT;
 
     UBOOL m_bWilsonDirac;
     UBOOL m_bGuageFixing;

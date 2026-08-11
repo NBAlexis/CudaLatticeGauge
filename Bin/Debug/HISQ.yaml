@@ -1,0 +1,1910 @@
+# EHJ_SimulateTest, EHJ_SimulateNf2p1, EHJ_Measure, EHJ_GaugeFixing
+# EHJ_SimulateTestCacheFull, EHJ_SimulateTestCacheMedian, EHJ_SimulateTestCacheNone
+# EHJ_DebugSU3_12
+WorkJob : EHJ_Measure
+VerboseLevel : DETAILED
+VerboseOutput : datetime
+
+# JobSimulateTest
+JobSimulateTest:
+
+    ## Log options
+    ## Verbose will always show in stdout
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
+    MaxThreadPerBlock : 512
+    VerboseLevel : DETAILED
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Profiler : 1
+    # If use double, set to 0 will be faster, if use single point float, use 8
+    ExponentialPrecision : 1
+    Warmup : 10
+    Metropolis : 50
+    
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 12]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    ActionListLength : 2
+    FermionFieldCount : 5
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 0
+        MinMaxStep : [4, 50]
+        GrowReduceThreshold : [-0.3, 0.02]
+        InnerLeapfrog : 1
+        DebugForce : 0
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorForceGradient, CIntegratorNestedForceGradient }
+        IntegratorType : CIntegratorNestedForceGradient
+        IntegratorStepLength : 1.0
+        IntegratorStep : 7
+        NestedStep : 20
+        Omelyan2Lambda : 0.38636665500756728
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3TreeImproved
+        FieldInitialType : EFIT_Identity
+        # u0=0.88, this is -1/(20 * u0^2)
+        RectOverPlaq : -0.0645661
+
+        Period : [1, 1, 1, 1]
+
+    FermionField1:
+        
+        FieldName : CFieldFermionHISQSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.0
+        FieldId : 2
+        PoolNumber : 15
+
+        Even : 1
+
+        Period : [1, 1, 1, -1]
+
+        MC : [9.9999990908502512e-01, -3.0831906519571126e-08, -1.7156350899477111e-07, -7.5097306479416274e-07, -3.1497834797288229e-06, -1.3023111114765444e-05, -5.2935793313885423e-05, -2.2580671712736666e-04, -1.3001913041494567e-03, -5.5906615173763850e-03, -1.8595160437325720e-02, -3.3694177798746595e-02, 7.3495561731240404e-06, 1.5284248344147264e-05, 4.1035459325352069e-05, 1.2165520399205419e-04, 3.7326525096960969e-04, 1.1603103797459514e-03, 3.7576263722648704e-03, 1.1411511818450513e-02, 3.2394399960427936e-02, 8.0419448260077409e-02, 1.4465098374365390e-01]
+        MD : [1.0000021155336281, 1.0939886112519286e-03, 1.6194518625506564e-03, 2.9258465733027279e-03, 5.6669529514102356e-03, 1.1391958815864864e-02, 2.6098248081539308e-02, 2.8374478337435085e-02, 2.6609540663972843e-02, 1.5160253740913428e-02, 6.4508778820102012e-06,1.4125426177598873e-05, 4.5962277609328359e-05, 1.7027169639196151e-04, 6.5239559724009728e-04, 2.4963044700994116e-03, 7.8975461377670288e-03, 3.0287985422753082e-02, 9.2698483284540570e-02]
+
+    FermionField2:
+        
+        FieldName : CFieldFermionHISQSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.0
+        FieldId : 3
+        PoolNumber : 15
+
+        Even : 1
+
+        Period : [1, 1, 1, -1]
+
+        MC : [2.7327733614742757e00, -5.1288622160737063e-03, -2.0478919078421993e-02, -6.3951352353102550e-02, -1.9268600508174474e-01, -5.8519459892515535e-01, -1.8580289566259904e00, -6.6894626972932318e00, -3.4401695696851874e01, -6.1789841402475429e02, 1.8642524371106700e-01, 3.1582609770026626e-01, 6.7910597147834129e-01, 1.6420879353554103e00, 4.2025399779967945e00, 1.1215270946596673e01, 3.2072436285328692e01, 1.1032630752536383e02, 7.6441549844451458e02]
+        MD : [1.4922969612472456e-01, 4.6061009721530329e-02, 1.1379997711196768e-01, 2.7453631915038118e-01, 6.8761853150948216e-01, 1.8320055253741194e00, 5.8748098933529755e00, 3.8086202810075271e01, 1.8528257058192529e-01, 3.7539911712311358e-01, 1.0581221519179564e00, 3.4031251236671252e00, 1.1740502300224540e01, 4.5730041178720789e01, 2.8391564624137345e02]
+
+    FermionField3:
+        
+        FieldName : CFieldFermionHISQSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.0
+        FieldId : 4
+        PoolNumber : 15
+
+        Even : 1
+
+        Period : [1, 1, 1, -1]
+
+        MC : [2.7327733614742757e00, -5.1288622160737063e-03, -2.0478919078421993e-02, -6.3951352353102550e-02, -1.9268600508174474e-01, -5.8519459892515535e-01, -1.8580289566259904e00, -6.6894626972932318e00, -3.4401695696851874e01, -6.1789841402475429e02, 1.8642524371106700e-01, 3.1582609770026626e-01, 6.7910597147834129e-01, 1.6420879353554103e00, 4.2025399779967945e00, 1.1215270946596673e01, 3.2072436285328692e01, 1.1032630752536383e02, 7.6441549844451458e02]
+        MD : [1.4922969612472456e-01, 4.6061009721530329e-02, 1.1379997711196768e-01, 2.7453631915038118e-01, 6.8761853150948216e-01, 1.8320055253741194e00, 5.8748098933529755e00, 3.8086202810075271e01, 1.8528257058192529e-01, 3.7539911712311358e-01, 1.0581221519179564e00, 3.4031251236671252e00, 1.1740502300224540e01, 4.5730041178720789e01, 2.8391564624137345e02]
+
+    FermionField4:
+        
+        FieldName : CFieldFermionHISQSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.0
+        FieldId : 5
+        PoolNumber : 15
+
+        Even : 1
+
+        Period : [1, 1, 1, -1]
+
+        MC : [2.7327733614742757e00, -5.1288622160737063e-03, -2.0478919078421993e-02, -6.3951352353102550e-02, -1.9268600508174474e-01, -5.8519459892515535e-01, -1.8580289566259904e00, -6.6894626972932318e00, -3.4401695696851874e01, -6.1789841402475429e02, 1.8642524371106700e-01, 3.1582609770026626e-01, 6.7910597147834129e-01, 1.6420879353554103e00, 4.2025399779967945e00, 1.1215270946596673e01, 3.2072436285328692e01, 1.1032630752536383e02, 7.6441549844451458e02]
+        MD : [1.4922969612472456e-01, 4.6061009721530329e-02, 1.1379997711196768e-01, 2.7453631915038118e-01, 6.8761853150948216e-01, 1.8320055253741194e00, 5.8748098933529755e00, 3.8086202810075271e01, 1.8528257058192529e-01, 3.7539911712311358e-01, 1.0581221519179564e00, 3.4031251236671252e00, 1.1740502300224540e01, 4.5730041178720789e01, 2.8391564624137345e02]
+
+    FermionField5:
+        
+        FieldName : CFieldFermionHISQSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.0
+        FieldId : 6
+        PoolNumber : 15
+
+        Even : 1
+
+        # -(1+epsi)/24, epsi = -0.116203
+        Naik: -0.036824875 
+
+        Period : [1, 1, 1, -1]
+
+        MC : [2.8632625463958368e00, -1.8589721708993069e-02, -6.6618257646310880e-02, -1.7948954697327313e-01, -4.6191013341188403e-01, -1.2063592494878799e00, -3.3600738533999448e00, -1.0970991346504185e01, -5.3397740494988270e01, -9.4197553141693140e02, 8.3061102769422712e-01, 1.2147110753467369e00, 2.1684820046243312e00, 4.3629198166612913e00, 9.4367759903301547e00, 2.1699176279854637e01, 5.4742751504634327e01, 1.7132130977818949e02, 1.1233984291995287e03]
+        MD : [1.3593606896652125e-01, 1.0825758523125259e-01, 2.3858292199170952e-01, 4.9757849228595463e-01, 1.0869288323433812e00, 2.5985318243095228e00, 7.8296700630618945e00, 5.0158518761212449e01, 8.2702131812075097e-01, 1.3808411366467241e00, 3.0698210123632368e00, 7.9184834281347021e00, 2.2574497038355780e01, 7.5512268302666101e01, 4.2484648181824633e02]
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 7.3
+
+    Action2:
+
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2, 3, 4, 5, 6]
+
+    Solver:
+
+        SolverForFieldId : 2
+
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.000001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        MaxStep : 30
+        Accuracy : 0.0001
+        AbsoluteAccuracy : 1
+        # SolverName : CMultiShiftFOM
+        # SolverForFieldId : 2
+        # UseCudaForSmallMatrix : 0
+        # MaxDim : 30
+        # Accuracy : 0.00000001
+        # Restart : 10
+        # AbsoluteAccuracy : 1
+
+    MSSolver2:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 10
+        MaxStep : 30
+        Accuracy : 0.000001
+        AbsoluteAccuracy : 1
+
+    MSSolver3:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 4
+        DiviationStep : 10
+        MaxStep : 30
+        Accuracy : 0.000001
+        AbsoluteAccuracy : 1
+
+    MSSolver4:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 5
+        DiviationStep : 10
+        MaxStep : 30
+        Accuracy : 0.000001
+        AbsoluteAccuracy : 1
+
+    MSSolver5:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 6
+        DiviationStep : 10
+        MaxStep : 30
+        Accuracy : 0.000001
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+        FieldId : 1
+        ShowResult : 1
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingHISQSU3
+        FieldId : 1
+        # Cache : EHLC_None
+
+
+# JobSimulateNf2p1
+JobSimulateNf2p1:
+
+    ## Log options
+    ## Verbose will always show in stdout
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
+    MaxThreadPerBlock : 512
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    # If use double, set to 0 will be faster, if use single point float, use 8
+    ExponentialPrecision : 10
+    WarmUp : 50
+    BeforeEquvibStep : 0
+    EquvibSkip : 0
+    EquvibStep : 50
+    SaveStartIndex : 0
+    ListStart : 0
+    ListEnd : 3
+    BetaList : [5.5, 5.6, 5.7]
+    PrefixList : [55, 56, 57]
+    SavePrefix : ./HS005_
+    Additive : 0
+
+    # 53551575Nt4 Omega60 
+    # Polyakovs : [0.2548793495166105009, 0.2674676527142243465, 0.28727804358433550130, 0.36891834544115924644, 0.3714890358030488316, 0.4434429554952389631, 0.5203437138701659326, 0.6383689173717348941, 0.7112141902124326872, 0.8122419471662560913, 0.9025054366091994723]
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 6]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    ActionListLength : 2
+    FermionFieldCount : 4
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## ============================================================
+    ## Initial files
+    ## ============================================================
+    # OldFileName : ./HS005_HISQScan_55_1.con
+    # OldPolyakov : 0.151
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 1
+        MinMaxStep : [4, 50]
+        GrowReduceThreshold : [-0.4, 0.03]
+        InnerLeapfrog : 1
+        DebugForce : 0
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorForceGradient, CIntegratorNestedForceGradient }
+        IntegratorType : CIntegratorNestedForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 10
+        NestedStep : 30
+        Omelyan2Lambda : 0.38636665500756728
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3TreeImproved
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    FermionField1:
+        
+        # s quark 0.05
+        FieldName : CFieldFermionHISQSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.1
+        FieldId : 2
+        PoolNumber : 15
+
+        Even : 1
+
+        Period : [1, 1, 1, -1]
+
+        # This is x^{1/8} for 0.05 to 10
+        MC : [1.866438276729494, -0.004158991473189813, -0.025668912499730936, -0.14428113228560133, -0.9896504385100587, -19.78523487237555, 0.020737682667942268, 0.15706642938087936, 0.7798392063015107, 3.9432010280737186, 34.39976205590734]
+
+        # This is x^{-1/4} for 0.05 to 10
+        MD : [0.2842931443442772, 0.02659641744957848, 0.07765289622977581, 0.23515046366202735, 0.830707148211016, 5.539797047798846, 0.011812260670741273, 0.11346775711169532, 0.5812344447717718, 2.869446212635544, 20.616157526098824]
+
+    FermionField2:
+        
+        # s quark 0.05
+        FieldName : CFieldFermionHISQSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.1
+        FieldId : 3
+        PoolNumber : 15
+
+        Even : 1
+
+        Period : [1, 1, 1, -1]
+
+        # This is x^{1/8} for 0.05 to 10
+        MC : [1.866438276729494, -0.004158991473189813, -0.025668912499730936, -0.14428113228560133, -0.9896504385100587, -19.78523487237555, 0.020737682667942268, 0.15706642938087936, 0.7798392063015107, 3.9432010280737186, 34.39976205590734]
+
+        # This is x^{-1/4} for 0.05 to 10
+        MD : [0.2842931443442772, 0.02659641744957848, 0.07765289622977581, 0.23515046366202735, 0.830707148211016, 5.539797047798846, 0.011812260670741273, 0.11346775711169532, 0.5812344447717718, 2.869446212635544, 20.616157526098824]
+
+    FermionField3:
+        
+        # s quark 0.05
+        FieldName : CFieldFermionHISQSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.1
+        FieldId : 4
+        PoolNumber : 15
+
+        Even : 1
+
+        Period : [1, 1, 1, -1]
+
+        # This is x^{1/8} for 0.05 to 10
+        MC : [1.866438276729494, -0.004158991473189813, -0.025668912499730936, -0.14428113228560133, -0.9896504385100587, -19.78523487237555, 0.020737682667942268, 0.15706642938087936, 0.7798392063015107, 3.9432010280737186, 34.39976205590734]
+
+        # This is x^{-1/4} for 0.05 to 10
+        MD : [0.2842931443442772, 0.02659641744957848, 0.07765289622977581, 0.23515046366202735, 0.830707148211016, 5.539797047798846, 0.011812260670741273, 0.11346775711169532, 0.5812344447717718, 2.869446212635544, 20.616157526098824]
+
+    FermionField4:
+        
+        # u and d preconditioned by s
+        # mass of u and d is 0.005, s is 0.05
+        FieldName : CFieldFermionHISQSU3
+
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.01
+        FieldId : 5
+        PoolNumber : 15
+
+        Even : 1
+
+        Period : [1, 1, 1, -1]
+
+        # This is ((x + 0.0099) / x)^{-1/4} for 0.005 to 3, 0.0099 = 0.1^2 - 0.01^2
+        MC : [0.9999957199138273, -0.0006249180117784359, -0.001848325779502673, 0.0017650217396427048, 0.007615641848679466]
+
+        # This is ((x + 0.0099) / x)^{1/2} for 0.005 to 3, 0.0099 = 0.1^2 - 0.01^2
+        MD : [1.0000065232412632, 0.002942060952310859, 0.0020053075314062567, 0.000553917147701648, 0.005203872494302923]
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 7.3
+
+    Action2:
+
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2, 3, 4, 5]
+
+    Solver:
+
+        SolverForFieldId : 2
+
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.000001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        MaxStep : 50
+        Accuracy : 0.00001
+        AbsoluteAccuracy : 1
+        # SolverName : CMultiShiftFOM
+        # SolverForFieldId : 2
+        # UseCudaForSmallMatrix : 0
+        # MaxDim : 30
+        # Accuracy : 0.00000001
+        # Restart : 10
+        # AbsoluteAccuracy : 1
+
+    MSSolver2:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 10
+        MaxStep : 50
+        Accuracy : 0.00001
+        AbsoluteAccuracy : 1
+
+    MSSolver3:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 4
+        DiviationStep : 10
+        MaxStep : 50
+        Accuracy : 0.00001
+        AbsoluteAccuracy : 1
+
+    MSSolver4:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 5
+        DiviationStep : 10
+        MaxStep : 50
+        Accuracy : 0.000001
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 1
+        MeasureDist : 0
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingHISQSU3
+        FieldId : 1
+
+# JobMeasure
+JobMeasure:
+
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    MaxThreadPerBlock : 128
+    MILC_StaggeredPhase : 1
+
+    ListStart : 0
+    ListEnd : 10
+    # BetaList : [6.8, 6.9, 7.0, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6]
+    # PrefixList : [68, 69, 70, 71, 72, 73, 74, 75, 76]
+    BetaList : [7.29]
+    PrefixList : [col]
+    StartN : 1
+    EndN : 60
+    SaveFermionFile : 0
+    FermionFileIndexStart : 1
+    FermionFileHead : ./BS02/BetaScan/Fermion/FB02_
+    LoadFermion : 0
+    LoadFermionFile : F4980204_
+    LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
+    ## EHMJ_Polyakov,EHMJ_Chiral, EHMJ_Wilson,EHMJ_Meson,EHMJ_MesonSimple,EHMJ_DoubleToFloat,
+    DistributionJob : EHMJ_Meson
+    FermionMomentum : 0
+    StochasticFieldCount : 20
+    CheckGaugeFixing : 0
+    UseZ4 : 1
+    SubFolder : 0
+    SubFolderPrefix : G:\c24P31
+    # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
+    LoadType : EFFT_CLGBinFloat
+
+    SavePrefix : G:\c24P31\c24P31_
+    CSVSavePrefix : c24P31_
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [24, 24, 24, 48]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    FermionFieldCount : 1
+    MeasureListLength : 6
+    CacheStaple : 0
+    AlsoCheckMD5 : 0
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionHISQSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.01888
+        FieldId : 2
+        PoolNumber : 30
+        EachSiteEta : 0
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Solver:
+
+        SolverForFieldId : 2
+
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 30
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 0
+        MeasureDist : 1
+        MeasureZ : 0
+        ShiftCenter : 0
+        ZSlice : 1
+
+    Measure2:
+
+        MeasureName : CMeasureChiralCondensateKS
+        FieldId : 2
+        MeasureDist : 1
+        ShowResult : 0
+        ShiftCenter : 0
+        DebugDivation : 0
+        ZSlice : 1
+
+    Measure3:
+
+        MeasureName : CMeasureWilsonLoop
+
+    Measure4:
+
+        MeasureName : CMeasureAMomentumJG
+        FieldId : 1
+        ShowResult : 1
+        MeasureDist : 1
+        MeasureSpin : 1
+        MeasureApprox : 0
+        ProjectivePlane : 0
+        NaiveNabla : 0
+
+    Measure5:
+
+        MeasureName : CMeasureMesonCorrelatorStaggered
+        ShowResult : 0
+        GaugeFixing : 0
+        FieldId : 2
+
+    Measure6:
+
+        MeasureName : CMeasureMesonCorrelatorStaggeredSimple2
+        ShowResult : 0
+        FieldId : 2
+        Source : EFS_Wall
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingHISQSU3
+        FieldId : 1
+        ProjSUN : 0
+
+# JobMeasureWilson
+JobMeasureWilson:
+
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+
+    ListStart : 0
+    ListEnd : 10
+    # BetaList : [6.8, 6.9, 7.0, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6]
+    # PrefixList : [68, 69, 70, 71, 72, 73, 74, 75, 76]
+    BetaList : [4.9, 5.0, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8]
+    PrefixList : [49, 50, 51, 52, 53, 54, 55, 56, 57, 58]
+    StartN : 101
+    EndN : 1000
+    SaveFermionFile : 0
+    FermionFileIndexStart : 1
+    FermionFileHead : ./BS02/BetaScan/Fermion/FB02_
+    LoadFermion : 0
+    LoadFermionFile : F4980204_
+    LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
+    ## EBSMJ_Polyakov, EBSMJ_Chiral, EBSMJ_Wilson, EBSMJ_Angular, EBSMJ_Meson, EBSMJ_MesonSimple
+    DistributionJob : EBSMJ_Polyakov
+    FermionMomentum : 0
+    StochasticFieldCount : 20
+    CheckGaugeFixing : 0
+    UseZ4 : 1
+    SubFolder : 1
+    SubFolderPrefix : G:\MesonMassElectric\BS01
+    # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
+    LoadType : EFFT_CLGBinFloat
+
+    SavePrefix : BS01_
+    CSVSavePrefix : BS01_
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [24, 24, 24, 12]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    FermionFieldCount : 1
+    MeasureListLength : 6
+    CacheStaple : 0
+    AlsoCheckMD5 : 0
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.1
+        FieldId : 2
+        PoolNumber : 15
+        EachSiteEta : 0
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Solver:
+
+        SolverForFieldId : 2
+
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.1
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 0
+        MeasureDist : 1
+        MeasureZ : 0
+        ShiftCenter : 0
+        ZSlice : 1
+
+    Measure2:
+
+        MeasureName : CMeasureChiralCondensateKS
+        FieldId : 2
+        MeasureDist : 1
+        ShowResult : 0
+        ShiftCenter : 0
+        DebugDivation : 0
+        ZSlice : 1
+
+    Measure3:
+
+        MeasureName : CMeasureWilsonLoop
+
+    Measure4:
+
+        MeasureName : CMeasureAMomentumJG
+        FieldId : 1
+        ShowResult : 1
+        MeasureDist : 1
+        MeasureSpin : 1
+        MeasureApprox : 0
+        ProjectivePlane : 0
+        NaiveNabla : 0
+
+    Measure5:
+
+        MeasureName : CMeasureMesonCorrelatorStaggered
+        ShowResult : 0
+        GaugeFixing : 0
+        FieldId : 2
+
+    Measure6:
+
+        MeasureName : CMeasureMesonCorrelatorStaggeredSimple
+        ShowResult : 0
+        FieldId : 2
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingAPEProj
+        AlphaLeft : 2.3
+        AlphaRight : 1
+        Iterate : 26
+        # Cabibbo-Marinani projection is not correctly implemented
+        Cabibbo : 1
+        ProjIterate : 15
+        HasT : 0
+
+# JobGaugeFixing
+JobGaugeFixing:
+
+    # VerboseLevel : DETAILED
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 1
+
+    Nt : 6
+    OmegaStart : 0
+    OmegaEnd : 12
+    IndexStart : 101
+    IndexEnd : 3000
+
+    SubFolder : 1
+    SubFolderPrefix : H:\EW\54002\Nt6\EM
+    LoadPrefix : SRF540_02EM_
+    FileList : [53, 54, 55, 56, 57, 58, 59, 60, 61, 62]
+    FolderList : [53, 54, 55, 56, 57, 58, 59, 60, 61, 62]
+    CheckSubFolder : 0
+    CheckSubFolderPrefix : G:\configs\Extrapolation\535161Nt6\GF
+    SavePrefix : H:\EW\54002\GF\GFSRF540_02EM_
+    UseLogADefinition : 0
+    OnlyCheck : 0
+    CheckAndFix : 0
+
+    # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
+    SaveType : EFFT_CLGBinFloat
+    LoadType : EFFT_CLGBinFloat
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 48]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    FermionFieldCount : 0
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    GaugeFixing:
+
+        Name : CGaugeFixingCoulombLosAlamos
+        Omega : 1.5
+        CheckErrorStep : 200
+        MaxIterate : 20000
+        Mixed : 1
+
+
+# ===================== CompareHISQ test jobs (16^4 lattice) =====================
+
+JobTask1Full:
+
+    MaxThreadPerBlock : 128
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Profiler : 0
+    ExponentialPrecision : 6
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [16, 16, 16, 16]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    FermionFieldCount : 1
+    ActionListLength : 2
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+        RectOverPlaq : -0.05
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_Zero
+        Mass : 0.22
+        Epsilon : -0.11
+        Naik : -0.03708333333333333
+        FieldId : 2
+        PoolNumber : 4
+        Even : 0
+        Period : [1, 1, 1, -1]
+        MC : [0.0]
+        MD : [0.0]
+
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 1000
+        MaxDim : 20
+        Accuracy : 1e-12
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 10000
+        Accuracy : 1e-12
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 7.3
+
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2]
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Iterate : 1
+        HasT : 1
+        FieldId : 1
+        Update : 1
+        Proj : 1
+        ProjSUN : 0
+        UseCaylayHamilton : 1
+
+JobTask1EO:
+
+    MaxThreadPerBlock : 128
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Profiler : 0
+    ExponentialPrecision : 6
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [16, 16, 16, 16]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    FermionFieldCount : 1
+    ActionListLength : 2
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+        RectOverPlaq : -0.05
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_Zero
+        Mass : 0.22
+        Epsilon : -0.11
+        Naik : -0.03708333333333333
+        FieldId : 2
+        PoolNumber : 4
+        Even : 1
+        Period : [1, 1, 1, -1]
+        MC : [0.0]
+        MD : [0.0]
+
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 1000
+        MaxDim : 20
+        Accuracy : 1e-12
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 10000
+        Accuracy : 1e-12
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 7.3
+
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2]
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Iterate : 1
+        HasT : 1
+        FieldId : 1
+        Update : 1
+        Proj : 1
+        ProjSUN : 0
+        UseCaylayHamilton : 1
+
+JobTask2Full:
+
+    MaxThreadPerBlock : 128
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Profiler : 0
+    ExponentialPrecision : 6
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [16, 16, 16, 16]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    FermionFieldCount : 1
+    ActionListLength : 2
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+        RectOverPlaq : -0.05
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_Zero
+        Mass : 0.0
+        Epsilon : -0.11
+        Naik : -0.03708333333333333
+        FieldId : 2
+        PoolNumber : 4
+        Even : 0
+        Period : [1, 1, 1, -1]
+        MC : [7.23743239760535140e+00, -8.82739688751703788e-04, -3.67615648210134743e-03, -1.09344703129186580e-02, -3.00890589850342366e-02, -8.10586883322496343e-02, -2.18063040352304449e-01, -5.94339449298790901e-01, -1.67778349886883227e+00, -5.13407500862463806e+00, -1.89099308631674496e+01, -1.10401274307636740e+02, -3.00281070421555251e+03, 5.44525819315833381e-02, 7.96517660912760134e-02, 1.40189583161585946e-01, 2.74522316544906497e-01, 5.68576690666255491e-01, 1.21333703957423933e+00, 2.64153573021421728e+00, 5.88086208530325916e+00, 1.36250813890236984e+01, 3.44901313865679882e+01, 1.09771437069182767e+02, 7.99677804996926739e+02]
+        MD : [1.38170547932284643e-01, 9.25951635742929338e-03, 1.80807443784882886e-02, 3.14309748125169985e-02, 5.49177602797074407e-02, 9.72455933234592784e-02, 1.74269714313905366e-01, 3.16821769422108768e-01, 5.90657410821655349e-01, 1.16027147114204410e+00, 2.55887348865557929e+00, 7.42134667990285912e+00, 4.75104517000766151e+01, 5.14919210130966865e-02, 7.09330160925194242e-02, 1.20184746598546832e-01, 2.30505692043332988e-01, 4.72301762898720667e-01, 1.00183677201029409e+00, 2.17073869815282761e+00, 4.80138298513395423e+00, 1.09822653423400549e+01, 2.69838198465812233e+01, 7.91604397093389309e+01, 4.08533735340719716e+02]
+
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 1000
+        MaxDim : 20
+        Accuracy : 1e-12
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 10000
+        Accuracy : 1e-12
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 7.3
+
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2]
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Iterate : 1
+        HasT : 1
+        FieldId : 1
+        Update : 1
+        Proj : 1
+        ProjSUN : 0
+        UseCaylayHamilton : 1
+
+JobTask2EO:
+
+    MaxThreadPerBlock : 128
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Profiler : 0
+    ExponentialPrecision : 6
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [16, 16, 16, 16]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    FermionFieldCount : 1
+    ActionListLength : 2
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+        RectOverPlaq : -0.05
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_Zero
+        Mass : 0.0
+        Epsilon : -0.11
+        Naik : -0.03708333333333333
+        FieldId : 2
+        PoolNumber : 4
+        Even : 1
+        Period : [1, 1, 1, -1]
+        MC : [7.23743239760535140e+00, -8.82739688751703788e-04, -3.67615648210134743e-03, -1.09344703129186580e-02, -3.00890589850342366e-02, -8.10586883322496343e-02, -2.18063040352304449e-01, -5.94339449298790901e-01, -1.67778349886883227e+00, -5.13407500862463806e+00, -1.89099308631674496e+01, -1.10401274307636740e+02, -3.00281070421555251e+03, 5.44525819315833381e-02, 7.96517660912760134e-02, 1.40189583161585946e-01, 2.74522316544906497e-01, 5.68576690666255491e-01, 1.21333703957423933e+00, 2.64153573021421728e+00, 5.88086208530325916e+00, 1.36250813890236984e+01, 3.44901313865679882e+01, 1.09771437069182767e+02, 7.99677804996926739e+02]
+        MD : [1.38170547932284643e-01, 9.25951635742929338e-03, 1.80807443784882886e-02, 3.14309748125169985e-02, 5.49177602797074407e-02, 9.72455933234592784e-02, 1.74269714313905366e-01, 3.16821769422108768e-01, 5.90657410821655349e-01, 1.16027147114204410e+00, 2.55887348865557929e+00, 7.42134667990285912e+00, 4.75104517000766151e+01, 5.14919210130966865e-02, 7.09330160925194242e-02, 1.20184746598546832e-01, 2.30505692043332988e-01, 4.72301762898720667e-01, 1.00183677201029409e+00, 2.17073869815282761e+00, 4.80138298513395423e+00, 1.09822653423400549e+01, 2.69838198465812233e+01, 7.91604397093389309e+01, 4.08533735340719716e+02]
+
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 1000
+        MaxDim : 20
+        Accuracy : 1e-12
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 10000
+        Accuracy : 1e-12
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 7.3
+
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2]
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Iterate : 1
+        HasT : 1
+        FieldId : 1
+        Update : 1
+        Proj : 1
+        ProjSUN : 0
+        UseCaylayHamilton : 1
+
+JobTask3EO:
+
+    MaxThreadPerBlock : 128
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Profiler : 0
+    ExponentialPrecision : 6
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [16, 16, 16, 16]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    FermionFieldCount : 1
+    ActionListLength : 2
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+        RectOverPlaq : -0.05
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_Zero
+        Mass : 0.0
+        Epsilon : -0.11
+        Naik : -0.03708333333333333
+        FieldId : 2
+        PoolNumber : 4
+        Even : 1
+        Period : [1, 1, 1, -1]
+        MC : [7.23743239760535140e+00, -8.82739688751703788e-04, -3.67615648210134743e-03, -1.09344703129186580e-02, -3.00890589850342366e-02, -8.10586883322496343e-02, -2.18063040352304449e-01, -5.94339449298790901e-01, -1.67778349886883227e+00, -5.13407500862463806e+00, -1.89099308631674496e+01, -1.10401274307636740e+02, -3.00281070421555251e+03, 5.44525819315833381e-02, 7.96517660912760134e-02, 1.40189583161585946e-01, 2.74522316544906497e-01, 5.68576690666255491e-01, 1.21333703957423933e+00, 2.64153573021421728e+00, 5.88086208530325916e+00, 1.36250813890236984e+01, 3.44901313865679882e+01, 1.09771437069182767e+02, 7.99677804996926739e+02]
+        MD : [1.38170547932284643e-01, 9.25951635742929338e-03, 1.80807443784882886e-02, 3.14309748125169985e-02, 5.49177602797074407e-02, 9.72455933234592784e-02, 1.74269714313905366e-01, 3.16821769422108768e-01, 5.90657410821655349e-01, 1.16027147114204410e+00, 2.55887348865557929e+00, 7.42134667990285912e+00, 4.75104517000766151e+01, 5.14919210130966865e-02, 7.09330160925194242e-02, 1.20184746598546832e-01, 2.30505692043332988e-01, 4.72301762898720667e-01, 1.00183677201029409e+00, 2.17073869815282761e+00, 4.80138298513395423e+00, 1.09822653423400549e+01, 2.69838198465812233e+01, 7.91604397093389309e+01, 4.08533735340719716e+02]
+
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 1000
+        MaxDim : 20
+        Accuracy : 1e-12
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 10000
+        Accuracy : 1e-12
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 7.3
+
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2]
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Iterate : 1
+        HasT : 1
+        FieldId : 1
+        Update : 1
+        Proj : 1
+        ProjSUN : 0
+        UseCaylayHamilton : 1
+
+JobTask4Action:
+
+    MaxThreadPerBlock : 128
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Profiler : 0
+    ExponentialPrecision : 6
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [16, 16, 16, 16]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    FermionFieldCount : 1
+    ActionListLength : 1
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+        FieldName : CFieldGaugeSU3TreeImproved
+        FieldInitialType : EFIT_Identity
+        RectOverPlaq : -0.0646541706
+        Beta : 7.29
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_Zero
+        Mass : 0.0
+        Epsilon : -0.11
+        Naik : -0.03708333333333333
+        FieldId : 2
+        PoolNumber : 4
+        Even : 0
+        Period : [1, 1, 1, -1]
+        MC : [0.0]
+        MD : [0.0]
+
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 1000
+        MaxDim : 20
+        Accuracy : 1e-12
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 10000
+        Accuracy : 1e-12
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 7.29
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Iterate : 1
+        HasT : 1
+        FieldId : 1
+        Update : 1
+        Proj : 1
+        ProjSUN : 0
+        UseCaylayHamilton : 1
+
+JobTask5Plaq:
+
+    MaxThreadPerBlock : 128
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Profiler : 0
+    ExponentialPrecision : 6
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [16, 16, 16, 16]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    FermionFieldCount : 1
+    ActionListLength : 1
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+        FieldName : CFieldGaugeSU3TreeImproved
+        FieldInitialType : EFIT_Identity
+        RectOverPlaq : -0.0646541706
+        Beta : 7.29
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_Zero
+        Mass : 0.0
+        Epsilon : -0.11
+        Naik : -0.03708333333333333
+        FieldId : 2
+        PoolNumber : 4
+        Even : 0
+        Period : [1, 1, 1, -1]
+        MC : [0.0]
+        MD : [0.0]
+
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 1000
+        MaxDim : 20
+        Accuracy : 1e-12
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 10000
+        Accuracy : 1e-12
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 7.29
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Iterate : 1
+        HasT : 1
+        FieldId : 1
+        Update : 1
+        Proj : 1
+        ProjSUN : 0
+        UseCaylayHamilton : 1
+
+JobTask6FermionAction:
+
+    MaxThreadPerBlock : 128
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Profiler : 0
+    ExponentialPrecision : 6
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [16, 16, 16, 16]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    FermionFieldCount : 3
+    ActionListLength : 2
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+        RectOverPlaq : -0.05
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_Zero
+        Mass : 0.0
+        Epsilon : -0.11
+        Naik : -0.03708333333333333
+        FieldId : 2
+        PoolNumber : 4
+        Even : 1
+        Period : [1, 1, 1, -1]
+        MC : [7.23743239760535140e+00, -8.82739688751703788e-04, -3.67615648210134743e-03, -1.09344703129186580e-02, -3.00890589850342366e-02, -8.10586883322496343e-02, -2.18063040352304449e-01, -5.94339449298790901e-01, -1.67778349886883227e+00, -5.13407500862463806e+00, -1.89099308631674496e+01, -1.10401274307636740e+02, -3.00281070421555251e+03, 5.44525819315833381e-02, 7.96517660912760134e-02, 1.40189583161585946e-01, 2.74522316544906497e-01, 5.68576690666255491e-01, 1.21333703957423933e+00, 2.64153573021421728e+00, 5.88086208530325916e+00, 1.36250813890236984e+01, 3.44901313865679882e+01, 1.09771437069182767e+02, 7.99677804996926739e+02]
+        MD : [1.38170547932284643e-01, 9.25951635742929338e-03, 1.80807443784882886e-02, 3.14309748125169985e-02, 5.49177602797074407e-02, 9.72455933234592784e-02, 1.74269714313905366e-01, 3.16821769422108768e-01, 5.90657410821655349e-01, 1.16027147114204410e+00, 2.55887348865557929e+00, 7.42134667990285912e+00, 4.75104517000766151e+01, 5.14919210130966865e-02, 7.09330160925194242e-02, 1.20184746598546832e-01, 2.30505692043332988e-01, 4.72301762898720667e-01, 1.00183677201029409e+00, 2.17073869815282761e+00, 4.80138298513395423e+00, 1.09822653423400549e+01, 2.69838198465812233e+01, 7.91604397093389309e+01, 4.08533735340719716e+02]
+
+    FermionField2:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_Zero
+        Mass : 0.0
+        Epsilon : -0.11
+        Naik : -0.03708333333333333
+        FieldId : 3
+        PoolNumber : 4
+        Even : 1
+        Period : [1, 1, 1, -1]
+        MC : [7.23743239760535140e+00, -8.82739688751703788e-04, -3.67615648210134743e-03, -1.09344703129186580e-02, -3.00890589850342366e-02, -8.10586883322496343e-02, -2.18063040352304449e-01, -5.94339449298790901e-01, -1.67778349886883227e+00, -5.13407500862463806e+00, -1.89099308631674496e+01, -1.10401274307636740e+02, -3.00281070421555251e+03, 5.44525819315833381e-02, 7.96517660912760134e-02, 1.40189583161585946e-01, 2.74522316544906497e-01, 5.68576690666255491e-01, 1.21333703957423933e+00, 2.64153573021421728e+00, 5.88086208530325916e+00, 1.36250813890236984e+01, 3.44901313865679882e+01, 1.09771437069182767e+02, 7.99677804996926739e+02]
+        MD : [1.38170547932284643e-01, 9.25951635742929338e-03, 1.80807443784882886e-02, 3.14309748125169985e-02, 5.49177602797074407e-02, 9.72455933234592784e-02, 1.74269714313905366e-01, 3.16821769422108768e-01, 5.90657410821655349e-01, 1.16027147114204410e+00, 2.55887348865557929e+00, 7.42134667990285912e+00, 4.75104517000766151e+01, 5.14919210130966865e-02, 7.09330160925194242e-02, 1.20184746598546832e-01, 2.30505692043332988e-01, 4.72301762898720667e-01, 1.00183677201029409e+00, 2.17073869815282761e+00, 4.80138298513395423e+00, 1.09822653423400549e+01, 2.69838198465812233e+01, 7.91604397093389309e+01, 4.08533735340719716e+02]
+
+    FermionField3:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_Zero
+        Mass : 0.0
+        Epsilon : -0.11
+        Naik : -0.03708333333333333
+        FieldId : 4
+        PoolNumber : 4
+        Even : 1
+        Period : [1, 1, 1, -1]
+        MC : [7.23743239760535140e+00, -8.82739688751703788e-04, -3.67615648210134743e-03, -1.09344703129186580e-02, -3.00890589850342366e-02, -8.10586883322496343e-02, -2.18063040352304449e-01, -5.94339449298790901e-01, -1.67778349886883227e+00, -5.13407500862463806e+00, -1.89099308631674496e+01, -1.10401274307636740e+02, -3.00281070421555251e+03, 5.44525819315833381e-02, 7.96517660912760134e-02, 1.40189583161585946e-01, 2.74522316544906497e-01, 5.68576690666255491e-01, 1.21333703957423933e+00, 2.64153573021421728e+00, 5.88086208530325916e+00, 1.36250813890236984e+01, 3.44901313865679882e+01, 1.09771437069182767e+02, 7.99677804996926739e+02]
+        MD : [1.38170547932284643e-01, 9.25951635742929338e-03, 1.80807443784882886e-02, 3.14309748125169985e-02, 5.49177602797074407e-02, 9.72455933234592784e-02, 1.74269714313905366e-01, 3.16821769422108768e-01, 5.90657410821655349e-01, 1.16027147114204410e+00, 2.55887348865557929e+00, 7.42134667990285912e+00, 4.75104517000766151e+01, 5.14919210130966865e-02, 7.09330160925194242e-02, 1.20184746598546832e-01, 2.30505692043332988e-01, 4.72301762898720667e-01, 1.00183677201029409e+00, 2.17073869815282761e+00, 4.80138298513395423e+00, 1.09822653423400549e+01, 2.69838198465812233e+01, 7.91604397093389309e+01, 4.08533735340719716e+02]
+
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 1000
+        MaxDim : 20
+        Accuracy : 1e-12
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 10000
+        Accuracy : 1e-12
+        AbsoluteAccuracy : 1
+
+    MSSolver3:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 50
+        MaxStep : 10000
+        Accuracy : 1e-12
+        AbsoluteAccuracy : 1
+
+    MSSolver4:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 4
+        DiviationStep : 50
+        MaxStep : 10000
+        Accuracy : 1e-12
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 7.3
+
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2, 3, 4]
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Iterate : 1
+        HasT : 1
+        FieldId : 1
+        Update : 1
+        Proj : 1
+        ProjSUN : 0
+        UseCaylayHamilton : 1
+
+
+
+JobTask7Mom:
+
+    MaxThreadPerBlock : 128
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Profiler : 0
+    ExponentialPrecision : 6
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 12]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    FermionFieldCount : 1
+    ActionListLength : 1
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_Zero
+        Mass : 0.0
+        FieldId : 2
+        PoolNumber : 4
+        Even : 0
+        Period : [1, 1, 1, -1]
+        MC : [0.0]
+        MD : [0.0]
+
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 1000
+        MaxDim : 20
+        Accuracy : 1e-12
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 7.3
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Iterate : 1
+        HasT : 1
+        FieldId : 1
+        Update : 1
+        Proj : 1
+        ProjSUN : 0
+        UseCaylayHamilton : 1
+
+# JobSimulateTestCacheFull
+JobSimulateTestCacheFull:
+    MaxThreadPerBlock : 128
+    VerboseLevel : DETAILED
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Profiler : 0
+    ExponentialPrecision : 1
+    Warmup : 5
+    Metropolis : 5
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 12345
+    MILC_StaggeredPhase : 1
+    FermionFieldCount : 1
+    ActionListLength : 2
+    MeasureListLength : 1
+    CacheStaple : 0
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 0
+        MinMaxStep : [4, 50]
+        GrowReduceThreshold : [-0.3, 0.02]
+        InnerLeapfrog : 1
+        DebugForce : 0
+        IntegratorType : CIntegratorNestedForceGradient
+        IntegratorStepLength : 1.0
+        IntegratorStep : 6
+        NestedStep : 20
+        Omelyan2Lambda : 0.38636665500756728
+    Gauge:
+        FieldName : CFieldGaugeSU3TreeImproved
+        FieldInitialType : EFIT_Identity
+        RectOverPlaq : -0.0645661
+        Period : [1, 1, 1, 1]
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.0
+        FieldId : 2
+        PoolNumber : 15
+        Even : 1
+        Period : [1, 1, 1, -1]
+        MC : [9.9999990908502512e-01, -3.0831906519571126e-08, -1.7156350899477111e-07, -7.5097306479416274e-07, -3.1497834797288229e-06, -1.3023111114765444e-05, -5.2935793313885423e-05, -2.2580671712736666e-04, -1.3001913041494567e-03, -5.5906615173765350e-03, -1.8595160437325720e-02, -3.3694177798746595e-02, 7.3495561731242069e-06, 1.5284248344147264e-05, 4.1035459325352069e-05, 1.2165520399205419e-04, 3.7326525096960968e-04, 1.1603103797459514e-03, 3.7576263722648703e-03, 1.1411511818450513e-02, 3.2394399960427936e-02, 8.0419448260077409e-02, 1.4465098374365390e-01]
+        MD : [1.0000021155336281, 1.0939886112519286e-03, 1.6194518625507164e-03, 2.9258465733027279e-03, 5.6669529512348256e-03, 1.1391958815864864e-02, 2.6098248081539308e-02, 2.8374478337437168e-02, 2.6609540663976950e-02, 1.5160253761432427e-02, 6.4508778820102012e-06, 1.4125426177598873e-05, 4.5962277609328359e-05, 1.7027169638159211e-04, 6.5239559724009728e-04, 2.4963044700994118e-03, 7.8975462317946679e-03, 3.0287985423028356e-02, 9.2698483284540570e-02]
+    Solver:
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        Accuracy : 1e-9
+        MaxStep : 1000
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        Accuracy : 1e-9
+        MaxStep : 1000
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 7.3
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2]
+    Measure1:
+        MeasureName : CMeasurePlaqutteEnergy
+        FieldId : 1
+        ShowResult : 1
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        FieldId : 1
+        Cache : EHLC_Full
+
+# JobSimulateTestCacheMedian
+JobSimulateTestCacheMedian:
+    MaxThreadPerBlock : 128
+    VerboseLevel : DETAILED
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Profiler : 0
+    ExponentialPrecision : 6
+    Warmup : 5
+    Metropolis : 5
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 12345
+    MILC_StaggeredPhase : 1
+    FermionFieldCount : 1
+    ActionListLength : 2
+    MeasureListLength : 1
+    CacheStaple : 0
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 0
+        MinMaxStep : [4, 50]
+        GrowReduceThreshold : [-0.3, 0.02]
+        InnerLeapfrog : 1
+        DebugForce : 0
+        IntegratorType : CIntegratorNestedForceGradient
+        IntegratorStepLength : 1.0
+        IntegratorStep : 5
+        NestedStep : 20
+        Omelyan2Lambda : 0.38636665500756728
+    Gauge:
+        FieldName : CFieldGaugeSU3TreeImproved
+        FieldInitialType : EFIT_Identity
+        RectOverPlaq : -0.0645661
+        Period : [1, 1, 1, 1]
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.0
+        FieldId : 2
+        PoolNumber : 15
+        Even : 1
+        Period : [1, 1, 1, -1]
+        MC : [9.9999990908502512e-01, -3.0831906519571126e-08, -1.7156350899477111e-07, -7.5097306479416274e-07, -3.1497834797288229e-06, -1.3023111114765444e-05, -5.2935793313885423e-05, -2.2580671712736666e-04, -1.3001913041494567e-03, -5.5906615173765350e-03, -1.8595160437325720e-02, -3.3694177798746595e-02, 7.3495561731242069e-06, 1.5284248344147264e-05, 4.1035459325352069e-05, 1.2165520399205419e-04, 3.7326525096960968e-04, 1.1603103797459514e-03, 3.7576263722648703e-03, 1.1411511818450513e-02, 3.2394399960427936e-02, 8.0419448260077409e-02, 1.4465098374365390e-01]
+        MD : [1.0000021155336281, 1.0939886112519286e-03, 1.6194518625507164e-03, 2.9258465733027279e-03, 5.6669529512348256e-03, 1.1391958815864864e-02, 2.6098248081539308e-02, 2.8374478337437168e-02, 2.6609540663976950e-02, 1.5160253761432427e-02, 6.4508778820102012e-06, 1.4125426177598873e-05, 4.5962277609328359e-05, 1.7027169638159211e-04, 6.5239559724009728e-04, 2.4963044700994118e-03, 7.8975462317946679e-03, 3.0287985423028356e-02, 9.2698483284540570e-02]
+    Solver:
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        Accuracy : 1e-9
+        MaxStep : 1000
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        Accuracy : 1e-9
+        MaxStep : 1000
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 7.3
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2]
+    Measure1:
+        MeasureName : CMeasurePlaqutteEnergy
+        FieldId : 1
+        ShowResult : 1
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        FieldId : 1
+        Cache : EHLC_Median
+
+# JobSimulateTestCacheNone
+JobSimulateTestCacheNone:
+    MaxThreadPerBlock : 128
+    VerboseLevel : DETAILED
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Profiler : 0
+    ExponentialPrecision : 6
+    Warmup : 5
+    Metropolis : 5
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 12345
+    MILC_StaggeredPhase : 1
+    FermionFieldCount : 1
+    ActionListLength : 2
+    MeasureListLength : 1
+    CacheStaple : 0
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 0
+        MinMaxStep : [4, 50]
+        GrowReduceThreshold : [-0.3, 0.02]
+        InnerLeapfrog : 1
+        DebugForce : 0
+        IntegratorType : CIntegratorNestedForceGradient
+        IntegratorStepLength : 1.0
+        IntegratorStep : 5
+        NestedStep : 20
+        Omelyan2Lambda : 0.38636665500756728
+    Gauge:
+        FieldName : CFieldGaugeSU3TreeImproved
+        FieldInitialType : EFIT_Identity
+        RectOverPlaq : -0.0645661
+        Period : [1, 1, 1, 1]
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.0
+        FieldId : 2
+        PoolNumber : 15
+        Even : 1
+        Period : [1, 1, 1, -1]
+        MC : [9.9999990908502512e-01, -3.0831906519571126e-08, -1.7156350899477111e-07, -7.5097306479416274e-07, -3.1497834797288229e-06, -1.3023111114765444e-05, -5.2935793313885423e-05, -2.2580671712736666e-04, -1.3001913041494567e-03, -5.5906615173765350e-03, -1.8595160437325720e-02, -3.3694177798746595e-02, 7.3495561731242069e-06, 1.5284248344147264e-05, 4.1035459325352069e-05, 1.2165520399205419e-04, 3.7326525096960968e-04, 1.1603103797459514e-03, 3.7576263722648703e-03, 1.1411511818450513e-02, 3.2394399960427936e-02, 8.0419448260077409e-02, 1.4465098374365390e-01]
+        MD : [1.0000021155336281, 1.0939886112519286e-03, 1.6194518625507164e-03, 2.9258465733027279e-03, 5.6669529512348256e-03, 1.1391958815864864e-02, 2.6098248081539308e-02, 2.8374478337437168e-02, 2.6609540663976950e-02, 1.5160253761432427e-02, 6.4508778820102012e-06, 1.4125426177598873e-05, 4.5962277609328359e-05, 1.7027169638159211e-04, 6.5239559724009728e-04, 2.4963044700994118e-03, 7.8975462317946679e-03, 3.0287985423028356e-02, 9.2698483284540570e-02]
+    Solver:
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        Accuracy : 1e-9
+        MaxStep : 1000
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        Accuracy : 1e-9
+        MaxStep : 1000
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 7.3
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2]
+    Measure1:
+        MeasureName : CMeasurePlaqutteEnergy
+        FieldId : 1
+        ShowResult : 1
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        FieldId : 1
+        Cache : EHLC_None
+
+# JobDebugSU3_12
+JobDebugSU3_12:
+    MaxThreadPerBlock : 512
+    VerboseLevel : DETAILED
+    VerboseOutput : stdout
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : [0, 0, 0, 0]
+    LatticeBoundary : [1, 1, 1, 1]
+    ThreadAutoDecompose : 1
+    RandomType : ER_RANLUX24_1998
+    RandomSeedType : ER_S_AbsoulteSeed
+    RandomSeed : 1234567
+    Field1:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity

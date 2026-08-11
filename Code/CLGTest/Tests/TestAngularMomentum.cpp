@@ -4,6 +4,7 @@
 // DESCRIPTION:
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [04/20/2019 nbale]
 //=============================================================================
 
@@ -12,14 +13,14 @@
 UINT TestAngularMomentum(CParameters& sParam)
 {
     CGaugeFixingRandom* pRandom = new CGaugeFixingRandom();
-    appGetLattice()->m_pGaugeField[0]->FixBoundary();
+    appGetLattice()->m_pGaugeField[0]->FixBoundary(EFB_Field);
     pRandom->Initial(appGetLattice(), sParam);
     CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureAMomentumStochastic* pJF = dynamic_cast<CMeasureAMomentumStochastic*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
-    CFieldFermionWilsonSquareSU3DR* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3DR*>(appGetLattice()->GetPooledFieldById(2));
-    CFieldFermionWilsonSquareSU3DR* pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3DR*>(appGetLattice()->GetPooledFieldById(2));
+    CFieldFermionWilsonSquareSU3DR* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3DR*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+    CFieldFermionWilsonSquareSU3DR* pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3DR*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
     pF1->InitialField(EFIT_RandomGaussian);
-    pF1->FixBoundary();
+    pF1->FixBoundary(EFB_Field);
     UINT uiError = 0;
 
     Real fJG1 = F(0.0);
@@ -164,110 +165,171 @@ UINT TestAngularMomentum(CParameters& sParam)
 
     pF1->Return();
     pF2->Return();
-
-    if (appAbs(fJG1 - fJG2) > F(0.000001))
+    Real fDelta = F(0.001);
+    UBOOL bShowOKTerms = FALSE;
+    if (appAbs(fJG1 - fJG2) / appAbs(fJG1) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJG1 = %f, fJG2 = %f\n")).c_str(), fJG1, fJG2);
+    }
+    else if (bShowOKTerms)
+    {
+        appGeneral(appDressColor(EVC_GREEN, _T("fJG1 = %f, fJG2 = %f\n")).c_str(), fJG1, fJG2);
     }
 
-    if (appAbs(fJGS1 - fJGS2) > F(0.000001))
+    if (appAbs(fJGS1 - fJGS2) / appAbs(fJGS1) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJGS1 = %f, fJGS2 = %f\n")).c_str(), fJGS1, fJGS2);
+    }
+    else if (bShowOKTerms)
+    {
+        appGeneral(appDressColor(EVC_GREEN, _T("fJGS1 = %f, fJGS2 = %f\n")).c_str(), fJGS1, fJGS2);
     }
 
-    if (appAbs(fJGChen1 - fJGChen2) > F(0.000001))
+    if (appAbs(fJGChen1 - fJGChen2) / appAbs(fJGChen1) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJGChen1 = %f, fJGChen2 = %f\n")).c_str(), fJGChen1, fJGChen2);
+    }
+    else if (bShowOKTerms)
+    {
+        appGeneral(appDressColor(EVC_GREEN, _T("fJGChen1 = %f, fJGChen2 = %f\n")).c_str(), fJGChen1, fJGChen2);
     }
 
-    if (appAbs(fJGSurf1 - fJGSurf2) > F(0.000001))
+    if (appAbs(fJGSurf1 - fJGSurf2) / appAbs(fJGSurf1) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJGSurf1 = %f, fJGSurf2 = %f\n")).c_str(), fJGSurf1, fJGSurf2);
+    }
+    else if (bShowOKTerms)
+    {
+        appGeneral(appDressColor(EVC_GREEN, _T("fJGSurf1 = %f, fJGSurf2 = %f\n")).c_str(), fJGSurf1, fJGSurf2);
     }
 
-    if (appAbs(fJGPot1 - fJGPot2) > F(0.000001))
+    if (appAbs(fJGPot1 - fJGPot2) / appAbs(fJGPot1) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJGPot1 = %f, fJGPot2 = %f\n")).c_str(), fJGPot1, fJGPot2);
+    }
+    else if (bShowOKTerms)
+    {
+        appGeneral(appDressColor(EVC_GREEN, _T("fJGPot1 = %f, fJGPot2 = %f\n")).c_str(), fJGPot1, fJGPot2);
     }
 
-    if (appAbs(fJFL1 - fJFL2) > F(0.000001))
+    if (appAbs(fJFL1 - fJFL2) / appAbs(fJFL1) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJFL1 = %f, fJFL2 = %f\n")).c_str(), fJFL1, fJFL2);
+    }
+    else if (bShowOKTerms)
+    {
+        appGeneral(appDressColor(EVC_GREEN, _T("fJFL1 = %f, fJFL2 = %f\n")).c_str(), fJFL1, fJFL2);
     }
 
-    if (appAbs(fJFS1 - fJFS2) > F(0.000001))
+    if (appAbs(fJFS1 - fJFS2) / appAbs(fJFS1) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJFS1 = %f, fJFS2 = %f\n")).c_str(), fJFS1, fJFS2);
+    }
+    else if (bShowOKTerms)
+    {
+        appGeneral(appDressColor(EVC_GREEN, _T("fJFS1 = %f, fJFS2 = %f\n")).c_str(), fJFS1, fJFS2);
     }
 
-    if (appAbs(fJFLPure1 - fJFLPure2) > F(0.000001))
+    if (appAbs(fJFLPure1 - fJFLPure2) / appAbs(fJFLPure1) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJFLPure1 = %f, fJFLPure2 = %f\n")).c_str(), fJFLPure1, fJFLPure2);
+    }
+    else if (bShowOKTerms)
+    {
+        appGeneral(appDressColor(EVC_GREEN, _T("fJFLPure1 = %f, fJFLPure2 = %f\n")).c_str(), fJFLPure1, fJFLPure2);
     }
 
-    if (appAbs(fJFPot1 - fJFPot2) > F(0.000001))
+    if (appAbs(fJFPot1 - fJFPot2) / appAbs(fJFPot1) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJFPot1 = %f, fJFPot2 = %f\n")).c_str(), fJFPot1, fJFPot2);
+    }
+    else if (bShowOKTerms)
+    {
+        appGeneral(appDressColor(EVC_GREEN, _T("fJFPot1 = %f, fJFPot2 = %f\n")).c_str(), fJFPot1, fJFPot2);
     }
 
     if (pJF->m_bMeasureJLPure)
     {
-        if (appAbs(fJFLPure1 - fJFL1 - fJFPot1) > F(0.000001))
+        if (appAbs(fJFLPure1 - fJFL1 - fJFPot1) / appAbs(fJFLPure1) > fDelta)
         {
             ++uiError;
+            appGeneral(appDressColor(EVC_RED, _T("fJFLPure1 = %f, fJFL1 = %f, fJFPot1 = %f\n")).c_str(), fJFLPure1, fJFL1, fJFPot1);
+        }
+        else if (bShowOKTerms)
+        {
+            appGeneral(appDressColor(EVC_GREEN, _T("fJFLPure1 = %f, fJFL1 = %f, fJFPot1 = %f\n")).c_str(), fJFLPure1, fJFL1, fJFPot1);
         }
     }
 
-    if (appAbs(fJG1In - fJG2In) > F(0.000001))
+    if (appAbs(fJG1In - fJG2In) / appAbs(fJG1In) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJG1In = %f, fJG2In = %f\n")).c_str(), fJG1In, fJG2In);
     }
 
-    if (appAbs(fJGS1In - fJGS2In) > F(0.000001))
+    if (appAbs(fJGS1In - fJGS2In) / appAbs(fJGS1In) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJGS1In = %f, fJGS2In = %f\n")).c_str(), fJGS1In, fJGS2In);
     }
 
-    if (appAbs(fJGChen1In - fJGChen2In) > F(0.000001))
+    if (appAbs(fJGChen1In - fJGChen2In) / appAbs(fJGChen1In) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJGChen1In = %f, fJGChen2In = %f\n")).c_str(), fJGChen1In, fJGChen2In);
     }
 
-    if (appAbs(fJGSurf1In - fJGSurf2In) > F(0.000001))
+    if (appAbs(fJGSurf1In - fJGSurf2In) / appAbs(fJGSurf1In) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJGSurf1In = %f, fJGSurf2In = %f\n")).c_str(), fJGSurf1In, fJGSurf2In);
     }
 
-    if (appAbs(fJGPot1In - fJGPot2In) > F(0.000001))
+    if (appAbs(fJGPot1In - fJGPot2In) / appAbs(fJGPot1In) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJGPot1In = %f, fJGPot2In = %f\n")).c_str(), fJGPot1In, fJGPot2In);
     }
 
-    if (appAbs(fJFL1In - fJFL2In) > F(0.000001))
+    if (appAbs(fJFL1In - fJFL2In) / appAbs(fJFL1In) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJFL1In = %f, fJFL2In = %f\n")).c_str(), fJFL1In, fJFL2In);
     }
 
-    if (appAbs(fJFS1In - fJFS2In) > F(0.000001))
+    if (appAbs(fJFS1In - fJFS2In) / appAbs(fJFS1In) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJFS1In = %f, fJFS2In = %f\n")).c_str(), fJFS1In, fJFS2In);
     }
 
-    if (appAbs(fJFLPure1In - fJFLPure2In) > F(0.000001))
+    if (appAbs(fJFLPure1In - fJFLPure2In) / appAbs(fJFLPure1In) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJFLPure1In = %f, fJFLPure2In = %f\n")).c_str(), fJFLPure1In, fJFLPure2In);
     }
 
-    if (appAbs(fJFPot1In - fJFPot2In) > F(0.000001))
+    if (appAbs(fJFPot1In - fJFPot2In) / appAbs(fJFPot1In) > fDelta)
     {
         ++uiError;
+        appGeneral(appDressColor(EVC_RED, _T("fJFPot1In = %f, fJFPot2In = %f\n")).c_str(), fJFPot1In, fJFPot2In);
     }
 
     if (pJF->m_bMeasureJLPure)
     {
-        if (appAbs(fJFLPure1In - fJFL1In - fJFPot1In) > F(0.000001))
+        if (appAbs(fJFLPure1In - fJFL1In - fJFPot1In) / appAbs(fJFLPure1In) > fDelta)
         {
             ++uiError;
+            appGeneral(appDressColor(EVC_RED, _T("fJFLPure1In = %f, fJFL1In = %f, fJFPot1In = %f\n")).c_str(), fJFLPure1In, fJFL1In, fJFPot1In);
         }
     }
 

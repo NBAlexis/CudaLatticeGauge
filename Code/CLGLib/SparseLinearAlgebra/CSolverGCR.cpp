@@ -5,6 +5,7 @@
 // 
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [02/16/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -62,6 +63,7 @@ void CSLASolverGCR::Configurate(const CParameters& param)
     {
         m_bAbsoluteAccuracy = (0 != iValue);
     }
+
     if (param.FetchValueReal(_T("Accuracy"), fValue))
     {
         m_fAccuracy = fValue;
@@ -84,7 +86,7 @@ void CSLASolverGCR::ReleaseBuffers()
 }
 
 UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, 
-    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
     EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
     TArray<CField*> pP;
@@ -92,26 +94,22 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB,
     TArray<Real> length_AP;
     for (UINT i = 0; i < m_uiMaxDim; ++i)
     {
-        CField* pVectors = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+        CField* pVectors = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
         pP.AddItem(pVectors);
-        pVectors = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+        pVectors = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
         pAP.AddItem(pVectors);
         length_AP.AddItem(F(0.0));
     }
 
-    CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pR = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pAAP = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pR = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
+    CField* pAAP = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId, _T(__FILE__), __LINE__);
 
     //use it to estimate relative error
-#if !_CLG_DOUBLEFLOAT
     DOUBLE fBLength = 1.0;
-#else
-    Real fBLength = F(1.0);
-#endif
     if (!m_bAbsoluteAccuracy)
     {
-        fBLength = pFieldB->Dot(pFieldB).x;
+        fBLength = pFieldB->GetLength();
     }
 
     appParanoiac(_T("-- CSLASolverGCR::Solve start operator: %s-- fLength = %f --\n"), __ENUM_TO_STRING(EFieldOperator, uiM).c_str(), fBLength);
@@ -131,7 +129,7 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB,
     {
         //r = b - A x0, p0 = r
         pX->CopyTo(pR); 
-        pR->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //r = -A x0
+        pR->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, EOCT_Minus); //r = -A x0
         pR->AxpyPlus(pFieldB); //r = b-Ax0
         pR->CopyTo(pP[0]);
 
@@ -140,26 +138,17 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB,
             const UINT j = jj % m_uiMaxDim;
 
             pP[j]->CopyTo(pAP[j]);
-            pAP[j]->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
+            pAP[j]->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
             //appParanoiac(_T("length p = %f ap = %f r = %f\n"), pP[j]->Dot(pP[j]).x, length_AP[j], pR->Dot(pR).x);
-#if !_CLG_DOUBLEFLOAT
-            length_AP[j] = static_cast<Real>(pAP[j]->Dot(pAP[j]).x);
-            CLGComplex al = cuCdivf_cr_host(_cToFloat(pAP[j]->Dot(pR)), length_AP[j]);
-#else
-            length_AP[j] = pAP[j]->Dot(pAP[j]).x;
-            CLGComplex al = cuCdivf_cr_host(pAP[j]->Dot(pR), length_AP[j]);
-#endif
+            length_AP[j] = static_cast<Real>(pAP[j]->GetLength());
+            CLGComplex al = cuCdivf_cr_host(_cToRealC(pAP[j]->Dot(pR)), length_AP[j]);
 
             pX->Axpy(al, pP[j]);
             pR->Axpy(_make_cuComplex(-al.x, -al.y), pAP[j]);
 
             if (0 == ((jj + 1) % m_uiCheckError))
             {
-#if !_CLG_DOUBLEFLOAT
-                fLastDiavation = static_cast<Real>(pR->Dot(pR).x);
-#else
-                fLastDiavation = pR->Dot(pR).x;
-#endif
+                fLastDiavation = static_cast<Real>(pR->GetLength());
                 appParanoiac(_T("CSLASolverGCR::Solve deviation: ---- diviation ----. restart = %d itera = %d divation = %f\n"), i, jj, fLastDiavation);
                 if (fLastDiavation < m_fAccuracy * fBLength)
                 {
@@ -179,24 +168,10 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB,
             
             if (jj != m_uiIterateNumber - 1) //otherwise, just restart
             {
-                //p(j+1) = r
                 const UINT nextPjIndex = (jj + 1) % m_uiMaxDim;
-                pAP[j]->CopyTo(pP[nextPjIndex]);
-                pAP[j]->CopyTo(pAAP);
-                pAAP->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
-
-                for (UINT k = 0; k < appMin(jj, m_uiMaxDim); ++k)
-                {
-                    if (k != nextPjIndex)
-                    {
-#if !_CLG_DOUBLEFLOAT
-                        CLGComplex beta = cuCdivf_cr_host(_cToFloat(pAP[k]->Dot(pAAP)), -length_AP[j]);
-#else
-                        CLGComplex beta = cuCdivf_cr_host(pAP[k]->Dot(pAAP), -length_AP[j]);
-#endif
-                        pP[nextPjIndex]->Axpy(beta, pP[k]);
-                    }
-                }
+                GenerateNextP(pP[nextPjIndex], pAAP, pR, pAP[j], pP, pAP, length_AP,
+                    jj, j, nextPjIndex,
+                    gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, uiM);
             }
         }
         appParanoiac(_T("CSLASolverGCR::Solve deviation: ---- restart ----. last divation = %f\n"), fLastDiavation);
@@ -215,6 +190,28 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB,
         pAP[k]->Return();
     }
     return FALSE;
+}
+
+void CSLASolverGCR::GenerateNextP(CField* pNextP, CField* pAAP, CField* pR, CField* pAPJ,
+    const TArray<CField*>& pP, const TArray<CField*>& pAP, const TArray<Real>& lengthAP,
+    UINT uiCurrentStep, UINT uiCurrentIndex, UINT uiNextIndex,
+    INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
+    EFieldOperator uiM) const
+{
+    pR->CopyTo(pNextP);
+    pR->CopyTo(pAAP);
+
+    pAAP->ApplyOperator(uiM, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields);
+
+    const UINT uiOrthogonalCount = appMin(uiCurrentStep + 1, m_uiMaxDim);
+    for (UINT k = 0; k < uiOrthogonalCount; ++k)
+    {
+        if (k != uiNextIndex)
+        {
+            CLGComplex beta = cuCdivf_cr_host(_cToRealC(pAP[k]->Dot(pAAP)), -lengthAP[k]);
+            pNextP->Axpy(beta, pP[k]);
+        }
+    }
 }
 
 __END_NAMESPACE

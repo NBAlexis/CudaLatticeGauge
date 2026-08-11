@@ -5,6 +5,7 @@
 // This is the class for Sparse Linear Algebra solves.
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [18/06/2020 nbale]
 //=============================================================================
 
@@ -30,7 +31,7 @@ public:
     void AllocateBuffers(const CField* pField) override;
     virtual void ReleaseBuffers();
     UBOOL Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& cn, const CField* pFieldB, 
-        INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+        INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
         EFieldOperator uiM, ESolverPhase ePhase = ESP_Once, const CField* pStart = NULL) override;
 
 protected:
@@ -43,7 +44,6 @@ protected:
 
     UINT m_uiReStart;
     UINT m_uiMaxDim;
-    Real m_fAccuracy;
     UBOOL m_bUseCudaForSmallMatrix;
 
     CLGComplex m_h[(_kMaxStep + 1) * _kMaxStep];

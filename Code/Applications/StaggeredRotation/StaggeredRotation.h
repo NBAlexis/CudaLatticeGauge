@@ -5,9 +5,11 @@
 //   This is to compress the configuration files to half the size
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [09/24/2020 nbale]
 //=============================================================================
 #pragma once
+
 #include "CLGLib.h"
 
 __DEFINE_ENUM(EStaggeredRotationJob,
@@ -27,7 +29,7 @@ __DEFINE_ENUM(EStaggeredRotationJob,
     )
 
 
-#define _CLG_EXPORT_CHIRAL(measureName, lstName, variableName, fileIdxHead) \
+#define _CLG_EXPORT_CHIRAL_ROTATION(measureName, lstName, variableName, fileIdxHead) \
 CCString sFileNameWrite##measureName##lstName = _T("%s_condensate"); \
 CCString sFileNameWrite##measureName##lstName##All = _T("%s_condensate"); \
 CCString sFileNameWrite##measureName##lstName##In = _T("%s_condensate"); \
@@ -57,7 +59,7 @@ WriteStringFileComplexArray(sFileNameWrite##measureName##lstName##In, lstName##m
 
 
 
-#define _CLG_EXPORT_CHIRALZSLICE(measureName, lstName, variableName, fileIdxHead) \
+#define _CLG_EXPORT_CHIRALZSLICE_ROTATION(measureName, lstName, variableName, fileIdxHead) \
 CCString sFileNameWrite##measureName##lstName##ZSlice = _T("%s_condensate"); \
 sFileNameWrite##measureName##lstName##ZSlice = sFileNameWrite##measureName##lstName##ZSlice + _T(#measureName) + _T(#lstName) + _T("ZSlice_Nt%d_") + _T(#fileIdxHead) + _T("%d.csv"); \
 sFileNameWrite##measureName##lstName##ZSlice.Format(sFileNameWrite##measureName##lstName##ZSlice, sCSVSavePrefix.c_str(), _HC_Lt, variableName); \

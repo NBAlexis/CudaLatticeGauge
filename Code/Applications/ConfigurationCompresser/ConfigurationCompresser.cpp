@@ -13,7 +13,7 @@
 int main(int argc, char * argv[])
 {
     CParameters params;
-#if _CLG_DEBUG
+#if _CLG_DEBUG && _CLG_WIN
     CYAMLParser::ParseFile(_T("ConfigurationCompresser.yaml"), params);
 #else
     CYAMLParser::ParseFile(_T("../Debug/ConfigurationCompresser.yaml"), params);

@@ -9,7 +9,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
-#include "Data/Field/Staggered/CFieldFermionKSSU3.h"
+#include "Data/Field/Staggered/CFieldFermionKST.h"
 #include "CMeasurePandChiralTalor.h"
 #include "CMeasurePandChiralTalorKS.h"
 
@@ -73,7 +73,7 @@ _kernelDFermionKS_PR_XYTerm_NoOmega(
             this_eta_tau = this_eta_tau + 1;
         }
 
-        deviceSU3Vector right = _deviceVXXTauOptimized(pGauge, sSite4, byGaugeFieldId, bXorY, bPlusMu, bPlusTau).MulVector(
+        deviceSU3Vector right = _deviceVXXTauOptimizedT(pGauge, sSite4, byGaugeFieldId, bXorY, bPlusMu, bPlusTau).MulVector(
             pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
 
         //when bXorY = 1, it is y partial _x, so is [1]
@@ -147,13 +147,13 @@ _kernelDFermionKS_PR_XYTau_Term_NoOmega(
         //We have anti-periodic boundary, so we need to use index out of lattice to get the correct sign
         const SIndex& sTargetBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sOffset)];
         
-        const deviceSU3Vector right = _deviceVXYTOptimized(pGauge, sSite4, byGaugeFieldId, bPlusX, bPlusY, bPlusT)
+        const deviceSU3Vector right = _deviceVXYTOptimizedT(pGauge, sSite4, byGaugeFieldId, bPlusX, bPlusY, bPlusT)
         .MulVector(pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
         const SSmallInt4 site_target = __deviceSiteIndexToInt4(sTargetBigIndex.m_uiSiteIndex);
 
         //eta124 of site is almost always -target, so use left or right is same
         //The only exception is on the boundary
-        INT eta124 = bPlusT ? (sSite4.y + sSite4.z) : (site_target.y + site_target.z + 1);
+        INT eta124 = bPlusT ? _deviceEta3(sSite4, 2) : (_deviceEta3(site_target, 2) + 1);
 
         if (sTargetBigIndex.NeedToOpposite())
         {
@@ -273,39 +273,41 @@ _kernelAdd4PlaqutteTermSU3_Shifted_NoOmegaSq(
     intokernalInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    //P4-3.7: global coordinate (position-dependent, P4-1.1).
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
 
 #if !_CLG_DOUBLEFLOAT
-    DOUBLE fXSq = (sSite4.x - _DC_Centerx + 0.5);
+    DOUBLE fXSq = (sSite4G.x - _DC_Centerx + 0.5);
     fXSq = fXSq * fXSq;
-    DOUBLE fYSq = (sSite4.y - _DC_Centery + 0.5);
+    DOUBLE fYSq = (sSite4G.y - _DC_Centery + 0.5);
     fYSq = fYSq * fYSq;
 
     //======================================================
     //4-plaqutte terms
     //Omega^2 x^2 Retr[1 - U_2,3]
-    const DOUBLE fU23 = fXSq * _device4PlaqutteTerm(pDeviceData, 1, 2, uiBigIdx, sSite4, byFieldId);
+    const DOUBLE fU23 = fXSq * _device4PlaqutteTermT(pDeviceData, 1, 2, uiBigIdx, sSite4, byFieldId);
 
     //Omega^2 y^2 Retr[1 - U_1,3]
-    const DOUBLE fU13 = fYSq * _device4PlaqutteTerm(pDeviceData, 0, 2, uiBigIdx, sSite4, byFieldId);
+    const DOUBLE fU13 = fYSq * _device4PlaqutteTermT(pDeviceData, 0, 2, uiBigIdx, sSite4, byFieldId);
 
     //Omega^2 (x^2 + y^2) Retr[1 - U_1,2]
-    const DOUBLE fU12 = (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 0, 1, uiBigIdx, sSite4, byFieldId);
+    const DOUBLE fU12 = (fXSq + fYSq) * _device4PlaqutteTermT(pDeviceData, 0, 1, uiBigIdx, sSite4, byFieldId);
 #else
-    Real fXSq = (sSite4.x - _DC_Centerx + F(0.5));
+    Real fXSq = (sSite4G.x - _DC_Centerx + F(0.5));
     fXSq = fXSq * fXSq;
-    Real fYSq = (sSite4.y - _DC_Centery + F(0.5));
+    Real fYSq = (sSite4G.y - _DC_Centery + F(0.5));
     fYSq = fYSq * fYSq;
 
     //======================================================
     //4-plaqutte terms
     //Omega^2 x^2 Retr[1 - U_2,3]
-    const Real fU23 = fXSq * _device4PlaqutteTerm(pDeviceData, 1, 2, uiBigIdx, sSite4, byFieldId);
+    const Real fU23 = fXSq * _device4PlaqutteTermT(pDeviceData, 1, 2, uiBigIdx, sSite4, byFieldId);
 
     //Omega^2 y^2 Retr[1 - U_1,3]
-    const Real fU13 = fYSq * _device4PlaqutteTerm(pDeviceData, 0, 2, uiBigIdx, sSite4, byFieldId);
+    const Real fU13 = fYSq * _device4PlaqutteTermT(pDeviceData, 0, 2, uiBigIdx, sSite4, byFieldId);
 
     //Omega^2 (x^2 + y^2) Retr[1 - U_1,2]
-    const Real fU12 = (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 0, 1, uiBigIdx, sSite4, byFieldId);
+    const Real fU12 = (fXSq + fYSq) * _device4PlaqutteTermT(pDeviceData, 0, 1, uiBigIdx, sSite4, byFieldId);
 #endif
 
     results[uiSiteIndex] = (fU23 + fU13 + fU12) * betaOverN;
@@ -319,43 +321,26 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddChairTermSU3_Term12_Shifted_NoOmega(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
-#if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN,
     DOUBLE* results
-#else
-    Real betaOverN,
-    Real* results
-#endif
 )
 {
     intokernalInt4;
 
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+    //P4-3.7: global coordinate.
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
 
-#if !_CLG_DOUBLEFLOAT
     betaOverN = -0.125 * betaOverN;
-    const DOUBLE fXOmega = (sSite4.x - _DC_Centerx + 0.5);
+    const DOUBLE fXOmega = (sSite4G.x - _DC_Centerx + 0.5);
 
     //===============
     //- x Omega V412
-    const DOUBLE fV412 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 0, 1, uiN);
+    const DOUBLE fV412 = fXOmega * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 0, 1, uiN);
 
     //===============
     //- x Omega V432
-    const DOUBLE fV432 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
-
-#else
-    betaOverN = -F(0.125) * betaOverN;
-    const Real fXOmega = (sSite4.x - _DC_Centerx + F(0.5));
-
-    //===============
-    //+x Omega V412
-    const Real fV412 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 0, 1, uiN);
-
-    //===============
-    //+x Omega V432
-    const Real fV432 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
-#endif
+    const DOUBLE fV432 = fXOmega * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
 
     results[uiSiteIndex] = (fV412 + fV432) * betaOverN;
 }
@@ -365,42 +350,26 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddChairTermSU3_Term34_Shifted_NoOmega(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
-#if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN,
     DOUBLE* results
-#else
-    Real betaOverN,
-    Real* results
-#endif
 )
 {
     intokernalInt4;
 
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+    //P4-3.7: global coordinate.
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
 
-#if !_CLG_DOUBLEFLOAT
     betaOverN = 0.125 * betaOverN;
-    const DOUBLE fYOmega = (sSite4.y - _DC_Centery + 0.5);
+    const DOUBLE fYOmega = (sSite4G.y - _DC_Centery + 0.5);
 
     //===============
     //+ y Omega V421
-    const DOUBLE fV421 = fYOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 1, 0, uiN);
+    const DOUBLE fV421 = fYOmega * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 1, 0, uiN);
 
     //===============
     //+ y Omega V431
-    const DOUBLE fV431 = fYOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
-#else
-    betaOverN = F(0.125) * betaOverN;
-    const Real fYOmega = (sSite4.y - _DC_Centery + F(0.5));
-
-    //===============
-    //-y Omega V421
-    const Real fV421 = fYOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 1, 0, uiN);
-
-    //===============
-    //-y Omega V431
-    const Real fV431 = fYOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
-#endif
+    const DOUBLE fV431 = fYOmega * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
 
     results[uiSiteIndex] = (fV421 + fV431) * betaOverN;
 }
@@ -409,34 +378,22 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddChairTermSU3_Term5_Shifted_NoOmegaSq(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
-#if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN,
     DOUBLE* results
-#else
-    Real betaOverN,
-    Real* results
-#endif
 )
 {
     intokernalInt4;
 
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+    //P4-3.7: global coordinate.
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
 
-#if !_CLG_DOUBLEFLOAT
     betaOverN = -0.125 * betaOverN;
-    const DOUBLE fXYOmega2 = (sSite4.x - _DC_Centerx + 0.5) * (sSite4.y - _DC_Centery + 0.5);
+    const DOUBLE fXYOmega2 = (sSite4G.x - _DC_Centerx + 0.5) * (sSite4G.y - _DC_Centery + 0.5);
 
     //===============
     //-Omega^2 xy V142
-    const DOUBLE fV132 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
-#else
-    betaOverN = -F(0.125) * betaOverN;
-    const Real fXYOmega2 = (sSite4.x - _DC_Centerx + F(0.5)) * (sSite4.y - _DC_Centery + F(0.5));
-
-    //===============
-    //+Omega^2 xy V142
-    const Real fV132 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
-#endif
+    const DOUBLE fV132 = fXYOmega2 * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
 
     results[uiSiteIndex] = fV132 * betaOverN;
 }
@@ -468,12 +425,12 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedZ4SingleField(
 
     const CFieldFermionKSSU3* pF1W = dynamic_cast<const CFieldFermionKSSU3*>(pZ4);
 
-    CFieldFermionKSSU3* pF2W = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(pInverseZ4->m_byFieldId));
+    CFieldFermionKSSU3* pF2W = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(pInverseZ4->m_byFieldId, _T(__FILE__), __LINE__));
     pInverseZ4->CopyTo(pF2W);
-    CFieldFermionKSSU3* pTmp = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(pInverseZ4->m_byFieldId));
+    CFieldFermionKSSU3* pTmp = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(pInverseZ4->m_byFieldId, _T(__FILE__), __LINE__));
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pAcceptGauge);
 
-    preparethread;
+    //preparethread;
 
     //======= D =========
 #if _CLG_DOUBLEFLOAT
@@ -496,7 +453,7 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedZ4SingleField(
     //======= DMD =========
     TArray<const CFieldGauge*> gauges;
     gauges.AddItem(pAcceptGauge);
-    pF2W->InverseD(1, 0, gauges.GetData(), NULL);
+    pF2W->InverseD(1, 0, 0, gauges.GetData(), NULL, NULL);
 
 
 #if _CLG_DOUBLEFLOAT
@@ -519,7 +476,7 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedZ4SingleField(
 
     //======= DMDMD =========
 
-    pF2W->InverseD(1, 0, gauges.GetData(), NULL);
+    pF2W->InverseD(1, 0, 0, gauges.GetData(), NULL, NULL);
 
 
 #if _CLG_DOUBLEFLOAT
@@ -539,6 +496,15 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedZ4SingleField(
         const DOUBLE fDiv2 = 1.0 / m_uiFieldCount;
 #endif
 
+        const TCHAR* sCondensateNames[ECPCTTTKS_Max] =
+        {
+            _T("TraceD"),
+            _T("TraceMD"),
+            _T("TraceDMD"),
+            _T("TraceMDMD"),
+            _T("TraceDMDMD")
+        };
+
         for (UINT i = 0; i < ECPCTTTKS_Max; ++i)
         {
 #if _CLG_DOUBLEFLOAT
@@ -548,6 +514,11 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedZ4SingleField(
 #endif
             appDetailed(_T("\n Condensate %d = %2.12f + %2.12f\n"), i, m_cTmpSum[i].x, m_cTmpSum[i].y);
             m_lstTraceRes[i].AddItem(m_cTmpSum[i]);
+
+            if (NULL != m_pOwner)
+            {
+                m_pOwner->AddOneConfigurationResult(this, sCondensateNames[i], m_cTmpSum[i]);
+            }
         }
 
         ++m_uiConfigurationCount;
@@ -561,6 +532,17 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedSingleField(const CFieldG
         appCrucial(_T("CMeasureMesonCorrelator only implemented with gauge SU3!\n"));
         return;
     }
+#if _CLG_MULTI_GPU
+    //I9: the Polyakov loop below is a per-site PRODUCT along t; with a split t
+    //direction each rank holds only a partial chain and polyakovSum is silently
+    //wrong (the omega terms below are purely local and would be fine, but the
+    //measurement is rejected as a whole, same rule as CMeasurePolyakovXY).
+    if (NULL != appGetComm() && appGetComm()->GpuGrid()[3] > 1)
+    {
+        appCrucial(_T("CMeasurePandChiralTalorKS: not supported on multi-GPU with a split t direction (cross-rank t chain not implemented). Rejected.\n"));
+        return;
+    }
+#endif
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     //const BYTE byGaugeFiledId = pGaugeSU3->m_byFieldId;
     preparethread;
@@ -568,7 +550,7 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedSingleField(const CFieldG
     const dim3 threadsxyz(_HC_DecompLx, _HC_DecompLy, 1);
 
     //=========== Calculate Polyakov loop ================
-    _kernelPolyakovLoopOfSiteTalor2 << <blockxyz, threadsxyz >> > (
+    _LAUNCH_KERNEL(_kernelPolyakovLoopOfSiteTalor2, blockxyz, threadsxyz, 
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
         _D_ComplexThreadBuffer,
@@ -576,28 +558,40 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedSingleField(const CFieldG
         );
 
     cuDoubleComplex polyakovSum = appGetCudaHelper()->ReduceComplex(_D_ComplexThreadBuffer, _HC_Volume_xyz);
+    //P4-3.7: local spatial sum -> global (t-loop product complete when t un-split).
+    appGlobalSum(polyakovSum);
 
     m_lstPolyakov.AddItem(polyakovSum);
+    if (NULL != m_pOwner)
+    {
+        m_pOwner->AddOneConfigurationResult(this, _T("Polyakov"), polyakovSum);
+    }
 
     //=========== Calculate Omega term ================
-    _kernelAddChairTermSU3_Term12_Shifted_NoOmega << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelAddChairTermSU3_Term12_Shifted_NoOmega, block, threads, 
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
         m_fBetaOverN,
         _D_RealThreadBuffer);
     DOUBLE omegaterm = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
-    _kernelAddChairTermSU3_Term34_Shifted_NoOmega << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelAddChairTermSU3_Term34_Shifted_NoOmega, block, threads, 
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
         m_fBetaOverN,
         _D_RealThreadBuffer);
     omegaterm += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+    //P4-3.7: local sums -> global.
+    GlobalSumReal(omegaterm);
 
     m_lstPolyakovSOmega.AddItem(omegaterm);
+    if (NULL != m_pOwner)
+    {
+        m_pOwner->AddOneConfigurationResult(this, _T("Omega"), omegaterm);
+    }
 
     //=========== Calculate Omega Squire term ================
-    _kernelAdd4PlaqutteTermSU3_Shifted_NoOmegaSq << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelAdd4PlaqutteTermSU3_Shifted_NoOmegaSq, block, threads, 
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
         m_fBetaOverN,
@@ -606,21 +600,27 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedSingleField(const CFieldG
     DOUBLE omegasqterm = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
 
-    _kernelAddChairTermSU3_Term5_Shifted_NoOmegaSq << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelAddChairTermSU3_Term5_Shifted_NoOmegaSq, block, threads, 
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
         m_fBetaOverN,
         _D_RealThreadBuffer);
     omegasqterm += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+    //P4-3.7: local sums -> global.
+    GlobalSumReal(omegasqterm);
 
     m_lstPolyakovSOmegaSq.AddItem(omegasqterm);
+    if (NULL != m_pOwner)
+    {
+        m_pOwner->AddOneConfigurationResult(this, _T("OmegaSq"), omegasqterm);
+    }
 }
 
 
 void CMeasurePandChiralTalorKS::ApplyM(CFieldFermionKSSU3* pTarget, const CFieldFermionKSSU3* pSource, const CFieldGaugeSU3* pGauge)
 {
     preparethread;
-    _kernelDFermionKS_PR_XYTerm_NoOmega << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDFermionKS_PR_XYTerm_NoOmega, block, threads, 
         pSource->m_pDeviceData,
         pGauge->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
@@ -630,7 +630,7 @@ void CMeasurePandChiralTalorKS::ApplyM(CFieldFermionKSSU3* pTarget, const CField
         _HC_Center);
 
 
-    _kernelDFermionKS_PR_XYTau_Term_NoOmega << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDFermionKS_PR_XYTau_Term_NoOmega, block, threads, 
         pSource->m_pDeviceData,
         pGauge->m_pDeviceData,
         pTarget->m_pDeviceData,
@@ -644,7 +644,7 @@ void CMeasurePandChiralTalorKS::Report()
     appPushLogDate(FALSE);
     for (UINT i = 0; i < ECPCTTT_Max; ++i)
     {
-        assert(m_uiConfigurationCount == static_cast<UINT>(m_lstTraceRes[i].Num()));
+        appAssert(m_uiConfigurationCount == static_cast<UINT>(m_lstTraceRes[i].Num()));
 
         appGeneral(_T("\n==========================================================================\n"));
         appGeneral(_T("==================== Traces No %d (%d con)============================\n"), i, m_uiConfigurationCount);

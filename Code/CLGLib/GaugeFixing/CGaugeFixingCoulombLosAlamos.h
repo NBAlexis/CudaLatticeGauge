@@ -33,6 +33,14 @@ public:
     , m_pA13(NULL)
     , m_pA22(NULL)
     , m_pA23(NULL)
+#if _CLG_MULTI_GPU
+    , m_pSavedG(NULL)
+    , m_pSavedA11(NULL)
+    , m_pSavedA12(NULL)
+    , m_pSavedA13(NULL)
+    , m_pSavedA22(NULL)
+    , m_pSavedA23(NULL)
+#endif
     , m_bMixed(FALSE)
     {
     }
@@ -49,13 +57,29 @@ public:
 
     void Initial(class CLatticeData* pOwner, const CParameters& params) override;
     void GaugeFixing(CFieldGauge* pResGauge) override;
-    void GaugeFixingForT(deviceSU3* pResGauge, SBYTE uiT, BYTE byFieldId);
+    void GaugeFixingForT(deviceSU3* pResGauge, SCHAR uiT, BYTE byFieldId);
 
     DOUBLE CheckRes(const CFieldGauge* pGauge) override;
-    DOUBLE CheckResDeviceBuffer(const deviceSU3* __restrict__ pGauge, BYTE byFieldId);
-    DOUBLE CheckResDeviceBufferOnlyT(const deviceSU3* __restrict__ pGauge, SBYTE uiT, BYTE byFieldId);
+    DOUBLE CheckResDeviceBuffer(const deviceSU3* pGauge, BYTE byFieldId);
+    DOUBLE CheckResDeviceBufferOnlyT(const deviceSU3* pGauge, SCHAR uiT, BYTE byFieldId);
 
     CCString GetInfos(const CCString& sTab) const override;
+
+#if _CLG_MULTI_GPU
+    //P4-2.2: temporary global-lattice fixing buffers (rank 0 only). The fixing
+    //buffers below are sized to the LOCAL lattice in Initial(); under the
+    //temporary GLOBAL context (see CGaugeFixing::MGEnterGlobalFixerContext) the
+    //kernels sweep the whole lattice, so the buffers must be re-allocated to the
+    //global 3D volume and restored afterwards.
+    void ResizeBuffersToGlobal();
+    void RestoreLocalBuffers();
+    deviceSU3* m_pSavedG;
+    Real* m_pSavedA11;
+    CLGComplex* m_pSavedA12;
+    CLGComplex* m_pSavedA13;
+    Real* m_pSavedA22;
+    CLGComplex* m_pSavedA23;
+#endif
 
     UINT m_pHDecomp[6];
     UINT* m_pDDecomp;

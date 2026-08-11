@@ -258,7 +258,7 @@ _kernelBosonConjugateVN(deviceDataBoson* pDeviceData)
 #pragma endregion
 
 template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::D(INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const CFieldTensor2* const* tensor2Fields, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
 {
     const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
 
@@ -294,8 +294,19 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::D(INT gaugeNum, INT bosonN
         fRealCoeff = F(-1.0);
     }
 
+#if _CLG_MULTI_GPU
+    //P4-4.2: the stencil reads pooled-boson + gauge neighbours; ensure the halo
+    //is valid, and the written target (this field) becomes dirty.
+    if (NULL != appGetHaloManager())
+    {
+        appGetHaloManager()->Ensure(m_byFieldId, _HC_HaloWidth);
+        appGetHaloManager()->Ensure(pPooled->m_byFieldId, _HC_HaloWidth);
+        appGetHaloManager()->RefillHalo(m_byFieldId);
+        appGetHaloManager()->RefillHalo(pPooled->m_byFieldId);
+    }
+#endif
     preparethread;
-    _kernelDBosonVN << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDBosonVN, block, threads, 
         pPooled->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
@@ -307,6 +318,12 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::D(INT gaugeNum, INT bosonN
         m_byFieldId);
 
     checkCudaErrors(cudaDeviceSynchronize());
+#if _CLG_MULTI_GPU
+    if (NULL != appGetHaloManager())
+    {
+        appGetHaloManager()->MarkDirty(m_byFieldId);
+    }
+#endif
     pPooled->Return();
 }
 
@@ -341,7 +358,7 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT gaugeNum,
     }
 
     preparethread;
-    _kernelDBosonForceVN << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDBosonForceVN, block, threads, 
         m_pDeviceData,
         (const deviceDataGauge*)gauge->GetData(),
         appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
@@ -372,7 +389,7 @@ template<typename deviceDataBoson, typename deviceDataGauge>
 void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::InitialField(EFieldInitialType eInitialType)
 {
     preparethread;
-    _kernelInitialBosonVN << <block, threads >> > (m_pDeviceData, m_byFieldId, eInitialType);
+    _LAUNCH_KERNEL(_kernelInitialBosonVN, block, threads, m_pDeviceData, m_byFieldId, eInitialType);
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
@@ -552,7 +569,7 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::AxpyPlus(const CField* x)
     const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
 
     preparethread;
-    _kernelAddBosonVN << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData);
+    _LAUNCH_KERNEL(_kernelAddBosonVN, block, threads, m_pDeviceData, pField->m_pDeviceData);
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
@@ -566,7 +583,7 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::AxpyMinus(const CField* x)
     const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
 
     preparethread;
-    _kernelSubBosonVN << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData);
+    _LAUNCH_KERNEL(_kernelSubBosonVN, block, threads, m_pDeviceData, pField->m_pDeviceData);
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
@@ -580,7 +597,7 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Axpy(Real a, const CField*
     const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
 
     preparethread;
-    _kernelAxpyRealBosonVN << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
+    _LAUNCH_KERNEL(_kernelAxpyRealBosonVN, block, threads, m_pDeviceData, pField->m_pDeviceData, a);
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
@@ -594,7 +611,7 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Axpy(const CLGComplex& a, 
     const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
 
     preparethread;
-    _kernelAxpyComplexBosonVN << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
+    _LAUNCH_KERNEL(_kernelAxpyComplexBosonVN, block, threads, m_pDeviceData, pField->m_pDeviceData, a);
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
@@ -608,7 +625,7 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Mul(const CField* other, U
     const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(other);
 
     preparethread;
-    _kernelMulComplexBosonVN << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, bDagger);
+    _LAUNCH_KERNEL(_kernelMulComplexBosonVN, block, threads, m_pDeviceData, pField->m_pDeviceData, bDagger);
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
@@ -621,7 +638,7 @@ cuDoubleComplex CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Dot(const CFiel
     }
     const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
     preparethread;
-    _kernelDotBosonVN << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, _D_ComplexThreadBuffer);
+    _LAUNCH_KERNEL(_kernelDotBosonVN, block, threads, m_pDeviceData, pField->m_pDeviceData, _D_ComplexThreadBuffer);
 
     return appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
 }
@@ -633,7 +650,7 @@ TArray<DOUBLE> CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Sum() const
     TArray<DOUBLE> ret;
     for (UINT i = 0; i < FloatN(); ++i)
     {
-        _kernelElementVN << <block, threads >> > (m_pDeviceData, i, _D_RealThreadBuffer);
+        _LAUNCH_KERNEL(_kernelElementVN, block, threads, m_pDeviceData, i, _D_RealThreadBuffer);
         ret.AddItem(appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer));
     }
     return ret;
@@ -643,21 +660,21 @@ template<typename deviceDataBoson, typename deviceDataGauge>
 void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::ScalarMultply(const CLGComplex& a)
 {
     preparethread;
-    _kernelScalarMultiplyBosonVN << <block, threads >> > (m_pDeviceData, a);
+    _LAUNCH_KERNEL(_kernelScalarMultiplyBosonVN, block, threads, m_pDeviceData, a);
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
 void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::ScalarMultply(Real a)
 {
     preparethread;
-    _kernelScalarMultiplyRealBosonVN << <block, threads >> > (m_pDeviceData, a);
+    _LAUNCH_KERNEL(_kernelScalarMultiplyRealBosonVN, block, threads, m_pDeviceData, a);
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
 void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Dagger()
 {
     preparethread;
-    _kernelBosonConjugateVN << <block, threads >> > (m_pDeviceData);
+    _LAUNCH_KERNEL(_kernelBosonConjugateVN, block, threads, m_pDeviceData);
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
@@ -685,7 +702,7 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::MakeRandomMomentum()
     }
 
     preparethread;
-    _kernelInitialBosonVN << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelInitialBosonVN, block, threads, 
         m_pDeviceData,
         m_byFieldId,
         EFIT_RandomGaussian);

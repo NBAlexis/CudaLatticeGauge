@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="CLGTest.cpp" />
@@ -11,6 +11,28 @@
     <ClCompile Include="Tests\TestConfigurationFileIO.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Tests\TestMG.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestImprove1.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestImprove2.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestImprove5.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestImprove6.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestImprove8.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClInclude Include="Tests\TestImproveHaloCommon.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+
     <ClCompile Include="Tests\TestSolver.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
@@ -45,6 +67,15 @@
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="Tests\TestSUN.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestHmcDiagnostics.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestNumpyExport.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestPSU3WithBoundary.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
@@ -103,6 +134,15 @@
       <Filter>YAMLs</Filter>
     </None>
     <None Include="..\..\Bin\Debug\TestSuit_SUN.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_HmcDiagnostics.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_EvenOdd.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_NumpyExport.yaml">
       <Filter>YAMLs</Filter>
     </None>
   </ItemGroup>

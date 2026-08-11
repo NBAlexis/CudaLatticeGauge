@@ -166,7 +166,6 @@ INT Measurement3D(CParameters& params)
     //CMeasureWilsonLoopXY* pWilson = dynamic_cast<CMeasureWilsonLoopXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(9));
 
     //CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
-    //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
 
     //CActionGaugePlaquetteRotating* pAG = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
 
@@ -571,7 +570,7 @@ INT Measurement3D(CParameters& params)
                 case EDJKS_VR:
                     {
                         appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);
-                        appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
+                        appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, NULL, pStaple);
                         pWilson->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                         if (uiN == iStartN)
                         {

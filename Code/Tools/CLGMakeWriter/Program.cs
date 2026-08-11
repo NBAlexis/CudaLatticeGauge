@@ -57,6 +57,10 @@ namespace CLGMakeWriter
             apps.Add("StaggeredRotation", new CProjFile("StaggeredRotation"));
             apps.Add("BetaGradient", new CProjFile("BetaGradient"));
             apps.Add("ElectricChemical", new CProjFile("ElectricChemical"));
+            apps.Add("HISQ", new CProjFile("HISQ"));
+            apps.Add("CLGExample", new CProjFile("CLGExample"));
+            apps.Add("WilsonDiracElectricMagnetic", new CProjFile("WilsonDiracElectricMagnetic"));
+            apps.Add("RotationImprovedFermion", new CProjFile("RotationImprovedFermion"));
 
             writer.WritteTheFile(projSolPath, clgLibProj, apps);
 

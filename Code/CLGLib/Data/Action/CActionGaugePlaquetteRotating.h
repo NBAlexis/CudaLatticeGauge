@@ -9,6 +9,7 @@
 // REVISION:
 //  [05/07/2019 nbale]
 //=============================================================================
+#if 0
 
 #ifndef _CACTIONGAUGEPLAQUETTE_ROTATING_H_
 #define _CACTIONGAUGEPLAQUETTE_ROTATING_H_
@@ -69,6 +70,7 @@ protected:
 __END_NAMESPACE
 
 #endif //#ifndef _CACTIONGAUGEPLAQUETTE_ROTATING_H_
+#endif
 
 //=============================================================================
 // END OF FILE

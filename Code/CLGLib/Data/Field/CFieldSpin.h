@@ -11,15 +11,15 @@
 #ifndef _CFIELDSPIN_H_
 #define _CFIELDSPIN_H_
 
-__BEGIN_NAMESPACE
-
-class CLGAPI CFieldSpin : public CField
-{
-public:
-
-};
-
-__END_NAMESPACE
+//__BEGIN_NAMESPACE
+//
+//class CLGAPI CFieldSpin : public CField
+//{
+//public:
+//
+//};
+//
+//__END_NAMESPACE
 
 #endif //#ifndef _CFIELDSPIN_H_
 

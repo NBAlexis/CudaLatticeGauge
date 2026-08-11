@@ -5,6 +5,7 @@
 // TFQMR is similar as BiCGStab, but a little bit slower
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [20/06/2020 nbale]
 //=============================================================================
 
@@ -30,8 +31,10 @@ public:
     UBOOL Solve(CField* pFieldX, const CField* pFieldB,
         INT gaugeNum,
         INT bosonNum,
+        INT tensor2Num,
         const CFieldGauge* const* gaugeFields,
         const CFieldBoson* const* bosonFields,
+        const CFieldTensor2* const* tensor2Fields,
         EFieldOperator uiM, ESolverPhase ePhase = ESP_Once, const CField* pStart = NULL) override;
 
 protected:

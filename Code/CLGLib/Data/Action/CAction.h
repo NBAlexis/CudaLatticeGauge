@@ -5,8 +5,10 @@
 // This is the class for all fields, gauge, fermion and spin fields are inherent from it
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/4/2018 nbale]
 //=============================================================================
+#pragma once
 
 #ifndef _CACTION_H_
 #define _CACTION_H_
@@ -35,11 +37,11 @@ public:
     /**
     * This is called langevin in Bridge++
     *
-    * To set pStable, if energy can be calculate using pre-calculated stables (so this action must be gauge action)
+    * To set pStaple, if energy can be calculate using pre-calculated staples (so this action must be gauge action)
     * bBeforeEvolution is set to be TRUE if call this just after an update (therefore the energy is already calculate for Metroplis of the last step),
     * and will return the last result.
     */
-    virtual DOUBLE Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldGauge* const* stableFields);
+    virtual DOUBLE Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields, const CFieldGauge* const* stapleFields);
 
     /**
     * Obtain the pointer of the fields
@@ -72,11 +74,28 @@ public:
         }
     }
 
+    /**
+    * Called before the fields are copied back (accepted) or discarded (rejected),
+    * it is a chance for the action to modify the fields which will be accepted.
+    * The default implementation does nothing.
+    * Note: the fields are not constant (the action may change them),
+    * while the arrays holding the pointers are constant.
+    */
+    virtual void OnFinishTrajectory(UBOOL bWillBeAccept, INT gaugeNum, INT bosonNum, INT tensor2Num, CFieldGauge* const* gaugeFields, CFieldBoson* const* bosonFields, CFieldTensor2* const* tensor2Fields)
+    {
+
+    }
+
     CCString GetInfos(const CCString &tab) const override;
 
     BYTE GetActionId() const { return m_byActionId; }
 
+    const TArray<BYTE>& GetGaugeFieldIds() const { return m_byGaugeFieldIds; }
+    const TArray<BYTE>& GetBosonFieldIds() const { return m_byBosonFieldIds; }
+
     virtual UBOOL IsFermion() const { return FALSE; }
+
+    virtual UBOOL IsDiscreteGauge() const { return FALSE; }
 
     DOUBLE GetBetaOverN() const { return m_fBetaOverN; }
 
@@ -100,7 +119,7 @@ protected:
         appCrucial(_T("PrepareForHMC not implemented\n"));
     }
 
-    virtual DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+    virtual DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStaple)
     {
         appCrucial(_T("Energy not implemented\n"));
         return 0.0;

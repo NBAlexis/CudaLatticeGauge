@@ -8,6 +8,7 @@
 // https://cboard.cprogramming.com/cplusplus-programming/113400-gcc-template-class-child-cant-directly-access-parent-fields.html
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [27/10/2022 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -36,8 +37,10 @@ _kernelAdd4PlaqutteTermT3D(
     intokernalInt4;
 
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+#if !_CLG_ASSUME_SQUARE_LATTICE
     const UINT plaqLength = __idx->m_pSmallData[CIndexData::kPlaqLengthIdx];
-    const UINT plaqCountAll = __idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx] * plaqLength;
+    const UINT plaqCountAllSite = __idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx] * plaqLength;
+#endif
 
     DOUBLE res = 0.0;
     #pragma unroll
@@ -52,7 +55,7 @@ _kernelAdd4PlaqutteTermT3D(
 
         //========================================
         //find plaqutte 1-3, or 2-3
-        SIndex first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
+        SIndex first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAllSite];
         deviceGauge toAdd(_deviceGetGaugeBCT(byFieldId, pDeviceData, first));
         if (first.NeedToDagger())
         {
@@ -60,7 +63,7 @@ _kernelAdd4PlaqutteTermT3D(
         }
         for (BYTE j = 1; j < plaqLength; ++j)
         {
-            first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
+            first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAllSite];
             deviceGauge toMul(_deviceGetGaugeBCT(byFieldId, pDeviceData, first));
             if (first.NeedToDagger())
             {
@@ -129,12 +132,8 @@ _kernelAddForce4PlaqutteTermT_XY3D(
                 idx[idir + 1]));
         }
 
-        deviceGauge force(pDeviceData[linkIndex]);
-
-        _muldag(force, stap);
-        _ta(force);
-        _mul(force, betaOverN);
-        _add(pForceData[linkIndex], force);
+        _mul(stap, betaOverN);
+        _add(pForceData[linkIndex], stap);
     }
 }
 
@@ -165,8 +164,12 @@ _kernelAddChairTermT_Term1234_3D(
     }
 
     betaOverN = F(0.125) * betaOverN;
-    const Real fXOmega = (sSite4.x - _DC_Centerx) * fOmega;
-    const Real fYOmega = (sSite4.y - _DC_Centery) * fOmega;
+    //Multi-GPU: the coordinates entering the Omega factors must be GLOBAL
+    //(P4-1.2/1.4-R1); identity on single-GPU. sSite4 itself stays local for
+    //the index-table lookups in _deviceChairTermT.
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
+    const Real fXOmega = (sSite4G.x - _DC_Centerx) * fOmega;
+    const Real fYOmega = (sSite4G.y - _DC_Centery) * fOmega;
 
     //===============
     //+x Omega V312
@@ -199,7 +202,8 @@ _kernelAddChairTermT_Term53D(
     }
 
     betaOverN = F(0.125) * betaOverN;
-    const Real fXYOmega2 = (sSite4.x - _DC_Centerx) * (sSite4.y - _DC_Centery) * fOmegaSq;
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
+    const Real fXYOmega2 = (sSite4G.x - _DC_Centerx) * (sSite4G.y - _DC_Centery) * fOmegaSq;
 
     //===============
     //+Omega^2 xy V132
@@ -213,9 +217,6 @@ _kernelAddChairTermT_Term53D(
 
 #pragma region Chair force
 
-/**
-* Split to 15 functions to avoid max-regcount
-*/
 template<typename deviceGauge>
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermT_Term13D(
@@ -238,13 +239,11 @@ _kernelAddForceChairTermT_Term13D(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 2))
     {
-        const deviceGauge staple_term1_4 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+        deviceGauge staple_term1_4 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             2, 0, 1, 0);
-        deviceGauge force4(pDeviceData[uiLink4]);
-        _muldag(force4, staple_term1_4);
-        _ta(force4);
-        _mul(force4, betaOverN);
-        _add(pForceData[uiLink4], force4);
+
+        _mul(staple_term1_4, betaOverN);
+        _add(pForceData[uiLink4], staple_term1_4);
     }
 
     //===============
@@ -254,13 +253,11 @@ _kernelAddForceChairTermT_Term13D(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 1))
     {
-        const deviceGauge staple_term1_2 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+        deviceGauge staple_term1_2 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             1, 0, 2, 0);
-        deviceGauge force2(pDeviceData[uiLink2]);
-        _muldag(force2, staple_term1_2);
-        _ta(force2);
-        _mul(force2, betaOverN);
-        _add(pForceData[uiLink2], force2);
+
+        _mul(staple_term1_2, betaOverN);
+        _add(pForceData[uiLink2], staple_term1_2);
     }
 
     //===============
@@ -270,13 +267,11 @@ _kernelAddForceChairTermT_Term13D(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 0))
     {
-        const deviceGauge staple_term1_1 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+        deviceGauge staple_term1_1 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             2, 0, 1, 0);
-        deviceGauge force1(pDeviceData[uiLink1]);
-        _muldag(force1, staple_term1_1);
-        _ta(force1);
-        _mul(force1, betaOverN);
-        _add(pForceData[uiLink1], force1);
+
+        _mul(staple_term1_1, betaOverN);
+        _add(pForceData[uiLink1], staple_term1_1);
     }
 }
 
@@ -302,13 +297,11 @@ _kernelAddForceChairTermT_Term33D(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 2))
     {
-        const deviceGauge staple_term3_4 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+        deviceGauge staple_term3_4 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             2, 1, 0, _deviceHi1);
-        deviceGauge force4(pDeviceData[uiLink4]);
-        _muldag(force4, staple_term3_4);
-        _ta(force4);
-        _mul(force4, betaOverN);
-        _add(pForceData[uiLink4], force4);
+
+        _mul(staple_term3_4, betaOverN);
+        _add(pForceData[uiLink4], staple_term3_4);
     }
 
     //===============
@@ -318,13 +311,11 @@ _kernelAddForceChairTermT_Term33D(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 0))
     {
-        const deviceGauge staple_term3_1 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+        deviceGauge staple_term3_1 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             0, 1, 2, _deviceHi1);
-        deviceGauge force1(pDeviceData[uiLink1]);
-        _muldag(force1, staple_term3_1);
-        _ta(force1);
-        _mul(force1, betaOverN);
-        _add(pForceData[uiLink1], force1);
+
+        _mul(staple_term3_1, betaOverN);
+        _add(pForceData[uiLink1], staple_term3_1);
     }
 
     //===============
@@ -334,13 +325,11 @@ _kernelAddForceChairTermT_Term33D(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 1))
     {
-        const deviceGauge staple_term3_2 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+        deviceGauge staple_term3_2 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             2, 1, 0, _deviceHi1);
-        deviceGauge force2(pDeviceData[uiLink2]);
-        _muldag(force2, staple_term3_2);
-        _ta(force2);
-        _mul(force2, betaOverN);
-        _add(pForceData[uiLink2], force2);
+
+        _mul(staple_term3_2, betaOverN);
+        _add(pForceData[uiLink2], staple_term3_2);
     }
 
 }
@@ -366,13 +355,11 @@ _kernelAddForceChairTermT_Term53D(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 0))
     {
-        const deviceGauge staple_term5_1 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+        deviceGauge staple_term5_1 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             0, 2, 1, _deviceHi2);
-        deviceGauge force1(pDeviceData[uiLink1]);
-        _muldag(force1, staple_term5_1);
-        _ta(force1);
-        _mul(force1, betaOverN);
-        _add(pForceData[uiLink1], force1);
+
+        _mul(staple_term5_1, betaOverN);
+        _add(pForceData[uiLink1], staple_term5_1);
     }
 
     //===============
@@ -381,13 +368,11 @@ _kernelAddForceChairTermT_Term53D(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 1))
     {
-        const deviceGauge staple_term5_2 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+        deviceGauge staple_term5_2 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             1, 2, 0, _deviceHi2);
-        deviceGauge force2(pDeviceData[uiLink2]);
-        _muldag(force2, staple_term5_2);
-        _ta(force2);
-        _mul(force2, betaOverN);
-        _add(pForceData[uiLink2], force2);
+
+        _mul(staple_term5_2, betaOverN);
+        _add(pForceData[uiLink2], staple_term5_2);
     }
 
     //===============
@@ -396,13 +381,11 @@ _kernelAddForceChairTermT_Term53D(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 2))
     {
-        const deviceGauge staple_term5_3 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+        deviceGauge staple_term5_3 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             0, 2, 1, _deviceHi2);
-        deviceGauge force3(pDeviceData[uiLink3]);
-        _muldag(force3, staple_term5_3);
-        _ta(force3);
-        _mul(force3, betaOverN);
-        _add(pForceData[uiLink3], force3);
+
+        _mul(staple_term5_3, betaOverN);
+        _add(pForceData[uiLink3], staple_term5_3);
     }
 
 }
@@ -426,9 +409,12 @@ _kernelAdd4PlaqutteTermT_Shifted3D(
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
-    DOUBLE fXSq = (sSite4.x - _DC_Centerx + 0.5);
+    //Multi-GPU: global coordinates for the Omega factors (P4-1.2/1.4-R1);
+    //identity on single-GPU.
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
+    DOUBLE fXSq = (sSite4G.x - _DC_Centerx + 0.5);
     fXSq = fXSq * fXSq;
-    DOUBLE fYSq = (sSite4.y - _DC_Centery + 0.5);
+    DOUBLE fYSq = (sSite4G.y - _DC_Centery + 0.5);
     fYSq = fYSq * fYSq;
 
     //======================================================
@@ -480,11 +466,8 @@ _kernelAddForce4PlaqutteTermT_XYZ_Shifted3D(
                 TRUE));
         }
         
-        deviceGauge force(pDeviceData[linkIndex]);
-        _muldag(force, stap);
-        _ta(force);
-        _mul(force, betaOverN);
-        _add(pForceData[linkIndex], force);
+        _mul(stap, betaOverN);
+        _add(pForceData[linkIndex], stap);
     }
 }
 
@@ -506,8 +489,9 @@ _kernelAddChairTermT_Term1234_Shifted3D(
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = 0.125 * betaOverN;
-    const DOUBLE fXOmega = (sSite4.x - _DC_Centerx + 0.5) * fOmega;
-    const DOUBLE fYOmega = (sSite4.y - _DC_Centery + 0.5) * fOmega;
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
+    const DOUBLE fXOmega = (sSite4G.x - _DC_Centerx + 0.5) * fOmega;
+    const DOUBLE fYOmega = (sSite4G.y - _DC_Centery + 0.5) * fOmega;
 
     //===============
     // F01F12 term  x Omega V312
@@ -532,7 +516,8 @@ _kernelAddChairTermT_Term5_Shifted3D(
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = 0.125 * betaOverN;
-    const DOUBLE fXYOmega2 = (sSite4.x - _DC_Centerx + 0.5) * (sSite4.y - _DC_Centery + 0.5) * fOmegaSq;
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
+    const DOUBLE fXYOmega2 = (sSite4G.x - _DC_Centerx + 0.5) * (sSite4G.y - _DC_Centery + 0.5) * fOmegaSq;
 
     //===============
     //+Omega^2 xy V142
@@ -567,13 +552,11 @@ _kernelAddForceChairTermT_Term1_Shifted3D(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const deviceGauge staple_term1_4 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+    deviceGauge staple_term = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         2, 0, 1, _deviceHiShifted0);
-    deviceGauge force4(pDeviceData[uiLink4]);
-    _muldag(force4, staple_term1_4);
-    _ta(force4);
-    _mul(force4, betaOverN);
-    _add(pForceData[uiLink4], force4);
+
+    _mul(staple_term, betaOverN);
+    _add(pForceData[uiLink4], staple_term);
     //}
 
 
@@ -584,13 +567,11 @@ _kernelAddForceChairTermT_Term1_Shifted3D(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const deviceGauge staple_term1_2 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+    staple_term = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         1, 0, 2, _deviceHiShifted0);
-    deviceGauge force2(pDeviceData[uiLink2]);
-    _muldag(force2, staple_term1_2);
-    _ta(force2);
-    _mul(force2, betaOverN);
-    _add(pForceData[uiLink2], force2);
+
+    _mul(staple_term, betaOverN);
+    _add(pForceData[uiLink2], staple_term);
    // }
 
     //===============
@@ -600,13 +581,11 @@ _kernelAddForceChairTermT_Term1_Shifted3D(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const deviceGauge staple_term1_1 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+    staple_term = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         2, 0, 1, _deviceHiShifted0);
-    deviceGauge force1(pDeviceData[uiLink1]);
-    _muldag(force1, staple_term1_1);
-    _ta(force1);
-    _mul(force1, betaOverN);
-    _add(pForceData[uiLink1], force1);
+
+    _mul(staple_term, betaOverN);
+    _add(pForceData[uiLink1], staple_term);
     //}
 }
 
@@ -632,13 +611,11 @@ _kernelAddForceChairTermT_Term3_Shifted3D(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const deviceGauge staple_term3_4 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+    deviceGauge staple_term = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         2, 1, 0, _deviceHiShifted1);
-    deviceGauge force4(pDeviceData[uiLink4]);
-    _muldag(force4, staple_term3_4);
-    _ta(force4);
-    _mul(force4, betaOverN);
-    _add(pForceData[uiLink4], force4);
+
+    _mul(staple_term, betaOverN);
+    _add(pForceData[uiLink4], staple_term);
     //}
 
     //===============
@@ -648,13 +625,11 @@ _kernelAddForceChairTermT_Term3_Shifted3D(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const deviceGauge staple_term3_1 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+    staple_term = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         0, 1, 2, _deviceHiShifted1);
-    deviceGauge force1(pDeviceData[uiLink1]);
-    _muldag(force1, staple_term3_1);
-    _ta(force1);
-    _mul(force1, betaOverN);
-    _add(pForceData[uiLink1], force1);
+
+    _mul(staple_term, betaOverN);
+    _add(pForceData[uiLink1], staple_term);
     //}
 
 
@@ -665,13 +640,11 @@ _kernelAddForceChairTermT_Term3_Shifted3D(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const deviceGauge staple_term3_2 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+    staple_term = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         2, 1, 0, _deviceHiShifted1);
-    deviceGauge force2(pDeviceData[uiLink2]);
-    _muldag(force2, staple_term3_2);
-    _ta(force2);
-    _mul(force2, betaOverN);
-    _add(pForceData[uiLink2], force2);
+
+    _mul(staple_term, betaOverN);
+    _add(pForceData[uiLink2], staple_term);
     //}
 
 }
@@ -697,13 +670,11 @@ _kernelAddForceChairTermT_Term5_Shifted3D(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const deviceGauge staple_term5_1 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+    deviceGauge staple_term = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         0, 2, 1, _deviceHiShifted2);
-    deviceGauge force1(pDeviceData[uiLink1]);
-    _muldag(force1, staple_term5_1);
-    _ta(force1);
-    _mul(force1, betaOverN);
-    _add(pForceData[uiLink1], force1);
+
+    _mul(staple_term, betaOverN);
+    _add(pForceData[uiLink1], staple_term);
     //}
 
     //===============
@@ -712,13 +683,11 @@ _kernelAddForceChairTermT_Term5_Shifted3D(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const deviceGauge staple_term5_2 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+    staple_term = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         1, 2, 0, _deviceHiShifted2);
-    deviceGauge force2(pDeviceData[uiLink2]);
-    _muldag(force2, staple_term5_2);
-    _ta(force2);
-    _mul(force2, betaOverN);
-    _add(pForceData[uiLink2], force2);
+
+    _mul(staple_term, betaOverN);
+    _add(pForceData[uiLink2], staple_term);
     //}
 
     //===============
@@ -727,13 +696,11 @@ _kernelAddForceChairTermT_Term5_Shifted3D(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const deviceGauge staple_term5_3 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
+    staple_term = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         0, 2, 1, _deviceHiShifted2);
-    deviceGauge force3(pDeviceData[uiLink3]);
-    _muldag(force3, staple_term5_3);
-    _ta(force3);
-    _mul(force3, betaOverN);
-    _add(pForceData[uiLink3], force3);
+
+    _mul(staple_term, betaOverN);
+    _add(pForceData[uiLink3], staple_term);
     //}
 }
 
@@ -757,36 +724,38 @@ UBOOL CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::CalculateForceOnGa
     }
 
     preparethread;
-
+    const DOUBLE beta = this->GetBetaOverN();
+    const DOUBLE omega = this->GetOmega();
+    const DOUBLE omegasq = omega * omega;
 
     if (!this->m_bShiftHalfCoord)
     {
-        _kernelAddForce4PlaqutteTermT_XY3D << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega() * this->GetOmega());
+        _LAUNCH_KERNEL(_kernelAddForce4PlaqutteTermT_XY3D<deviceGauge>, block, threads, pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData,
+            pForceSU3->m_pDeviceData, beta, omegasq);
 
-        _kernelAddForceChairTermT_Term13D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega());
+        _LAUNCH_KERNEL(_kernelAddForceChairTermT_Term13D<deviceGauge>, block, threads, pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
+            pForceSU3->m_pDeviceData, beta, omega);
 
-        _kernelAddForceChairTermT_Term33D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega());
+        _LAUNCH_KERNEL(_kernelAddForceChairTermT_Term33D<deviceGauge>, block, threads, pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
+            pForceSU3->m_pDeviceData, beta, omega);
 
-        _kernelAddForceChairTermT_Term53D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega() * this->GetOmega());
+        _LAUNCH_KERNEL(_kernelAddForceChairTermT_Term53D<deviceGauge>, block, threads, pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
+            pForceSU3->m_pDeviceData, beta, omegasq);
     }
     else
     {
 
-        _kernelAddForce4PlaqutteTermT_XYZ_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega() * this->GetOmega());
+        _LAUNCH_KERNEL(_kernelAddForce4PlaqutteTermT_XYZ_Shifted3D<deviceGauge>, block, threads, pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData,
+            pForceSU3->m_pDeviceData, beta, omegasq);
         
-        _kernelAddForceChairTermT_Term1_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega());
+        _LAUNCH_KERNEL(_kernelAddForceChairTermT_Term1_Shifted3D<deviceGauge>, block, threads, pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
+            pForceSU3->m_pDeviceData, beta, omega);
 
-        _kernelAddForceChairTermT_Term3_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega());
+        _LAUNCH_KERNEL(_kernelAddForceChairTermT_Term3_Shifted3D<deviceGauge>, block, threads, pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
+            pForceSU3->m_pDeviceData, beta, omega);
 
-        _kernelAddForceChairTermT_Term5_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega() * this->GetOmega());
+        _LAUNCH_KERNEL(_kernelAddForceChairTermT_Term5_Shifted3D<deviceGauge>, block, threads, pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
+            pForceSU3->m_pDeviceData, beta, omegasq);
     }
 
     checkCudaErrors(cudaDeviceSynchronize());
@@ -797,13 +766,20 @@ UBOOL CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::CalculateForceOnGa
 * The implementation depends on the type of gauge field
 */
 template<typename deviceGauge, INT matrixN>
-DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStaple)
 {
     //see:
     //https://cboard.cprogramming.com/cplusplus-programming/113400-gcc-template-class-child-cant-directly-access-parent-fields.html
     if (bBeforeEvolution)
     {
         return this->m_fLastEnergy;
+    }
+
+    const CFieldGaugeLink<deviceGauge, matrixN>* pGaugeSU3 = dynamic_cast<const CFieldGaugeLink<deviceGauge, matrixN>*>(pGauge);
+    if (NULL == pGaugeSU3)
+    {
+        appCrucial(_T("CActionGaugePlaquetteRotating only work with SU3 now.\n"));
+        return this->m_fNewEnergy;
     }
 
     if (this->IsCloverEnergy())
@@ -814,13 +790,6 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
     {
         this->m_fNewEnergy = pGauge->CalculatePlaqutteEnergy(this->GetBetaOverN());
     }
-    
-    const CFieldGaugeLink<deviceGauge, matrixN>* pGaugeSU3 = dynamic_cast<const CFieldGaugeLink<deviceGauge, matrixN>*>(pGauge);
-    if (NULL == pGaugeSU3)
-    {
-        appCrucial(_T("CActionGaugePlaquetteRotating only work with SU3 now.\n"));
-        return this->m_fNewEnergy;
-    }
 
     preparethread;
 
@@ -829,7 +798,7 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
     if (this->m_bShiftHalfCoord)
     {
 
-        _kernelAdd4PlaqutteTermT_Shifted3D << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelAdd4PlaqutteTermT_Shifted3D<deviceGauge>, block, threads,
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
             this->GetBetaOverN(),
@@ -838,7 +807,7 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
 
         this->m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
-        _kernelAddChairTermT_Term1234_Shifted3D << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelAddChairTermT_Term1234_Shifted3D<deviceGauge>, block, threads,
             pGaugeSU3->m_byFieldId, 
             pGaugeSU3->m_pDeviceData, 
             this->GetBetaOverN(),
@@ -847,7 +816,7 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
 
         this->m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
-        _kernelAddChairTermT_Term5_Shifted3D << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelAddChairTermT_Term5_Shifted3D<deviceGauge>, block, threads,
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
             this->GetBetaOverN(),
@@ -859,7 +828,7 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
     }
     else
     {
-        _kernelAdd4PlaqutteTermT3D << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelAdd4PlaqutteTermT3D<deviceGauge>, block, threads,
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
             appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
@@ -869,7 +838,7 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
 
         this->m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
-        _kernelAddChairTermT_Term1234_3D << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelAddChairTermT_Term1234_3D<deviceGauge>, block, threads,
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
             this->GetBetaOverN(),
@@ -878,7 +847,7 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
 
         this->m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
-        _kernelAddChairTermT_Term53D << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelAddChairTermT_Term53D<deviceGauge>, block, threads,
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
             this->GetBetaOverN(),
@@ -889,13 +858,20 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
 
     }
 
+    //The rotating-term kernels write per-site partial sums into the thread
+    //buffer and ThreadBufferSum reduces only this rank's local sub-lattice;
+    //the plaquette part (CalculatePlaqutteEnergy*) is likewise local. Sum the
+    //total across ranks for the global action (P4-1.2). No-op on a lone rank.
+    appGlobalSum(this->m_fNewEnergy);
 
     return this->m_fNewEnergy;
 }
 
-__CLG_FORCETEMPLATE_CONSTRUCTOR(CActionGaugePlaquetteRotatingT3D, U1, CLGComplex, 1)
+template class CActionGaugePlaquetteRotatingT3D<CLGComplex, 1>;
+template class CActionGaugePlaquetteRotatingT3D<deviceSU3, 3>;
 
 __CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingU1_3D)
+__CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotating3D)
 
 __END_NAMESPACE
 

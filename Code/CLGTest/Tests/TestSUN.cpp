@@ -4,12 +4,13 @@
 // DESCRIPTION:
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [06/21/2024 nbale]
 //=============================================================================
 
 #include "CLGTest.h"
 
-__REGIST_TEST(TestUpdateCommon, SUN, TestSU4, SUN);
+___REGIST_TEST(TestUpdateCommon, SUN, TestSU4, SUN, _TEST_MULTIGPU);
 __REGIST_TEST(TestUpdateCommon, SUN, TestSU4D, SUND);
 __REGIST_TEST(TestUpdateCommon, SUN, TestRotationSUND, SUNRD);
 __REGIST_TEST(TestUpdateCommon, SUN, TestRotationSUNP, SUNRP);

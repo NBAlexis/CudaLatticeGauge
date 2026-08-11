@@ -5,6 +5,7 @@
 // This is the class for hibrid Monte Carlo
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/7/2018 nbale]
 //=============================================================================
 
@@ -21,7 +22,7 @@ class CLGAPI CHMC : public CUpdator
 
 public:
 
-    CHMC() : CUpdator(), m_pIntegrator(NULL), m_bMetropolis(FALSE) {  }
+    CHMC() : CUpdator(), m_pIntegrator(NULL), m_bMetropolis(FALSE), m_uiSkip(1) {  }
     ~CHMC();
     UINT Update(UINT iSteps, UBOOL bMeasure) override;
     Real CalculateEnergy() override { return 0.0f; }
@@ -32,11 +33,21 @@ public:
     void Initial(class CLatticeData* pOwner, const CParameters& params) override;
     CCString GetInfos(const CCString &tab) const override;
 
-    void SetAutoCorrection(UBOOL bAutoCorrection) override { m_bMetropolis = bAutoCorrection; }
+    void SetAutoCorrection(UBOOL bAutoCorrection) override 
+    { 
+        m_bMetropolis = bAutoCorrection; 
+        if (m_bMetropolis)
+        {
+            m_bTestHDiff = FALSE;
+        }
+    }
+
+    void UpdateUntileAccept(UINT iSteps, UBOOL bMeasure) override;
 
 protected:
 
     UBOOL m_bMetropolis;
+    UINT m_uiSkip;
 };
 
 __END_NAMESPACE

@@ -4,6 +4,7 @@
 // DESCRIPTION:
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [01/28/2019 nbale]
 //=============================================================================
 
@@ -88,23 +89,64 @@ UINT TestFermionUpdatorKS(CParameters& sParam)
 }
 
 __REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKS, KS);
+__REGIST_TEST(TestUpdateCommon, Boundary, TestFermionUpdatorKSD, KSD);
 
 __REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSNestedForceGradient, nestedForceGrad);
 
 //multi-level integrator not work efficiently now
-//__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSNestedForceGradientNf2p1, multilevelForceGrad);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSNestedForceGradientNf2p1, multilevelForceGrad);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSNestedOmelyanNf2p1, mutlevelOmelyan);
 
-//__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSNestedOmelyanNf2p1, mutlevelOmelyan);
 //__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSNestedOmelyanNf2p1MultiField, NestedOmelyanNf2p1MultiField);
 //__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSNestedForceGradientNf2p1MultiField, NestedForceGradient);
 //__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSNested11StageNf2p1MultiField, Nested11StageNf2p1MultiField);
 
-__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSP4, P4);
+//__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSP4, P4);
 
-___REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGamma, KSGamma, _TEST_RELEASE);
-___REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGammaProj, KSGammaProj, _TEST_RELEASE);
-___REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGammaEM, KSGammaEM, _TEST_RELEASE);
-___REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGammaEMProj, KSGammaEMProj, _TEST_RELEASE);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGamma, KSGamma);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGammaProj, KSGammaProj);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGammaEM, KSGammaEM);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGammaEMProj, KSGammaEMProj);
 
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGammaEMEvenOdd, EvenOddGammaEM);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGammaEvenOdd, EvenOddGamma);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSEvenOdd, EvenOdd);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSImproved, KSImproved);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorASQTAD2Level, ASQTAD2Level);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorHISQ, HISQ);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorHISQNoEvenOdd, HISQNoEvenOdd);
+//__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorHISQPhase1, HISQPhase1);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorHISQPhase2, HISQPhase);
 
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSEvenOddCombined, EOCombined);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSEvenOddEMCombined, EOEMCombined);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSHISQCombined, HISQCombined);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorHISQPhaseCombined, HISQPhaseCombined);
 
+__REGIST_TEST(TestUpdateCommon, Boundary, TestFermionUpdatorKSImprovedD, ASQTADD);
+
+UINT TestHISQPhaseEquiv(CParameters& sParam)
+{
+    CFieldFermionHISQSU3* pf1 = dynamic_cast<CFieldFermionHISQSU3*>(appGetLattice()->GetFieldById(2));
+    CFieldFermionHISQWithPhaseSU3* pf2 = dynamic_cast<CFieldFermionHISQWithPhaseSU3*>(appGetLattice()->GetFieldById(3));
+    CGaugeSmearingHISQWithPhaseSU3* pSmearing = dynamic_cast<CGaugeSmearingHISQWithPhaseSU3*>(appGetGaugeSmearing(1));
+    CActionFermionKSImprove* pActionFermion1 = dynamic_cast<CActionFermionKSImprove*>(appGetLattice()->GetActionById(2));
+    CActionFermionKSImprove* pActionFermion2 = dynamic_cast<CActionFermionKSImprove*>(appGetLattice()->GetActionById(3));
+    TArray<const CFieldGauge*> gaugelist;
+    gaugelist.AddItem(dynamic_cast<const CFieldGauge*>(appGetLattice()->GetFieldById(1)));
+
+    //Initial pf1
+    pActionFermion1->PrepareForHMC(1, 0, gaugelist.GetData(), NULL, 0);
+    pf1->CopyTo(pf2);
+
+    DOUBLE e1 = pActionFermion1->Energy(TRUE, 1, 0, 0, gaugelist.GetData(), NULL, NULL, NULL);
+    
+    //set smearing with U1 Field 99, use HisqWithPhase
+    pSmearing->m_byU1FieldId = 99;
+    DOUBLE e2 = pActionFermion2->Energy(TRUE, 1, 0, 0, gaugelist.GetData(), NULL, NULL, NULL);
+
+    appGeneral(_T("%.20f vs %.20f\n"), e1, e2);
+    return 0;
+}
+
+//___REGIST_TEST(TestHISQPhaseEquiv, Verify, TestFermionUpdatorHISQPhase3, HISQPhase, _TEST_NOCHECK);

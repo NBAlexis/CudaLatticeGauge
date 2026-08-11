@@ -7,6 +7,7 @@
 // REVISION:
 //  [12/3/2018 nbale]
 //=============================================================================
+#pragma once
 
 #ifndef _CBOUNDARYCONDITIONTORUSSQUARE_H_
 #define _CBOUNDARYCONDITIONTORUSSQUARE_H_

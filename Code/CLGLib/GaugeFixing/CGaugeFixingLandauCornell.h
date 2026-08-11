@@ -37,6 +37,21 @@ public:
     , m_pMomentumTable(NULL)
     , m_pTempFFTBuffer(NULL)
     , m_bFA(TRUE)
+#if _CLG_MULTI_GPU
+    , m_pSavedA11(NULL)
+    , m_pSavedA12(NULL)
+    , m_pSavedA13(NULL)
+    , m_pSavedA22(NULL)
+    , m_pSavedA23(NULL)
+    , m_pSavedGamma11(NULL)
+    , m_pSavedGamma12(NULL)
+    , m_pSavedGamma13(NULL)
+    , m_pSavedGamma22(NULL)
+    , m_pSavedGamma23(NULL)
+    , m_pSavedG(NULL)
+    , m_pSavedMomentumTable(NULL)
+    , m_pSavedTempFFTBuffer(NULL)
+#endif
     {
     }
 
@@ -63,6 +78,12 @@ public:
 
     CCString GetInfos(const CCString& sTab) const override;
 
+    //P4-2.4: core deviation loop over one gauge buffer (local or gathered-global).
+    DOUBLE CheckResLocal(const deviceSU3* pGaugeData, BYTE byFieldId);
+
+    //P4-2.4: the 4D iteration loop, run over a local or a gathered-global buffer.
+    void GaugeFixingLoop(deviceSU3* pDeviceBufferPointer, BYTE byFieldId);
+
     DOUBLE m_fAlpha;
 
     //device SU3 is not alligned, therefor use CLGComplex*
@@ -83,6 +104,28 @@ public:
 
     //FFT accelaration
     UBOOL m_bFA;
+
+#if _CLG_MULTI_GPU
+    //P4-2.4: temporary global-lattice fixing buffers (rank 0 only), mirroring
+    //P4-2.3/P4-2.4: the 4D-volume buffers above are sized to the LOCAL lattice in
+    //Initial(); under the temporary GLOBAL context they are re-allocated to the
+    //global volume, the momentum table is re-baked, then restored on exit.
+    void ResizeBuffersToGlobal();
+    void RestoreLocalBuffers();
+    DOUBLE* m_pSavedA11;
+    cuDoubleComplex* m_pSavedA12;
+    cuDoubleComplex* m_pSavedA13;
+    DOUBLE* m_pSavedA22;
+    cuDoubleComplex* m_pSavedA23;
+    DOUBLE* m_pSavedGamma11;
+    cuDoubleComplex* m_pSavedGamma12;
+    cuDoubleComplex* m_pSavedGamma13;
+    DOUBLE* m_pSavedGamma22;
+    cuDoubleComplex* m_pSavedGamma23;
+    deviceSU3* m_pSavedG;
+    DOUBLE* m_pSavedMomentumTable;
+    cuDoubleComplex* m_pSavedTempFFTBuffer;
+#endif
 };
 
 __END_NAMESPACE

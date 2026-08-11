@@ -154,6 +154,8 @@ _kernelDFermionWilsonSquareSU3_Acc(
     case EOCT_Complex:
         pResultData[uiSiteIndex].MulComp(cCoeff);
         break;
+    default:
+        break;
     }
 }
 
@@ -165,7 +167,7 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelDWilsonForceSU3_Acc(
     const deviceWilsonVectorSU3* __restrict__ pInverseD,
     const deviceWilsonVectorSU3* __restrict__ pInverseDDdagger,
-    const deviceSU3* __restrict__ pGauge,
+    //const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pFermionMove,
     deviceSU3* pForce,
     Real fKai,
@@ -195,7 +197,7 @@ _kernelDWilsonForceSU3_Acc(
         const deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
         deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
 
-        deviceSU3 x_Gauge_element = pGauge[linkIndex];
+        //deviceSU3 x_Gauge_element = pGauge[linkIndex];
 
         deviceWilsonVectorSU3 right1(x_p_mu_Right);
         right1.Sub(gammaMu.MulWilsonC(right1));
@@ -203,7 +205,7 @@ _kernelDWilsonForceSU3_Acc(
         {
             right1.Add(gamma4.MulWilsonC(x_p_mu_Right).MulRealC(fGT));
         }
-        deviceSU3 mid = deviceSU3::makeSU3Contract(x_Left, right1);
+        deviceSU3 mid = deviceSU3::makeSU3Contract(right1, x_Left);
 
         deviceWilsonVectorSU3 right2(x_Right);
         right2.Add(gammaMu.MulWilsonC(right2));
@@ -211,20 +213,11 @@ _kernelDWilsonForceSU3_Acc(
         {
             right2.Sub(gamma4.MulWilsonC(x_Right).MulRealC(fGT));
         }
-        mid.Add(deviceSU3::makeSU3Contract(right2, x_p_mu_Left));
+        mid.Add(deviceSU3::makeSU3Contract(x_p_mu_Left, right2));
 
-        deviceSU3 forceOfThisLink = x_Gauge_element.MulC(mid);
-        forceOfThisLink.Ta();
-        if (x_p_mu_Fermion.NeedToOpposite())
-        {
-            forceOfThisLink.MulReal(-fKai);
-        }
-        else
-        {
-            forceOfThisLink.MulReal(fKai);
-        }
+        _mul(mid, fKai * (1 - 2 * static_cast<INT>(x_p_mu_Fermion.NeedToOpposite())));
 
-        pForce[linkIndex].Add(forceOfThisLink);
+        pForce[linkIndex].Add(mid);
     }
 }
 
@@ -247,13 +240,13 @@ void CFieldFermionWilsonSquareSU3Acc::DOperator(void* pTargetBuffer, const void*
     const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
 
     preparethread;
-    _kernelDFermionWilsonSquareSU3_Acc << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDFermionWilsonSquareSU3_Acc, block, threads, 
         pSource,
         pGauge,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         pTarget,
-        m_fKai,
+        static_cast<Real>(m_fKai),
         CCommonData::m_fG,
         m_byFieldId,
         bDagger,
@@ -262,30 +255,30 @@ void CFieldFermionWilsonSquareSU3Acc::DOperator(void* pTargetBuffer, const void*
         cCmpCoeff);
 }
 
-void CFieldFermionWilsonSquareSU3Acc::DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const
+void CFieldFermionWilsonSquareSU3Acc::DerivateDOperator(DOUBLE fCoeff, void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const
 {
     deviceSU3* pForceSU3 = (deviceSU3*)pForce;
-    const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
+    //const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
     const deviceWilsonVectorSU3* pDphiBuffer = (deviceWilsonVectorSU3*)pDphi;
     const deviceWilsonVectorSU3* pDDphiBuffer = (deviceWilsonVectorSU3*)pDDphi;
 
     preparethread;
-    _kernelDWilsonForceSU3_Acc << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDWilsonForceSU3_Acc, block, threads, 
         pDphiBuffer,
         pDDphiBuffer,
-        pGauge,
+        //pGauge,
         appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         pForceSU3,
-        m_fKai,
+        static_cast<Real>(fCoeff),
         CCommonData::m_fG,
         m_byFieldId);
 }
 
 #pragma endregion
 
-void CFieldFermionWilsonSquareSU3Acc::CopyTo(CField* U) const
+void CFieldFermionWilsonSquareSU3Acc::CopyParamTo(CField* U) const
 {
-    CFieldFermionWilsonSquareSU3::CopyTo(U);
+    CFieldFermionWilsonSquareSU3::CopyParamTo(U);
 }
 
 CCString CFieldFermionWilsonSquareSU3Acc::GetInfos(const CCString &tab) const

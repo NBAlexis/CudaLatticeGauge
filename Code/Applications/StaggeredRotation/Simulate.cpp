@@ -55,6 +55,10 @@ INT SimulateStaggeredRotation(CParameters& params)
     params.FetchValueINT(_T("Additive"), iVaule);
     UBOOL bAdditive = 0 != iVaule;
 
+    iVaule = 0;
+    params.FetchValueINT(_T("SaveLastConfigOnly"), iVaule);
+    UBOOL bSaveLastConfigOnly = 0 != iVaule;
+
     TArray<Real> old_polyakovs;
     params.FetchValueArrayReal(_T("Polyakovs"), old_polyakovs);
 
@@ -111,6 +115,9 @@ INT SimulateStaggeredRotation(CParameters& params)
         //UINT uiHalf = (_HC_Lx + 1) / 2;
 
         CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+        CMeasureRotatingAction* pAM = dynamic_cast<CMeasureRotatingAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
+        CMeasureWilsonLoop* pWL = dynamic_cast<CMeasureWilsonLoop*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
+
         //TArray<TArray<CLGComplex>> polykovX_nx;
         TArray<CLGComplex> polykov;
         TArray<Real> polykovphase;
@@ -139,7 +146,7 @@ INT SimulateStaggeredRotation(CParameters& params)
         {
             appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sOldFileNames[uiNt - iMinNt], EFFT_CLGBin);
             pPL->OnConfigurationAccepted(_FIELDS, NULL);
-            Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fOldFilePolyakov[uiNt - iMinNt]);
+            Real fError = static_cast<Real>(appAbs(cuCabs(pPL->m_lstLoop[0]) - fOldFilePolyakov[uiNt - iMinNt]));
 #if _CLG_DOUBLEFLOAT
             if (fError < F(1E-07))
 #else
@@ -152,7 +159,7 @@ INT SimulateStaggeredRotation(CParameters& params)
             else
             {
                 appGeneral(_T("\n ================ have the initial file, but not matching.... %2.12f, %2.12f, diff=%f ===========\n"),
-                    _cuCabsf(pPL->m_lstLoop[0]), fOldFilePolyakov[uiNt - iMinNt], fError);
+                    cuCabs(pPL->m_lstLoop[0]), fOldFilePolyakov[uiNt - iMinNt], fError);
             }
         }
 
@@ -181,7 +188,7 @@ INT SimulateStaggeredRotation(CParameters& params)
             }
             else
             {
-                appCrucial(_T("!!! Note you are using a no rotating ferion or quenched approximation!\n"));
+                appCrucial(_T("!!! Note you are using a no rotating fermion or quenched approximation!\n"));
             }
 
             appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Random);
@@ -203,7 +210,7 @@ INT SimulateStaggeredRotation(CParameters& params)
             appGeneral(_T("\n|<P>|,arg<P>={\n"));
             for (INT i = 0; i < pPL->m_lstLoop.Num(); ++i)
             {
-                appGeneral(_T("{%f, %f},\n"), _cuCabsf(pPL->m_lstLoop[i]), __cuCargf(pPL->m_lstLoop[i]));
+                appGeneral(_T("{%f, %f},\n"), cuCabs(pPL->m_lstLoop[i]), cuCarg(pPL->m_lstLoop[i]));
             }
             appGeneral(_T("}\n"));
             appPopLogDate();
@@ -257,7 +264,7 @@ INT SimulateStaggeredRotation(CParameters& params)
             }
             else
             {
-                appCrucial(_T("!!! Note you are using a no rotating ferion or quenched approximation!\n"));
+                appCrucial(_T("!!! Note you are using a no rotating fermion or quenched approximation!\n"));
             }
 
             if (bAdditive)
@@ -274,8 +281,9 @@ INT SimulateStaggeredRotation(CParameters& params)
                 appGetLattice()->m_pMeasurements->Reset();
                 sFileName.Format(_T("%sR_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, iSaveStartIndex);
                 appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, EFFT_CLGBin);
+                pPL->Reset();
                 pPL->OnConfigurationAccepted(_FIELDS, NULL);
-                Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fPolyaOld);
+                Real fError = static_cast<Real>(appAbs(cuCabs(pPL->m_lstLoop[0]) - fPolyaOld));
 #if _CLG_DOUBLEFLOAT
                 if (fError < F(1E-07))
 #else
@@ -287,7 +295,7 @@ INT SimulateStaggeredRotation(CParameters& params)
                 else
                 {
                     appGeneral(_T("\n ================ have the initial file, but not matching.... %2.12f, %2.12f, diff=%f ===========\n"),
-                        _cuCabsf(pPL->m_lstLoop[0]), fPolyaOld, fError);
+                        cuCabs(pPL->m_lstLoop[0]), fPolyaOld, fError);
                     appFailQuitCLG();
                     return 1;
                 }
@@ -303,24 +311,27 @@ INT SimulateStaggeredRotation(CParameters& params)
                 UINT uiAcce = appGetLattice()->m_pUpdator->GetConfigurationCount();
                 if (uiAcce != iConfigNumberNow)
                 {
-                    sFileName.Format(_T("R_Nt%d_O%d_%d"), uiNt, uiOmega, uiAcce + iSaveStartIndex);
-                    sFileName = sSavePrefix + sFileName;
+                    if (!bSaveLastConfigOnly || uiAcce == iEquib)
+                    {
+                        sFileName.Format(_T("R_Nt%d_O%d_%d"), uiNt, uiOmega, uiAcce + iSaveStartIndex);
+                        sFileName = sSavePrefix + sFileName;
 
-                    //=================================
-                    //Save config
-                    const CCString MD5 = appGetLattice()->m_pGaugeField[0]->SaveToFile(sFileName + _T(".con"));
+                        //=================================
+                        //Save config
+                        const CCString MD5 = appGetLattice()->m_pGaugeField[0]->SaveToFile(sFileName + _T(".con"));
 
-                    //=================================
-                    //Save info
-                    appGetTimeNow(buff1, 256);
-                    appGetTimeUtc(buff2, 256);
-                    sInfo.Format(_T("TimeStamp : %d\nTime : %s\nTimeUTC : %s\nMD5 : %s\n"),
-                        appGetTimeStamp(),
-                        buff1,
-                        buff2,
-                        MD5.c_str());
-                    sInfo = sInfo + appGetLattice()->GetInfos(_T(""));
-                    appGetFileSystem()->WriteAllText(sFileName + _T(".txt"), sInfo);
+                        //=================================
+                        //Save info
+                        appGetTimeNow(buff1, 256);
+                        appGetTimeUtc(buff2, 256);
+                        sInfo.Format(_T("TimeStamp : %d\nTime : %s\nTimeUTC : %s\nMD5 : %s\n"),
+                            appGetTimeStamp(),
+                            buff1,
+                            buff2,
+                            MD5.c_str());
+                        sInfo = sInfo + appGetLattice()->GetInfos(_T(""));
+                        appGetFileSystem()->WriteAllText(sFileName + _T(".txt"), sInfo);
+                    }
 
                     iConfigNumberNow = uiAcce;
                 }
@@ -329,6 +340,37 @@ INT SimulateStaggeredRotation(CParameters& params)
 #pragma region gather measurements
 
             appGetLattice()->m_pMeasurements->Report();
+
+            // Save Polyakov loop values to CSV, following the same format as Measurement.cpp
+            if (NULL != pPL)
+            {
+                pPL->Export(sSavePrefix, 1, static_cast<UINT>(pPL->m_lstLoop.Num()), uiOmega, iOmegaStart);
+
+                //=================================
+                //pPL->Export only writes csv, export the npy of the Polyakov loop as well
+                CCString sFileNamePL;
+                sFileNamePL.Format(_T("%s_polyakov_%d"), sSavePrefix.c_str(), uiOmega);
+                appGetLattice()->m_pMeasurements->GetMeasureData(_T("measure1.PolyakovT"))->Export(sFileNamePL);
+            }
+            if (NULL != pAM)
+            {
+                CCString sFileNameS0;
+                CCString sFileNameS1;
+                CCString sFileNameS2;
+                sFileNameS0.Format(_T("%s_s0_%d"), sSavePrefix.c_str(), uiOmega);
+                sFileNameS1.Format(_T("%s_s1_%d"), sSavePrefix.c_str(), uiOmega);
+                sFileNameS2.Format(_T("%s_s2_%d"), sSavePrefix.c_str(), uiOmega);
+                appGetLattice()->m_pMeasurements->GetMeasureData(_T("measure2.S0"))->Export(sFileNameS0);
+                appGetLattice()->m_pMeasurements->GetMeasureData(_T("measure2.S1"))->Export(sFileNameS1);
+                appGetLattice()->m_pMeasurements->GetMeasureData(_T("measure2.S2"))->Export(sFileNameS2);
+                //pAM->Export(sSavePrefix, 1, static_cast<UINT>(pAM->m_lstLoop.Num()), uiOmega, iOmegaStart);
+            }
+            if (NULL != pWL)
+            {
+                CCString sFileNameWL;
+                sFileNameWL.Format(_T("%s_wl_%d"), sSavePrefix.c_str(), uiOmega);
+                appGetLattice()->m_pMeasurements->GetMeasureData(_T("measure3.WilsonLoop"))->Export(sFileNameWL);
+            }
 
             //===================== Polyakov loop =====================
             assert(pPL->m_lstLoop.Num() == static_cast<INT>(iEquib - iEquibSkip));
@@ -352,22 +394,22 @@ INT SimulateStaggeredRotation(CParameters& params)
         }
 
         appGeneral(_T("\n========= Nt=%d finished! ==========\n\n"), uiNt);
-        appPushLogDate(FALSE);
-        assert(polykov.Num() == static_cast<INT>(iAfterEquib + 1));
+        //appPushLogDate(FALSE);
+        //assert(polykov.Num() == static_cast<INT>(iAfterEquib + 1));
 
-        appGeneral(_T("|Polyakov|={\n"));
-        for (UINT i = 0; i <= iAfterEquib; ++i)
-        {
-            appGeneral(i == iAfterEquib ? _T("%2.10f\n ") : _T("%2.10f,\n"),
-                _cuCabsf(polykov[i]));
-        }
-        appGeneral(_T("}\n\narg(Polyakov)={\n"));
+        //appGeneral(_T("|Polyakov|={\n"));
+        //for (UINT i = 0; i <= iAfterEquib; ++i)
+        //{
+        //    appGeneral(i == iAfterEquib ? _T("%2.10f\n ") : _T("%2.10f,\n"),
+        //        _cuCabsf(polykov[i]));
+        //}
+        //appGeneral(_T("}\n\narg(Polyakov)={\n"));
 
-        for (UINT i = 0; i <= iAfterEquib; ++i)
-        {
-            appGeneral(i == iAfterEquib ? _T("%2.10f\n ") : _T("%2.10f,\n"),
-                polykovphase[i]);
-        }
+        //for (UINT i = 0; i <= iAfterEquib; ++i)
+        //{
+        //    appGeneral(i == iAfterEquib ? _T("%2.10f\n ") : _T("%2.10f,\n"),
+        //        polykovphase[i]);
+        //}
 
         //for (UINT x = 0; x < static_cast<UINT>(CCommonData::m_sCenter.x); ++x)
         //{
@@ -383,7 +425,7 @@ INT SimulateStaggeredRotation(CParameters& params)
         //    appGeneral(_T("}\n\n"));
         //}
 
-        appPopLogDate();
+        //appPopLogDate();
 
         appGeneral(_T("\n=====================================\n========= Nt=%d finished! ==========\n"), uiNt);
         appQuitCLG();

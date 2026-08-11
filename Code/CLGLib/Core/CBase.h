@@ -8,6 +8,7 @@
 // Since c++ 11, the virtual is replaced with override
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/14/2018 nbale]
 //=============================================================================
 #pragma once
@@ -41,7 +42,7 @@ protected:
 #define __CLGDECLARE_FIELD(class_name) \
 __CLGDECLARE_CLASS(class_name) \
 public: \
-void CopyTo(CField* U) const override; \
+void CopyParamTo(CField* U) const override; \
 CField* GetCopy() const override \
 { \
     class_name* ret = new class_name(); \
@@ -83,13 +84,6 @@ struct CLGAPI class_name##helper \
 }; \
 static class_name##helper s_##class_name##helper; 
 
-#define __CLG_FORCETEMPLATE_CONSTRUCTOR(classname, specifiyname, ...) \
-void __DLL_EXPORT __force_constructor##classname##specifiyname() \
-{ \
-    classname<__VA_ARGS__> unused##classname##specifiyname; \
-    (void)unused##classname##specifiyname; \
-}
-
 
 __BEGIN_NAMESPACE
 
@@ -117,7 +111,7 @@ class CLGAPI CBase
 public:
     CBase() { }
     virtual ~CBase() { }
-    virtual const CClass* GetClass() const { return NULL; }
+    virtual const CClass* GetClass() const = 0;
     virtual CCString GetInfos(const CCString& tab) const
     {
         return tab + _T("Name : ") + GetClass()->GetName() + _T("\n");

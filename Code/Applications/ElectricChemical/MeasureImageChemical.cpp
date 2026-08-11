@@ -130,8 +130,8 @@ INT MeasureRW(CParameters& params)
 
     if (EGMJRW_Chiral == eJob || EGMJRW_ChiralDiagnal == eJob)
     {
-        pF1Light = dynamic_cast<CFieldFermionKSSU3Gamma*>(appGetLattice()->GetPooledFieldById(2));
-        pF2Light = dynamic_cast<CFieldFermionKSSU3Gamma*>(appGetLattice()->GetPooledFieldById(2));
+        pF1Light = dynamic_cast<CFieldFermionKSSU3Gamma*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+        pF2Light = dynamic_cast<CFieldFermionKSSU3Gamma*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
     }
 
     appPushLogDate(FALSE);
@@ -148,7 +148,7 @@ INT MeasureRW(CParameters& params)
         appGeneral(_T("\n========= Chemical = %f  ==========\n"), lstChemical[uiOmega]);
 
         pU->m_fCoeffGamma4 = lstChemical[uiOmega];
-        pU->UpdatePooledParamters();
+        //pU->UpdatePooledParamters();
 
         pPL->Reset();
         pCCLight->Reset();
@@ -228,10 +228,10 @@ INT MeasureRW(CParameters& params)
                     {
                         pF1Light->InitialField(EFIT_RandomGaussian);
                     }
-                    pF1Light->FixBoundary();
+                    pF1Light->FixBoundary(EFB_Field);
                     pF1Light->CopyTo(pF2Light);
                     pF1Light->InverseD(_FIELDS);
-                    pF1Light->FixBoundary();
+                    pF1Light->FixBoundary(EFB_Field);
                     if (bSaveFermion)
                     {
                         CCString sFermionFile = "";
@@ -271,7 +271,7 @@ INT MeasureRW(CParameters& params)
                     CCString sFileDiagnal;
                     sFileDiagnal.Format(_T("%s_diagnal_Nt%d_IC%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
                     TArray<TArray<CLGComplex>> lightdiagnal = pCCLight->ExportDiagnal(_FIELDS, pF1Light, pF2Light);
-                    WriteStringFileComplexArray2(sFileDiagnal, lightdiagnal);
+                    WriteComplexArray2(sFileDiagnal, lightdiagnal);
                 }
                 break;
             default:
@@ -298,55 +298,32 @@ INT MeasureRW(CParameters& params)
         {
         case EGMJRW_Polyakov:
         {
-            CCString sFileNameWrite1;
-            CCString sFileNameWrite2;
-            sFileNameWrite1.Format(_T("%s_%d_polyakov.csv"), sCSVSavePrefix.c_str(), uiOmega);
-            sFileNameWrite2.Format(_T("%s_%d_polyakov_ZSlice.csv"), sCSVSavePrefix.c_str(), uiOmega);
-
-            //extract result
-            TArray<CLGComplex> polyOut;
-            TArray<TArray<CLGComplex>> polyakovOmgZSlice;
-            for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-            {
-                polyOut.AddItem(pPL->m_lstLoop[j]);
-
-                if (pPL->m_bMeasureZSlice)
-                {
-                    TArray<CLGComplex> thisConfigurationZSlice;
-                    for (UINT i = 0; i < _HC_Lz; ++i)
-                    {
-                        thisConfigurationZSlice.AddItem(pPL->m_lstPZSlice[j * _HC_Lz + i]);
-                    }
-                    polyakovOmgZSlice.AddItem(thisConfigurationZSlice);
-                }
-            }
-            WriteStringFileComplexArray(sFileNameWrite1, polyOut);
-            WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgZSlice);
+            pPL->Export(sCSVSavePrefix, iStartN, iEndN, uiOmega, iListStart);
         }
         break;
         case EGMJRW_Chiral:
         {
-            _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
+            _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega);
             if (pCCLight->m_bMeasureConnect)
             {
-                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
+                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega);
             }
 
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma1);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma2);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma5);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma51);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma52);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma53);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma54);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma12);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma13);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma14);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma23);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma24);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma34);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma1, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma2, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma5, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma51, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma52, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma53, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma54, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma12, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma13, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma14, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma23, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma24, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma34, uiOmega);
 
         }
         break;

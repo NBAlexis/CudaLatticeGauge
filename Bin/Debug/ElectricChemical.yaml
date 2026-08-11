@@ -3,28 +3,34 @@ WorkJob : EEC_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
+# JobSimulate
 JobSimulate:
 
     ## Log options
     ## Verbose will always show in stdout
     ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
     ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
+    MaxThreadPerBlock : 512
     VerboseLevel : GENERAL
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
-    ExponentialPrecision : 0
+    ExponentialPrecision : 10
+    WarmUp : 10
     BeforeEquvibStep : 0
     EquvibSkip : 0
     EquvibStep : 20
     SaveStartIndex : 0
-    ListStart : 1
-    ListEnd : 6
-    Electric : [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
-    Chemical : [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
+    ListStart : 0
+    ListEnd : 16
+    # elec 4 [0.0, 0.1309, 0.261799, 0.392699, 0.523599]
+    Electric : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    # mag 15 [0.0,0.0327249,0.0654498,0.0981748,0.1309,0.163625,0.19635,0.229074,0.261799,0.294524,0.327249,0.359974,0.392699,0.425424,0.458149,0.490874]
+    Magnetic : [0.,0.0327249,0.0654498,0.0981748,0.1309,0.163625,0.19635,0.229074,0.261799,0.294524,0.327249,0.359974,0.392699,0.425424,0.458149,0.490874]
+    Chemical : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-    SavePrefix : ./EC530_02_
+    SavePrefix : ./EC530_01_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -32,13 +38,13 @@ JobSimulate:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 24, 6]
+    LatticeLength : [24, 24, 24, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
-    ActionListLength : 3
+    ActionListLength : 2
     GaugeFieldCount : 2
     FermionFieldCount : 2
     MeasureListLength : 1
@@ -62,8 +68,8 @@ JobSimulate:
         DebugForce : 0
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        # CIntegratorNestedOmelyan CIntegratorNested11Stage
-        IntegratorType : CIntegratorNestedOmelyan
+        # CIntegratorNestedOmelyan CIntegratorNested11Stage CIntegratorNestedForceGradient
+        IntegratorType : CIntegratorNestedForceGradient
         # IntegratorType : CIntegratorOmelyan 
         IntegratorStepLength : 1
         IntegratorStep : 8
@@ -85,13 +91,16 @@ JobSimulate:
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
-        Mass : 0.2
+        Mass : 0.1
         FieldId : 2
         PoolNumber : 15
 
-        Gamma54 : 0.1
+        Gamma54 : 0.0
         Charge : 0.6666666666666666667
         EMFieldID : 4
+
+        # Gamma54 does not support even
+        Even : 1
 
         Period : [1, 1, 1, -1]
         # MC is to prepare
@@ -111,13 +120,16 @@ JobSimulate:
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
-        Mass : 0.2
+        Mass : 0.1
         FieldId : 3
         PoolNumber : 15
 
-        Gamma54 : 0.1
+        Gamma54 : 0.0
         Charge : -0.3333333333333333333333
         EMFieldID : 4
+
+        # Gamma54 does not support even
+        Even : 1
 
         Period : [1, 1, 1, -1]
 
@@ -135,7 +147,11 @@ JobSimulate:
         FieldInitialType : EFIT_U1Real
         FieldId : 4
         Period : [1, 1, 1, 1]
-        EzType : EURT_E_t
+        # for only Ez use EURT_E_t
+        # for only Bz use EURT_Bp_xy/EURT_Bp_x/EURT_Bp_y
+        # for Ex, Bz use EURT_ExBz_ty for EzType, and fill in EzValue and BzValue
+        # for Ez, Bz, use both EURT_E_t for EzType, and EURT_Bp_xy/EURT_Bp_x/EURT_Bp_y for BzType
+        EzType : EURT_ExBz_ty
         EzValue : 0.1
         Dynamic : 0
 
@@ -148,13 +164,9 @@ JobSimulate:
 
     Action2:
 
-        ActionName : CActionFermionKS
-        FieldId : 2
-
-    Action3:
-
-        ActionName : CActionFermionKS
-        FieldId : 3
+        # combined is a little faster, but only supports EM, not chiral chemical potential
+        ActionName : CActionFermionKSCombined
+        FieldIds : [2, 3]
 
     Solver:
 
@@ -208,7 +220,7 @@ JobSimulate:
         SolverForFieldId : 2
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.000001
+        Accuracy : 0.000000001
         AbsoluteAccuracy : 1
         # SolverName : CMultiShiftFOM
         # SolverForFieldId : 2
@@ -224,7 +236,7 @@ JobSimulate:
         SolverForFieldId : 3
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.000001
+        Accuracy : 0.000000001
         AbsoluteAccuracy : 1
         # SolverName : CMultiShiftFOM
         # SolverForFieldId : 2
@@ -240,6 +252,256 @@ JobSimulate:
         FieldId : 1
         ShowResult : 1
 
+# JobSimulateWD
+JobSimulateWD:
+
+    ## Log options
+    ## Verbose will always show in stdout
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
+    MaxThreadPerBlock : 512
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    # If use double, set to 0 will be faster, if use single point float, use 8
+    ExponentialPrecision : 10
+    WarmUp : 10
+    BeforeEquvibStep : 0
+    EquvibSkip : 0
+    EquvibStep : 20
+    SaveStartIndex : 0
+    ListStart : 0
+    ListEnd : 16
+    # elec 4 [0.0, 0.1309, 0.261799, 0.392699, 0.523599]
+    Electric : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    # mag 15 [0.0,0.0327249,0.0654498,0.0981748,0.1309,0.163625,0.19635,0.229074,0.261799,0.294524,0.327249,0.359974,0.392699,0.425424,0.458149,0.490874]
+    Magnetic : [0.,0.0327249,0.0654498,0.0981748,0.1309,0.163625,0.19635,0.229074,0.261799,0.294524,0.327249,0.359974,0.392699,0.425424,0.458149,0.490874]
+    Chemical : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+    SavePrefix : ./EC530_01_
+    Additive : 0
+
+    # 53551575Nt4 Omega60 
+    # Polyakovs : [0.2548793495166105009, 0.2674676527142243465, 0.28727804358433550130, 0.36891834544115924644, 0.3714890358030488316, 0.4434429554952389631, 0.5203437138701659326, 0.6383689173717348941, 0.7112141902124326872, 0.8122419471662560913, 0.9025054366091994723]
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [24, 24, 24, 6]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    ActionListLength : 2
+    GaugeFieldCount : 2
+    FermionFieldCount : 2
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## ============================================================
+    ## Initial files
+    ## ============================================================
+    # OldFileName : ./6000204/SRF6000204_R_Nt6_O1_1466.con
+    # OldPolyakov : 0.605417311192
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 1
+        MinMaxStep : [4, 50]
+        GrowReduceThreshold : [-0.3, 0.02]
+        InnerLeapfrog : 1
+        DebugForce : 0
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # CIntegratorNestedOmelyan CIntegratorNested11Stage CIntegratorNestedForceGradient
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorOmelyan 
+        IntegratorStepLength : 1
+        IntegratorStep : 8
+        NestedStep : 20
+        Omelyan2Lambda : 0.38636665500756728
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3GammaEM
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.1
+        FieldId : 2
+        PoolNumber : 15
+
+        Gamma54 : 0.0
+        Charge : 0.6666666666666666667
+        EMFieldID : 4
+
+        # Gamma54 does not support even
+        Even : 1
+
+        Period : [1, 1, 1, -1]
+        # MC is to prepare
+
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    FermionField2:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3GammaEM
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.1
+        FieldId : 3
+        PoolNumber : 15
+
+        Gamma54 : 0.0
+        Charge : -0.3333333333333333333333
+        EMFieldID : 4
+
+        # Gamma54 does not support even
+        Even : 1
+
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Gauge2:
+
+        FieldName : CFieldGaugeU1Real
+        FieldInitialType : EFIT_U1Real
+        FieldId : 4
+        Period : [1, 1, 1, 1]
+        # for only Ez use EURT_E_t
+        # for only Bz use EURT_Bp_xy/EURT_Bp_x/EURT_Bp_y
+        # for Ex, Bz use EURT_ExBz_ty for EzType, and fill in EzValue and BzValue
+        # for Ez, Bz, use both EURT_E_t for EzType, and EURT_Bp_xy/EURT_Bp_x/EURT_Bp_y for BzType
+        EzType : EURT_ExBz_ty
+        EzValue : 0.1
+        Dynamic : 0
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        CloverEnergy : 0
+        ShiftCoord : 0
+        Beta : 5.3
+
+    Action2:
+
+        # combined is a little faster, but only supports EM, not chiral chemical potential
+        ActionName : CActionFermionKSCombined
+        FieldIds : [2, 3]
+
+    Solver:
+
+        SolverForFieldId : 2
+
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.000001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    Solver2:
+
+        SolverForFieldId : 3
+
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.000001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 20
+        MaxStep : 500
+        Accuracy : 0.000000001
+        AbsoluteAccuracy : 1
+        # SolverName : CMultiShiftFOM
+        # SolverForFieldId : 2
+        # UseCudaForSmallMatrix : 0
+        # MaxDim : 30
+        # Accuracy : 0.0001
+        # Restart : 100
+        # AbsoluteAccuracy : 1
+
+    MSSolver2:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 20
+        MaxStep : 500
+        Accuracy : 0.000000001
+        AbsoluteAccuracy : 1
+        # SolverName : CMultiShiftFOM
+        # SolverForFieldId : 2
+        # UseCudaForSmallMatrix : 0
+        # MaxDim : 30
+        # Accuracy : 0.0001
+        # Restart : 100
+        # AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 1
+
+# JobMeasure
 JobMeasure:
 
     ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
@@ -249,9 +511,14 @@ JobMeasure:
     ShowParameterContent : 0
 
     ListStart : 0
-    ListEnd : 12
-    Electric : [0, 0.0654498469498, 0.130899693900, 0.196349540849, 0.261799387799, 0.327249234749, 0.392699081699, 0.458148928649, 0.523598775598, 0.589048622548, 0.654498469498, 0.719948316448]
-    Chemical : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    ListEnd : 1
+    # elec 4 
+    Electric : [0., 0.1309, 0.261799, 0.392699, 0.523599, 0.654498, 0.785398, 0.916298]
+    # Electric : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    # mag 15 [0.0,0.0327249,0.0654498,0.0981748,0.1309,0.163625,0.19635,0.229074,0.261799,0.294524,0.327249,0.359974,0.392699,0.425424,0.458149,0.490874]
+    # Magnetic : [0.,0.0327249,0.0654498,0.0981748,0.1309,0.163625,0.19635,0.229074,0.261799,0.294524,0.327249,0.359974,0.392699,0.425424,0.458149,0.490874]
+    Magnetic : [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+    Chemical : [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
     StartN : 101
     EndN : 120
     SaveFermionFile : 0
@@ -260,23 +527,23 @@ JobMeasure:
     LoadFermion : 0
     LoadFermionFile : F4980204_
     LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
-    ## EGMJ_Polyakov, EGMJ_Chiral, EGMJ_Meson
-    DistributionJob : EGMJ_Meson
+    ## EGMJ_Polyakov, EGMJ_Chiral, EGMJ_Meson, EGMJ_BerryPhase
+    DistributionJob : EGMJ_Chiral
     FermionMomentum : 0
-    StochasticFieldCount : 1
+    StochasticFieldCount : 20
     CheckGaugeFixing : 0
     UseZ4 : 1
     SubFolder : 1
-    SubFolderPrefix : G:\MesonMassElectric\GF49001
+    SubFolderPrefix : H:\MesonMassElectric\53001\M0
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : GFEC490_01_
-    CSVSavePrefix : G:\MesonMassElectric\Meson\EC490_01_
+    SavePrefix : EC530_01_
+    CSVSavePrefix : ./EC530_01_M0_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [24, 24, 24, 12]
+    LatticeLength : [24, 24, 24, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
@@ -284,7 +551,7 @@ JobMeasure:
     RandomSeedType : ERST_Timestamp
     GaugeFieldCount : 2
     FermionFieldCount : 2
-    MeasureListLength : 4
+    MeasureListLength : 6
     CacheStaple : 0
     AlsoCheckMD5 : 0
 
@@ -357,7 +624,7 @@ JobMeasure:
         FieldInitialType : EFIT_U1Real
         FieldId : 4
         Period : [1, 1, 1, 1]
-        EzType : EURT_E_t
+        EzType : EURT_ExBz_ty
         EzValue : 0.1
         Dynamic : 0
 
@@ -412,10 +679,15 @@ JobMeasure:
         MeasureName : CMeasurePolyakovXY
         FieldId : 1
         ShowResult : 0
-        MeasureDist : 1
+        MeasureDist : 0
+        MeasureX : 1
+        MeasureY : 1
         MeasureZ : 1
         ShiftCenter : 0
+        XSlice : 1
+        YSlice : 1
         ZSlice : 1
+        TSlice : 1
 
     Measure2:
 
@@ -425,7 +697,10 @@ JobMeasure:
         ShowResult : 0
         ShiftCenter : 0
         DebugDivation : 0
+        XSlice : 1
+        YSlice : 1
         ZSlice : 1
+        TSlice : 1
 
     Measure3:
 
@@ -435,7 +710,10 @@ JobMeasure:
         ShowResult : 0
         ShiftCenter : 0
         DebugDivation : 0
+        XSlice : 1
+        YSlice : 1
         ZSlice : 1
+        TSlice : 1
 
     Measure4:
 
@@ -443,9 +721,26 @@ JobMeasure:
         FieldId : 2
         FieldId2 : 3
         ShowResult : 0
-        WallSource : 1
+        Source : EFS_Point
         DoGaugeFixing : 0
 
+    Measure5:
+
+        # need gauge fixing
+        MeasureName : CMeasureBerryPhase
+        WilsonDirac : 0
+        FieldId : 2
+        ShowResult : 0
+
+    Measure6:
+
+        # need gauge fixing
+        MeasureName : CMeasureBerryPhase
+        WilsonDirac : 0
+        FieldId : 3
+        ShowResult : 0
+
+# JobGaugeFixing
 JobGaugeFixing:
 
     # VerboseLevel : DETAILED
@@ -504,6 +799,7 @@ JobGaugeFixing:
         MaxIterate : 20000
         Mixed : 1
 
+# JobSimulateRW
 JobSimulateRW:
 
     ## Log options
@@ -659,6 +955,7 @@ JobSimulateRW:
         FieldId : 1
         ShowResult : 1
 
+# JobMeasureImageChemical
 JobMeasureImageChemical:
 
     ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}

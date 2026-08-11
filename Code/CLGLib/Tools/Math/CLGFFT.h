@@ -39,7 +39,7 @@ public:
     {
         if (NULL != m_pDeviceBuffer)
         {
-            checkCudaErrors(cudaFree(m_pDeviceBuffer));
+            checkCudaErrors(__cudaFree(m_pDeviceBuffer));
         }
     }
 

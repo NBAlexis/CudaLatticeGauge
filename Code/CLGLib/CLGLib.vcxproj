@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -13,8 +13,16 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_MG|x64">
+      <Configuration>Debug_MG</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_MG|x64">
+      <Configuration>Release_MG</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -26,30 +34,44 @@
     <ClInclude Include="Core\CLGDefine.h" />
     <ClInclude Include="Core\CLGFloat.h" />
     <ClInclude Include="Core\CLGLibManager.h" />
+    <ClInclude Include="Core\Distributed\CLGComm.h" />
+    <ClInclude Include="Core\Distributed\CHaloBufferHandle.h" />
+    <ClInclude Include="Core\Distributed\CHaloManager.h" />
     <ClInclude Include="Core\CLGSetup.h" />
     <ClInclude Include="Core\CudaHelper.h" />
     <ClInclude Include="Core\CudaHelperFunctions.h" />
     <ClInclude Include="Data\Action\CAction.h" />
+    <ClInclude Include="Data\Action\CActionDiscreteDNPlaquette.h" />
+    <ClInclude Include="Data\Action\CActionDiscreteGauge.h" />
+    <ClInclude Include="Data\Action\CActionDiscreteZNPlaquette.h" />
+    <ClInclude Include="Data\Action\CActionFermionHISQCombined.h" />
     <ClInclude Include="Data\Action\CActionFermionKS.h" />
-    <ClInclude Include="Data\Action\CActionFermionWilsonNf2.h" />
+    <ClInclude Include="Data\Action\CActionFermionKSCombined.h" />
+    <ClInclude Include="Data\Action\CActionFermionKSImprove.h" />
+    <ClInclude Include="Data\Action\CActionFermionKSImproveCombined.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquette.h" />
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteAnisotropic.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteAcceleration.h" />
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteAtGradient.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteBetaGradient.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteBoost.h" />
-    <ClInclude Include="Data\Action\CActionGaugePlaquettePolar.h" />
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteCylinder.h" />
+    <ClInclude Include="Data\Action\CActionGaugePlaquettePSU3.h" />
+    <ClInclude Include="Data\Action\CActionGaugePlaquettePSU3WithBoundary.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRigidAcc.h" />
-    <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating.h" />
-    <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating3D.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingT.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingT3D.h" />
     <ClInclude Include="Data\Action\CActionPhi4.h" />
+    <ClInclude Include="Data\Action\CActionTemperatureDistribution.h" />
     <ClInclude Include="Data\Boundary\CBoundaryCondition.h" />
     <ClInclude Include="Data\Boundary\CBoundaryConditionPeriodicAndDirichletSquare.h" />
     <ClInclude Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.h" />
     <ClInclude Include="Data\Boundary\CBoundaryConditionTorusSquare.h" />
     <ClInclude Include="Data\CCommonData.h" />
+    <ClInclude Include="Data\Field\Boson\CFieldBosonReal.h" />
     <ClInclude Include="Data\Field\Boson\CFieldBosonVN.h" />
     <ClInclude Include="Data\Field\Boson\CFieldBosonVNKernel.h" />
+    <ClInclude Include="Data\Field\Boson\CFieldBosonT.h" />
     <ClInclude Include="Data\Field\Boson\CFieldBosonVNRotation.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundary.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryOne.h" />
@@ -60,35 +82,44 @@
     <ClInclude Include="Data\Field\CFieldFermion.h" />
     <ClInclude Include="Data\Field\CFieldGauge.h" />
     <ClInclude Include="Data\Field\CFieldSpin.h" />
+    <ClInclude Include="Data\Field\CFieldTensor2.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeKernel.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeLink.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeLinkDirichlet.h" />
-    <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3.h" />
-    <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3D.h" />
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3OneLoopImproved.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3TreeImproved.h" />
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3_12.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeU1Real.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeZ2.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKS.h" />
-    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3.h" />
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSHISQ.h" />
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSHISQAnisotropic.h" />
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSHISQAnisotropicKernel.h" />
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSHISQWithPhase.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3Acc.h" />
-    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3D.h" />
-    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3DR.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3Gamma.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3GammaEM.h" />
-    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3P4.h" />
-    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3R.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3REM.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3RigidAcc.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKST.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSTD.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSTKernel.h" />
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSTKernelGamma.h" />
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSTKernelR.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSTR.h" />
+    <ClInclude Include="Data\Field\Tensor2\CFieldTensor2Fields.h" />
+    <ClInclude Include="Data\Field\Tensor2\CFieldTensor2Kernel.h" />
+    <ClInclude Include="Data\Field\Tensor2\CFieldTensor2T.h" />
+    <ClInclude Include="Data\Field\Tensor2\CFieldTensor2Z3.h" />
+    <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonKernel.h" />
+    <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareCloverSU3.h" />
     <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3.h" />
     <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Acc.h" />
     <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Boost.h" />
     <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3D.h" />
     <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3DR.h" />
     <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3DRigidAcc.h" />
+    <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3EM.h" />
     <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Gamma.h" />
     <ClInclude Include="Data\Lattice\CIndex.h" />
     <ClInclude Include="Data\Lattice\CIndexData.h" />
@@ -99,7 +130,17 @@
     <ClInclude Include="GaugeFixing\CGaugeFixingCoulombLosAlamos.h" />
     <ClInclude Include="GaugeFixing\CGaugeFixingLandauCornell.h" />
     <ClInclude Include="GaugeFixing\CGaugeFixingLandauLosAlamos.h" />
+    <ClInclude Include="GaugeFixing\CGaugeFixingMAG.h" />
+    <ClInclude Include="GaugeFixing\CGaugeFixingMCGDirect.h" />
+    <ClInclude Include="GaugeFixing\CGaugeFixingMCGIndirect.h" />
     <ClInclude Include="GaugeFixing\CGaugeFixingRandom.h" />
+    <ClInclude Include="GaugeSmearing\CGaugeSmearing.h" />
+    <ClInclude Include="GaugeSmearing\CGaugeSmearingAPEProj.h" />
+    <ClInclude Include="GaugeSmearing\CGaugeSmearingAPEStout.h" />
+    <ClInclude Include="GaugeSmearing\CGaugeSmearingASQTAD.h" />
+    <ClInclude Include="GaugeSmearing\CGaugeSmearingHISQ.h" />
+    <ClInclude Include="GaugeSmearing\CGaugeSmearingHISQWithPhase.h" />
+    <ClInclude Include="GaugeSmearing\CGaugeSmearingStout.h" />
     <ClInclude Include="Measurement\CMeasure.h" />
     <ClInclude Include="Measurement\CMeasureAction.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumStochastic.h" />
@@ -107,35 +148,32 @@
     <ClInclude Include="Measurement\CMeasureAngularMomentumKSREM.h" />
     <ClInclude Include="Measurement\CMeasureBerryPhase.h" />
     <ClInclude Include="Measurement\CMeasureBosonCond.h" />
+    <ClInclude Include="Measurement\CMeasureBosonValue.h" />
     <ClInclude Include="Measurement\CMeasureChargeAndCurrents.h" />
     <ClInclude Include="Measurement\CMeasureChiralCondensate.h" />
     <ClInclude Include="Measurement\CMeasureChiralCondensateKS.h" />
     <ClInclude Include="Measurement\CMeasureConnectedChiralSusceptibilityKS.h" />
+    <ClInclude Include="Measurement\CMeasureData.h" />
     <ClInclude Include="Measurement\CMeasurementManager.h" />
     <ClInclude Include="Measurement\CMeasureMesonCorrelator.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumJG.h" />
     <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggered.h" />
-    <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.h" />
     <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple2.h" />
     <ClInclude Include="Measurement\CMeasurePandChiralTalor.h" />
     <ClInclude Include="Measurement\CMeasurePandChiralTalorKS.h" />
     <ClInclude Include="Measurement\CMeasurePlaqutteEnergy.h" />
-    <ClInclude Include="Measurement\CMeasurePolyakov.h" />
-    <ClInclude Include="Measurement\CMeasurePolyakovSUN.h" />
-    <ClInclude Include="Measurement\CMeasurePolyakovU1XY.h" />
     <ClInclude Include="Measurement\CMeasurePolyakovXY.h" />
     <ClInclude Include="Measurement\CMeasurePolyakovXY3D.h" />
+    <ClInclude Include="Measurement\CMeasureRotatingAction.h" />
     <ClInclude Include="Measurement\CMeasureTopologicChargeXY.h" />
     <ClInclude Include="Measurement\CMeasureWilsonLoop.h" />
     <ClInclude Include="Measurement\CMeasureWilsonLoopWithPath.h" />
     <ClInclude Include="Measurement\CMeasureWilsonLoopXY.h" />
-    <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearing.h" />
-    <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.h" />
-    <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.h" />
     <ClInclude Include="Platform\CFile.h" />
     <ClInclude Include="Platform\PlatformIncs.h" />
     <ClInclude Include="Platform\PlatformDefine.h" />
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftFOM.h" />
+    <ClInclude Include="SparseLinearAlgebra\CMultiShiftCG.h" />
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftGMRES.h" />
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftNested.h" />
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftSolver.h" />
@@ -147,11 +185,15 @@
     <ClInclude Include="SparseLinearAlgebra\CSolverGMRES.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverGMRESMDR.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverTFQMR.h" />
+    <ClInclude Include="SparseLinearAlgebra\CSolverCG.h" />
+    <ClInclude Include="SparseLinearAlgebra\CSolverDeflatedCG.h" />
+    <ClInclude Include="Tools\CSimpleProfiler.h" />
     <ClInclude Include="Tools\CYAMLParser.h" />
     <ClInclude Include="Tools\Data\CBitFlag.h" />
     <ClInclude Include="Tools\Data\CCString.h" />
     <ClInclude Include="Tools\Data\CLGMD5.h" />
     <ClInclude Include="Tools\Data\CLinkedList.h" />
+    <ClInclude Include="Tools\Data\CUUID.h" />
     <ClInclude Include="Tools\Data\STDStringFunctions.h" />
     <ClInclude Include="Tools\Data\TArray.h" />
     <ClInclude Include="Tools\Data\TemplateFunctions.h" />
@@ -163,19 +205,28 @@
     <ClInclude Include="Tools\Math\CRationalApproximation.h" />
     <ClInclude Include="Tools\Math\DeviceInlineSU3.h" />
     <ClInclude Include="Tools\Math\DeviceInlineTemplate.h" />
+    <ClInclude Include="Tools\Math\DeviceInlineTemplate2.h" />
     <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineGaugeChair.h" />
     <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineGauge.h" />
     <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineStaggeredRotation.h" />
     <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineUseNoTemplateFunction.h" />
     <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineStaggeredGamma.h" />
+    <ClInclude Include="Tools\Math\DN.h" />
     <ClInclude Include="Tools\Math\GammaMatrix.h" />
     <ClInclude Include="Tools\Math\CudaComplexFunction.h" />
+    <ClInclude Include="Tools\Math\ON.h" />
     <ClInclude Include="Tools\Math\Random.h" />
+    <ClInclude Include="Tools\Math\SLNC.h" />
+    <ClInclude Include="Tools\Math\SON.h" />
     <ClInclude Include="Tools\Math\SU2.h" />
     <ClInclude Include="Tools\Math\SU3.h" />
+    <ClInclude Include="Tools\Math\SU3_12.h" />
     <ClInclude Include="Tools\Math\SUN.h" />
+    <ClInclude Include="Tools\Math\UN.h" />
     <ClInclude Include="Tools\Math\Vectors.h" />
     <ClInclude Include="Tools\Math\VectorsN.h" />
+    <ClInclude Include="Tools\Math\VectorsN2.h" />
+    <ClInclude Include="Tools\Math\ZN.h" />
     <ClInclude Include="Tools\Tracer.h" />
     <ClInclude Include="Tools\Timer.h" />
     <ClInclude Include="Update\Continous\CHMC.h" />
@@ -189,50 +240,68 @@
     <ClInclude Include="Update\Continous\CIntegratorNestedOmelyan.h" />
     <ClInclude Include="Update\Continous\CIntegratorNestedForceGradient.h" />
     <ClInclude Include="Update\Continous\CIntegratorOmelyan.h" />
+    <ClInclude Include="Update\CStapleCache.h" />
     <ClInclude Include="Update\CUpdator.h" />
+    <ClInclude Include="Update\Discrete\CHeatbath.h" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="CLGLib_Private.cu" />
+    <CudaCompile Include="Data\Action\CActionDiscreteDNPlaquette.cu" />
+    <CudaCompile Include="Data\Action\CActionDiscreteZNPlaquette.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteAcceleration.cu" />
+    <CudaCompile Include="Data\Action\CActionGaugePlaquetteAtGradient.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteBetaGradient.cu" />
+    <CudaCompile Include="Data\Action\CActionGaugePlaquetteCylinder.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteBoost.cu" />
-    <CudaCompile Include="Data\Action\CActionGaugePlaquettePolar.cu" />
+    <CudaCompile Include="Data\Action\CActionGaugePlaquettePSU3.cu" />
+    <CudaCompile Include="Data\Action\CActionGaugePlaquettePSU3WithBoundary.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRigidAcc.cu" />
-    <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotating3D.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingT.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingT3D.cu" />
+    <CudaCompile Include="Data\Action\CActionTemperatureDistribution.cu" />
     <CudaCompile Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.cu" />
+    <CudaCompile Include="Data\Field\Boson\CFieldBosonReal.cu" />
     <CudaCompile Include="Data\Field\Boson\CFieldBosonVNKernel.cu" />
     <CudaCompile Include="Data\Field\CFieldCommonKernel.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeKernel.cu" />
-    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3.cu" />
-    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3D.cu" />
-    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3TreeImproved.cu" />
+    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3_12.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeU1Real.cu" />
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3.cu" />
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSHISQAnisotropicKernel.cu" />
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSHISQWithPhase.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3Acc.cu" />
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3D.cu" />
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3DR.cu" />
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3Gamma.cu" />
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3GammaEM.cu" />
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3P4.cu" />
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3R.cu" />
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3REM.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3RigidAcc.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTKernel.cu" />
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTKernelGamma.cu" />
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTKernelR.cu" />
+    <CudaCompile Include="Data\Field\Tensor2\CFieldTensor2.cu" />
+    <CudaCompile Include="Data\Field\Tensor2\CFieldTensor2Kernel.cu" />
+    <CudaCompile Include="Data\Field\Tensor2\CFieldTensor2Z3.cu" />
+    <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonKernel.cu" />
     <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3.cu" />
     <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Acc.cu" />
     <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Boost.cu" />
     <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3D.cu" />
     <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3DR.cu" />
     <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3DRigidAcc.cu" />
+    <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3EM.cu" />
     <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Gamma.cu" />
     <CudaCompile Include="GaugeFixing\CGaugeFixingCoulombCornell.cu" />
     <CudaCompile Include="GaugeFixing\CGaugeFixingCoulombLosAlamos.cu" />
     <CudaCompile Include="GaugeFixing\CGaugeFixingLandauLosAlamos.cu" />
+    <CudaCompile Include="GaugeFixing\CGaugeFixingMAG.cu" />
+    <CudaCompile Include="GaugeFixing\CGaugeFixingMCGDirect.cu" />
+    <CudaCompile Include="GaugeFixing\CGaugeFixingMCGIndirect.cu" />
     <CudaCompile Include="GaugeFixing\CGaugeFixingRandom.cu" />
+    <CudaCompile Include="GaugeSmearing\CGaugeSmearing.cu" />
+    <CudaCompile Include="GaugeSmearing\CGaugeSmearingAPEProj.cu" />
+    <CudaCompile Include="GaugeSmearing\CGaugeSmearingAPEStout.cu" />
+    <CudaCompile Include="GaugeSmearing\CGaugeSmearingASQTAD.cu" />
+    <CudaCompile Include="GaugeSmearing\CGaugeSmearingHISQ.cu" />
+    <CudaCompile Include="GaugeSmearing\CGaugeSmearingStout.cu" />
     <CudaCompile Include="Measurement\CMeasureAMomentumStochastic.cu" />
     <CudaCompile Include="Measurement\CMeasureAngularMomentumKS.cu" />
     <CudaCompile Include="Measurement\CMeasureAngularMomentumKSREM.cu" />
+    <CudaCompile Include="Measurement\CMeasureBosonValue.cu" />
     <CudaCompile Include="Measurement\CMeasureChiralCondensate.cu">
       <FileType>Document</FileType>
     </CudaCompile>
@@ -242,9 +311,15 @@
     <CudaCompile Include="Measurement\CMeasure.cu">
       <FileType>Document</FileType>
     </CudaCompile>
+    <ClCompile Include="GaugeFixing\CGaugeFixing.cpp" />
     <ClCompile Include="Core\Version.cpp" />
     <ClCompile Include="Data\Action\CAction.cpp" />
+    <ClCompile Include="Data\Action\CActionDiscreteGauge.cpp" />
+    <ClCompile Include="Data\Action\CActionFermionHISQCombined.cpp" />
     <ClCompile Include="Data\Action\CActionFermionKS.cpp" />
+    <ClCompile Include="Data\Action\CActionFermionKSCombined.cpp" />
+    <ClCompile Include="Data\Action\CActionFermionKSImprove.cpp" />
+    <ClCompile Include="Data\Action\CActionFermionKSImproveCombined.cpp" />
     <ClCompile Include="Data\Action\CActionPhi4.cpp" />
     <ClCompile Include="Data\Boundary\CBoundaryCondition.cpp" />
     <ClCompile Include="Data\Field\Boson\CFieldBosonVN.cpp" />
@@ -256,20 +331,37 @@
     <ClCompile Include="Data\Field\CFieldGauge.cpp" />
     <ClCompile Include="Data\Field\Gauge\CFieldGaugeLink.cpp" />
     <ClCompile Include="Data\Field\Gauge\CFieldGaugeLinkDirichlet.cpp" />
+    <ClCompile Include="Data\Field\Gauge\CFieldGaugeSU3OneLoopImproved.cpp" />
+    <ClCompile Include="Data\Field\Gauge\CFieldGaugeSU3TreeImproved.cpp" />
+    <ClCompile Include="Data\Field\Staggered\CFieldFermionKS.cpp" />
+    <ClCompile Include="Data\Field\Staggered\CFieldFermionKSHISQ.cpp" />
+    <ClCompile Include="Data\Field\Staggered\CFieldFermionKSHISQAnisotropic.cpp" />
+    <ClCompile Include="Data\Field\Staggered\CFieldFermionKSSU3Gamma.cpp" />
+    <ClCompile Include="Data\Field\Staggered\CFieldFermionKSSU3GammaEM.cpp" />
+    <ClCompile Include="Data\Field\Staggered\CFieldFermionKSSU3REM.cpp" />
     <ClCompile Include="Data\Field\Staggered\CFieldFermionKST.cpp" />
     <ClCompile Include="Data\Field\Staggered\CFieldFermionKSTD.cpp" />
     <ClCompile Include="Data\Field\Staggered\CFieldFermionKSTR.cpp" />
+    <ClCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareCloverSU3.cpp" />
+    <ClCompile Include="Data\Lattice\CLatticeData.cpp" />
+    <ClCompile Include="GaugeSmearing\CGaugeSmearingHISQWithPhase.cpp" />
     <ClCompile Include="Measurement\CMeasureAction.cpp" />
     <CudaCompile Include="Measurement\CMeasureBerryPhase.cu">
       <FileType>Document</FileType>
     </CudaCompile>
     <ClCompile Include="Measurement\CMeasureBosonCond.cpp" />
+    <ClCompile Include="Measurement\CMeasureRotatingAction.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftFOM.cpp" />
+    <ClCompile Include="SparseLinearAlgebra\CMultiShiftCG.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftGMRES.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftBiCGStab.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftNested.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRESMDR.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverTFQMR.cpp" />
+    <ClCompile Include="SparseLinearAlgebra\CSolverCG.cpp" />
+    <ClCompile Include="SparseLinearAlgebra\CSolverDeflatedCG.cpp" />
+    <ClCompile Include="Tools\CSimpleProfiler.cpp" />
+    <ClCompile Include="Tools\Math\CRationalApproximation.cpp" />
     <ClCompile Include="Tools\Math\HostRandom.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorForceGradient.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorMultiLevelNestedForceGradient.cpp" />
@@ -278,6 +370,7 @@
     <ClCompile Include="Update\Continous\CIntegratorNestedForceGradient.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorNestedLeapFrog.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorNestedOmelyan.cpp" />
+    <ClCompile Include="Update\CStapleCache.cpp" />
     <ClCompile Include="Update\CUpdator.cpp" />
     <ClCompile Include="CLGLib_Private.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -285,22 +378,22 @@
       <FileType>Document</FileType>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_MG|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_MG|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Core\CLGLibManager.cpp" />
+    <ClCompile Include="Core\Distributed\CLGComm.cpp" />
+    <ClCompile Include="Core\Distributed\CHaloBufferHandle.cpp" />
+    <ClCompile Include="Core\Distributed\CHaloManager.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGCR.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRES.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorOmelyan.cpp" />
     <CudaCompile Include="Core\CudaHelper.cu">
       <FileType>Document</FileType>
     </CudaCompile>
-    <ClCompile Include="Data\Action\CActionFermionWilsonNf2.cpp" />
     <ClCompile Include="Data\Field\CField.cpp" />
-    <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotating.cu" />
     <CudaCompile Include="Data\Boundary\CBoundaryConditionPeriodicAndDirichletSquare.cu" />
     <CudaCompile Include="Data\Lattice\CIndexData.cu" />
-    <CudaCompile Include="Data\Lattice\CLatticeData.cu">
-      <FileType>Document</FileType>
-    </CudaCompile>
     <ClCompile Include="Measurement\CMeasurementManager.cpp" />
     <ClCompile Include="Measurement\CMeasurePlaqutteEnergy.cpp" />
     <ClCompile Include="Platform\CFile.cpp" />
@@ -312,22 +405,15 @@
     <CudaCompile Include="Measurement\CMeasureMesonCorrelator.cu" />
     <CudaCompile Include="Measurement\CMeasureAMomentumJG.cu" />
     <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggered.cu" />
-    <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.cu" />
     <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple2.cu" />
     <CudaCompile Include="Measurement\CMeasurePandChiralTalor.cu" />
     <CudaCompile Include="Measurement\CMeasurePandChiralTalorKS.cu" />
-    <CudaCompile Include="Measurement\CMeasurePolyakov.cu" />
-    <CudaCompile Include="Measurement\CMeasurePolyakovSUN.cu" />
-    <CudaCompile Include="Measurement\CMeasurePolyakovU1XY.cu" />
     <CudaCompile Include="Measurement\CMeasurePolyakovXY.cu" />
     <CudaCompile Include="Measurement\CMeasurePolyakovXY3D.cu" />
     <CudaCompile Include="Measurement\CMeasureTopologicChargeXY.cu" />
     <CudaCompile Include="Measurement\CMeasureWilsonLoop.cu" />
     <CudaCompile Include="Measurement\CMeasureWilsonLoopWithPath.cu" />
     <CudaCompile Include="Measurement\CMeasureWilsonLoopXY.cu" />
-    <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearing.cu" />
-    <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.cu" />
-    <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.cu" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp" />
     <CudaCompile Include="Tools\Math\CLGFFT.cu" />
     <CudaCompile Include="Tools\Math\CLinearAlgebraHelper.cu" />
@@ -338,6 +424,7 @@
     <ClCompile Include="Tools\Tracer.cpp" />
     <ClCompile Include="Update\Continous\CHMC.cpp" />
     <ClCompile Include="Update\Continous\CIntegrator.cpp" />
+    <CudaCompile Include="Update\Discrete\CHeatbath.cu" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />
@@ -346,8 +433,8 @@
     <ClCompile Include="Data\Action\CActionGaugePlaquette.cpp">
       <FileType>Document</FileType>
     </ClCompile>
-    <CudaCompile Include="Data\Boundary\CBoundaryConditionTorusSquare.cu" />
-    <CudaCompile Include="Data\Lattice\CIndexSquare.cu" />
+    <ClCompile Include="Data\Action\CActionGaugePlaquetteAnisotropic.cpp" />
+    <CudaCompile Include="Data\Boundary\CBoundaryConditionTorusSquare.cu" />    <CudaCompile Include="Data\Lattice\CIndexSquare.cu" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -379,7 +466,20 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MG|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MG|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
@@ -388,7 +488,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.5.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 13.0.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -401,7 +501,13 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug_MG|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release_MG|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -419,7 +525,19 @@
     <TargetName>$(ProjectName)_d</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MG|x64'">
+    <IncludePath>$(SolutionDir)CLGLib\;$(ProjectDir);$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)..\Bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\Temp\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)_d</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\Bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\Temp\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)CLGLib\;$(ProjectDir);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MG|x64'">
     <OutDir>$(SolutionDir)..\Bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Temp\$(Configuration)\$(ProjectName)\</IntDir>
     <IncludePath>$(SolutionDir)CLGLib\;$(ProjectDir);$(IncludePath)</IncludePath>
@@ -482,7 +600,8 @@
       <PrecompiledHeaderFile>CLGLib_Private.h</PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)_$(Configuration).pdb</ProgramDataBaseFileName>
       <DisableSpecificWarnings>26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <LanguageStandard>Default</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(CudaToolkitIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)..\Libs;$(CudaToolkitLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -499,18 +618,66 @@
     </CudaCompile>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_86,sm_86;compute_75,sm_75;</CodeGeneration>
+      <CodeGeneration>compute_86,sm_86;</CodeGeneration>
       <Defines>WIN32;</Defines>
       <Runtime>InheritFromHost</Runtime>
       <AdditionalCompilerOptions>
       </AdditionalCompilerOptions>
-      <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4505 -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4505 -Xcompiler /wd4100  -Xcompiler /wd20199 %(AdditionalOptions)</AdditionalOptions>
       <Emulation>false</Emulation>
       <FastMath>true</FastMath>
       <Keep>true</Keep>
       <KeepDir>$(IntDir)Cuda\</KeepDir>
       <PtxAsOptionV>true</PtxAsOptionV>
       <GenerateLineInfo>false</GenerateLineInfo>
+      <GPUDebugInfo>false</GPUDebugInfo>
+      <FastCompile>Max</FastCompile>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MG|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CLG_MULTI_GPU=1;WIN64;_MBCS;%(PreprocessorDefinitions);DEBUG=1;_WINDLL</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>CLGLib_Private.h</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(IntDir)$(ProjectName)_$(Configuration).pdb</ProgramDataBaseFileName>
+      <DisableSpecificWarnings>26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(MSMPI_INC);$(CudaToolkitIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(MSMPI_LIB64);$(SolutionDir)..\Libs;$(CudaToolkitLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+      <ImportLibrary>$(SolutionDir)..\Libs\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>msmpi.lib;cufft.lib;curand.lib;cudadevrt.lib;cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+    </Link>
+    <CudaCompile>
+      <Include>./</Include>
+    </CudaCompile>
+    <CudaCompile>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
+    </CudaCompile>
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+      <CodeGeneration>compute_86,sm_86;</CodeGeneration>
+      <Defines>_CLG_MULTI_GPU=1;WIN32;</Defines>
+      <Runtime>InheritFromHost</Runtime>
+      <AdditionalCompilerOptions>
+      </AdditionalCompilerOptions>
+      <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4505 -Xcompiler /wd4100  -Xcompiler /wd20199 %(AdditionalOptions)</AdditionalOptions>
+      <Emulation>false</Emulation>
+      <FastMath>true</FastMath>
+      <Keep>true</Keep>
+      <KeepDir>$(IntDir)Cuda\</KeepDir>
+      <PtxAsOptionV>true</PtxAsOptionV>
+      <GenerateLineInfo>false</GenerateLineInfo>
+      <GPUDebugInfo>false</GPUDebugInfo>
+      <FastCompile>Max</FastCompile>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -572,7 +739,8 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ExceptionHandling>Sync</ExceptionHandling>
       <DisableSpecificWarnings>26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <LanguageStandard>Default</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(CudaToolkitIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -584,19 +752,64 @@
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_86,sm_86;compute_75,sm_75;</CodeGeneration>
+      <CodeGeneration>compute_75,sm_75;compute_86,sm_86;compute_89,sm_89;</CodeGeneration>
       <Defines>WIN32;</Defines>
       <FastMath>true</FastMath>
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
-      <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4505 -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4505 -Xcompiler /wd4100 -Xcompiler /wd20199 %(AdditionalOptions)</AdditionalOptions>
       <PtxAsOptionV>true</PtxAsOptionV>
       <Keep>true</Keep>
       <KeepDir>$(IntDir)Cuda\</KeepDir>
       <Include>./</Include>
+      <ExtensibleWholeProgramCompilation>false</ExtensibleWholeProgramCompilation>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_MG|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>_CLG_MULTI_GPU=1;WIN64;_MBCS;%(PreprocessorDefinitions);_WINDLL</PreprocessorDefinitions>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>CLGLib_Private.h</PrecompiledHeaderFile>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <DisableSpecificWarnings>26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(MSMPI_INC);$(CudaToolkitIncludeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(MSMPI_LIB64);$(SolutionDir)..\Libs;$(CudaToolkitLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+      <ImportLibrary>$(SolutionDir)..\Libs\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>msmpi.lib;cufft.lib;curand.lib;cudadevrt.lib;cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+      <CodeGeneration>compute_75,sm_75;compute_86,sm_86;compute_89,sm_89;</CodeGeneration>
+      <Defines>_CLG_MULTI_GPU=1;WIN32;</Defines>
+      <FastMath>true</FastMath>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
+      <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4505 -Xcompiler /wd4100 -Xcompiler /wd20199 %(AdditionalOptions)</AdditionalOptions>
+      <PtxAsOptionV>true</PtxAsOptionV>
+      <Keep>true</Keep>
+      <KeepDir>$(IntDir)Cuda\</KeepDir>
+      <Include>./</Include>
+      <ExtensibleWholeProgramCompilation>false</ExtensibleWholeProgramCompilation>
     </CudaCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.5.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 13.0.targets" />
   </ImportGroup>
 </Project>

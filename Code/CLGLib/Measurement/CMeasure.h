@@ -5,29 +5,15 @@
 // This is the class for one measurement
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [01/29/2019 nbale]
 //=============================================================================
+#include "Tools/Math/DeviceInlineTemplate.h"
 
 #ifndef _CMEASURE_H_
 #define _CMEASURE_H_
 
 __BEGIN_NAMESPACE
-
-#if !_CLG_WIN
-
-inline void strerror_s(TCHAR* buffer, size_t bufferSize, INT error)
-{
-    strcpy(buffer, strerror(error));
-}
-
-inline void _gcvt_s(TCHAR* buff, UINT uiBuffLength, Real fVaule, UINT uiDigit)
-{
-    static TCHAR tmpBuff[10];
-    appSprintf(tmpBuff, 10, _T("%s.%df"), _T("%"), uiDigit);
-    appSprintf(buff, uiBuffLength, tmpBuff, fVaule);
-}
-
-#endif
 
 class CLGAPI CMeasure : public CBase
 {
@@ -52,7 +38,7 @@ public:
     * Accept gauge can be smoothed.
     * pCorrespondingStaple Might be NULL.
     */
-    virtual void OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple);
+    virtual void OnConfigurationAccepted(INT gaugeNum, INT bosonNum, INT tensor2Num, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldTensor2* const* tensor2Fields, const class CFieldGauge* const* pCorrespondingStaple);
 
 
     /**
@@ -64,7 +50,7 @@ public:
     /**
     * Z4 Source
     */
-    virtual void OnConfigurationAcceptedZ4(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd);
+    virtual void OnConfigurationAcceptedZ4(INT gaugeNum, INT bosonNum, INT tensor2Num, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldTensor2* const* tensor2Fields, const class CFieldGauge* const* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd);
 
 protected:
 
@@ -111,6 +97,7 @@ public:
     virtual UBOOL IsZ4Source() const { return FALSE; }
     virtual UBOOL NeedGaugeSmearing() const { return m_bNeedSmearing; }
 
+    BYTE GetId() const { return m_byId; }
     BYTE GetFermionFieldId() const { return m_byFermionFieldId; }
     BYTE GetGaugeFieldIdSingleField() const { return m_lstGaugeFieldIds[0]; }
 
@@ -136,87 +123,208 @@ public:
 
 #pragma region Distribution Common functions
 
-    static void FillDataWithR_R(
-        TArray<Real>& arrData,
-        TArray<Real>* arrInner,
-        TArray<Real>& arrFull,
+    template<class T>
+    static void FillDataWithR(
+        TArray<T>& arrData,
+        TArray<T>* arrInner,
+        TArray<T>& arrFull,
         TArray<UINT>& arrR,
-        Real* hostData,
+        T* hostData,
         UINT* hostR,
         UINT uiConfig,
         UINT uiMaxR,
         UINT uiEdgeR,
         Real fDivider,
-        UBOOL bFillR);
+        UBOOL bFillR)
+    {
+        T fAverageJGInner = _makeZeroHost<T>();
+        T fAverageJGAll = _makeZeroHost<T>();
+        UINT uiInnerPointsAll = 0;
+        UINT uiInnerPointsInner = 0;
 
-    static void FillDataWithR_C(
-        TArray<CLGComplex>& arrData,
-        TArray<CLGComplex>* arrInner,
-        TArray<CLGComplex>& arrFull,
-        TArray<UINT>& arrR,
-        CLGComplex* hostData,
-        UINT* hostR,
-        UINT uiConfig,
-        UINT uiMaxR,
-        UINT uiEdgeR,
-        Real fDivider,
-        UBOOL bFillR);
+        if (0 == uiConfig)
+        {
+            appAssert(!bFillR || 0 == arrR.Num());
+            appAssert(0 == arrData.Num());
 
+            for (UINT uiL = 0; uiL <= uiMaxR; ++uiL)
+            {
+                if (hostR[uiL] > 0)
+                {
+                    if (bFillR)
+                    {
+                        arrR.AddItem(uiL);
+                    }
+
+                    arrData.AddItem(_mulCHost(hostData[uiL], fDivider));
+
+                    uiInnerPointsAll += hostR[uiL];
+                    _addHost(fAverageJGAll, _mulCHost(hostData[uiL], fDivider * hostR[uiL]));
+                    if (NULL != arrInner && uiL < uiEdgeR)
+                    {
+                        uiInnerPointsInner += hostR[uiL];
+                        _addHost(fAverageJGInner, _mulCHost(hostData[uiL], fDivider * hostR[uiL]));
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (INT i = 0; i < arrR.Num(); ++i)
+            {
+                appAssert(hostR[arrR[i]] > 0);
+                arrData.AddItem(_mulCHost(hostData[arrR[i]], fDivider));
+
+                uiInnerPointsAll += hostR[arrR[i]];
+                _addHost(fAverageJGAll, _mulCHost(hostData[arrR[i]], fDivider * hostR[arrR[i]]));
+                if (NULL != arrInner && arrR[i] < uiEdgeR)
+                {
+                    uiInnerPointsInner += hostR[arrR[i]];
+                    _addHost(fAverageJGInner, _mulCHost(hostData[arrR[i]], fDivider * hostR[arrR[i]]));
+                }
+            }
+        }
+
+        if (uiInnerPointsAll > 0)
+        {
+            _divHost(fAverageJGAll, uiInnerPointsAll);
+        }
+        if (NULL != arrInner && uiInnerPointsInner > 0)
+        {
+            _divHost(fAverageJGInner, uiInnerPointsInner);
+        }
+        arrFull.AddItem(fAverageJGAll);
+        if (NULL != arrInner)
+        {
+            arrInner->AddItem(fAverageJGInner);
+        }
+    }
     
-    static void ReportDistributionXY_R(UINT uiConfig, const TArray<Real>& arrayRes);
-    static void ReportDistributionXY_C(UINT uiConfig, const TArray<CLGComplex>& arrayRes);
+    template<class T>
+    static void ReportDistributionXY(UINT uiConfig, const TArray<T>& arrayRes)
+    {
+        appAssert(uiConfig * (_HC_Lx - 1) * (_HC_Ly - 1)
+            == static_cast<UINT>(arrayRes.Num()));
 
-    static void _ZeroXYPlane(Real* pDeviceRes);
-    static void _ZeroXYPlaneC(CLGComplex* pDeviceRes);
+        TArray<T> tmpjgs;
+        appGeneral(_T("{\n"));
+        for (UINT k = 0; k < uiConfig; ++k)
+        {
+            appGeneral(_T("{"));
+            for (UINT i = 0; i < _HC_Ly - 1; ++i)
+            {
+                appGeneral(_T("{"));
+                for (UINT j = 0; j < _HC_Lx - 1; ++j)
+                {
+                    const UINT idx = k * (_HC_Lx - 1) * (_HC_Ly - 1) + i * (_HC_Lx - 1) + j;
+
+                    if (0 == k)
+                    {
+                        tmpjgs.AddItem(arrayRes[idx]);
+                    }
+                    else
+                    {
+                        tmpjgs[i * (_HC_Lx - 1) + j] += arrayRes[idx];
+                    }
+
+                    if (0 == j)
+                    {
+                        appGeneral(_T("%s"), appToString(arrayRes[idx]).c_str());
+                    }
+                    else
+                    {
+                        appGeneral(_T(", %s"), appToString(arrayRes[idx]).c_str());
+                    }
+                }
+                appGeneral(_T("}, "));
+            }
+            appGeneral(_T("}\n"));
+        }
+        appGeneral(_T("}\n"));
+
+        appGeneral(_T("\n -------------------- Average -------------------------\n\n"));
+
+        for (UINT i = 0; i < _HC_Ly - 1; ++i)
+        {
+            for (UINT j = 0; j < _HC_Lx - 1; ++j)
+            {
+                appGeneral(_T("(x=%d,y=%d)%s,   "),
+                    j + 1, i + 1,
+                    appToString(_divCHost(tmpjgs[i * (_HC_Lx - 1) + j], uiConfig)).c_str());
+            }
+            appGeneral(_T("\n"));
+        }
+    }
+
+    template<class T>
+    static void _ZeroXYPlane(T* pDeviceRes);
     /**
     * array[x, y] = array[x, y] / (lz * lt)
     */
-    static void _AverageXYPlane(Real* pDeviceRes);
-    static void _AverageXYPlaneC(CLGComplex* pDeviceRes);
+    template<class T>
+    static void _AverageXYPlane(T* pDeviceRes);
 
-    static void XYDataToRdistri_R(
+    template<class T>
+    static void _ZeroSlice(T* pDeviceRes, BYTE byDir);
+
+    template<class T>
+    static void XYDataToRdistri(
         UBOOL bShiftCenter,
-        const Real* __restrict__ source,
+        const T* source,
         UINT* count,
-        Real* result,
+        T* result,
         UINT uiMaxR,
         UBOOL bCalculateCounter,
         BYTE byFieldId);
 
-    static void XYDataToRdistri_C(
-        UBOOL bShiftCenter,
-        const CLGComplex* __restrict__ source,
-        UINT* count,
-        CLGComplex* result,
-        UINT uiMaxR,
-        UBOOL bCalculateCounter,
-        BYTE byFieldId);
+    template<class T>
+    static void ReportDistributeWithR(UINT uiConf, UINT uiR, const TArray<T>& arrayData)
+    {
+        appAssert(uiConf * uiR == static_cast<UINT>(arrayData.GetCount()));
+        appGeneral(_T("{\n"));
+        for (UINT conf = 0; conf < uiConf; ++conf)
+        {
+            for (UINT r = 0; r < uiR; ++r)
+            {
+                if (0 == r)
+                {
+                    appGeneral(_T("{ %s"), appToString(arrayData[uiR * conf + r]).c_str());
+                }
+                else
+                {
+                    appGeneral(_T(", %s"), appToString(arrayData[uiR * conf + r]).c_str());
+                }
+            }
 
-    static void ReportDistributeWithR_R(UINT uiConf, UINT uiR, const TArray<Real>& arrayData);
+            appGeneral(_T("},\n"));
+        }
+        appGeneral(_T("}\n"));
+    }
 
     /**
      * TransformFromXYDataToRDataOnce_C and TransformFromXYDataToRDataOnce_R
      * is for gauge measurement
      */
-    static void TransformFromXYDataToRDataOnce_C(
+    template<class T>
+    static void TransformFromXYDataToRDataOnce(
         UBOOL bShiftCenter,
-        const CLGComplex* __restrict__ pXYData,
+        const T* __restrict__ pXYData,
         UINT* pCountBuffer,
-        CLGComplex* pValueBuffer,
+        T* pValueBuffer,
         UINT* pHostCountBuffer,
-        CLGComplex* pHostValueBuffer,
+        T* pHostValueBuffer,
         UINT uiMaxR,
         UINT uiEdgeR,
         UBOOL bCalculateCounter,
         BYTE byFieldId,
-        TArray<CLGComplex>& arrData,
-        TArray<CLGComplex>* arrInner,
-        TArray<CLGComplex>& arrFull,
+        TArray<T>& arrData,
+        TArray<T>* arrInner,
+        TArray<T>& arrFull,
         TArray<UINT>& arrR,
         UINT uiConfig,
         Real fDivider)
     {
-        XYDataToRdistri_C(
+        XYDataToRdistri(
             bShiftCenter,
             pXYData,
             pCountBuffer,
@@ -230,59 +338,10 @@ public:
             checkCudaErrors(cudaMemcpy(pHostCountBuffer, pCountBuffer, sizeof(UINT) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
         }
         
-        checkCudaErrors(cudaMemcpy(pHostValueBuffer, pValueBuffer, sizeof(CLGComplex) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
+        checkCudaErrors(cudaMemcpy(pHostValueBuffer, pValueBuffer, sizeof(T) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
 
         //Here we have already divide by all XYZ points
-        FillDataWithR_C(
-            arrData,
-            arrInner,
-            arrFull,
-            arrR,
-            pHostValueBuffer,
-            pHostCountBuffer,
-            uiConfig,
-            uiMaxR,
-            uiEdgeR,
-            fDivider,
-            bCalculateCounter
-        );
-    }
-
-    static void TransformFromXYDataToRDataOnce_R(
-        UBOOL bShiftCenter,
-        const Real* __restrict__ pXYData,
-        UINT* pCountBuffer,
-        Real* pValueBuffer,
-        UINT* pHostCountBuffer,
-        Real* pHostValueBuffer,
-        UINT uiMaxR,
-        UINT uiEdgeR,
-        UBOOL bCalculateCounter,
-        BYTE byFieldId,
-        TArray<Real>& arrData,
-        TArray<Real>* arrInner,
-        TArray<Real>& arrFull,
-        TArray<UINT>& arrR,
-        UINT uiConfig,
-        Real fDivider)
-    {
-        XYDataToRdistri_R(
-            bShiftCenter,
-            pXYData,
-            pCountBuffer,
-            pValueBuffer,
-            uiMaxR,
-            bCalculateCounter,
-            byFieldId);
-
-        if (bCalculateCounter)
-        {
-            checkCudaErrors(cudaMemcpy(pHostCountBuffer, pCountBuffer, sizeof(UINT) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
-        }
-        checkCudaErrors(cudaMemcpy(pHostValueBuffer, pValueBuffer, sizeof(Real) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
-
-        //Here we have already divide by all XYZ points
-        FillDataWithR_R(
+        FillDataWithR(
             arrData,
             arrInner,
             arrFull,
@@ -304,8 +363,12 @@ public:
      * Sometimes, we need to set bMinus = TRUE, because
      * <qbar M q> = - tr[MD^{-1}]
      * but tr[MD^{-1}] is measured
+     * 
+     * NOTE: For chiral condensation, it is usually defined as tr[D^{-1}], not -tr[D^{-1}].
+     * NOTE: Usually, tr[D^{-1}] > 0, and -tr[D^{-1}] < 0.
      */
-    static void TransformFromXYDataToRData_C(
+    template<class T>
+    static void TransformFromXYDataToRData(
         UBOOL bMinus,
         UBOOL bShiftCenter,
         UINT uiMaxR,
@@ -314,33 +377,41 @@ public:
         UINT uiFieldCount,
         UINT uiMeasureCount,
         UINT uiConfig,
-        const CLGComplex* const* pXYBuffers,
+        const T* const* pXYBuffers,
         UINT* pCountBuffer,
-        CLGComplex* pValueBuffer,
+        T* pValueBuffer,
         UINT* pHostCountBuffer,
-        CLGComplex* pHostValueBuffer,
+        T* pHostValueBuffer,
         TArray<UINT>& lstR,
-        TArray<CLGComplex>* lstValues,
-        TArray<CLGComplex>* lstAll,
-        TArray<CLGComplex>* lstInner);
+        TArray<T>* lstValues,
+        TArray<T>* lstAll,
+        TArray<T>* lstInner)
+    {
+        for (UINT i = 0; i < uiMeasureCount; ++i)
+        {
+            XYDataToRdistri(bShiftCenter, pXYBuffers[i], pCountBuffer, pValueBuffer, uiMaxR, 0 == i, byFieldId);
+            if (0 == i)
+            {
+                checkCudaErrors(cudaMemcpy(pHostCountBuffer, pCountBuffer, sizeof(UINT) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
+            }
 
-    static void TransformFromXYDataToRData_R(
-        UBOOL bShiftCenter,
-        UINT uiMaxR,
-        UINT uiEdgeR,
-        BYTE byFieldId,
-        UINT uiFieldCount,
-        UINT uiMeasureCount,
-        UINT uiConfig,
-        const Real* const* pXYBuffers,
-        UINT* pCountBuffer,
-        Real* pValueBuffer,
-        UINT* pHostCountBuffer,
-        Real* pHostValueBuffer,
-        TArray<UINT>& lstR,
-        TArray<Real>* lstValues,
-        TArray<Real>* lstAll,
-        TArray<Real>* lstInner);
+            checkCudaErrors(cudaMemcpy(pHostValueBuffer, pValueBuffer, sizeof(T) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
+
+            FillDataWithR(
+                lstValues[i],
+                NULL == lstInner ? NULL : &(lstInner[i]),
+                lstAll[i],
+                lstR,
+                pHostValueBuffer,
+                pHostCountBuffer,
+                uiConfig,
+                uiMaxR,
+                uiEdgeR,
+                (bMinus ? F(-1.0) : F(1.0)) / static_cast<Real>(uiFieldCount * _HC_Lz * _HC_Lt),
+                0 == i
+            );
+        }
+    }
 
     /**
      * Many measurements measure the XY distributions, needs to calculate max R and edge
@@ -397,13 +468,13 @@ public:
 
     Real GetLastRealRes() const
     {
-        assert(m_lstRealResults.Num() > 0);
+        appAssert(m_lstRealResults.Num() > 0);
         return (m_lstRealResults.Num() > 0) ? m_lstRealResults[m_lstRealResults.Num() - 1] : F(0.0);
     }
 
     CLGComplex GetLastCmpRes() const
     {
-        assert(m_lstComplexResults.Num() > 0);
+        appAssert(m_lstComplexResults.Num() > 0);
         return (m_lstComplexResults.Num() > 0) ? m_lstComplexResults[m_lstComplexResults.Num() - 1] : _zeroc;
     }
 
@@ -421,13 +492,13 @@ public:
 
     Real RealResAtI(INT i) const
     {
-        assert(i < m_lstRealResults.Num() && i >= 0);
+        appAssert(i < m_lstRealResults.Num() && i >= 0);
         return (i < m_lstRealResults.Num() && i >= 0) ? m_lstRealResults[i] : F(0.0);
     }
 
     CLGComplex CmpResAtI(INT i) const
     {
-        assert(i < m_lstComplexResults.Num() && i >= 0);
+        appAssert(i < m_lstComplexResults.Num() && i >= 0);
         return (i < m_lstComplexResults.Num() && i >= 0) ? m_lstComplexResults[i] : _zeroc;
     }
 
@@ -446,6 +517,48 @@ public:
     }
 
 protected:
+
+    //P4-3.1: reduce a locally-measured DOUBLE (e.g. CFieldGauge::CalculatePlaqutteEnergy,
+    //which returns the local partial sum on multi-GPU) to the GLOBAL value on every
+    //rank. Survey note: the HMC plaquette-energy path (CActionGaugePlaquette::
+    //EnergySingleField) was already Allreduced in P4-1.2+, and measurements here do
+    //NOT go through CAction::Energy, so calling this on the measured value cannot
+    //double-reduce. Implemented in CMeasure.cu (needs appGetComm()).
+    void GlobalSumReal(DOUBLE& fValue) const;
+
+    //P4-3.5 (code only, untested): array variant for per-time-slice profiles.
+    //Reduce a locally-measured DOUBLE array (uiCount entries, e.g. Lt slices) to
+    //the GLOBAL values on every rank. Implemented in CMeasure.cu; test pending
+    //(P4-3.5 unit-level 1-vs-N).
+    void GlobalSumRealArray(DOUBLE* pValues, UINT uiCount) const;
+
+    //P4-3.2: plaquette normalization count. On multi-GPU a globally-reduced
+    //plaquette ENERGY must be normalized by the GLOBAL plaquette count (the
+    //local _HC_PlaqutteCount is the per-rank share); single-GPU is unchanged.
+    DOUBLE GlobalPlaqutteCount() const;
+
+    //P4-3.3: global lattice length in direction uiDir (0..3). On multi-GPU the
+    //local _HC_Lx.._HC_Lt are the per-rank share; position/profile normalization
+    //factors of globally-reduced results must use the GLOBAL lengths.
+    //Single-GPU (no comm) returns the local value, which is the whole lattice.
+    DOUBLE GlobalL(UINT uiDir) const;
+
+    //P4-3.4: reduce a locally-measured CLGComplex array (uiCount entries) to the
+    //GLOBAL values on every rank. CLGComplex is cuDoubleComplex on double builds
+    //and cuComplex on float builds; the reduction goes through a DOUBLE staging
+    //buffer in the float case (MPI double is the portable choice). No-op on
+    //single-GPU / unsplit builds.
+    void GlobalSumComplexArray(CLGComplex* pValues, UINT uiCount) const;
+
+    //I9: scalar variant of GlobalSumComplexArray.
+    void GlobalSumComplex(CLGComplex& fValue) const;
+
+    //I9: Real-array variant, declared only on float builds: on double builds
+    //Real == DOUBLE, so the DOUBLE* overload above already applies (same pattern
+    //as CLGComm::AllreduceSum). Staged through DOUBLE in the implementation.
+#if !_CLG_DOUBLEFLOAT
+    void GlobalSumRealArray(Real* pValues, UINT uiCount) const;
+#endif
 
     void UpdateRealResult(Real fResult, UBOOL bUpdateConfigurationCount = TRUE)
     {
@@ -510,7 +623,7 @@ public:
     UINT GetFieldCount() const { return m_uiFieldCount; }
     void SetFieldCount(UINT uiFieldCount) { m_uiFieldCount = uiFieldCount; }
 
-    virtual TArray<TArray<CLGComplex>> ExportDiagnal(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, class CFieldFermion* pooled1, class CFieldFermion* pooled2)
+    virtual TArray<TArray<CLGComplex>> ExportDiagnal(INT gaugeNum, INT bosonNum, INT tensor2Num, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldTensor2* const* tensor2Fields, class CFieldFermion* pooled1, class CFieldFermion* pooled2)
     {
         TArray<TArray<CLGComplex>> ret;
         appCrucial(_T("ExportDiagnal not implemented\n"));
@@ -531,323 +644,108 @@ protected:
 
 };
 
-enum { kFileDigital = 20, };
+#include "CMeasureData.h"
 
-template <class T>
-void WriteRealArray(const CCString& sFileName, const TArray<T>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kFileDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-
-    if (file.fail())
-    {
-        static TCHAR errorMsg[256];
-        strerror_s(errorMsg, 256, errno);
-        appCrucial(_T("Saving %s failed! Because %s\n"), sFileName.c_str(), errorMsg);
-    }
-
-    TCHAR str[50];
-    for (INT i = 0; i < lst.Num(); ++i)
-    {
-        _gcvt_s(str, 50, static_cast<DOUBLE>(lst[i]), iDigital);
-        CCString sReal = CCString(str);
-        sReal = sReal.Replace(_T("e"), _T("*^"));
-        file << _T(" ");
-        file << sReal;
-        if (i != lst.GetCount() - 1)
-        {
-            file << _T(",");
-        }
-    }
-    file.flush();
-    file.close();
-}
-
-template <class T>
-void WriteRealArray2(const CCString& sFileName, const TArray<TArray<T>>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kFileDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-
-    if (file.fail())
-    {
-        static TCHAR errorMsg[256];
-        strerror_s(errorMsg, 256, errno);
-        appCrucial(_T("Saving %s failed! Because %s\n"), sFileName.c_str(), errorMsg);
-    }
-
-    TCHAR str[50];
-    for (INT i = 0; i < lst.GetCount(); ++i)
-    {
-        for (INT j = 0; j < lst[i].GetCount(); ++j)
-        {
-            _gcvt_s(str, 50, lst[i][j], iDigital);
-            CCString sReal = CCString(str);
-            sReal = sReal.Replace(_T("e"), _T("*^"));
-            file << _T(" ");
-            file << sReal;
-            if (j != lst[i].GetCount() - 1)
-            {
-                file << _T(",");
-            }
-        }
-        file << _T("\n");
-    }
-    file.flush();
-    file.close();
-}
-
-inline void WriteComplexArray(const CCString& sFileName, const TArray<CLGComplex>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kFileDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-
-    if (file.fail())
-    {
-        static TCHAR errorMsg[256];
-        strerror_s(errorMsg, 256, errno);
-        appCrucial(_T("Saving %s failed! Because %s\n"), sFileName.c_str(), errorMsg);
-    }
-
-    TCHAR str[50];
-    for (INT i = 0; i < lst.Num(); ++i)
-    {
-        _gcvt_s(str, 50, lst[i].x, iDigital);
-        CCString sReal = CCString(str);
-        sReal = sReal.Replace(_T("e"), _T("*^"));
-        _gcvt_s(str, 50, lst[i].y, iDigital);
-        CCString sImg = CCString(str);
-        sImg = sImg.Replace(_T("e"), _T("*^"));
-        CCString sMid = _T(" + ");
-        if (sImg.Left(1) == _T("-"))
-        {
-            sImg = sImg.Right(sImg.GetLength() - 1);
-            sMid = _T(" - ");
-        }
-
-        file << _T(" ");
-        file << sReal;
-        file << sMid;
-        file << sImg;
-        if (i == lst.GetCount() - 1)
-        {
-            file << _T(" I");
-        }
-        else
-        {
-            file << _T(" I,");
-        }
-    }
-    file.flush();
-    file.close();
-}
-
-#if !_CLG_DOUBLEFLOAT
-inline void WriteComplexArray(const CCString& sFileName, const TArray<cuDoubleComplex>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kFileDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-
-    if (file.fail())
-    {
-        static TCHAR errorMsg[256];
-        strerror_s(errorMsg, 256, errno);
-        appCrucial(_T("Saving %s failed! Because %s\n"), sFileName.c_str(), errorMsg);
-    }
-
-    TCHAR str[50];
-    for (INT i = 0; i < lst.Num(); ++i)
-    {
-        _gcvt_s(str, 50, lst[i].x, iDigital);
-        CCString sReal = CCString(str);
-        sReal = sReal.Replace(_T("e"), _T("*^"));
-        _gcvt_s(str, 50, lst[i].y, iDigital);
-        CCString sImg = CCString(str);
-        sImg = sImg.Replace(_T("e"), _T("*^"));
-        CCString sMid = _T(" + ");
-        if (sImg.Left(1) == _T("-"))
-        {
-            sImg = sImg.Right(sImg.GetLength() - 1);
-            sMid = _T(" - ");
-        }
-
-        file << _T(" ");
-        file << sReal;
-        file << sMid;
-        file << sImg;
-        if (i == lst.GetCount() - 1)
-        {
-            file << _T(" I");
-        }
-        else
-        {
-            file << _T(" I,");
-        }
-    }
-    file.flush();
-    file.close();
-}
-#endif
-
-inline void WriteComplexArray2(const CCString& sFileName, const TArray<TArray<CLGComplex>>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = static_cast<INT>(kFileDigital);
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-
-    if (file.fail())
-    {
-        static TCHAR errorMsg[256];
-        strerror_s(errorMsg, 256, errno);
-        appCrucial(_T("Saving %s failed! Because %s\n"), sFileName.c_str(), errorMsg);
-    }
-
-    TCHAR str[50];
-    for (INT i = 0; i < lst.GetCount(); ++i)
-    {
-        for (INT j = 0; j < lst[i].GetCount(); ++j)
-        {
-            _gcvt_s(str, 50, lst[i][j].x, iDigital);
-            CCString sReal = CCString(str);
-            sReal = sReal.Replace(_T("e"), _T("*^"));
-            _gcvt_s(str, 50, lst[i][j].y, iDigital);
-            CCString sImg = CCString(str);
-            sImg = sImg.Replace(_T("e"), _T("*^"));
-            CCString sMid = _T(" + ");
-            if (sImg.Left(1) == _T("-"))
-            {
-                sImg = sImg.Right(sImg.GetLength() - 1);
-                sMid = _T(" - ");
-            }
-            file << _T(" ");
-            file << sReal;
-            file << sMid;
-            file << sImg;
-            if (j == lst[i].GetCount() - 1)
-            {
-                file << _T(" I");
-            }
-            else
-            {
-                file << _T(" I,");
-            }
-        }
-        file << _T("\n");
-    }
-    file.flush();
-    file.close();
-}
-
-inline void WriteComplexArray2Simple(const CCString& sFileName, const TArray<TArray<CLGComplex>>& lst, UBOOL bAppend = FALSE)
-{
-    const INT iDigital = 8;
-    std::ofstream file;
-    if (!bAppend)
-    {
-        file.open(sFileName.c_str(), std::ios::out);
-    }
-    else
-    {
-        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
-    }
-
-    if (file.fail())
-    {
-        static TCHAR errorMsg[256];
-        strerror_s(errorMsg, 256, errno);
-        appCrucial(_T("Saving %s failed! Because %s\n"), sFileName.c_str(), errorMsg);
-    }
-
-    TCHAR str[50];
-    for (INT i = 0; i < lst.GetCount(); ++i)
-    {
-        for (INT j = 0; j < lst[i].GetCount(); ++j)
-        {
-            _gcvt_s(str, 50, lst[i][j].x, iDigital);
-            CCString sReal = CCString(str);
-            sReal = sReal.Replace(_T("e"), _T("*^"));
-
-            file << _T(" ");
-            file << sReal;
-
-            if (abs(lst[i][j].y) > F(0.0001) * lst[i][j].x)
-            {
-                _gcvt_s(str, 50, lst[i][j].y, iDigital);
-                CCString sImg = CCString(str);
-                sImg = sImg.Replace(_T("e"), _T("*^"));
-                CCString sMid = _T(" + ");
-                if (sImg.Left(1) == _T("-"))
-                {
-                    sImg = sImg.Right(sImg.GetLength() - 1);
-                    sMid = _T(" - ");
-                }
-
-                file << sMid;
-                file << sImg;
-                if (j == lst[i].GetCount() - 1)
-                {
-                    file << _T(" I");
-                }
-                else
-                {
-                    file << _T(" I,");
-                }
-            }
-            else
-            {
-                if (j != lst[i].GetCount() - 1)
-                {
-                    file << _T(",");
-                }
-            }
-        }
-        file << _T("\n");
-    }
-    file.flush();
-    file.close();
-}
 
 __END_NAMESPACE
 
+//=============== some widely used macros in applications ======================
+
+#define _CLG_EXPORT_CHIRAL(measureName, lstName, variableName) \
+CCString sFileNameWrite##measureName##lstName = _T("%s_%d_condensate"); \
+CCString sFileNameWrite##measureName##lstName##XSlice = _T("%s_%d_condensateXSlice"); \
+CCString sFileNameWrite##measureName##lstName##YSlice = _T("%s_%d_condensateYSlice"); \
+CCString sFileNameWrite##measureName##lstName##ZSlice = _T("%s_%d_condensateZSlice"); \
+CCString sFileNameWrite##measureName##lstName##TSlice = _T("%s_%d_condensateTSlice"); \
+CCString sFileNameWrite##measureName##lstName##In = _T("%s_%d_condensate"); \
+CCString sFileNameWrite##measureName##lstName##OverR = _T("%s_%d_condensate"); \
+sFileNameWrite##measureName##lstName = sFileNameWrite##measureName##lstName + _T(#measureName) + _T(#lstName) + _T(".csv"); \
+sFileNameWrite##measureName##lstName##XSlice = sFileNameWrite##measureName##lstName##XSlice + _T(#measureName) + _T(#lstName) + _T(".csv"); \
+sFileNameWrite##measureName##lstName##YSlice = sFileNameWrite##measureName##lstName##YSlice + _T(#measureName) + _T(#lstName) + _T(".csv"); \
+sFileNameWrite##measureName##lstName##ZSlice = sFileNameWrite##measureName##lstName##ZSlice + _T(#measureName) + _T(#lstName) + _T(".csv"); \
+sFileNameWrite##measureName##lstName##TSlice = sFileNameWrite##measureName##lstName##TSlice + _T(#measureName) + _T(#lstName) + _T(".csv"); \
+sFileNameWrite##measureName##lstName##In = sFileNameWrite##measureName##lstName##In + _T(#measureName) + _T(#lstName) + _T("_In.csv"); \
+sFileNameWrite##measureName##lstName##OverR = sFileNameWrite##measureName##lstName##OverR + _T(#measureName) + _T(#lstName) + _T("_OverR.csv"); \
+sFileNameWrite##measureName##lstName.Format(sFileNameWrite##measureName##lstName, sCSVSavePrefix.c_str(), variableName); \
+sFileNameWrite##measureName##lstName##XSlice.Format(sFileNameWrite##measureName##lstName##XSlice, sCSVSavePrefix.c_str(), variableName); \
+sFileNameWrite##measureName##lstName##YSlice.Format(sFileNameWrite##measureName##lstName##YSlice, sCSVSavePrefix.c_str(), variableName); \
+sFileNameWrite##measureName##lstName##ZSlice.Format(sFileNameWrite##measureName##lstName##ZSlice, sCSVSavePrefix.c_str(), variableName); \
+sFileNameWrite##measureName##lstName##TSlice.Format(sFileNameWrite##measureName##lstName##TSlice, sCSVSavePrefix.c_str(), variableName); \
+sFileNameWrite##measureName##lstName##In.Format(sFileNameWrite##measureName##lstName##In, sCSVSavePrefix.c_str(), variableName); \
+sFileNameWrite##measureName##lstName##OverR.Format(sFileNameWrite##measureName##lstName##OverR, sCSVSavePrefix.c_str(), variableName); \
+TArray<CLGComplex> lstName##measureName; \
+TArray<CLGComplex> lstName##measureName##In; \
+TArray<TArray<CLGComplex>> lstName##measureName##XSlice; \
+TArray<TArray<CLGComplex>> lstName##measureName##YSlice; \
+TArray<TArray<CLGComplex>> lstName##measureName##ZSlice; \
+TArray<TArray<CLGComplex>> lstName##measureName##TSlice; \
+TArray<TArray<CLGComplex>> lstName##measureName##OverR; \
+for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
+{ \
+    lstName##measureName.AddItem(measureName->m_lstCondAll[lstName][j]); \
+    lstName##measureName##In.AddItem(measureName->m_lstCondIn[lstName][j]); \
+    TArray<CLGComplex> thisConfigurationOverR; \
+    for (INT i = 0; i < measureName->m_lstR.Num(); ++i) \
+    { \
+        thisConfigurationOverR.AddItem(measureName->m_lstCond[lstName][j * measureName->m_lstR.Num() + i]); \
+    } \
+    lstName##measureName##OverR.AddItem(thisConfigurationOverR); \
+    if (measureName->m_bMeasureXSlice) \
+    { \
+        TArray<CLGComplex> thisConfiguration##measureName##lstName##XSlice; \
+        for (UINT i = 0; i < _HC_Lx; ++i) \
+        { \
+            thisConfiguration##measureName##lstName##XSlice.AddItem(measureName->m_lstCondXSlice[lstName][j * _HC_Lx + i]); \
+        } \
+        lstName##measureName##XSlice.AddItem(thisConfiguration##measureName##lstName##XSlice); \
+    } \
+    if (measureName->m_bMeasureYSlice) \
+    { \
+        TArray<CLGComplex> thisConfiguration##measureName##lstName##YSlice; \
+        for (UINT i = 0; i < _HC_Ly; ++i) \
+        { \
+            thisConfiguration##measureName##lstName##YSlice.AddItem(measureName->m_lstCondYSlice[lstName][j * _HC_Ly + i]); \
+        } \
+        lstName##measureName##YSlice.AddItem(thisConfiguration##measureName##lstName##YSlice); \
+    } \
+    if (measureName->m_bMeasureZSlice) \
+    { \
+        TArray<CLGComplex> thisConfiguration##measureName##lstName##ZSlice; \
+        for (UINT i = 0; i < _HC_Lz; ++i) \
+        { \
+            thisConfiguration##measureName##lstName##ZSlice.AddItem(measureName->m_lstCondZSlice[lstName][j * _HC_Lz + i]); \
+        } \
+        lstName##measureName##ZSlice.AddItem(thisConfiguration##measureName##lstName##ZSlice); \
+    } \
+    if (measureName->m_bMeasureTSlice) \
+    { \
+        TArray<CLGComplex> thisConfiguration##measureName##lstName##TSlice; \
+        for (UINT i = 0; i < _HC_Lt; ++i) \
+        { \
+            thisConfiguration##measureName##lstName##TSlice.AddItem(measureName->m_lstCondTSlice[lstName][j * _HC_Lt + i]); \
+        } \
+        lstName##measureName##TSlice.AddItem(thisConfiguration##measureName##lstName##TSlice); \
+    } \
+} \
+WriteComplexArray(sFileNameWrite##measureName##lstName, lstName##measureName); \
+WriteComplexArray(sFileNameWrite##measureName##lstName##In, lstName##measureName##In); \
+WriteComplexArray2(sFileNameWrite##measureName##lstName##OverR, lstName##measureName##OverR); \
+if (measureName->m_bMeasureXSlice) \
+{ \
+    WriteComplexArray2(sFileNameWrite##measureName##lstName##XSlice, lstName##measureName##XSlice); \
+} \
+if (measureName->m_bMeasureYSlice) \
+{ \
+    WriteComplexArray2(sFileNameWrite##measureName##lstName##YSlice, lstName##measureName##YSlice); \
+} \
+if (measureName->m_bMeasureZSlice) \
+{ \
+    WriteComplexArray2(sFileNameWrite##measureName##lstName##ZSlice, lstName##measureName##ZSlice); \
+} \
+if (measureName->m_bMeasureTSlice) \
+{ \
+    WriteComplexArray2(sFileNameWrite##measureName##lstName##TSlice, lstName##measureName##TSlice); \
+}
 #endif //#ifndef _CMEASURE_H_
 
 //=============================================================================

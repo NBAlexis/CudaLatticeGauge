@@ -4,6 +4,7 @@
 // DESCRIPTION:
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [05/10/2019 nbale]
 //=============================================================================
 
@@ -187,13 +188,30 @@ __REGIST_TEST(TestUpdateCommon, Rotation, TestRotationWilsonDiracProjectivePlane
 __REGIST_TEST(TestUpdateCommon, Rotation, TestRotationKSDirichlet, RotationKSDirichlet);
 __REGIST_TEST(TestUpdateCommon, Rotation, TestRotationKSTorus, RotationKSTorus);
 __REGIST_TEST(TestUpdateCommon, Rotation, TestRotationKSProjectivePlane, RotationKSProjectivePlane);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationKSEvenOddDirichlet, RotationKSEvenOddDirichlet);
 
 __REGIST_TEST(TestUpdateCommon, Rotation, TestRotationEMProjectivePlane, RotationEMProjectivePlane);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationEMTorusEven, RotationEMTorusEven);
 
 __REGIST_TEST(TestUpdateCommon, Rotation, TestRotationProjectivePlaneU1, RotationProjectivePlaneU1);
 
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationQuenchDirichlet, RotationQuenched);
 __REGIST_TEST(TestUpdateCommon, Rotation, TestRotationQuenched3D, RotationQuenched3D);
 __REGIST_TEST(TestUpdateCommon, Rotation, TestRotationQuenchedU13D, RotationQuenchedU13D);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationQuenchTorusShift, RQuenchTorusShift);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationHISQR32O045, RHISQR32O045);
+
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationHISQTorus, RHISQTorus);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationHISQEvenOddTorus, RHISQEvenOddTorus);
+//__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationHISQTorusE0Eta0Shift0, RHISQTorusE0Eta0Shift0);
+//__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationHISQTorusE0Eta0Shift1, RHISQTorusE0Eta0Shift1);
+//__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationHISQTorusE0Eta1Shift0, RHISQTorusE0Eta1Shift0);
+//__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationHISQTorusE0Eta1Shift1, RHISQTorusE0Eta1Shift1);
+//__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationHISQTorusE1Eta0Shift0, RHISQTorusE1Eta0Shift0);
+//__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationHISQTorusE1Eta0Shift1, RHISQTorusE1Eta0Shift1);
+//__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationHISQTorusE1Eta1Shift0, RHISQTorusE1Eta1Shift0);
+//__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationHISQTorusE1Eta1Shift1, RHISQTorusE1Eta1Shift1);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationStoutlinkTorus, RStoutlinkTorus);
 
 
 __REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorus, AccelerationTorus);
@@ -206,9 +224,9 @@ __REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationDirichletMidCenterQ, Accele
 
 __REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusQ, AccelerationTorusQ);
 
-___REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAcc, RigidAccTorusKS, _TEST_NOCHECK);
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAcc, RigidAccTorusKS);
 
-___REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAccMidCenter, RigidAccTorusKSMidCenter, _TEST_NOCHECK);
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAccMidCenter, RigidAccTorusKSMidCenter);
 
 //__REGIST_TEST(TestAcceleration, Updator, TestAcceleration);
 
@@ -227,7 +245,8 @@ ___REGIST_TEST(TestBoost, Updator, TestBoost, Boost, _TEST_NOCHECK);
 //__REGIST_TEST(TestRotation, Rotation, TestRotationProjectivePlane);
 
 //Special cases
-__REGIST_TEST(TestBetaGradient, Updator, TestBetaGradient, BetaGradient);
+__REGIST_TEST(TestUpdateCommon, Updator, TestBetaGradient, BetaGradient);
+__REGIST_TEST(TestUpdateCommon, Updator, TestAtGradient, AtGradient);
 
 //=============================================================================
 // END OF FILE

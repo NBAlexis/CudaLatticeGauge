@@ -15,7 +15,7 @@ __BEGIN_NAMESPACE
 
 void CBoundaryCondition::SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc)
 {
-    assert(byFieldId < kMaxFieldCount);
+    appAssert(byFieldId < kMaxFieldCount);
     m_FieldBC[byFieldId] = bc.m_sPeriodic;
 }
 

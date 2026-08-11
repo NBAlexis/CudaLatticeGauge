@@ -5,6 +5,7 @@
 // This is the class for all boson fields
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [3/31/2024 nbale]
 //=============================================================================
 
@@ -26,7 +27,7 @@ public:
 
     virtual void MakeRandomMomentum() = 0;
 
-    UBOOL ApplyOperator(EFieldOperator op, INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, 
+    UBOOL ApplyOperator(EFieldOperator op, INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, const CFieldTensor2* const* tensor2Fields, 
         EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0), void* pOtherParameters = NULL) override;
 
     /**
@@ -36,10 +37,10 @@ public:
     * (partial phi)^2 = phi^2 - phi(n)[U_{mu}(n)phi(n+mu) + U_{-mu}(n)phi(n-mu)]
     * This is [U_{mu}(n)phi(n+mu) + U_{-mu}(n)phi(n-mu)]
     */
-    virtual void D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0));
+    virtual void D(INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, const CFieldTensor2* const* tensor2Fields, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0));
     virtual void ForceOnGauge(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, CFieldGauge* const* pGaugeForce, const CFieldBoson* const* pBoson) const = 0;
 
-    virtual UINT CheckHermitian(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson) const = 0;
+    virtual UINT CheckHermitian(INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const CFieldTensor2* const* tensor2Fields) const = 0;
     virtual void InitialAsSource(const SFermionBosonSource& sourceData) = 0;
 
 protected:
@@ -56,6 +57,14 @@ public:
         INT iConst = 0;
         param.FetchValueINT(_T("Constant"), iConst);
         m_bConstant = (0 != iConst);
+
+        INT iNoGauge = 0;
+        param.FetchValueINT(_T("NoGauge"), iNoGauge);
+
+        if (iNoGauge)
+        {
+            m_byGaugeFieldIds.RemoveAll();
+        }
     }
 
 #pragma region real operators
@@ -70,9 +79,9 @@ public:
 
     virtual TArray<DOUBLE> Sum() const = 0;
 
-    void CopyTo(CField* U) const override
+    void CopyParamTo(CField* U) const override
     {
-        CField::CopyTo(U);
+        CField::CopyParamTo(U);
 
         CFieldBoson* pOther = dynamic_cast<CFieldBoson*>(U);
         pOther->m_uiSiteCount = m_uiSiteCount;

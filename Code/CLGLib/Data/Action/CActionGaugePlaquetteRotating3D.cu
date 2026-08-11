@@ -7,6 +7,7 @@
 // REVISION:
 //  [27/10/2022 nbale]
 //=============================================================================
+#if 0
 #include "CLGLib_Private.h"
 #include "CActionGaugePlaquetteRotating3D.h"
 
@@ -860,31 +861,31 @@ UBOOL CActionGaugePlaquetteRotating3D::CalculateForceOnGaugeSingleField(const CF
 
     if (!m_bShiftHalfCoord)
     {
-        _kernelAddForce4PlaqutteTermSU3_XY3D << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData,
+        _LAUNCH_KERNEL(_kernelAddForce4PlaqutteTermSU3_XY3D, block, threads, pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-        _kernelAddForceChairTermSU3_Term13D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
+        _LAUNCH_KERNEL(_kernelAddForceChairTermSU3_Term13D, block, threads, pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-        _kernelAddForceChairTermSU3_Term33D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
+        _LAUNCH_KERNEL(_kernelAddForceChairTermSU3_Term33D, block, threads, pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-        _kernelAddForceChairTermSU3_Term53D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
+        _LAUNCH_KERNEL(_kernelAddForceChairTermSU3_Term53D, block, threads, pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
     }
     else
     {
 
-        _kernelAddForce4PlaqutteTermSU3_XYZ_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData,
+        _LAUNCH_KERNEL(_kernelAddForce4PlaqutteTermSU3_XYZ_Shifted3D, block, threads, pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
         
-        _kernelAddForceChairTermSU3_Term1_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
+        _LAUNCH_KERNEL(_kernelAddForceChairTermSU3_Term1_Shifted3D, block, threads, pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-        _kernelAddForceChairTermSU3_Term3_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
+        _LAUNCH_KERNEL(_kernelAddForceChairTermSU3_Term3_Shifted3D, block, threads, pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-        _kernelAddForceChairTermSU3_Term5_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
+        _LAUNCH_KERNEL(_kernelAddForceChairTermSU3_Term5_Shifted3D, block, threads, pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
     }
 
@@ -925,7 +926,7 @@ DOUBLE CActionGaugePlaquetteRotating3D::EnergySingleField(UBOOL bBeforeEvolution
     if (m_bShiftHalfCoord)
     {
 
-        _kernelAdd4PlaqutteTermSU3_Shifted3D << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelAdd4PlaqutteTermSU3_Shifted3D, block, threads, 
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
             m_fBetaOverN,
@@ -934,7 +935,7 @@ DOUBLE CActionGaugePlaquetteRotating3D::EnergySingleField(UBOOL bBeforeEvolution
 
         m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
-        _kernelAddChairTermSU3_Term1234_Shifted3D << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelAddChairTermSU3_Term1234_Shifted3D, block, threads, 
             pGaugeSU3->m_byFieldId, 
             pGaugeSU3->m_pDeviceData, 
             m_fBetaOverN, 
@@ -943,7 +944,7 @@ DOUBLE CActionGaugePlaquetteRotating3D::EnergySingleField(UBOOL bBeforeEvolution
 
         m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
-        _kernelAddChairTermSU3_Term5_Shifted3D << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelAddChairTermSU3_Term5_Shifted3D, block, threads, 
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
             m_fBetaOverN,
@@ -955,7 +956,7 @@ DOUBLE CActionGaugePlaquetteRotating3D::EnergySingleField(UBOOL bBeforeEvolution
     }
     else
     {
-        _kernelAdd4PlaqutteTermSU33D << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelAdd4PlaqutteTermSU33D, block, threads, 
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
             appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
@@ -965,7 +966,7 @@ DOUBLE CActionGaugePlaquetteRotating3D::EnergySingleField(UBOOL bBeforeEvolution
 
         m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
-        _kernelAddChairTermSU3_Term1234_3D << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelAddChairTermSU3_Term1234_3D, block, threads, 
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
             m_fBetaOverN,
@@ -974,7 +975,7 @@ DOUBLE CActionGaugePlaquetteRotating3D::EnergySingleField(UBOOL bBeforeEvolution
 
         m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
-        _kernelAddChairTermSU3_Term53D << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelAddChairTermSU3_Term53D, block, threads, 
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
             m_fBetaOverN,
@@ -997,7 +998,7 @@ CCString CActionGaugePlaquetteRotating3D::GetInfos(const CCString &tab) const
 }
 
 __END_NAMESPACE
-
+#endif
 
 //=============================================================================
 // END OF FILE

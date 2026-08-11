@@ -19,11 +19,22 @@ __CLGIMPLEMENT_CLASS(CFieldBoundaryWilsonSquareSU3)
 __CLGIMPLEMENT_CLASS(CFieldBoundaryBosonU1)
 __CLGIMPLEMENT_CLASS(CFieldBoundaryBosonSU2)
 __CLGIMPLEMENT_CLASS(CFieldBoundaryBosonSU3)
+
+#if _CLG_SU4_BOSON
 __CLGIMPLEMENT_CLASS(CFieldBoundaryBosonSU4)
+#endif
+#if _CLG_SU5_BOSON
 __CLGIMPLEMENT_CLASS(CFieldBoundaryBosonSU5)
+#endif
+#if _CLG_SU6_BOSON
 __CLGIMPLEMENT_CLASS(CFieldBoundaryBosonSU6)
+#endif
+#if _CLG_SU7_BOSON
 __CLGIMPLEMENT_CLASS(CFieldBoundaryBosonSU7)
+#endif
+#if _CLG_SU8_BOSON
 __CLGIMPLEMENT_CLASS(CFieldBoundaryBosonSU8)
+#endif
 
 __END_NAMESPACE
 

@@ -4,6 +4,7 @@
 // DESCRIPTION:
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [04/20/2019 nbale]
 //=============================================================================
 
@@ -90,7 +91,7 @@ UINT TestBoundaryMapping(CParameters& sParam)
 
     CFieldGauge* pStape = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField[0]->GetCopy());
     appGetLattice()->m_pGaugeField[0]->CalculateOnlyStaple(pStape);
-    const Real fEnergy4 = static_cast<Real>(appGetLattice()->m_pGaugeField[0]->CalculatePlaqutteEnergyUsingStable(
+    const Real fEnergy4 = static_cast<Real>(appGetLattice()->m_pGaugeField[0]->CalculatePlaqutteEnergyUsingStaple(
         appGetLattice()->m_pActionList[0]->GetBetaOverN(), pStape));
 
     if (appAbs(fEnergy1 - fExpE1) < F(0.000000001))
@@ -158,8 +159,8 @@ UINT TestEtaShift(CParameters& sParam)
     pF3->TestSetEtaShift(TRUE);
     pF4->TestSetEtaShift(FALSE);
     UINT uiError = 0;
-    pF1->D(1, 0, su3.GetData(), NULL);
-    pF2->D(1, 0, su3.GetData(), NULL);
+    pF1->D(1, 0, 0, su3.GetData(), NULL, NULL);
+    pF2->D(1, 0, 0, su3.GetData(), NULL, NULL);
     pF1->AxpyMinus(pF2);
     const DOUBLE fDiff1 = cuCabs(pF1->Dot(pF1));
     appGeneral(_T("Diff1 = %2.12f\n"), fDiff1);
@@ -167,8 +168,8 @@ UINT TestEtaShift(CParameters& sParam)
     {
         ++uiError;
     }
-    pF3->D(1, 0, u1.GetData(), NULL);
-    pF4->D(1, 0, u1.GetData(), NULL);
+    pF3->D(1, 0, 0, u1.GetData(), NULL, NULL);
+    pF4->D(1, 0, 0, u1.GetData(), NULL, NULL);
     pF3->AxpyMinus(pF4);
     const DOUBLE fDiff2 = cuCabs(pF3->Dot(pF3));
     appGeneral(_T("Diff2 = %2.12f\n"), fDiff2);

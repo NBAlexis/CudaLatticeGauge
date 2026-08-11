@@ -1,0 +1,42 @@
+Task: GaugeFixing
+StartN: 1
+EndN: 1
+LoadPrefix: t02_su3_conf
+SavePrefix: t02_su3_gf_conf
+LoadType: EFFT_CLGBin
+SaveType: EFFT_CLGBin
+OnlyCheck: 0
+CheckAndFix: 0
+
+Dim: 4
+Dir: 4
+LatticeLength: [8, 8, 8, 8]
+LatticeIndex: CIndexSquare
+LatticeBoundary: CBoundaryConditionTorusSquare
+ThreadAutoDecompose: 1
+MaxThreadPerBlock: 256
+RandomType: ER_Schrage
+RandomSeed: 1234567
+
+GaugeFieldCount: 1
+ActionListLength: 1
+MeasureListLength: 0
+FermionFieldCount: 0
+
+Gauge:
+    FieldName: CFieldGaugeSU3
+    FieldInitialType: EFIT_ReadFromFile
+    GaugeFileType: EFFT_CLGBin
+    GaugeFileName: t02_su3_conf_1.con
+
+Action1:
+    ActionName: CActionGaugePlaquette
+    Beta: 5.0
+    GaugeFields: {1}
+
+GaugeFixing:
+    Name: CGaugeFixingLandauLosAlamos
+    Omega: 1.5
+    CheckErrorStep: 100
+    MaxIterate: 1000
+    Accuracy: 0.0001

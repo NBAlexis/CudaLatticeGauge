@@ -1,0 +1,34 @@
+Task: Measure
+LoadPrefix: t02_su3_conf
+StartN: 1
+EndN: 5
+
+Outputs:
+    Names: [measure1.PolyakovT]
+    Files: [t06_polyakov_t]
+
+Dim: 4
+Dir: 4
+LatticeLength: [8, 8, 8, 8]
+LatticeIndex: CIndexSquare
+LatticeBoundary: CBoundaryConditionTorusSquare
+ThreadAutoDecompose: 1
+MaxThreadPerBlock: 256
+RandomType: ER_Schrage
+RandomSeed: 1234567
+
+GaugeFieldCount: 1
+MeasureListLength: 1
+ActionListLength: 0
+
+Gauge:
+    FieldName: CFieldGaugeSU3
+    FieldInitialType: EFIT_ReadFromFile
+    GaugeFileType: EFFT_CLGBin
+    GaugeFileName: t02_su3_conf_1.con
+
+Measure1:
+    MeasureName: CMeasurePolyakovXY
+    FieldId: 1
+    ShowResult: 1
+    MeasureDist: 1

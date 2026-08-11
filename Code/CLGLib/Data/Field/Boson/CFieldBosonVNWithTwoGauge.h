@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CFieldBosonVN.h
+// FILENAME : CFieldBosonVNTwoGauge.h
 // 
 // DESCRIPTION:
 // This is the class for all boson fields
@@ -8,8 +8,8 @@
 //  [3/31/2024 nbale]
 //=============================================================================
 
-#ifndef _CFIELDBOSONVN_H_
-#define _CFIELDBOSONVN_H_
+#ifndef _CFIELDBOSONVNTWOGAUGE_H_
+#define _CFIELDBOSONVNTWOGAUGE_H_
 
 #define __DEFINE_BOSON_FIELD(FIELD_NAME, TYPE_BOSON, TYPE_GAUGE, VECTOR_N, FLOAT_N, ELEMENT_TYPE) \
 __CLG_REGISTER_HELPER_HEADER(FIELD_NAME) \
@@ -25,12 +25,12 @@ public: \
 
 __BEGIN_NAMESPACE
 
-template<typename deviceDataBoson, typename deviceDataGauge>
-class __DLL_EXPORT CFieldBosonVN : public CFieldBoson
+template<typename deviceDataBoson, typename deviceDataGauge1, typename deviceDataGauge2>
+class __DLL_EXPORT CFieldBosonVNTwoGauge : public CFieldBoson
 {
 public:
-    CFieldBosonVN();
-    ~CFieldBosonVN();
+    CFieldBosonVNTwoGauge();
+    ~CFieldBosonVNTwoGauge();
 
     void CopyTo(CField* U) const override;
 
@@ -39,13 +39,12 @@ public:
     */
     void MakeRandomMomentum() override;
 
-    void D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void D(INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, const CFieldTensor2* const* tensor2Fields, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
     void ForceOnGauge(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, CFieldGauge* const* pGaugeForce, const CFieldBoson* const* pBoson) const override;
 
     void InitialField(EFieldInitialType eInitialType) override;
     void InitialFieldWithFile(const CCString&, EFieldFileType) override;
     void InitialWithByte(BYTE* byData) override;
-    //void InitialOtherParameters(CParameters& params) override;
     void DebugPrintMe() const override;
 
     void Dagger() override;
@@ -71,14 +70,6 @@ public:
 
 };
 
-__DEFINE_BOSON_FIELD(CFieldBosonU1, CLGComplex, CLGComplex, 1, 2, EFT_BosonComplex)
-__DEFINE_BOSON_FIELD(CFieldBosonSU2, deviceSU2Vector, deviceSU2, 2, 4, EFT_BosonComplexVector2)
-__DEFINE_BOSON_FIELD(CFieldBosonSU3, deviceSU3Vector, deviceSU3, 3, 6, EFT_BosonComplexVector3)
-__DEFINE_BOSON_FIELD(CFieldBosonSU4, deviceSU4Vector, deviceSU4, 4, 8, EFT_BosonComplexVector4)
-__DEFINE_BOSON_FIELD(CFieldBosonSU5, deviceSU5Vector, deviceSU5, 5, 10, EFT_BosonComplexVector5)
-__DEFINE_BOSON_FIELD(CFieldBosonSU6, deviceSU6Vector, deviceSU6, 6, 12, EFT_BosonComplexVector6)
-__DEFINE_BOSON_FIELD(CFieldBosonSU7, deviceSU7Vector, deviceSU7, 7, 14, EFT_BosonComplexVector7)
-__DEFINE_BOSON_FIELD(CFieldBosonSU8, deviceSU8Vector, deviceSU8, 8, 16, EFT_BosonComplexVector8)
 
 __END_NAMESPACE
 

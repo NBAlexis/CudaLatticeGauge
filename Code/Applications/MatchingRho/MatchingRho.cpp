@@ -24,10 +24,25 @@ for (UINT iConf = 0; iConf < uiAccepCountAfterE; ++iConf) \
 appGeneral(_T("}\n")); \
 
 
+#define __Export_Correlator(name) \
+assert(static_cast<INT>(iEquib * _HC_Lt) == name##Correlator.Num()); \
+TArray<TArray<DOUBLE>> tosave##name##Correlator; \
+for (UINT iConf = 0; iConf < iEquib; ++iConf) \
+{ \
+    TArray<DOUBLE> eachConf; \
+    for (INT iT = 0; iT < _HC_Lti; ++iT) \
+    { \
+        eachConf.AddItem(name##Correlator[iConf * _HC_Lt + iT]); \
+    } \
+    tosave##name##Correlator.AddItem(eachConf); \
+} \
+WriteRealArray2(sCSVPrefix + #name + _T(".csv"), tosave##name##Correlator);
+
+
 int main(int argc, char * argv[])
 {
     CParameters params;
-#if _CLG_DEBUG
+#if _CLG_DEBUG && _CLG_WIN
     CYAMLParser::ParseFile(_T("MatchingRho.yaml"), params);
 #else
     CYAMLParser::ParseFile(_T("../Debug/MatchingRho.yaml"), params);
@@ -47,6 +62,13 @@ int main(int argc, char * argv[])
     params.FetchValueINT(_T("OnlyMeasure"), iVaule);
     const UBOOL bOnlyMeasure = 0 != iVaule;
 
+    if (!bOnlyMeasure)
+    {
+        iVaule = 0;
+        params.FetchValueINT(_T("OnlySimulate"), iVaule);
+    }
+    const UBOOL bOnlySimulate = bOnlyMeasure ? FALSE : (0 != iVaule);
+
     iVaule = 0;
     params.FetchValueINT(_T("DoMeasureFermion"), iVaule);
     const UBOOL bMeasureFermion = 0 != iVaule;
@@ -60,12 +82,24 @@ int main(int argc, char * argv[])
     const UBOOL bMeasureTrace = 0 != iVaule;
 
     iVaule = 0;
+    params.FetchValueINT(_T("DoMeasureWilson"), iVaule);
+    const UBOOL bMeasureWilson = 0 != iVaule;
+
+    iVaule = 0;
     params.FetchValueINT(_T("UseZ4"), iVaule);
     const UBOOL bZ4 = 0 != iVaule;
 
-    iVaule = 0;
-    params.FetchValueINT(_T("CompressedFile"), iVaule);
-    const UBOOL bCompressedFile = 0 != iVaule;
+    //iVaule = 0;
+    //params.FetchValueINT(_T("CompressedFile"), iVaule);
+    //const UBOOL bCompressedFile = 0 != iVaule;
+
+    CCString sLoadType = _T("EFFT_CLGBin");
+    EFieldFileType eLoadType = EFFT_CLGBin;
+    if (params.FetchStringValue(_T("LoadType"), sLoadType))
+    {
+        eLoadType = __STRING_TO_ENUM(EFieldFileType, sLoadType);
+    }
+    appGeneral(_T("load type: %s\n"), __ENUM_TO_STRING(EFieldFileType, eLoadType).c_str());
 
     iVaule = 0;
     params.FetchValueINT(_T("DoSmearing"), iVaule);
@@ -87,7 +121,6 @@ int main(int argc, char * argv[])
     params.FetchStringValue(_T("CSVPrefix"), sCSVPrefix);
     appGeneral(_T("CSV prefix: %s\n"), sCSVPrefix.c_str());
 
-#if !_CLG_DOUBLEFLOAT
     TArray<DOUBLE> pionCorrelator;
     TArray<DOUBLE> rhoCorrelator;
 
@@ -95,15 +128,7 @@ int main(int argc, char * argv[])
     TArray<DOUBLE> rho1Correlator;
     TArray<DOUBLE> rho2Correlator;
     TArray<DOUBLE> rho3Correlator;
-#else
-    TArray<Real> pionCorrelator;
-    TArray<Real> rhoCorrelator;
 
-    TArray<Real> rho0Correlator;
-    TArray<Real> rho1Correlator;
-    TArray<Real> rho2Correlator;
-    TArray<Real> rho3Correlator;
-#endif
     //TArray<Real> potentialR;
     //TArray<CLGComplex> potentialC;
 
@@ -121,9 +146,10 @@ int main(int argc, char * argv[])
 
     CMeasurePandChiralTalor* pTalor = dynamic_cast<CMeasurePandChiralTalor*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
     pTalor->m_fBetaOverN = appGetLattice()->m_pActionList[0]->GetBetaOverN();
+    CMeasureWilsonLoop* pWL = dynamic_cast<CMeasureWilsonLoop*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
 
     CFieldGaugeSU3* pStaple = NULL;
-    if (bDoSmearing)
+    if (bDoSmearing || bMeasureWilson)
     {
         pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField[0]->GetCopy());
     }
@@ -166,12 +192,12 @@ int main(int argc, char * argv[])
         if (!bOnlyMeasure)
         {
             //If do some simulation
-            uiAccepCountBeforeE2 = appGetLattice()->m_pUpdator->Update(1, TRUE);
+            uiAccepCountBeforeE2 = appGetLattice()->m_pUpdator->Update(1, !bOnlySimulate);
             if (uiAccepCountAfterE != uiAccepCountBeforeE2)
             {
                 uiAccepCountAfterE = uiAccepCountBeforeE2;
 
-                if (NULL != pMC)
+                if (NULL != pMC && !bOnlySimulate)
                 {
                     //save measures
                     for (UINT uiLt = 0; uiLt < _HC_Lt; ++uiLt)
@@ -214,7 +240,7 @@ int main(int argc, char * argv[])
                 //=================================
                 //Save config
                 CCString sMD5;
-                if (bCompressedFile)
+                if (eLoadType == EFFT_CLGBinCompressed)
                 {
                     sMD5 = appGetLattice()->m_pGaugeField[0]->SaveToCompressedFile(sFileName + _T(".cco"));
                 }
@@ -244,19 +270,19 @@ int main(int argc, char * argv[])
             sFileName.Format(_T("Matching_%d"), uiAccepCountAfterE + iSaveIndexStart);
             sFileName = sSavePrefix + sFileName;
 
-            if (bCompressedFile)
+            if (eLoadType == EFFT_CLGBinCompressed)
             {
                 appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName + _T(".cco"), EFFT_CLGBinCompressed);
             }
             else
             {
-                appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName + _T(".con"), EFFT_CLGBin);
+                appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName + _T(".con"), eLoadType);
             }
             
             if (bDoSmearing)
             {
                 appGetLattice()->m_pGaugeField[0]->CalculateOnlyStaple(pStaple);
-                appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField[0], pStaple);
+                appGetLattice()->m_pGaugeSmearing[appGetLattice()->m_pGaugeField[0]->m_byFieldId]->GaugeSmearing(appGetLattice()->m_pGaugeField[0], NULL, pStaple);
             }
 
             if (bMeasureFermion)
@@ -268,17 +294,11 @@ int main(int argc, char * argv[])
                     rho1Correlator.AddItem(pMC->m_lstResultsLastConf[1][uiLt]);
                     rho2Correlator.AddItem(pMC->m_lstResultsLastConf[2][uiLt]);
                     rho3Correlator.AddItem(pMC->m_lstResultsLastConf[3][uiLt]);
-#if !_CLG_DOUBLEFLOAT
                     rhoCorrelator.AddItem((
                         pMC->m_lstResultsLastConf[1][uiLt]
                         + pMC->m_lstResultsLastConf[2][uiLt]
                         + pMC->m_lstResultsLastConf[3][uiLt]) / 3.0);
-#else
-                    rhoCorrelator.AddItem((
-                        pMC->m_lstResultsLastConf[1][uiLt]
-                      + pMC->m_lstResultsLastConf[2][uiLt]
-                      + pMC->m_lstResultsLastConf[3][uiLt]) / F(3.0));
-#endif
+
                     rho0Correlator.AddItem(pMC->m_lstResultsLastConf[4][uiLt]);
                 }
             }
@@ -291,8 +311,8 @@ int main(int argc, char * argv[])
                         appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Identity);
                     }
 
-                    CFieldFermionWilsonSquareSU3*  pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
-                    CFieldFermionWilsonSquareSU3*  pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+                    CFieldFermionWilsonSquareSU3*  pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+                    CFieldFermionWilsonSquareSU3*  pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
                     const UINT iFieldCount = pCC->GetFieldCount();
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
@@ -304,10 +324,10 @@ int main(int argc, char * argv[])
                         {
                             pF1->InitialField(EFIT_RandomGaussian);
                         }
-                        pF1->FixBoundary();
+                        pF1->FixBoundary(EFB_Field);
                         pF1->CopyTo(pF2);
                         pF1->InverseD(_FIELDS);
-                        pF1->FixBoundary();
+                        pF1->FixBoundary(EFB_Field);
 
                         pCC->OnConfigurationAcceptedZ4(
                             _FIELDS,
@@ -325,6 +345,23 @@ int main(int argc, char * argv[])
                     appGeneral(_T("Measurement is not found!\n"));
                 }
             }
+            else if (NULL != pWL && bMeasureWilson)
+            {
+                appGetLattice()->m_pGaugeField[0]->CalculateOnlyStaple(pStaple);
+                appGetLattice()->m_pGaugeSmearing[appGetLattice()->m_pGaugeField[0]->m_byFieldId]->GaugeSmearing(appGetLattice()->m_pGaugeField[0], NULL, pStaple);
+                pWL->OnConfigurationAccepted(_FIELDS, NULL);
+                if (1 == uiAccepCountAfterE)
+                {
+                    TArray<Real> lstRadius;
+                    for (INT i = 0; i < pWL->m_lstR.Num(); ++i)
+                    {
+                        lstRadius.AddItem(_hostsqrt(static_cast<Real>(pWL->m_lstR[i])));
+                    }
+                    CCString sRadiousFile;
+                    sRadiousFile.Format(_T("%s_VR_R.csv"), sCSVPrefix.c_str());
+                    WriteStringFileRealArray(sRadiousFile, lstRadius);
+                }
+            }
             else
             {
                 if (NULL != pPL && !bMeasureTrace)
@@ -335,8 +372,8 @@ int main(int argc, char * argv[])
                 if (bMeasureTrace && NULL != pTalor)
                 {
                     pTalor->OnConfigurationAccepted(_FIELDS, NULL);
-                    CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
-                    CFieldFermionWilsonSquareSU3* pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+                    CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+                    CFieldFermionWilsonSquareSU3* pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
                     const UINT iFieldCount = pTalor->GetFieldCount();
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
@@ -412,7 +449,7 @@ int main(int argc, char * argv[])
                 appGeneral(_T("{"));
                 for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
                 {
-                    const CLGComplex cV = pPL->m_lstP[j * pPL->m_lstR.Num() + i];
+                    const cuDoubleComplex cV = pPL->m_lstP[j * pPL->m_lstR.Num() + i];
                     appGeneral(_T("%2.12f %s %2.12f I%s"), cV.x, cV.y < F(0.0) ? _T("") : _T("+"), cV.y, (i == pPL->m_lstR.Num() - 1) ? _T("") : _T(", "));
                 }
                 appGeneral(_T("}%s\n"), (j == iEquib - 1) ? _T("") : _T(","));
@@ -430,16 +467,30 @@ int main(int argc, char * argv[])
 
     if ((!bOnlyMeasure || bMeasureFermion) && NULL != pMC)
     {
-        appPushLogDate(FALSE);
+        if (!bOnlySimulate)
+        {
+            appPushLogDate(FALSE);
 
-        __Show_Correlator(pion);
-        __Show_Correlator(rho);
-        __Show_Correlator(rho1);
-        __Show_Correlator(rho2);
-        __Show_Correlator(rho3);
-        __Show_Correlator(rho0);
+            __Show_Correlator(pion);
+            __Show_Correlator(rho);
+            __Show_Correlator(rho1);
+            __Show_Correlator(rho2);
+            __Show_Correlator(rho3);
+            __Show_Correlator(rho0);
 
-        appPopLogDate();
+            __Export_Correlator(pion);
+            __Export_Correlator(rho);
+            __Export_Correlator(rho1);
+            __Export_Correlator(rho2);
+            __Export_Correlator(rho3);
+            __Export_Correlator(rho0);
+
+            appPopLogDate();
+        }
+        else
+        {
+            appGeneral(_T("\n========================================\nOnly Simulate Finished\n=============================\n"));
+        }
     }
 
     if (bOnlyMeasure && bMeasureCondensation && NULL != pCC)
@@ -515,7 +566,59 @@ int main(int argc, char * argv[])
         WriteStringFileRealArray(sCSVFileName, pTalor->m_lstPolyakovSOmegaSq);
     }
 
-    if (bDoSmearing)
+    if (bOnlyMeasure && bMeasureWilson && NULL != pWL)
+    {
+        CCString sCSVFile;
+        sCSVFile.Format(_T("%s_VR.csv"), sCSVPrefix.c_str());
+        TArray<TArray<CLGComplex>> vrs;
+        for (UINT j = 0; j < iEquib; ++j)
+        {
+            TArray<CLGComplex> thisConfiguration;
+            for (INT i = 0; i < pWL->m_lstR.Num(); ++i)
+            {
+                for (UINT t = 0; t < _HC_Lt / 2; ++t)
+                {
+                    thisConfiguration.AddItem(pWL->m_lstC[j][i][t]);
+                }
+            }
+            vrs.AddItem(thisConfiguration);
+        }
+        WriteComplexArray2(sCSVFile, vrs);
+    }
+
+    if (bOnlyMeasure && !bMeasureFermion && !bMeasureCondensation && !bMeasureTrace && !bMeasureWilson && NULL != pPL)
+    {
+        CCString sCSVFileR;
+        CCString sCSVFileP;
+        CCString sCSVFilePXY;
+        sCSVFileR.Format(_T("%s_R.csv"), sCSVPrefix.c_str());
+        sCSVFileP.Format(_T("%s_P.csv"), sCSVPrefix.c_str());
+        sCSVFilePXY.Format(_T("%s_PXY.csv"), sCSVPrefix.c_str());
+
+        TArray<Real> lstR;
+        for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
+        {
+            lstR.AddItem(_hostsqrt(static_cast<Real>(pPL->m_lstR[i])));
+        }
+        WriteRealArray(sCSVFileR, lstR);
+
+        TArray<cuDoubleComplex> p;
+        TArray<TArray<cuDoubleComplex>> pxy;
+        for (UINT j = 0; j < iEquib; ++j)
+        {
+            TArray<cuDoubleComplex> thisConfiguration;
+            for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
+            {
+                thisConfiguration.AddItem(pPL->m_lstP[j * pPL->m_lstR.Num() + i]);
+            }
+            pxy.AddItem(thisConfiguration);
+            p.AddItem(pPL->m_lstLoop[j]);
+        }
+        WriteComplexArray(sCSVFileP, p);
+        WriteComplexArray2(sCSVFilePXY, pxy);
+    }
+
+    if (bDoSmearing || bMeasureWilson)
     {
         delete pStaple;
     }

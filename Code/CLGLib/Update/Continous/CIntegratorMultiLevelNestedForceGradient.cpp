@@ -5,6 +5,7 @@
 // This is the Approximate force gradient integrator for HMC
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [08/17/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -47,7 +48,6 @@ void CIntegratorMultiLevelNestedForceGradient::NestedEvaluate(INT iLevel, Real f
     //exp(h/6 S), only iLevel == 0 will refresh force
     UpdateP(f1Over6Estep, iLevel, 
         bFirst ? ESP_StartTrajectory : ESP_InTrajectory,
-        FALSE,
         TRUE);
 
     if (m_bDebugForce)
@@ -87,13 +87,12 @@ void CIntegratorMultiLevelNestedForceGradient::NestedEvaluate(INT iLevel, Real f
         //If not update momentum, the step length is unused. So set to 1.0
         UpdateP(F(1.0), iLevel,
             ESP_InTrajectory,
-            FALSE,
             FALSE);
 
         PreserveFields();
         AddForceToFieldDirectly(f1Over24EstepSq);
 
-        UpdateP(f2Over3Estep, iLevel, ESP_InTrajectory, FALSE, TRUE);
+        UpdateP(f2Over3Estep, iLevel, ESP_InTrajectory, TRUE);
         if (m_bDebugForce)
         {
             appGeneral(_T(" ------ Force (%d) = %f\n"), iLevel, CalcForce());
@@ -124,12 +123,12 @@ void CIntegratorMultiLevelNestedForceGradient::NestedEvaluate(INT iLevel, Real f
         if (uiStep < uiStepAll)
         {
             appDetailed("  Force Gradient nested level %d step %d\n", iLevel, uiStep);
-            UpdateP(f1Over3Estep, iLevel, ESP_InTrajectory, FALSE, TRUE);
+            UpdateP(f1Over3Estep, iLevel, ESP_InTrajectory, TRUE);
         }
         else
         {
             appDetailed("  Force Gradient nested last step %d\n", uiStep);
-            UpdateP(f1Over6Estep, iLevel, bLast ? ESP_EndTrajectory : ESP_InTrajectory, bLast, TRUE);
+            UpdateP(f1Over6Estep, iLevel, bLast ? ESP_EndTrajectory : ESP_InTrajectory, TRUE);
         }
         if (m_bDebugForce)
         {

@@ -109,7 +109,7 @@ CMeasurePolyakovXY3D::~CMeasurePolyakovXY3D()
 
     if (NULL != m_pXYDeviceLoopDensity)
     {
-        checkCudaErrors(cudaFree(m_pXYDeviceLoopDensity));
+        checkCudaErrors(__cudaFree(m_pXYDeviceLoopDensity));
     }
 
     if (NULL != m_pXYHostLoopDensityAbs)
@@ -119,22 +119,22 @@ CMeasurePolyakovXY3D::~CMeasurePolyakovXY3D()
 
     if (NULL != m_pXYDeviceLoopDensityAbs)
     {
-        checkCudaErrors(cudaFree(m_pXYDeviceLoopDensityAbs));
+        checkCudaErrors(__cudaFree(m_pXYDeviceLoopDensityAbs));
     }
 
     if (NULL != m_pDistributionR)
     {
-        checkCudaErrors(cudaFree(m_pDistributionR));
+        checkCudaErrors(__cudaFree(m_pDistributionR));
     }
 
     if (NULL != m_pDistributionP)
     {
-        checkCudaErrors(cudaFree(m_pDistributionP));
+        checkCudaErrors(__cudaFree(m_pDistributionP));
     }
 
     if (NULL != m_pDistributionPAbs)
     {
-        checkCudaErrors(cudaFree(m_pDistributionPAbs));
+        checkCudaErrors(__cudaFree(m_pDistributionPAbs));
     }
 
     if (NULL != m_pHostDistributionR)
@@ -158,9 +158,9 @@ void CMeasurePolyakovXY3D::Initial(CMeasurementManager* pOwner, CLatticeData* pL
     CMeasure::Initial(pOwner, pLatticeData, param, byId);
 
     m_pXYHostLoopDensity = (CLGComplex*)malloc(sizeof(CLGComplex) * _HC_Lx * _HC_Ly);
-    checkCudaErrors(cudaMalloc((void**)&m_pXYDeviceLoopDensity, sizeof(CLGComplex) * _HC_Lx * _HC_Ly));
+    checkCudaErrors(__cudaMalloc((void**)&m_pXYDeviceLoopDensity, sizeof(CLGComplex) * _HC_Lx * _HC_Ly));
     m_pXYHostLoopDensityAbs = (Real*)malloc(sizeof(Real) * _HC_Lx * _HC_Ly);
-    checkCudaErrors(cudaMalloc((void**)&m_pXYDeviceLoopDensityAbs, sizeof(Real) * _HC_Lx * _HC_Ly));
+    checkCudaErrors(__cudaMalloc((void**)&m_pXYDeviceLoopDensityAbs, sizeof(Real) * _HC_Lx * _HC_Ly));
     Reset();
 
     INT iValue = 0;
@@ -175,9 +175,9 @@ void CMeasurePolyakovXY3D::Initial(CMeasurementManager* pOwner, CLatticeData* pL
 
     //assuming the center is really at center
     SetMaxAndEdge(&m_uiMaxR, &m_uiEdgeR, m_bShiftCenter);
-    checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
-    checkCudaErrors(cudaMalloc((void**)&m_pDistributionP, sizeof(CLGComplex) * (m_uiMaxR + 1)));
-    checkCudaErrors(cudaMalloc((void**)&m_pDistributionPAbs, sizeof(Real) * (m_uiMaxR + 1)));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDistributionP, sizeof(CLGComplex) * (m_uiMaxR + 1)));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDistributionPAbs, sizeof(Real) * (m_uiMaxR + 1)));
 
     m_pHostDistributionR = (UINT*)malloc(sizeof(UINT) * (m_uiMaxR + 1));
     m_pHostDistributionP = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMaxR + 1));
@@ -198,7 +198,7 @@ void CMeasurePolyakovXY3D::OnConfigurationAcceptedSingleField(const class CField
         const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pAcceptGauge);
         dim3 block1(_HC_DecompX, 1, 1);
         dim3 threads1(_HC_DecompLx, 1, 1);
-        _kernelPolyakovLoopOfSite3D_SU3 << <block1, threads1 >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, m_pXYDeviceLoopDensity, m_pXYDeviceLoopDensityAbs);
+        _LAUNCH_KERNEL(_kernelPolyakovLoopOfSite3D_SU3, block1, threads1, pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, m_pXYDeviceLoopDensity, m_pXYDeviceLoopDensityAbs);
     }
     else
     {
@@ -210,7 +210,7 @@ void CMeasurePolyakovXY3D::OnConfigurationAcceptedSingleField(const class CField
         const CFieldGaugeU1* pGaugeU1 = dynamic_cast<const CFieldGaugeU1*>(pAcceptGauge);
         dim3 block1(_HC_DecompX, 1, 1);
         dim3 threads1(_HC_DecompLx, 1, 1);
-        _kernelPolyakovLoopOfSite3D_U1 << <block1, threads1 >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData, m_pXYDeviceLoopDensity, m_pXYDeviceLoopDensityAbs);
+        _LAUNCH_KERNEL(_kernelPolyakovLoopOfSite3D_U1, block1, threads1, pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData, m_pXYDeviceLoopDensity, m_pXYDeviceLoopDensityAbs);
     }
     
     checkCudaErrors(cudaMemcpy(m_pXYHostLoopDensity, m_pXYDeviceLoopDensity, sizeof(CLGComplex) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
@@ -220,7 +220,7 @@ void CMeasurePolyakovXY3D::OnConfigurationAcceptedSingleField(const class CField
         m_lstLoopDensity.AddItem(m_pXYHostLoopDensity[i * _HC_Ly + _HC_Centery]);
     }
 
-    TransformFromXYDataToRDataOnce_C(
+    TransformFromXYDataToRDataOnce(
         m_bShiftCenter,
         m_pXYDeviceLoopDensity,
         m_pDistributionR,
@@ -239,7 +239,7 @@ void CMeasurePolyakovXY3D::OnConfigurationAcceptedSingleField(const class CField
         F(1.0) / static_cast<Real>(_HC_Lz)
     );
 
-    TransformFromXYDataToRDataOnce_R(
+    TransformFromXYDataToRDataOnce(
         m_bShiftCenter,
         m_pXYDeviceLoopDensityAbs,
         m_pDistributionR,
@@ -299,13 +299,21 @@ void CMeasurePolyakovXY3D::OnConfigurationAcceptedSingleField(const class CField
         appDetailed(_T("\n=====================================================\n"), m_uiConfigurationCount);
     }
 
+    if (NULL != m_pOwner)
+    {
+        m_pOwner->AddOneConfigurationResult(this, _T("PolyakovLoop"), m_lstLoop[m_lstLoop.GetCount() - 1]);
+        m_pOwner->AddOneConfigurationResult(this, _T("PolyakovLoopAbs"), m_lstLoopAbs[m_lstLoopAbs.GetCount() - 1]);
+        m_pOwner->AddOneConfigurationResult(this, _T("PolyakovLoopInner"), m_lstLoopInner[m_lstLoopInner.GetCount() - 1]);
+        m_pOwner->AddOneConfigurationResult(this, _T("PolyakovLoopAbsInner"), m_lstLoopAbsInner[m_lstLoopAbsInner.GetCount() - 1]);
+    }
+
     ++m_uiConfigurationCount;
 }
 
 void CMeasurePolyakovXY3D::Report()
 {
-    assert(m_uiConfigurationCount == static_cast<UINT>(m_lstLoop.Num()));
-    assert(static_cast<UINT>(m_uiConfigurationCount * _HC_Centerx)
+    appAssert(m_uiConfigurationCount == static_cast<UINT>(m_lstLoop.Num()));
+    appAssert(static_cast<UINT>(m_uiConfigurationCount * _HC_Centerx)
         == static_cast<UINT>(m_lstLoopDensity.Num()));
 
     appPushLogDate(FALSE);

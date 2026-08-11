@@ -11,7 +11,7 @@
 #ifndef _CLATTICEDATA_H_
 #define _CLATTICEDATA_H_
 
-#define _FIELDS appGetLattice()->m_pGaugeField.Num(), appGetLattice()->m_pBosonField.Num(), appGetLattice()->m_pGaugeField.GetData(), appGetLattice()->m_pBosonField.GetData()
+#define _FIELDS appGetLattice()->m_pGaugeField.Num(), appGetLattice()->m_pBosonField.Num(), appGetLattice()->m_pTensor2Field.Num(), appGetLattice()->m_pGaugeField.GetData(), appGetLattice()->m_pBosonField.GetData(), appGetLattice()->m_pTensor2Field.GetData()
 
 __BEGIN_NAMESPACE
 
@@ -43,10 +43,10 @@ public:
 
     void CreateFermionSolver(const CCString& sSolver, const CParameters& param, const class CField* pFermionField, BYTE byFieldId);
     void CreateMultiShiftSolver(const CCString& sSolver, const CParameters& param, const class CField* pFermionField, BYTE byFieldId);
-    void OnUpdatorConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple) const;
+    void OnUpdatorConfigurationAccepted(INT gaugeNum, INT bosonNum, INT tensor2Num, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldTensor2* const* pAcceptTensor2, const class CFieldGauge* const* pCorrespondingStaple) const;
     void OnUpdatorFinished(UBOOL bMeasured, UBOOL bReport) const;
     //void GetPlaquetteLengthCount(BYTE& plaqLength, BYTE& countPerSite, BYTE& countPerLink);
-    void CreateFieldPool(BYTE byFieldId, UINT uiCount);
+    //void CreateFieldPool(BYTE byFieldId, UINT uiCount);
     void SetFieldBoundaryCondition(BYTE byFieldId, const SBoundCondition& bc) const;
     void FixAllFieldBoundary() const;
 
@@ -69,6 +69,7 @@ public:
     UINT GetDefaultSUN() const;
     TArray<class CFieldGauge*> m_pGaugeField;
     TArray<class CFieldBoson*> m_pBosonField;
+    TArray<class CFieldTensor2*> m_pTensor2Field;
     TArray<class CFieldFermion*> m_pFermionField;
     class CFieldGauge* m_pAphys;
     class CFieldGauge* m_pUpure;
@@ -84,8 +85,8 @@ public:
     TArray<class CFieldBoundaryParent*> m_pAllBoundaryFields; //only for delete
     THashMap<BYTE, class CFieldBoundaryParent*> m_pBoundaryFieldMap;
 
-    TArray<class CFieldPool*> m_pFieldPools;
-    THashMap<BYTE, class CFieldPool*> m_pFieldPoolMap;
+    //TArray<class CFieldPool*> m_pFieldPools;
+    //THashMap<BYTE, class CFieldPool*> m_pFieldPoolMap;
     class CFieldCache* m_pFieldCache;
 
     /**
@@ -107,16 +108,17 @@ public:
     class CSLASolver* m_pFermionSolver[kMaxFieldCount];
     class CMultiShiftSolver* m_pFermionMultiShiftSolver[kMaxFieldCount];
 
-    class CGaugeSmearing* m_pGaugeSmearing;
+    class CGaugeSmearing* m_pGaugeSmearing[kMaxFieldCount];
+    class CStapleCache* m_pStapleCaches[kMaxFieldCount];
     class CGaugeFixing* m_pGaugeFixing;
 
     class CField* GetFieldById(BYTE byId) const { return m_pFieldMap.Exist(byId) ? m_pFieldMap.GetAt(byId) : NULL; }
     class CFieldBoundaryParent* GetBoundaryFieldById(BYTE byId) const { return m_pBoundaryFieldMap.Exist(byId) ? m_pBoundaryFieldMap.GetAt(byId) : NULL; }
     class CAction* GetActionById(BYTE byId) const { return m_pActionMap.Exist(byId) ? m_pActionMap.GetAt(byId) : NULL; }
-    class CField* GetPooledFieldById(BYTE byId);
-    class CField* GetPooledCopy(const CField* pField);
-    void ReCopyPooled() const;
-    void ReCopyPooled(BYTE byId) const;
+    class CField* GetPooledFieldById(BYTE byId, const char* file, INT iLine);
+    class CField* GetPooledCopy(const CField* pField, const char* file, INT iLine);
+    //void ReCopyPooled() const;
+    //void ReCopyPooled(BYTE byId) const;
 
     static INT GetGaugeFieldIndexById(INT num, const class CFieldGauge* const* gaugeFields, BYTE byFieldId);
     static INT GetBosonFieldIndexById(INT num, const class CFieldBoson* const* bosonFields, BYTE byFieldId);
@@ -131,6 +133,11 @@ public:
             ret.AddItem(m_pOtherFields[i]);
         }
         return ret; 
+    }
+
+    UBOOL HasBoundaryField(BYTE byFieldId) const
+    {
+        return m_pBoundaryFieldMap.Exist(byFieldId) && (NULL != m_pBoundaryFieldMap.GetAt(byFieldId));
     }
 
 protected:
@@ -152,7 +159,7 @@ inline class CSLASolver* appGetFermionSolver(BYTE byFieldId);
 
 inline class CMultiShiftSolver* appGetMultiShiftSolver(BYTE byFieldId);
 
-inline class CGaugeSmearing* appGetGaugeSmearing();
+inline class CGaugeSmearing* appGetGaugeSmearing(BYTE byFieldId);
 
 
 __END_NAMESPACE

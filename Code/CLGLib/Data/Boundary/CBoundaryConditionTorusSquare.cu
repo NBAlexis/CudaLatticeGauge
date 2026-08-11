@@ -25,21 +25,40 @@ _kernalBakeEdgeTorusBoundary(
 {
     UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
     SSmallInt4 realCoord(pMapping[idxAll]);
-    //realCoord.x = static_cast<SBYTE>(idxAll / mods.x) - CIndexData::kCacheIndexEdge;
-    //realCoord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y) - CIndexData::kCacheIndexEdge;
-    //realCoord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z) - CIndexData::kCacheIndexEdge;
-    //realCoord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
 
-    //UBOOL bDebug = FALSE;
-    //if (realCoord.m_byData4[3] < 0 || realCoord.m_byData4[3] > 1)
-    //{
-    //    bDebug = TRUE;
-    //}
-    //SSmallInt4 old(realCoord);
+#if _CLG_MULTI_GPU
+    //Raw (pre-wrap) neighbour coordinate, needed to tell a split-direction
+    //out-of-lattice neighbour (lives on another rank -> halo) from an ordinary
+    //periodic wrap within this rank.
+    const INT iRaw[4] = { realCoord.x, realCoord.y, realCoord.z, realCoord.w };
+#endif
 
-    SBYTE signchange = 1;
+    SCHAR signchange = 1;
     for (UINT uiDir = 0; uiDir < 4; ++uiDir)
     {
+#if _CLG_MULTI_GPU
+        //The BC sign (e.g. antiperiodic-t, bc.w = -1) must toggle ONLY when the
+        //neighbour crosses the TRUE GLOBAL lattice boundary, never an internal
+        //split boundary. _constIntegers[ECI_Lx+dir] here is this rank's LOCAL
+        //length, so an unconditional local wrap wrongly flips the sign on the
+        //split-adjacent plane (bug signature: 2*kappa error at each internal
+        //t-face). Gate each wrap on whether this rank sits at the global edge.
+        const INT iLocalLen = _constIntegers[ECI_Lx + uiDir];
+        const INT iGlobalOffset = _constIntegers[ECI_GlobalOffsetX + uiDir];
+        const INT iGlobalLen = _constIntegers[ECI_GlobalLx + uiDir];
+        const UBOOL bNegEdge = (0 == iGlobalOffset);              // at global -edge
+        const UBOOL bPosEdge = (iGlobalOffset + iLocalLen == iGlobalLen); // +edge
+        while (realCoord.m_byData4[uiDir] < 0)
+        {
+            realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + iLocalLen;
+            if (bNegEdge) { signchange = signchange * bc.m_byData4[uiDir]; }
+        }
+        while (realCoord.m_byData4[uiDir] >= iLocalLen)
+        {
+            realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - iLocalLen;
+            if (bPosEdge) { signchange = signchange * bc.m_byData4[uiDir]; }
+        }
+#else
         while (realCoord.m_byData4[uiDir] < 0)
         {
             realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
@@ -51,16 +70,40 @@ _kernalBakeEdgeTorusBoundary(
             realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
             signchange = signchange * bc.m_byData4[uiDir];
         }
+#endif
     }
-
-    //if (bDebug)
-    //{
-    //    printf("%d %d %d %d to %d %d %d %d\n", old.x, old.y, old.z, old.w, realCoord.x, realCoord.y, realCoord.z, realCoord.w);
-    //}
 
     const UINT uiSiteIndex = _deviceGetSiteIndex(realCoord);
     pDeviceData[idxAll] = SIndex(uiSiteIndex);
     pDeviceData[idxAll].m_byTag = signchange < 0 ? _kDaggerOrOpposite : 0;
+
+#if _CLG_MULTI_GPU
+    //Redirect split-direction face neighbours to halo storage (Design B). The
+    //wrapped local site index above stays as the DEFAULT (and is exactly the
+    //correct value when this direction's process-grid neighbour is this rank
+    //itself, i.e. the single-card self-exchange oracle). When the neighbour is a
+    //different rank the halo buffer is filled by CHaloManager before any read.
+    const UINT uiGrid[4] = { _DC_GpuGridX, _DC_GpuGridY, _DC_GpuGridZ, _DC_GpuGridT };
+    const UINT uiLocalL[4] = { static_cast<UINT>(_constIntegers[ECI_Lx]),
+        static_cast<UINT>(_constIntegers[ECI_Ly]), static_cast<UINT>(_constIntegers[ECI_Lz]),
+        static_cast<UINT>(_constIntegers[ECI_Lt]) };
+    const INT iWrapped[4] = { realCoord.x, realCoord.y, realCoord.z, realCoord.w };
+    UINT uiHaloSlot = 0;
+    const EHaloRedirectResult eRedirect = _deviceHaloRedirectSite(uiLocalL, uiGrid, _DC_Volume, _DC_HaloWidth,
+        iRaw, iWrapped, uiHaloSlot);
+    if (EHR_Halo == eRedirect)
+    {
+        pDeviceData[idxAll].m_uiSiteIndex = _DC_Volume + uiHaloSlot;
+        pDeviceData[idxAll].m_byTag |= _kGlue;
+    }
+    else if (EHR_Invalid == eRedirect)
+    {
+        //Improve-1 (3.8): a split-direction crossing beyond HaloWidth has NO
+        //legal target -- never degrade it to the silent local wrap above.
+        pDeviceData[idxAll].m_uiSiteIndex = SIndex::_kInvalidSiteIndex;
+        pDeviceData[idxAll].m_byTag = 0;
+    }
+#endif
 }
 
 /**
@@ -85,14 +128,33 @@ _kernalBakeBoundGlueTorusBoundary(
 {
     UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
     SSmallInt4 realCoord(pMapping[idxAll]);
-    //realCoord.x = static_cast<SBYTE>(idxAll / mods.x) - CIndexData::kCacheIndexEdge;
-    //realCoord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y) - CIndexData::kCacheIndexEdge;
-    //realCoord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z) - CIndexData::kCacheIndexEdge;
-    //realCoord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
 
-    SBYTE signchange = 1;
+#if _CLG_MULTI_GPU
+    const INT iRaw[4] = { realCoord.x, realCoord.y, realCoord.z, realCoord.w };
+#endif
+
+    SCHAR signchange = 1;
     for (UINT uiDir = 0; uiDir < 4; ++uiDir)
     {
+#if _CLG_MULTI_GPU
+        //See _kernalBakeEdgeTorusBoundary: only toggle the BC sign on a true
+        //GLOBAL boundary crossing, not an internal split boundary.
+        const INT iLocalLen = _constIntegers[ECI_Lx + uiDir];
+        const INT iGlobalOffset = _constIntegers[ECI_GlobalOffsetX + uiDir];
+        const INT iGlobalLen = _constIntegers[ECI_GlobalLx + uiDir];
+        const UBOOL bNegEdge = (0 == iGlobalOffset);
+        const UBOOL bPosEdge = (iGlobalOffset + iLocalLen == iGlobalLen);
+        while (realCoord.m_byData4[uiDir] < 0)
+        {
+            realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + iLocalLen;
+            if (bNegEdge) { signchange = signchange * bc.m_byData4[uiDir]; }
+        }
+        while (realCoord.m_byData4[uiDir] >= iLocalLen)
+        {
+            realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - iLocalLen;
+            if (bPosEdge) { signchange = signchange * bc.m_byData4[uiDir]; }
+        }
+#else
         while (realCoord.m_byData4[uiDir] < 0)
         {
             realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
@@ -104,9 +166,35 @@ _kernalBakeBoundGlueTorusBoundary(
             realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
             signchange = signchange * bc.m_byData4[uiDir];
         }
+#endif
     }
 
-    const UINT uiSiteIndex = _deviceGetSiteIndex(realCoord);
+    UINT uiSiteIndex = _deviceGetSiteIndex(realCoord);
+
+#if _CLG_MULTI_GPU
+    //Same split-direction face redirect as the site edge kernel: point the link
+    //at the halo site's link block. A halo site owns _DC_Dir links laid out just
+    //like a local site, so the link index is haloSite * Dir + byDir.
+    const UINT uiGrid[4] = { _DC_GpuGridX, _DC_GpuGridY, _DC_GpuGridZ, _DC_GpuGridT };
+    const UINT uiLocalL[4] = { static_cast<UINT>(_constIntegers[ECI_Lx]),
+        static_cast<UINT>(_constIntegers[ECI_Ly]), static_cast<UINT>(_constIntegers[ECI_Lz]),
+        static_cast<UINT>(_constIntegers[ECI_Lt]) };
+    const INT iWrapped[4] = { realCoord.x, realCoord.y, realCoord.z, realCoord.w };
+    UINT uiHaloSlot = 0;
+    const EHaloRedirectResult eGlue = _deviceHaloRedirectSite(uiLocalL, uiGrid, _DC_Volume, _DC_HaloWidth,
+        iRaw, iWrapped, uiHaloSlot);
+    if (EHR_Halo == eGlue)
+    {
+        uiSiteIndex = _DC_Volume + uiHaloSlot;
+    }
+    else if (EHR_Invalid == eGlue)
+    {
+        //Improve-1 (3.8): a split-direction crossing beyond HaloWidth has NO
+        //legal target -- never degrade it to the silent local wrap.
+        uiSiteIndex = SIndex::_kInvalidSiteIndex;
+    }
+#endif
+
     for (BYTE byDir = 0; byDir < _DC_Dir; ++byDir)
     {
         pDeviceData[idxAll * _DC_Dir + byDir] = SIndex(uiSiteIndex);
@@ -114,6 +202,17 @@ _kernalBakeBoundGlueTorusBoundary(
 
         //Bound should never have anti-periodic boundary condition?
         pDeviceData[idxAll * _DC_Dir + byDir].m_byTag = signchange < 0 ? _kDaggerOrOpposite : 0;
+
+#if _CLG_MULTI_GPU
+        if (EHR_Halo == eGlue)
+        {
+            pDeviceData[idxAll * _DC_Dir + byDir].m_byTag |= _kGlue;
+        }
+        else if (EHR_Invalid == eGlue)
+        {
+            pDeviceData[idxAll * _DC_Dir + byDir].m_byTag = 0;
+        }
+#endif
     }
 }
 
@@ -134,7 +233,7 @@ CBoundaryConditionTorusSquare::CBoundaryConditionTorusSquare() : CBoundaryCondit
 
 //void CBoundaryConditionTorusSquare::SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc)
 //{
-//    assert(byFieldId < kMaxFieldCount);
+//    appAssert(byFieldId < kMaxFieldCount);
 //    m_FieldBC[byFieldId] = bc.m_sPeriodic;
 //}
 
@@ -155,7 +254,7 @@ void CBoundaryConditionTorusSquare::BakeEdgePoints(BYTE byFieldId, const SSmallI
     biggerLatticeMod.y = biggerLattice.z * biggerLattice.w;
     biggerLatticeMod.z = biggerLattice.w;
 
-    _kernalBakeEdgeTorusBoundary << <blocks, threads >> > (m_FieldBC[byFieldId], deviceMappingTable, deviceBuffer, biggerLatticeMod);
+    _LAUNCH_KERNEL(_kernalBakeEdgeTorusBoundary, blocks, threads, m_FieldBC[byFieldId], deviceMappingTable, deviceBuffer, biggerLatticeMod);
 }
 
 //void CBoundaryConditionTorusSquare::BakeBondInfo(const SSmallInt4*, BYTE* deviceTable, BYTE byFieldId) const
@@ -171,7 +270,7 @@ void CBoundaryConditionTorusSquare::BakeEdgePoints(BYTE byFieldId, const SSmallI
 //    dim3 threads(threadPerSite, 1, 1);
 //    dim3 blocks(uiVolumn / threadPerSite, 1, 1);
 //
-//    _kernalBakeBondInfo_Torus << <blocks, threads >> > (deviceTable);
+//    _LAUNCH_KERNEL(_kernalBakeBondInfo_Torus, blocks, threads, deviceTable);
 //}
 
 void CBoundaryConditionTorusSquare::BakeBondGlue(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const
@@ -191,7 +290,7 @@ void CBoundaryConditionTorusSquare::BakeBondGlue(BYTE byFieldId, const SSmallInt
     biggerLatticeMod.y = biggerLattice.z * biggerLattice.w;
     biggerLatticeMod.z = biggerLattice.w;
 
-    _kernalBakeBoundGlueTorusBoundary << <blocks, threads >> > (m_FieldBC[byFieldId], deviceMappingTable, deviceBuffer, biggerLatticeMod);
+    _LAUNCH_KERNEL(_kernalBakeBoundGlueTorusBoundary, blocks, threads, m_FieldBC[byFieldId], deviceMappingTable, deviceBuffer, biggerLatticeMod);
 }
 
 __END_NAMESPACE

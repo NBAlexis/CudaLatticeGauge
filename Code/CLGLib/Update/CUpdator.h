@@ -7,6 +7,7 @@
 // It can also be descrete for Z2, Zn, tetrahydraul, octahydraul, icosahydraul, using Heatbath
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/8/2018 nbale]
 //=============================================================================
 
@@ -17,6 +18,7 @@ __BEGIN_NAMESPACE
 
 __DEFINE_ENUM(EUpdatorType,
     EUT_HMC,
+    EUT_Heatbath,
     EUT_Max,
 
     EUT_ForceDWORD = 0x7fffffff,
@@ -30,7 +32,9 @@ public:
         : m_pOwner(NULL)
         , m_uiUpdateCall(0)
         , m_iAcceptedConfigurationCount(0)
+        , m_iSaveIndexStart(0)
         , m_bSaveConfigurations(FALSE)
+        , m_eSaveFieldType(EFFT_CLGBin)
         , m_bTestHDiff(FALSE) 
         , m_bReport(TRUE)
         , m_bAdaptiveUpdate(FALSE)
@@ -57,9 +61,27 @@ public:
     //void OnConfigurationAccepted();
     void SaveConfiguration(UINT uiUpdateStep) const;
 
+    /**
+    * Load the tensor2 companion files of a saved configuration into the
+    * lattice tensor2 fields (in place).
+    *
+    * For every dynamic lattice tensor2 field with id F, the companion file
+    *   <prefix>_<N>_t<F>.con
+    * (written by SaveConfiguration) is loaded with eLoadType. Fields without a
+    * matching file are left untouched. This is the counterpart of
+    * SaveConfiguration's tensor2 saving and is meant to be called by
+    * measurement applications right after loading the gauge .con file.
+    */
+    void LoadTensor2Configuration(const CCString& sPrefix, UINT uiN, EFieldFileType eLoadType) const;
+
     void SetTestHdiff(UBOOL bTestHDiff) 
     {
         m_bTestHDiff = bTestHDiff;
+    }
+
+    void ClearHDiffHistory()
+    {
+        m_lstHDiff.RemoveAll();
     }
 
     virtual void SetAutoCorrection(UBOOL bAutoCorrection) = 0;
@@ -143,17 +165,36 @@ public:
         return static_cast<Real>(m_fLastHDiff);
     }
 
-    void SetSaveConfiguration(UBOOL bSave, const CCString& sPrefix)
+    Real GetMaxHDiff() const
+    {
+        DOUBLE fMax = appAbs(m_lstHDiff[0]);
+        INT idx = 0;
+        for (INT i = 1; i < m_lstHDiff.Num(); ++i)
+        {
+            if (fMax < appAbs(m_lstHDiff[i]))
+            {
+                fMax = appAbs(m_lstHDiff[i]);
+                idx = i;
+            }
+        }
+        return static_cast<Real>(m_lstHDiff[idx]);
+    }
+
+    void SetSaveConfiguration(UBOOL bSave, const CCString& sPrefix, UINT saveIndexStart = 0, EFieldFileType efft = EFFT_CLGBin)
     {
         m_bSaveConfigurations = bSave;
         m_sConfigurationPrefix = sPrefix;
+        m_iSaveIndexStart = saveIndexStart;
+        m_eSaveFieldType = efft;
     }
 
 protected:
 
     UINT m_uiUpdateCall;
     UINT m_iAcceptedConfigurationCount;
+    UINT m_iSaveIndexStart;
     UBOOL m_bSaveConfigurations;
+    EFieldFileType m_eSaveFieldType;
     UBOOL m_bTestHDiff;
     UBOOL m_bReport;
     UBOOL m_bAdaptiveUpdate;

@@ -189,7 +189,6 @@ INT Measurement(CParameters& params)
     //CMeasurePandChiralTalorKS* pTaylorHeavy = dynamic_cast<CMeasurePandChiralTalorKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(11));
 
     //CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
-    //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
 
     CActionGaugePlaquetteRotating* pAG = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
     CFieldFermionKSSU3R* pLight = dynamic_cast<CFieldFermionKSSU3R*>(appGetLattice()->GetFieldById(2));
@@ -206,10 +205,10 @@ INT Measurement(CParameters& params)
         || EDJKS_Taylor == eJob
         || EDJKS_AngularMomentumDiagnal == eJob)
     {
-        pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
-        pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
-        pF1Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
-        pF2Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
+        pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+        pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+        pF1Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3, _T(__FILE__), __LINE__));
+        pF2Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3, _T(__FILE__), __LINE__));
     }
 
     appPushLogDate(FALSE);
@@ -358,6 +357,7 @@ INT Measurement(CParameters& params)
                 break;
                 case EDJKS_Chiral:
                 {
+                    appGetStapleCache(1)->Cache(appGetLattice()->m_pGaugeField[0], ECC_BeforeAllUpdateAfterSmearing);
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
                         if (bZ4)
@@ -368,10 +368,10 @@ INT Measurement(CParameters& params)
                         {
                             pF1Light->InitialField(EFIT_RandomGaussian);
                         }
-                        pF1Light->FixBoundary();
+                        pF1Light->FixBoundary(EFB_Field);
                         pF1Light->CopyTo(pF2Light);
                         pF1Light->InverseD(_FIELDS);
-                        pF1Light->FixBoundary();
+                        pF1Light->FixBoundary(EFB_Field);
                         if (bSaveFermion)
                         {
                             CCString sFermionFile = "";
@@ -417,10 +417,10 @@ INT Measurement(CParameters& params)
                         {
                             pF1Heavy->InitialField(EFIT_RandomGaussian);
                         }
-                        pF1Heavy->FixBoundary();
+                        pF1Heavy->FixBoundary(EFB_Field);
                         pF1Heavy->CopyTo(pF2Heavy);
                         pF1Heavy->InverseD(_FIELDS);
-                        pF1Heavy->FixBoundary();
+                        pF1Heavy->FixBoundary(EFB_Field);
                         if (bSaveFermion)
                         {
                             CCString sFermionFile = "";
@@ -474,10 +474,12 @@ INT Measurement(CParameters& params)
                 break;
                 case EDJKS_ChiralAndFermionMomentum:
                 {
+                    appGetStapleCache(1)->Cache(appGetLattice()->m_pGaugeField[0], ECC_BeforeAllUpdateAfterSmearing);
                     appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField[0]);
                     pJG->OnConfigurationAccepted(_FIELDS, NULL);
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
+                        appDetailed(_T("%d heavy...\n"), i);
                         if (0 == (1 & uiLoadFermion))
                         {
                             if (bZ4)
@@ -488,10 +490,10 @@ INT Measurement(CParameters& params)
                             {
                                 pF1Light->InitialField(EFIT_RandomGaussian);
                             }
-                            pF1Light->FixBoundary();
+                            pF1Light->FixBoundary(EFB_Field);
                             pF1Light->CopyTo(pF2Light);
                             pF1Light->InverseD(_FIELDS);
-                            pF1Light->FixBoundary();
+                            pF1Light->FixBoundary(EFB_Field);
                             if (bSaveFermion)
                             {
                                 CCString sFermionFile = "";
@@ -548,6 +550,7 @@ INT Measurement(CParameters& params)
                             0 == i,
                             iFieldCount == i + 1);
 
+                        appDetailed(_T("%d light...\n"), i);
                         if (0 == (2 & uiLoadFermion))
                         {
                             if (bZ4)
@@ -558,10 +561,10 @@ INT Measurement(CParameters& params)
                             {
                                 pF1Heavy->InitialField(EFIT_RandomGaussian);
                             }
-                            pF1Heavy->FixBoundary();
+                            pF1Heavy->FixBoundary(EFB_Field);
                             pF1Heavy->CopyTo(pF2Heavy);
                             pF1Heavy->InverseD(_FIELDS);
-                            pF1Heavy->FixBoundary();
+                            pF1Heavy->FixBoundary(EFB_Field);
                             if (bSaveFermion)
                             {
                                 CCString sFermionFile = "";
@@ -634,7 +637,7 @@ INT Measurement(CParameters& params)
                 case EDJKS_VR:
                     {
                         appGetLattice()->m_pGaugeField[0]->CalculateOnlyStaple(pStaple);
-                        appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField[0], pStaple);
+                        appGetLattice()->m_pGaugeSmearing[appGetLattice()->m_pGaugeField[0]->m_byFieldId]->GaugeSmearing(appGetLattice()->m_pGaugeField[0], NULL, pStaple);
                         pWilson->OnConfigurationAccepted(_FIELDS, NULL);
                         if (uiN == iStartN)
                         {
@@ -833,106 +836,27 @@ INT Measurement(CParameters& params)
         {
             case EDJKS_Polyakov:
             {
-                CCString sFileNameWrite1;
-                CCString sFileNameWrite2;
-                CCString sFileNameWrite3;
-                sFileNameWrite1.Format(_T("%s_polyakov_Nt%d_R.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-                sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                sFileNameWrite3.Format(_T("%s_polyakovabs_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                
-                //extract result
-                assert(static_cast<INT>(iEndN - iStartN + 1) * pPL->m_lstR.Num() == pPL->m_lstP.Num());
-                
-                if (uiOmega == iStartOmega)
-                {
-                    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                    {
-                        lstR.AddItem(F(0.5)* _hostsqrt(static_cast<Real>(pPL->m_lstR[i])));
-                    }
-                    WriteStringFileRealArray(sFileNameWrite1, lstR);
-                }
-
-                TArray<TArray<CLGComplex>> polyakovOmgR;
-                TArray<CLGComplex> polyIn;
-                TArray<CLGComplex> polyOut;
-
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    TArray<CLGComplex> thisConfiguration;
-                    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                    {
-                        thisConfiguration.AddItem(pPL->m_lstP[j * pPL->m_lstR.Num() + i]);
-                    }
-                    polyakovOmgR.AddItem(thisConfiguration);
-                    polyIn.AddItem(pPL->m_lstLoopInner[j]);
-                    polyOut.AddItem(pPL->m_lstLoop[j]);
-                }
-                lstPolyIn.AddItem(polyIn);
-                lstPolyOut.AddItem(polyOut);
-                WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgR);
-
-                TArray<TArray<Real>> polyakovOmgRAbs;
-                TArray<Real> polyInAbs;
-                TArray<Real> polyOutAbs;
-
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    TArray<Real> thisConfiguration;
-                    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                    {
-                        thisConfiguration.AddItem(pPL->m_lstPAbs[j * pPL->m_lstR.Num() + i]);
-                    }
-                    polyakovOmgRAbs.AddItem(thisConfiguration);
-                    polyInAbs.AddItem(pPL->m_lstLoopAbsInner[j]);
-                    polyOutAbs.AddItem(pPL->m_lstLoopAbs[j]);
-                }
-                lstPolyInAbs.AddItem(polyInAbs);
-                lstPolyOutAbs.AddItem(polyOutAbs);
-                WriteStringFileRealArray2(sFileNameWrite3, polyakovOmgRAbs);
-
-                if (pPL->m_bMeasureLoopZ)
-                {
-                    CCString sFileNameWrite4;
-                    sFileNameWrite4.Format(_T("%s_polyakovZ_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                    polyakovOmgR.RemoveAll();
-                    polyIn.RemoveAll();
-                    polyOut.RemoveAll();
-
-                    for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                    {
-                        TArray<CLGComplex> thisConfiguration;
-                        for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                        {
-                            thisConfiguration.AddItem(pPL->m_lstPZ[j * pPL->m_lstR.Num() + i]);
-                        }
-                        polyakovOmgR.AddItem(thisConfiguration);
-                        polyIn.AddItem(pPL->m_lstLoopZInner[j]);
-                        polyOut.AddItem(pPL->m_lstLoopZ[j]);
-                    }
-                    lstPolyInZ.AddItem(polyIn);
-                    lstPolyOutZ.AddItem(polyOut);
-                    WriteStringFileComplexArray2(sFileNameWrite4, polyakovOmgR);
-                }
+                pPL->Export(sCSVSavePrefix, iStartN, iEndN, uiOmega, iStartOmega);
             }
             break;
             case EDJKS_Chiral:
             {
-                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega, O);
+                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega);
                 if (pCCLight->m_bMeasureConnect)
                 {
-                    _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega, O);
+                    _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega);
                 }
                 
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiOmega, O);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiOmega);
                 if (pCCHeavy->m_bMeasureConnect)
                 {
-                    _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiOmega, O);
+                    _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiOmega);
                 }
                 
-                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiOmega, O);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiOmega);
 
                 if (uiOmega == iStartOmega)
                 {
@@ -975,55 +899,55 @@ INT Measurement(CParameters& params)
                 _CLG_EXPORT_ANGULAR(pJG, JGSurf, uiOmega, O);
                 _CLG_EXPORT_ANGULAR(pJG, JGPot, uiOmega, O);
 
-                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega, O);
+                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega);
                 if (pCCLight->m_bMeasureConnect)
                 {
-                    _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega, O);
+                    _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega);
                 }
                 
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega, O);
-                if (pCCLight->m_bMeasureZSlice)
-                {
-                    _CLG_EXPORT_CHIRALZSLICE(pCCLight, ChiralKS, uiOmega, O);
-                    _CLG_EXPORT_CHIRALZSLICE(pCCLight, CMTKSGamma3, uiOmega, O);
-                    _CLG_EXPORT_CHIRALZSLICE(pCCLight, CMTKSGamma4, uiOmega, O);
-                }
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega);
+                //if (pCCLight->m_bMeasureZSlice)
+                //{
+                //    _CLG_EXPORT_CHIRALZSLICE(pCCLight, ChiralKS, uiOmega, O);
+                //    _CLG_EXPORT_CHIRALZSLICE(pCCLight, CMTKSGamma3, uiOmega, O);
+                //    _CLG_EXPORT_CHIRALZSLICE(pCCLight, CMTKSGamma4, uiOmega, O);
+                //}
 
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiOmega, O);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiOmega);
 
                 if (pCCHeavy->m_bMeasureConnect)
                 {
-                    _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiOmega, O);
+                    _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiOmega);
                 }
 
-                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiOmega, O);
-                if (pCCHeavy->m_bMeasureZSlice)
-                {
-                    _CLG_EXPORT_CHIRALZSLICE(pCCHeavy, ChiralKS, uiOmega, O);
-                    _CLG_EXPORT_CHIRALZSLICE(pCCHeavy, CMTKSGamma3, uiOmega, O);
-                    _CLG_EXPORT_CHIRALZSLICE(pCCHeavy, CMTKSGamma4, uiOmega, O);
-                }
+                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiOmega);
+                //if (pCCHeavy->m_bMeasureZSlice)
+                //{
+                //    _CLG_EXPORT_CHIRALZSLICE(pCCHeavy, ChiralKS, uiOmega, O);
+                //    _CLG_EXPORT_CHIRALZSLICE(pCCHeavy, CMTKSGamma3, uiOmega, O);
+                //    _CLG_EXPORT_CHIRALZSLICE(pCCHeavy, CMTKSGamma4, uiOmega, O);
+                //}
 
-                _CLG_EXPORT_CHIRAL(pFALight, OrbitalKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pFALight, SpinKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pFALight, PotentialKS, uiOmega, O);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFALight, OrbitalKS, uiOmega, O);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFALight, SpinKS, uiOmega, O);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFALight, PotentialKS, uiOmega, O);
                 if (pFALight->m_bMeasureZSlice)
                 {
-                    _CLG_EXPORT_CHIRALZSLICE(pFALight, OrbitalKS, uiOmega, O);
-                    _CLG_EXPORT_CHIRALZSLICE(pFALight, SpinKS, uiOmega, O);
-                    _CLG_EXPORT_CHIRALZSLICE(pFALight, PotentialKS, uiOmega, O);
+                    _CLG_EXPORT_CHIRALZSLICE_ROTATION(pFALight, OrbitalKS, uiOmega, O);
+                    _CLG_EXPORT_CHIRALZSLICE_ROTATION(pFALight, SpinKS, uiOmega, O);
+                    _CLG_EXPORT_CHIRALZSLICE_ROTATION(pFALight, PotentialKS, uiOmega, O);
                 }
 
-                _CLG_EXPORT_CHIRAL(pFAHeavy, OrbitalKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pFAHeavy, SpinKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pFAHeavy, PotentialKS, uiOmega, O);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFAHeavy, OrbitalKS, uiOmega, O);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFAHeavy, SpinKS, uiOmega, O);
+                _CLG_EXPORT_CHIRAL_ROTATION(pFAHeavy, PotentialKS, uiOmega, O);
                 if (pFAHeavy->m_bMeasureZSlice)
                 {
-                    _CLG_EXPORT_CHIRALZSLICE(pFAHeavy, OrbitalKS, uiOmega, O);
-                    _CLG_EXPORT_CHIRALZSLICE(pFAHeavy, SpinKS, uiOmega, O);
-                    _CLG_EXPORT_CHIRALZSLICE(pFAHeavy, PotentialKS, uiOmega, O);
+                    _CLG_EXPORT_CHIRALZSLICE_ROTATION(pFAHeavy, OrbitalKS, uiOmega, O);
+                    _CLG_EXPORT_CHIRALZSLICE_ROTATION(pFAHeavy, SpinKS, uiOmega, O);
+                    _CLG_EXPORT_CHIRALZSLICE_ROTATION(pFAHeavy, PotentialKS, uiOmega, O);
                 }
 
                 if (uiOmega == iStartOmega)

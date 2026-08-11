@@ -142,7 +142,7 @@ TestKSFermion:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
         ## MultiStep : 2
 

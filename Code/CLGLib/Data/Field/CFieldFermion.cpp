@@ -9,18 +9,18 @@
 //=============================================================================
 #include "CLGLib_Private.h"
 #include "WilsonDirac/CFieldFermionWilsonSquareSU3.h"
-#include "Staggered/CFieldFermionKSSU3.h"
+#include "Staggered/CFieldFermionKST.h"
 #include "Measurement/CMeasureAngularMomentumKS.h"
 
 __BEGIN_NAMESPACE
 
 void ExportDiagnalWilsonSU3(const CCString& sFileName, EMeasureDiagnal eType, 
-    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson,
+    INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const CFieldTensor2* const* tensor2Fields,
     const CFieldFermionWilsonSquareSU3* pFermion)
 {
     UBOOL bOnlyRed = TRUE;
     TArray <TArray<CLGComplex>> rets;
-    CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(pFermion->m_byFieldId));
+    CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(pFermion->m_byFieldId, _T(__FILE__), __LINE__));
     if (NULL == pF1)
     {
         appCrucial(_T("CMeasureDiagnal::ExportDiagnalStaggeredSU3 only work with CFieldFermionKSSU3 and CFieldGaugeSU3"));
@@ -50,12 +50,12 @@ void ExportDiagnalWilsonSU3(const CCString& sFileName, EMeasureDiagnal eType,
                 {
                 case EMD_D:
                     {
-                        pF1->D(gaugeNum, bosonNum, gaugeFields, pBoson);
+                        pF1->D(gaugeNum, bosonNum, tensor2Num, gaugeFields, pBoson, tensor2Fields);
                     }
                     break;
                 case EMD_InverseD:
                     {
-                        pF1->InverseD(gaugeNum, bosonNum, gaugeFields, pBoson);
+                        pF1->InverseD(gaugeNum, bosonNum, tensor2Num, gaugeFields, pBoson, tensor2Fields);
                     }
                     break;
                 case EMD_Gamma1:
@@ -64,40 +64,40 @@ void ExportDiagnalWilsonSU3(const CCString& sFileName, EMeasureDiagnal eType,
                 case EMD_Gamma4:
                 case EMD_Gamma5:
                     {
-                        pF1->ApplyGamma(static_cast<EGammaMatrix>(static_cast<INT>(GAMMA1) + static_cast<INT>(eType - EMD_Gamma1)));
+                        pF1->ApplyGamma(0, 0, NULL, NULL, static_cast<EGammaMatrix>(static_cast<INT>(GAMMA1) + static_cast<INT>(eType - EMD_Gamma1)));
                     }
                     break;
                 case EMD_Sigma12:
                     {
-                        pF1->ApplyGamma(SIGMA12);
+                        pF1->ApplyGamma(0, 0, NULL, NULL, SIGMA12);
                     }
                     break;
                 case EMD_Sigma13:
                     {
-                        pF1->ApplyGamma(SIGMA31);
+                        pF1->ApplyGamma(0, 0, NULL, NULL, SIGMA31);
                         scale = F(-1.0);
                     }
                     break;
                 case EMD_Sigma14:
                     {
-                        pF1->ApplyGamma(SIGMA41);
+                        pF1->ApplyGamma(0, 0, NULL, NULL, SIGMA41);
                         scale = F(-1.0);
                     }
                     break;
                 case EMD_Sigma23:
                     {
-                        pF1->ApplyGamma(SIGMA23);
+                        pF1->ApplyGamma(0, 0, NULL, NULL, SIGMA23);
                     }
                     break;
                 case EMD_Sigma24:
                     {
-                        pF1->ApplyGamma(SIGMA42);
+                        pF1->ApplyGamma(0, 0, NULL, NULL, SIGMA42);
                         scale = F(-1.0);
                     }
                     break;
                 case EMD_Sigma34:
                     {
-                        pF1->ApplyGamma(SIGMA43);
+                        pF1->ApplyGamma(0, 0, NULL, NULL, SIGMA43);
                         scale = F(-1.0);
                     }
                     break;
@@ -106,7 +106,7 @@ void ExportDiagnalWilsonSU3(const CCString& sFileName, EMeasureDiagnal eType,
                 case EMD_Gamma53:
                 case EMD_Gamma54:
                     {
-                        pF1->ApplyGamma(static_cast<EGammaMatrix>(static_cast<INT>(GAMMA51) + static_cast<INT>(eType - EMD_Gamma51)));
+                        pF1->ApplyGamma(0, 0, NULL, NULL, static_cast<EGammaMatrix>(static_cast<INT>(GAMMA51) + static_cast<INT>(eType - EMD_Gamma51)));
                     }
                     break;
                 default:
@@ -138,12 +138,12 @@ void ExportDiagnalWilsonSU3(const CCString& sFileName, EMeasureDiagnal eType,
 }
 
 void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType, 
-    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson,
+    INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const CFieldTensor2* const* tensor2Fields,
     const CFieldFermionKSSU3* pFermion)
 {
     UBOOL bOnlyRed = TRUE;
     TArray <TArray<CLGComplex>> rets;
-    CFieldFermionKSSU3* pF1 = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(pFermion->m_byFieldId));
+    CFieldFermionKSSU3* pF1 = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(pFermion->m_byFieldId, _T(__FILE__), __LINE__));
     if (NULL == pF1)
     {
         appCrucial(_T("CMeasureDiagnal::ExportDiagnalStaggeredSU3 only work with CFieldFermionKSSU3 and CFieldGaugeSU3"));
@@ -172,12 +172,12 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
             {
             case EMD_D:
                 {
-                    pF1->D(gaugeNum, bosonNum, gaugeFields, pBoson);
+                    pF1->D(gaugeNum, bosonNum, tensor2Num, gaugeFields, pBoson, tensor2Fields);
                 }
                 break;
             case EMD_InverseD:
                 {
-                    pF1->InverseD(gaugeNum, bosonNum, gaugeFields, pBoson);
+                    pF1->InverseD(gaugeNum, bosonNum, tensor2Num, gaugeFields, pBoson, tensor2Fields);
                 }
                 break;
             case EMD_Gamma1:
@@ -186,37 +186,37 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
             case EMD_Gamma4:
             case EMD_Gamma5:
                 {
-                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, static_cast<EGammaMatrix>(static_cast<INT>(GAMMA1) + static_cast<INT>(eType - EMD_Gamma1)));
+                    pF1->ApplyGamma(gaugeNum, bosonNum, gaugeFields, pBoson, static_cast<EGammaMatrix>(static_cast<INT>(GAMMA1) + static_cast<INT>(eType - EMD_Gamma1)));
                 }
                 break;
             case EMD_Sigma12:
                 {
-                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA12);
+                    pF1->ApplyGamma(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA12);
                 }
                 break;
             case EMD_Sigma13:
                 {
-                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA31);
+                    pF1->ApplyGamma(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA31);
                 }
                 break;
             case EMD_Sigma14:
                 {
-                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA41);
+                    pF1->ApplyGamma(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA41);
                 }
                 break;
             case EMD_Sigma23:
                 {
-                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA23);
+                    pF1->ApplyGamma(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA23);
                 }
                 break;
             case EMD_Sigma24:
                 {
-                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA42);
+                    pF1->ApplyGamma(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA42);
                 }
                 break;
             case EMD_Sigma34:
                 {
-                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA43);
+                    pF1->ApplyGamma(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA43);
                 }
                 break;
             case EMD_Gamma51:
@@ -224,7 +224,7 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
             case EMD_Gamma53:
             case EMD_Gamma54:
                 {
-                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, static_cast<EGammaMatrix>(static_cast<INT>(GAMMA51) + static_cast<INT>(eType - EMD_Gamma51)));
+                    pF1->ApplyGamma(gaugeNum, bosonNum, gaugeFields, pBoson, static_cast<EGammaMatrix>(static_cast<INT>(GAMMA51) + static_cast<INT>(eType - EMD_Gamma51)));
                 }
                 break;
             case EMD_Oribital:
@@ -264,38 +264,159 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
     appSafeDelete(pF2);
 }
 
-UBOOL CFieldFermion::InverseD(INT gaugeNum, INT bosonNum,
-    const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields)
+
+CFieldFermion::CFieldFermion()
+    : CField()
+    , m_uiSiteCount(_HC_Volume)
+    //Set for real at allocation time by the concrete subclass. 0 keeps single-GPU
+    /// unsplit builds unchanged (mirrors CFieldGauge::m_uiHaloLinkCount).
+    , m_uiHaloSiteCount(0)
+    , m_bEvenPseudofermion(FALSE)
+    , m_iMCIndex(-1)
+    , m_iMDIndex(-1)
+    , m_eRational(ER_NoRational)
+    // , m_bDoperatorUseEffectiveGauge(FALSE)
 {
-    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, gaugeNum, bosonNum, gaugeFields, bosonFields, EFO_F_D);
+
 }
 
-UBOOL CFieldFermion::InverseDdagger(INT gaugeNum, INT bosonNum,
-    const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields)
+CFieldMatrixOperation* CFieldMatrixOperation::Create(EFieldType ef)
 {
-    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, gaugeNum, bosonNum, gaugeFields, bosonFields, EFO_F_Ddagger);
+    if (ef == EFT_FermionWilsonSquareSU3)
+    {
+        return new CFieldMatrixOperationWilsonSquareSU3();
+    }
+
+    if (ef == EFT_FermionStaggeredSU3)
+    {
+        return new CFieldMatrixOperationKSSU3();
+    }
+
+    appCrucial(_T("Matrix operation for field type %s not implemented!\n"), __ENUM_TO_STRING(EFieldType, ef).c_str());
+    return NULL;
 }
 
-UBOOL CFieldFermion::InverseDDdagger(INT gaugeNum, INT bosonNum,
-    const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields)
+UBOOL CFieldFermion::RationalApproximation(EFieldOperator op, INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const CFieldTensor2* const* tensor2Fields, INT iRationalIndex, UBOOL bAction)
 {
-    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, gaugeNum, bosonNum, gaugeFields, bosonFields, EFO_F_DDdagger);
+    CMultiShiftSolver* solver = appGetMultiShiftSolver(m_byFieldId);
+    if (NULL == solver)
+    {
+        return FALSE;
+    }
+    _RECORD(CFieldFermion::RationalApproximation);
+    TArray<CField*> solutions;
+    TArray<CLGComplex> shifts;
+    for (UINT i = 0; i < GRASet.m_pRASet[iRationalIndex]->m_uiDegree; ++i)
+    {
+        CField* pPooled = appGetLattice()->GetPooledFieldById(m_byFieldId, _T(__FILE__), __LINE__);
+        solutions.AddItem(pPooled);
+        shifts.AddItem(_make_cuComplex(GRASet.m_pRASet[iRationalIndex]->m_lstB[i], F(0.0)));
+    }
+
+    solver->Solve(solutions, shifts, this, gaugeNum, bosonNum, tensor2Num, gaugeFields, pBoson, tensor2Fields, op);
+
+    UINT uiStart = 0;
+    if (bAction)
+    {
+        //Zero();
+        solutions[0]->CopyBufferTo(this);
+        ScalarMultply(GRASet.m_pRASet[iRationalIndex]->m_lstA[0]);
+        uiStart = 1;
+        solutions[0]->Return();
+    }
+    else
+    {
+        ScalarMultply(GRASet.m_pRASet[iRationalIndex]->m_fC);
+    }
+
+    for (UINT i = uiStart; i < GRASet.m_pRASet[iRationalIndex]->m_uiDegree; ++i)
+    {
+        Axpy(GRASet.m_pRASet[iRationalIndex]->m_lstA[i], solutions[i]);
+        solutions[i]->Return();
+    }
+    return TRUE;
 }
 
-UBOOL CFieldFermion::InverseDD(INT gaugeNum, INT bosonNum,
-    const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields)
+UBOOL CFieldFermion::RationalApproximationPooled(EFieldOperator op, INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const CFieldTensor2* const* tensor2Fields, INT iRationalIndex, TArray<CField*>& solutions) const
 {
-    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, gaugeNum, bosonNum, gaugeFields, bosonFields, EFO_F_DD);
+    CMultiShiftSolver* solver = appGetMultiShiftSolver(m_byFieldId);
+    if (NULL == solver)
+    {
+        return FALSE;
+    }
+    TArray<CLGComplex> shifts;
+    for (UINT i = 0; i < GRASet.m_pRASet[iRationalIndex]->m_uiDegree; ++i)
+    {
+        CField* pPooled = appGetLattice()->GetPooledFieldById(m_byFieldId, _T(__FILE__), __LINE__);
+        solutions.AddItem(pPooled);
+        shifts.AddItem(_make_cuComplex(GRASet.m_pRASet[iRationalIndex]->m_lstB[i], F(0.0)));
+    }
+
+    solver->Solve(solutions, shifts, this, gaugeNum, bosonNum, tensor2Num, gaugeFields, pBoson, tensor2Fields, op);
+    return TRUE;
 }
 
-CCString CFieldFermionKS::GetInfos(const CCString& tab) const
+UBOOL CFieldFermion::InverseD(INT gaugeNum, INT bosonNum, INT tensor2Num,
+    const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields)
 {
-    CCString sRet = CFieldFermion::GetInfos(tab);
-    sRet = sRet + tab + _T("Mass (2am) : ") + appToString(m_f2am) + _T("\n");
-    sRet = sRet + tab + _T("Diagonal Mass : ") + appToString(m_bDiagonalMass) + _T("\n");
-    sRet = sRet + tab + _T("Each site eta : ") + appToString(m_bEachSiteEta) + _T("\n");
-    sRet = sRet + tab + _T("MD Rational (c) : ") + appToString(m_rMD.m_fC) + _T("\n");
-    sRet = sRet + tab + _T("MC Rational (c) : ") + appToString(m_rMC.m_fC) + _T("\n");
+    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, EFO_F_D);
+}
+
+UBOOL CFieldFermion::InverseDdagger(INT gaugeNum, INT bosonNum, INT tensor2Num,
+    const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields)
+{
+    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, EFO_F_Ddagger);
+}
+
+UBOOL CFieldFermion::InverseDDdagger(INT gaugeNum, INT bosonNum, INT tensor2Num,
+    const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields)
+{
+    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, EFO_F_DDdagger);
+}
+
+UBOOL CFieldFermion::InverseDD(INT gaugeNum, INT bosonNum, INT tensor2Num,
+    const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields)
+{
+    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, gaugeNum, bosonNum, tensor2Num, gaugeFields, bosonFields, tensor2Fields, EFO_F_DD);
+}
+
+void CFieldFermion::InitialOtherParameters(CParameters& params)
+{
+    CField::InitialOtherParameters(params);
+
+    INT iEven = 0;
+    params.FetchValueINT(_T("Even"), iEven);
+    m_bEvenPseudofermion = (0 != iEven);
+
+    TArray<Real> coeffs;
+    params.FetchValueArrayReal(_T("MD"), coeffs);
+    if (0 == coeffs.Num())
+    {
+        appGeneral(_T("no rational approximation configured for fermin MC!\n"));
+        coeffs.AddItem(F(1.0));
+    }
+    m_iMDIndex = GRASet.Add(coeffs);
+
+    params.FetchValueArrayReal(_T("MC"), coeffs);
+    if (0 == coeffs.Num())
+    {
+        appGeneral(_T("no rational approximation configured for fermin MD!\n"));
+        coeffs.AddItem(F(1.0));
+    }
+    m_iMCIndex = GRASet.Add(coeffs);
+
+    CCString sEnumValue = _T("ER_NoRational");
+    params.FetchStringValue(_T("Rational"), sEnumValue);
+    m_eRational = __STRING_TO_ENUM(ERational, sEnumValue);
+}
+
+CCString CFieldFermion::GetInfos(const CCString& tab) const
+{
+    CCString sRet = CField::GetInfos(tab);
+    sRet = sRet + tab + _T("Even Pseudofermion : ") + appToString(m_bEvenPseudofermion) + _T("\n");
+    sRet = sRet + tab + _T("MD Rational (energy and force) : ") + appToString(GRASet.m_pRASet[m_iMDIndex]->m_fC) + _T("Num:") + appToString(GRASet.m_pRASet[m_iMDIndex]->m_lstA) + _T("Don:") + appToString(GRASet.m_pRASet[m_iMDIndex]->m_lstB) + _T("\n");
+    sRet = sRet + tab + _T("MC Rational (Gaussian noise momentum) : ") + appToString(GRASet.m_pRASet[m_iMCIndex]->m_fC) + _T("Num:") + appToString(GRASet.m_pRASet[m_iMCIndex]->m_lstA) + _T("Don:") + appToString(GRASet.m_pRASet[m_iMCIndex]->m_lstB) + _T("\n");
+    sRet = sRet + tab + _T("Rational : ") + __ENUM_TO_STRING(ERational, m_eRational) + _T("\n");
     return sRet;
 }
 

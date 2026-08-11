@@ -5,6 +5,7 @@
 // This is the Approximate force gradient integrator for HMC
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [03/05/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -30,26 +31,19 @@ void CIntegratorForceGradient::Evaluate()
     const Real f1Over24EstepSq = m_fEStep * m_fEStep * OneOver24;
 
     appDetailed("  Force Gradient sub step 0\n");
-    UpdateP(f1Over6Estep, FALSE, ESP_StartTrajectory);
+    UpdateP(f1Over6Estep, ESP_StartTrajectory);
 
     for (UINT uiStep = 1; uiStep < m_uiStepCount + 1; ++uiStep)
     {
         UpdateU(f1Over2EStep);
 
         // middle step
-        ZeroForce();
-        checkCudaErrors(cudaDeviceSynchronize());
-        for (INT i = 0; i < m_lstActions.Num(); ++i)
-        {
-            //this is accumulate
-            m_lstActions[i]->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), NULL, ESP_InTrajectory);
-            checkCudaErrors(cudaDeviceSynchronize());
-        }
+        CalcForceOfActions(m_lstActions, EFC_All, ESP_InTrajectory);
 
         PreserveFields();
         AddForceToFieldDirectly(f1Over24EstepSq);
 
-        UpdateP(f2Over3Estep, FALSE, ESP_InTrajectory);
+        UpdateP(f2Over3Estep, ESP_InTrajectory);
 
         //restore U
         RecoverFields();
@@ -58,12 +52,12 @@ void CIntegratorForceGradient::Evaluate()
         if (uiStep < m_uiStepCount)
         {
             appDetailed("  Force Gradient sub step %d\n", uiStep);
-            UpdateP(f1Over3Estep, FALSE, ESP_InTrajectory);
+            UpdateP(f1Over3Estep, ESP_InTrajectory);
         }
         else
         {
             appDetailed("  Force Gradient last step %d\n", uiStep);
-            UpdateP(f1Over6Estep, TRUE, ESP_EndTrajectory);
+            UpdateP(f1Over6Estep, ESP_EndTrajectory);
         }
     }
 

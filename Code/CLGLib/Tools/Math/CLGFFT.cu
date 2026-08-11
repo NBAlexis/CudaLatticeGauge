@@ -277,12 +277,12 @@ UBOOL CCLGFFTHelper::FFT3D(CLGComplex* copied, UBOOL bForward, EFFT_Scale eScale
         if (ES_1OverNForward == eScale)
         {
             preparethread;
-            _kernelScale << <block, threads >> > (copied, F(1.0) / _HC_Volume_xyz);
+            _LAUNCH_KERNEL(_kernelScale, block, threads, copied, F(1.0) / _HC_Volume_xyz);
         }
         else if (ES_1OverSqrtNBoth == eScale)
         {
             preparethread;
-            _kernelScale << <block, threads >> > (copied, F(1.0) / _hostsqrt(static_cast<Real>(_HC_Volume_xyz)));
+            _LAUNCH_KERNEL(_kernelScale, block, threads, copied, F(1.0) / _hostsqrt(static_cast<Real>(_HC_Volume_xyz)));
         }
     }
     else
@@ -290,12 +290,12 @@ UBOOL CCLGFFTHelper::FFT3D(CLGComplex* copied, UBOOL bForward, EFFT_Scale eScale
         if (ES_1OverNInverse == eScale)
         {
             preparethread;
-            _kernelScale << <block, threads >> > (copied, F(1.0) / _HC_Volume_xyz);
+            _LAUNCH_KERNEL(_kernelScale, block, threads, copied, F(1.0) / _HC_Volume_xyz);
         }
         else if (ES_1OverSqrtNBoth == eScale)
         {
             preparethread;
-            _kernelScale << <block, threads >> > (copied, F(1.0) / _hostsqrt(static_cast<Real>(_HC_Volume_xyz)));
+            _LAUNCH_KERNEL(_kernelScale, block, threads, copied, F(1.0) / _hostsqrt(static_cast<Real>(_HC_Volume_xyz)));
         }
     }
     return TRUE;
@@ -318,12 +318,12 @@ UBOOL CCLGFFTHelper::FFT4D(CLGComplex* copied, UBOOL bForward, EFFT_Scale eScale
         if (ES_1OverNForward == eScale)
         {
             preparethread;
-            _kernelScale << <block, threads >> > (copied, F(1.0) / _HC_Volume);
+            _LAUNCH_KERNEL(_kernelScale, block, threads, copied, F(1.0) / _HC_Volume);
         }
         else if (ES_1OverSqrtNBoth == eScale)
         {
             preparethread;
-            _kernelScale << <block, threads >> > (copied, F(1.0) / _hostsqrt(static_cast<Real>(_HC_Volume)));
+            _LAUNCH_KERNEL(_kernelScale, block, threads, copied, F(1.0) / _hostsqrt(static_cast<Real>(_HC_Volume)));
         }
     }
     else
@@ -331,12 +331,12 @@ UBOOL CCLGFFTHelper::FFT4D(CLGComplex* copied, UBOOL bForward, EFFT_Scale eScale
         if (ES_1OverNInverse == eScale)
         {
             preparethread;
-            _kernelScale << <block, threads >> > (copied, F(1.0) / _HC_Volume);
+            _LAUNCH_KERNEL(_kernelScale, block, threads, copied, F(1.0) / _HC_Volume);
         }
         else if (ES_1OverSqrtNBoth == eScale)
         {
             preparethread;
-            _kernelScale << <block, threads >> > (copied, F(1.0) / _hostsqrt(static_cast<Real>(_HC_Volume)));
+            _LAUNCH_KERNEL(_kernelScale, block, threads, copied, F(1.0) / _hostsqrt(static_cast<Real>(_HC_Volume)));
         }
     }
 
@@ -440,12 +440,12 @@ UBOOL CCLGFFTHelper::FFT4DDouble(cuDoubleComplex* copied, UBOOL bForward, EFFT_S
         if (ES_1OverNForward == eScale)
         {
             preparethread;
-            _kernelScaleDouble << <block, threads >> > (copied, 1.0 / _HC_Volume);
+            _LAUNCH_KERNEL(_kernelScaleDouble, block, threads, copied, 1.0 / _HC_Volume);
         }
         else if (ES_1OverSqrtNBoth == eScale)
         {
             preparethread;
-            _kernelScaleDouble << <block, threads >> > (copied, 1.0 / _hostsqrtd(static_cast<DOUBLE>(_HC_Volume)));
+            _LAUNCH_KERNEL(_kernelScaleDouble, block, threads, copied, 1.0 / _hostsqrtd(static_cast<DOUBLE>(_HC_Volume)));
         }
     }
     else
@@ -453,12 +453,12 @@ UBOOL CCLGFFTHelper::FFT4DDouble(cuDoubleComplex* copied, UBOOL bForward, EFFT_S
         if (ES_1OverNInverse == eScale)
         {
             preparethread;
-            _kernelScaleDouble << <block, threads >> > (copied, 1.0 / _HC_Volume);
+            _LAUNCH_KERNEL(_kernelScaleDouble, block, threads, copied, 1.0 / _HC_Volume);
         }
         else if (ES_1OverSqrtNBoth == eScale)
         {
             preparethread;
-            _kernelScaleDouble << <block, threads >> > (copied, 1.0 / _hostsqrtd(static_cast<DOUBLE>(_HC_Volume)));
+            _LAUNCH_KERNEL(_kernelScaleDouble, block, threads, copied, 1.0 / _hostsqrtd(static_cast<DOUBLE>(_HC_Volume)));
         }
     }
 
@@ -470,7 +470,7 @@ void CCLGFFTHelper::CheckBuffer()
 {
     if (NULL == m_pDeviceBuffer)
     {
-        checkCudaErrors(cudaMalloc((void**)& m_pDeviceBuffer, _HC_Volume * sizeof(CLGComplex)));
+        checkCudaErrors(__cudaMalloc((void**)& m_pDeviceBuffer, _HC_Volume * sizeof(CLGComplex)));
     }
 }
 
@@ -483,12 +483,12 @@ UBOOL CCLGFFTHelper::FFT3DSU3(deviceSU3* res, UBOOL bForward, EFFT_Scale eScale)
     preparethread;
     for (BYTE i = 0; i < 9; ++i)
     {
-        _kernelCopyElementSU3ToC << <block, threads>> > (res, m_pDeviceBuffer, i);
+        _LAUNCH_KERNEL(_kernelCopyElementSU3ToC, block, threads, res, m_pDeviceBuffer, i);
         if (!FFT3D(m_pDeviceBuffer, bForward, eScale))
         {
             return FALSE;
         }
-        _kernelCopyElementCToSU3 << <block, threads >> > (res, m_pDeviceBuffer, i);
+        _LAUNCH_KERNEL(_kernelCopyElementCToSU3, block, threads, res, m_pDeviceBuffer, i);
     }
     return TRUE;
 }
@@ -499,12 +499,12 @@ UBOOL CCLGFFTHelper::FFT4DSU3(deviceSU3* res, UBOOL bForward, EFFT_Scale eScale)
     preparethread;
     for (BYTE i = 0; i < 9; ++i)
     {
-        _kernelCopyElementSU3ToC << <block, threads >> > (res, m_pDeviceBuffer, i);
+        _LAUNCH_KERNEL(_kernelCopyElementSU3ToC, block, threads, res, m_pDeviceBuffer, i);
         if (!FFT4D(m_pDeviceBuffer, bForward, eScale))
         {
             return FALSE;
         }
-        _kernelCopyElementCToSU3 << <block, threads >> > (res, m_pDeviceBuffer, i);
+        _LAUNCH_KERNEL(_kernelCopyElementCToSU3, block, threads, res, m_pDeviceBuffer, i);
     }
     return TRUE;
 }
@@ -650,7 +650,7 @@ void CCLGFFTHelper::TestFFT()
     CLGComplex* dD3Res;
     CLGComplex* hD3Res = (CLGComplex*)malloc(_tfftMX * _tfftMY * _tfftMZ * sizeof(CLGComplex));
     CLGComplex* hD3Source = (CLGComplex*)malloc(_tfftMX * _tfftMY * _tfftMZ * sizeof(CLGComplex));
-    checkCudaErrors(cudaMalloc((void**)& dD3Res, _tfftMX * _tfftMY * _tfftMZ * sizeof(CLGComplex)));
+    checkCudaErrors(__cudaMalloc((void**)& dD3Res, _tfftMX * _tfftMY * _tfftMZ * sizeof(CLGComplex)));
     appGeneral(_T("(* Copy those to Mathematica to test *)\n"));
     GenerateTestArray(hD3Source, _tfftMX * _tfftMY * _tfftMZ);
     appGeneral(_T("sour3d="));
@@ -670,7 +670,7 @@ void CCLGFFTHelper::TestFFT()
     CLGComplex* hD4Res = (CLGComplex*)malloc(_tfftMX * _tfftMY * _tfftMZ * _tfftMT * sizeof(CLGComplex));
     CLGComplex* hD4Source = (CLGComplex*)malloc(_tfftMX * _tfftMY * _tfftMZ * _tfftMT * sizeof(CLGComplex));
 
-    checkCudaErrors(cudaMalloc((void**)& dD4Res, _tfftMX * _tfftMY * _tfftMZ * _tfftMT * sizeof(CLGComplex)));
+    checkCudaErrors(__cudaMalloc((void**)& dD4Res, _tfftMX * _tfftMY * _tfftMZ * _tfftMT * sizeof(CLGComplex)));
 
     GenerateTestArray(hD4Source, _tfftMX * _tfftMY * _tfftMZ * _tfftMT);
     appGeneral(_T("sour="));
@@ -732,8 +732,8 @@ void CCLGFFTHelper::TestFFT()
     free(hD3Source);
     free(hD4Res);
     free(hD4Source);
-    checkCudaErrors(cudaFree(dD3Res));
-    checkCudaErrors(cudaFree(dD4Res));
+    checkCudaErrors(__cudaFree(dD3Res));
+    checkCudaErrors(__cudaFree(dD4Res));
 }
 
 __END_NAMESPACE

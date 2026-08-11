@@ -6,6 +6,7 @@
 //
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [07/01/2024 nbale]
 //=============================================================================
 
@@ -96,6 +97,14 @@ public:
         return ret;
     }
 
+    __device__ __inline__ void Zero()
+    {
+        for (INT i = 0; i < N; ++i)
+        {
+            m_ve[i] = _make_cuComplex(F(0.0), F(0.0));
+        }
+    }
+
     __device__ __inline__ static deviceSUNVector<N, NofE> makeOneSUNVector()
     {
         deviceSUNVector<N, NofE> ret;
@@ -104,6 +113,14 @@ public:
             ret.m_ve[i] = _make_cuComplex(F(1.0), F(0.0));
         }
         return ret;
+    }
+
+    __device__ __inline__ void Id()
+    {
+        for (INT i = 0; i < N; ++i)
+        {
+            m_ve[i] = _make_cuComplex(F(1.0), F(0.0));
+        }
     }
 
     __device__ __inline__ static deviceSUNVector<N, NofE> makeOneSUNVectorColor(BYTE byColor)
@@ -191,6 +208,22 @@ public:
         for (INT i = 0; i < N; ++i)
         {
             m_ve[i] = _cuCmulf(m_ve[i], other);
+        }
+    }
+
+    __device__ __inline__ void DivReal(Real other)
+    {
+        for (INT i = 0; i < N; ++i)
+        {
+            m_ve[i] = cuCdivf_cr(m_ve[i], other);
+        }
+    }
+
+    __device__ __inline__ void DivComp(const CLGComplex& other)
+    {
+        for (INT i = 0; i < N; ++i)
+        {
+            m_ve[i] = _cuCdivf(m_ve[i], other);
         }
     }
 
@@ -315,6 +348,8 @@ public:
 
     __device__ __inline__ deviceSUNVector<N, NofE> MulRealC(Real other) const { deviceSUNVector<N, NofE> ret(*this); ret.MulReal(other); return ret; }
     __device__ __inline__ deviceSUNVector<N, NofE> MulCompC(const CLGComplex& other) const { deviceSUNVector<N, NofE> ret(*this); ret.MulComp(other); return ret; }
+    __device__ __inline__ deviceSUNVector<N, NofE> DivRealC(Real other) const { deviceSUNVector<N, NofE> ret(*this); ret.DivReal(other); return ret; }
+    __device__ __inline__ deviceSUNVector<N, NofE> DivCompC(const CLGComplex& other) const { deviceSUNVector<N, NofE> ret(*this); ret.DivComp(other); return ret; }
     __device__ __inline__ deviceSUNVector<N, NofE> MulZ4C(BYTE z4) const { deviceSUNVector<N, NofE> ret(*this); ret.MulZ4(z4); return ret; }
 
     __device__ __inline__ CLGComplex Sum() const
@@ -342,6 +377,16 @@ public:
         }
     }
 
+    __device__ __inline__ Real Abs() const
+    {
+        Real len = ConjugateDotC(*this).x;
+        if (len > _CLG_FLT_MIN_)
+        {
+            return _sqrt(len);
+        }
+        return F(0.0);
+    }
+
     CLGComplex m_ve[NofE];
 };
 
@@ -350,6 +395,11 @@ typedef deviceSUNVector<5, 8> deviceSU5Vector;
 typedef deviceSUNVector<6, 8> deviceSU6Vector;
 typedef deviceSUNVector<7, 8> deviceSU7Vector;
 typedef deviceSUNVector<8, 8> deviceSU8Vector;
+
+#define _TYPEDEFSUNVECTOR(n, moe) typedef deviceSUNVector<n, moe> deviceSU##n##Vector;
+#define _DEF_F2_TO_SUNVECTOR(n, imp) _DEF_F2_N(n, imp, 16, 16, 16, 16, 16, 16, 16, 16, 8, 8, 8, 8, 4)
+
+_DEF_F2_TO_SUNVECTOR(_MAX_SUN, _TYPEDEFSUNVECTOR)
 
 __END_NAMESPACE
 

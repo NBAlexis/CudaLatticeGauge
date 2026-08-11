@@ -8,6 +8,7 @@
 // REVISION:
 //  [12/5/2018 nbale]
 //=============================================================================
+#pragma once
 
 #ifndef _CBOUNDARYCONDITION_H_
 #define _CBOUNDARYCONDITION_H_
@@ -59,7 +60,7 @@ public:
      */
     virtual void BakeBondGlue(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceTable) const = 0;
 
-    virtual UBOOL NeedToFixBoundary() const { return FALSE; }
+    //virtual UBOOL NeedToFixBoundary() const { return FALSE; }
 
     SSmallInt4 GetFieldBC(BYTE byFieldId) const { return m_FieldBC[byFieldId]; }
 

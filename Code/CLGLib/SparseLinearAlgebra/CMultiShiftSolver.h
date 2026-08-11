@@ -5,6 +5,7 @@
 // This is the class for Sparse Linear Algebra solves, multi-shift version
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [15/06/2020 nbale]
 //=============================================================================
 
@@ -17,9 +18,27 @@ class CLGAPI CMultiShiftSolver : public CBase
 {
 public:
 
-    CMultiShiftSolver() : m_pOwner(NULL), m_bAbsoluteAccuracy(FALSE) { }
+    CMultiShiftSolver() : m_pOwner(NULL), m_fAccuracy(0.000001), m_bAbsoluteAccuracy(FALSE) {}
 
-    virtual void Configurate(const CParameters& param) = 0;
+    virtual void Configurate(const CParameters& param)
+    {
+        INT iValue = 1;
+        DOUBLE fValue = 0.000001;
+
+        if (param.FetchValueINT(_T("AbsoluteAccuracy"), iValue))
+        {
+            m_bAbsoluteAccuracy = (0 != iValue);
+        }
+        if (param.FetchValueDOUBLE(_T("Accuracy"), fValue))
+        {
+            m_fAccuracy = fValue;
+            if (m_fAccuracy < _CLG_FLT_EPSILON * F(2.0))
+            {
+                m_fAccuracy = _CLG_FLT_EPSILON * F(2.0);
+                appGeneral(_T("Solver accuracy too small (%2.18f), set to be %2.18f\n"), fValue, m_fAccuracy);
+            }
+        }
+    }
 
     /**
     * One solver can be solely correspond to one kind of field.
@@ -40,8 +59,10 @@ public:
         const CField* pFieldB,
         INT gaugeNum,
         INT bosonNum,
+        INT tensor2Num,
         const CFieldGauge* const* gaugeFields,
         const CFieldBoson* const* bosonFields,
+        const CFieldTensor2* const* tensor2Fields,
         EFieldOperator uiM,
         ESolverPhase ePhase = ESP_Once,
         const CField* pStart = NULL) = 0;
@@ -49,7 +70,9 @@ public:
     class CLatticeData* m_pOwner;
     virtual CCString GetInfos(const CCString& tab) const
     {
-        return tab + _T("##The multi-shift solver should be irrelevant to configurations\n") + tab + _T("Name : Do_Not_Care\n");
+        return tab + _T("##The solver should be irrelevant to configurations\n")
+            + CBase::GetInfos(tab)
+            + tab + _T("Accuracy(absolute) : ") + appToString(m_fAccuracy) + _T("(") + appToString(m_bAbsoluteAccuracy) + _T(")\n");
     }
 
     UBOOL IsAbsoluteAccuracy() const { return m_bAbsoluteAccuracy; }
@@ -57,7 +80,7 @@ public:
 protected:
 
     UINT m_uiAccurayCheckInterval;
-    Real m_fAccuracy;
+    DOUBLE m_fAccuracy;
     UBOOL m_bAbsoluteAccuracy;
 };
 

@@ -1,0 +1,69 @@
+Task: Simulate
+WarmUp: 0
+SaveStartIndex: 0
+ConfigurationNumber: 1
+SavePrefix: t05_su3_ks_conf
+
+Dim: 4
+Dir: 4
+LatticeLength: [8, 8, 8, 8]
+LatticeIndex: CIndexSquare
+LatticeBoundary: CBoundaryConditionTorusSquare
+ThreadAutoDecompose: 1
+MaxThreadPerBlock: 256
+RandomType: ER_Schrage
+RandomSeed: 1234567
+
+ActionListLength: 2
+GaugeFieldCount: 1
+FermionFieldCount: 1
+MeasureListLength: 1
+
+Updator:
+    UpdatorType: CHMC
+    Metropolis: 1
+    IntegratorType: CIntegratorLeapFrog
+    IntegratorStepLength: 0.1
+    IntegratorStep: 10
+
+Gauge:
+    FieldName: CFieldGaugeSU3
+    FieldInitialType: EFIT_Random
+
+FermionField1:
+    FieldName: CFieldFermionKSSU3
+    FieldInitialType: EFIT_RandomGaussian
+    Mass: 0.1
+    FieldId: 2
+    PoolNumber: 15
+    Period: [1, 1, 1, -1]
+    MC: [1.53128, -0.000947, -0.022930, -1.192485, 0.005144, 0.075515, 1.338794]
+    MD: [0.390460, 0.051109, 0.140828, 0.596484, 0.001277, 0.028616, 0.410599]
+    EN: [0.653047, 0.008528, 0.051543, 0.458672, 0.002240, 0.039726, 0.583143]
+
+Solver:
+    SolverName: CSLASolverGMRES
+    SolverForFieldId: 2
+    MaxDim: 20
+    Accuracy: 0.01
+    Restart: 15
+    AbsoluteAccuracy: 1
+
+MSSolver:
+    SolverName: CMultiShiftBiCGStab
+    SolverForFieldId: 2
+    DiviationStep: 100
+    MaxStep: 20
+    Accuracy: 0.01
+    AbsoluteAccuracy: 1
+
+Action1:
+    ActionName: CActionGaugePlaquette
+    Beta: 5.0
+
+Action2:
+    ActionName: CActionFermionKS
+    FieldId: 2
+
+Measure1:
+    MeasureName: CMeasurePlaqutteEnergy

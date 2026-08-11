@@ -32,6 +32,14 @@ public:
     , m_pA13(NULL)
     , m_pA22(NULL)
     , m_pA23(NULL)
+#if _CLG_MULTI_GPU
+    , m_pSavedG(NULL)
+    , m_pSavedA11(NULL)
+    , m_pSavedA12(NULL)
+    , m_pSavedA13(NULL)
+    , m_pSavedA22(NULL)
+    , m_pSavedA23(NULL)
+#endif
     {
     }
 
@@ -51,6 +59,12 @@ public:
 
     CCString GetInfos(const CCString& sTab) const override;
 
+    //P4-2.4: core deviation loop over one gauge buffer (local or gathered-global).
+    DOUBLE CheckResLocal(const deviceSU3* pGaugeData, BYTE byFieldId);
+
+    //P4-2.4: the 4D iteration loop, run over a local or a gathered-global buffer.
+    void GaugeFixingLoop(deviceSU3* pDeviceBufferPointer, BYTE byFieldId);
+
     Real m_fOmega;
     UINT m_iCheckErrorStep;
     deviceSU3* m_pG;
@@ -59,6 +73,21 @@ public:
     CLGComplex* m_pA13;
     Real* m_pA22;
     CLGComplex* m_pA23;
+
+#if _CLG_MULTI_GPU
+    //P4-2.4: temporary global-lattice fixing buffers (rank 0 only), mirroring
+    //P4-2.2/P4-2.3: the 4D-volume buffers above are sized to the LOCAL lattice in
+    //Initial(); under the temporary GLOBAL context they are re-allocated to the
+    //global volume and restored on exit.
+    void ResizeBuffersToGlobal();
+    void RestoreLocalBuffers();
+    deviceSU3* m_pSavedG;
+    Real* m_pSavedA11;
+    CLGComplex* m_pSavedA12;
+    CLGComplex* m_pSavedA13;
+    Real* m_pSavedA22;
+    CLGComplex* m_pSavedA23;
+#endif
 };
 
 __END_NAMESPACE

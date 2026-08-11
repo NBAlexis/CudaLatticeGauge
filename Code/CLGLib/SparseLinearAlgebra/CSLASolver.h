@@ -5,6 +5,7 @@
 // This is the class for Sparse Linear Algebra solves.
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [01/03/2019 nbale]
 //=============================================================================
 
@@ -43,16 +44,21 @@ public:
         const CField* pFieldB, 
         INT gaugeNum,
         INT bosonNum,
+        INT tensor2Num,
         const CFieldGauge* const* gaugeFields, 
         const CFieldBoson* const* bosonFields,
+        const CFieldTensor2* const* tensor2Fields,
         EFieldOperator uiM, 
         ESolverPhase ePhase = ESP_Once,
         const CField* pStart = NULL) = 0;
 
     class CLatticeData* m_pOwner;
+
     virtual CCString GetInfos(const CCString &tab) const 
     { 
-        return tab + _T("##The solver should be irrelevant to configurations\n") + tab + _T("Name : Do_Not_Care\n");
+        return tab + _T("##The solver should be irrelevant to configurations\n") 
+             + CBase::GetInfos(tab)
+             + tab + _T("Accuracy(absolute) : ") + appToString(m_fAccuracy) + _T("(") + appToString(m_bAbsoluteAccuracy) + _T(")\n");
     }
 
     UBOOL IsAbsoluteAccuracy() const {return m_bAbsoluteAccuracy; }

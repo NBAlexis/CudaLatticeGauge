@@ -1,0 +1,144 @@
+\subsection{\label{actiontable}Action table}
+
+\subsubsection{\label{TreeImprovedGauge}Tree improved gauge}
+
+For naive Wilson action, ignore $a$~(let $a=1$),
+\begin{equation}
+\begin{split}
+&A_{lat} = g_s A\\    
+&F_{\mu\nu,lat} = g_sF_{\mu\nu}\\    
+&\sum _{\mu>\nu}F^2_{\mu\nu,lat} = \frac{1}{2}\sum _{\mu ,\nu}F_{\mu\nu,lat} = \frac{1}{2}g_s^2 F_{\mu\nu}\\    
+&\frac{1}{4}F_{\mu\nu} = \frac{2}{g_s^2} \sum _{\mu>\nu}F_{\mu\nu,lat}=\frac{\beta}{N_c}\sum _{\mu>\nu}F_{\mu\nu,lat}\\
+\end{split}
+\end{equation}
+\textbf{so, $\frac{\beta}{N_c}=\frac{2}{g_s^2}$, that is the reason in literatures, $\beta = 6/g^2$.}
+
+For tree-level improved case, 
+\begin{equation}
+\begin{split}
+&S=\frac{\beta}{N_c}\left(\frac{5}{3} S_{plaq}- \frac{1}{12} S_{rect}\right)\\
+&S_{plaq} = \sum _{plaq}{\rm Retr}(1-U_{plaq})\\
+&S_{rect} = \sum _{rect}{\rm Retr}(1\textcolor[rgb]{1,0,0}{-}U_{rect})\\
+\end{split}
+\end{equation}
+
+If we redefine $\beta' = \frac{\beta}{N_c}\frac{5}{3}$, then $\beta' = 10/g^2$ and,
+\begin{equation}
+\begin{split}
+&S=\frac{\beta'}{N_c}\left(S_{plaq}- \frac{1}{20} S_{rect}\right)
+\end{split}
+\end{equation}
+
+With tadpole improved, it is
+\begin{equation}
+\begin{split}
+&S=\frac{\beta'}{N_cu_0^2}\left(S_{plaq}- \frac{1}{20u_0^2} S_{rect}\right)
+\end{split}
+\end{equation}
+
+Usually, one defines $\beta''=10/(g^2u_0^2)$, and
+\begin{equation}
+\begin{split}
+&S=\frac{\beta''}{N_c}\left(S_{plaq}- \frac{1}{20u_0^2} S_{rect}\right)\\
+&S_{plaq}=\sum _{\mu>\nu}U_{\mu,\nu}\\
+&S_{rect}=\sum _{\mu\neq \nu}U_{\mu,\mu,\nu}=\sum _{\mu>\nu}\left(U_{\mu,\mu,\nu}+U_{\mu,\nu,\nu}\right)\\
+\end{split}
+\end{equation}
+
+\subsubsection{\label{StoutlinkWilsonDirac}Stout link smearing Wilson Dirac}
+
+Using $\kappa=\frac{1}{2am_f+8}$, the Wilson-Dirac fermion operator is, (in \href{https://research.kek.jp/people/matufuru/Research/Docs/Bridge/Clover_HMC/note_cloverHMC_1.3.1.pdf}{Lattice QCD simulations with clover quarks}, it uses $\bar{\sigma}\bar{F}=\sigma F$, where $\bar{\sigma}=\frac{1}{2}[\gamma ,\gamma]$, $\bar{F}=\frac{1}{8}(P-P^{\dagger})$, so $\sigma=\frac{i}{2}[\gamma ,\gamma]$, $\bar{F}=\frac{1}{8i}(P-P^{\dagger})$)
+\begin{equation}
+\begin{split}
+&S=\bar{\psi}D\psi,\\    
+&D=1-\kappa\left[\sum _{\mu}\left((1-\gamma _{\mu})U_{\mu}(x _L)\delta _{x _L,(x+\mu)_R}+(1+\gamma _{\mu})U_{\mu}^{-1}(x _L-\mu)\delta _{x_L,(x-\mu)_R}\right)+\frac{1}{2}c_{SW}\sigma_{\mu\nu}F_{\mu\nu}\right]\\
+\end{split}
+\end{equation}
+
+with
+\begin{equation}
+\begin{split}
+&F_{\mu\nu}=\frac{1}{8\textcolor[rgb]{1,0,0}{i}}\left(P_{\mu\nu}-P_{\mu\nu}^{\dagger}\right)\\
+\end{split}
+\end{equation}
+There are different definitions of $P_{\mu\nu}$, the original one was,
+\begin{equation}
+\begin{split}
+&P_{\mu\nu}=U_{\mu,\nu}+U_{\nu,-\mu}-U_{\mu,-\nu}-U_{-\nu,-\mu}\\
+\end{split}
+\end{equation}
+Using $U_{a,b}=U_{b,a}^{\dagger}$, it is equivalent to use,
+\begin{equation}
+\begin{split}
+&P'_{\mu\nu}=U_{\mu,\nu}-U_{-\mu,\nu}-U_{\mu,-\nu}+U_{-\mu,-\nu}\\
+\end{split}
+\end{equation}
+or
+\begin{equation}
+\begin{split}
+&P''_{\mu\nu}=U_{\mu,\nu}+U_{\nu,-\mu}+U_{-\nu,\mu}+U_{-\mu,-\nu}\\
+\end{split}
+\end{equation}
+In the code, we use $P'$.
+
+\textbf{Note, $\sigma$ is in Euclidean space. Because $\gamma _5 \sigma ^E_{41}\gamma _5 = \left(\sigma ^E_{41}\right)^{\dagger}$, $\gamma _5 \sigma ^M_{41}\gamma _5 = -\left(\sigma ^M_{41}\right)^{\dagger}$ and $F_{\mu\nu}^{\dagger}=F_{\mu\nu}$ (note the $i$ in denominator). \textcolor[rgb]{1,0,0}{The Minkovski space $\sigma _{\mu\nu}F_{\mu\nu}$ is not $\gamma _5$ Hermitian.}}
+
+And therefore,
+\begin{equation}
+\begin{split}
+&-\left(am + 4\right)S=\frac{1}{2}\sum _{\mu}\bar{\psi}(x)\left((1-\gamma _{\mu})U_{\mu}(x _L)\psi(x+\mu)+(1+\gamma _{\mu})U_{\mu}^{-1}(x _L-\mu)\psi (x-\mu)\right)\\    
+&+\bar{\psi}\left[-(am+4) + \textcolor[rgb]{1,0,0}{\frac{1}{4}}c_{SW}\sigma_{\mu\nu}F_{\mu\nu}\right]\psi\\
+\end{split}
+\end{equation}
+
+Using $\sigma _{\nu\mu}F_{\nu\mu}=\sigma _{\mu\nu}F_{\mu\nu}$, it can be simplified as,
+\begin{equation}
+\begin{split}
+&D=1-\kappa\left[\sum _{\mu}\left((1-\gamma _{\mu})U_{\mu}(x _L)\delta _{x _L,(x+\mu)_R}+(1+\gamma _{\mu})U_{\mu}^{-1}(x _L-\mu)\delta _{x_L,(x-\mu)_R}\right)+c_{SW}\sum _{\mu>\nu}\sigma_{\mu\nu}F_{\mu\nu}\right]\\
+\end{split}
+\end{equation}
+
+With tadpole improvement,
+\begin{equation}
+\begin{split}
+&\kappa = \frac{1}{v_0(2am + 8)}\\
+&c_{SW}=\frac{1}{v_0^3}\\
+\end{split}
+\end{equation}
+
+\subsubsection{\label{HISQAction}HISQ Action}
+
+\begin{equation}
+\begin{split}
+&D=2m\delta _{m,n} + \sum _{\mu}\eta _{\mu}(n)\left[U^{eff,2}_{\mu}(n) \delta _{n,n+\mu} - U^{eff,2}_{-\mu}(n)\delta _{n,n-\mu}+ \textcolor[rgb]{1,0,0}{\left(-\frac{1+\epsilon}{24}\right)}\left(U^{eff,1}_{3\mu}(n) \delta _{n,n+3\mu} - U^{eff,1}_{-3\mu}(n)\delta _{n,n-3\mu}\right)\right]\\
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+&U^{eff,2}_{\mu}(n) = S_{Asqtad}(\textcolor[rgb]{1,0,0}{\epsilon})U^{eff,1}_{\mu}(n)\\
+&U^{eff,1}_{\mu}(n) = P_{U_3}S_{fat7}(\epsilon=0)U_{\mu}(n)\\
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+&S_{fat7}U = \frac{1}{8}U+\frac{1}{16}fat3+\frac{1}{64}fat5+\frac{1}{384}fat7\\
+&S_{Asqtad}(\epsilon)U = \frac{1+\textcolor[rgb]{1,0,0}{\epsilon}}{8}U+\frac{1}{16}fat3+\frac{1}{64}fat5+\frac{1}{384}fat7-\frac{1}{8}Lepage\\
+\end{split}
+\end{equation}
+
+Because different fermions have different $\epsilon$, it seems easier to implement this,
+\begin{equation}
+\begin{split}
+&D=2m\delta _{m,n} + \sum _{\mu}\eta _{\mu}(n)\left[U^{eff,2}_{\mu}(n) \delta _{n,n+\mu} - U^{eff,2}_{-\mu}(n)\delta _{n,n-\mu}\right.\\
+&\left.+\frac{\epsilon}{8}\left(U^{eff,1}_{\mu}(n) \delta _{n,n+\mu} - U^{eff,1}_{-\mu}(n)\delta _{n,n-\mu}\right)+ \textcolor[rgb]{1,0,0}{\left(-\frac{1+\epsilon}{24}\right)}\left(U^{eff,1}_{3\mu}(n) \delta _{n,n+3\mu} - U^{eff,1}_{-3\mu}(n)\delta _{n,n-3\mu}\right)\right]\\
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+&U^{eff,2}_{\mu}(n) = S_{Asqtad}(\textcolor[rgb]{1,0,0}{\epsilon=0})U^{eff,1}_{\mu}(n)\\
+&U^{eff,1}_{\mu}(n) = P_{U_3}S_{fat7}U_{\mu}(n)\\
+\end{split}
+\end{equation}

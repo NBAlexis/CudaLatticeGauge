@@ -6,9 +6,13 @@
 //
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [07/03/2024 nbale]
 //=============================================================================
 #include "DeviceTemplates/DeviceInlineUseNoTemplateFunction.h"
+#include "Tools/Math/DeviceInlineTemplate2.h"
+#include "Tools/Math/ZN.h"
+#include "Tools/Math/DN.h"
 
 #ifndef _DEVICEINLINETEMPLATE_H_
 #define _DEVICEINLINETEMPLATE_H_
@@ -39,6 +43,7 @@ template<> __device__ __inline__ cuDoubleComplex _makeId<cuDoubleComplex>()
 }
 #endif
 
+
 template<> __device__ __inline__ deviceSU2 _makeId<deviceSU2>()
 {
     return deviceSU2::makeSU2Id();
@@ -47,31 +52,6 @@ template<> __device__ __inline__ deviceSU2 _makeId<deviceSU2>()
 template<> __device__ __inline__ deviceSU3 _makeId<deviceSU3>()
 {
     return deviceSU3::makeSU3Id();
-}
-
-template<> __device__ __inline__ deviceSU4 _makeId<deviceSU4>()
-{
-    return deviceSU4::makeSUNId();
-}
-
-template<> __device__ __inline__ deviceSU5 _makeId<deviceSU5>()
-{
-    return deviceSU5::makeSUNId();
-}
-
-template<> __device__ __inline__ deviceSU6 _makeId<deviceSU6>()
-{
-    return deviceSU6::makeSUNId();
-}
-
-template<> __device__ __inline__ deviceSU7 _makeId<deviceSU7>()
-{
-    return deviceSU7::makeSUNId();
-}
-
-template<> __device__ __inline__ deviceSU8 _makeId<deviceSU8>()
-{
-    return deviceSU8::makeSUNId();
 }
 
 template<> __device__ __inline__ deviceSU2Vector _makeId<deviceSU2Vector>()
@@ -84,39 +64,45 @@ template<> __device__ __inline__ deviceSU3Vector _makeId<deviceSU3Vector>()
     return deviceSU3Vector::makeOneSU3Vector();
 }
 
-template<> __device__ __inline__ deviceSU4Vector _makeId<deviceSU4Vector>()
+template<typename T> __device__ __inline__ void _Id(T& v) = delete;
+
+template<> __device__ __inline__ void _Id<INT>(INT &v) { v = 1; }
+template<> __device__ __inline__ void _Id<UINT>(UINT& v) { v = 1; }
+template<> __device__ __inline__ void _Id<BYTE>(BYTE& v) { v = 1; }
+template<> __device__ __inline__ void _Id<Real>(Real& v) { v = F(1.0); }
+template<> __device__ __inline__ void _Id<CLGComplex>(CLGComplex& v) { v.x = F(1.0); v.y = F(0.0); }
+#if _CLG_DOUBLEFLOAT
+template<> __device__ __inline__ void _Id<FLOAT>(FLOAT& v) { v = 1.0f; }
+template<> __device__ __inline__ void _Id<cuComplex>(cuComplex& v)
 {
-    return deviceSU4Vector::makeOneSUNVector();
+    v.x = 1.0f; v.y = 0.0f;
 }
-
-template<> __device__ __inline__ deviceSU5Vector _makeId<deviceSU5Vector>()
+#else
+template<> __device__ __inline__ void _Id<DOUBLE>(DOUBLE& v) { v = 1.0; }
+template<> __device__ __inline__ void _Id<cuDoubleComplex>(cuDoubleComplex& v)
 {
-    return deviceSU5Vector::makeOneSUNVector();
+    v.x = 1.0; v.y = 0.0;
 }
-
-template<> __device__ __inline__ deviceSU6Vector _makeId<deviceSU6Vector>()
-{
-    return deviceSU6Vector::makeOneSUNVector();
-}
-
-template<> __device__ __inline__ deviceSU7Vector _makeId<deviceSU7Vector>()
-{
-    return deviceSU7Vector::makeOneSUNVector();
-}
-
-template<> __device__ __inline__ deviceSU8Vector _makeId<deviceSU8Vector>()
-{
-    return deviceSU8Vector::makeOneSUNVector();
-}
-
-template<> __device__ __inline__ deviceWilsonVectorSU3 _makeId<deviceWilsonVectorSU3>()
-{
-    return deviceWilsonVectorSU3::makeOneWilsonVectorSU3();
-}
-
-
+#endif
+template<> __device__ __inline__ void _Id<deviceSU2>(deviceSU2& v) { v.Id(); }
+template<> __device__ __inline__ void _Id<deviceSU3>(deviceSU3& v) { v.Id(); }
+template<INT N, INT NoE> __device__ __inline__ void _Id(deviceSUN<N, NoE>& v) { v.Id(); }
+template<INT N, INT NoE> __device__ __inline__ void _Id(deviceSLNC<N, NoE>& v) { v.Id(); }
+template<INT N, INT NoE> __device__ __inline__ void _Id(deviceUN<N, NoE>& v) { v.Id(); }
+template<INT N, INT NoE> __device__ __inline__ void _Id(deviceON<N, NoE>& v) { v.Id(); }
+template<INT N, INT NoE> __device__ __inline__ void _Id(deviceSON<N, NoE>& v) { v.Id(); }
+template<INT N> __device__ __inline__ void _Id(deviceZN<N>& v) { v.Id(); }
+template<> __device__ __inline__ void _Id<deviceSU2Vector>(deviceSU2Vector& v) { v.Id(); }
+template<> __device__ __inline__ void _Id<deviceSU3Vector>(deviceSU3Vector& v) { v.Id(); }
+template<INT N, INT NoE> __device__ __inline__ void _Id(deviceSUNVector<N, NoE>& v) { v.Id(); }
+template<> __device__ __inline__ void _Id<deviceWilsonVectorSU3>(deviceWilsonVectorSU3& v) { v.Id(); }
 
 template<typename T> __device__ __inline__ T _makeZero() = delete;
+template<typename T> __host__ __inline__ T _makeZeroHost() = delete;
+template<> __host__ __inline__ FLOAT _makeZeroHost<FLOAT>() { return 0.0f; }
+template<> __host__ __inline__ DOUBLE _makeZeroHost<DOUBLE>() { return 0.0; }
+template<> __host__ __inline__ cuComplex _makeZeroHost<cuComplex>() { return make_cuComplex(0.0f, 0.0f); }
+template<> __host__ __inline__ cuDoubleComplex _makeZeroHost<cuDoubleComplex>() { return make_cuDoubleComplex(0.0, 0.0); }
 
 template<> __device__ __inline__ INT _makeZero<INT>() { return 0; }
 template<> __device__ __inline__ UINT _makeZero<UINT>() { return 0; }
@@ -148,31 +134,6 @@ template<> __device__ __inline__ deviceSU3 _makeZero<deviceSU3>()
     return deviceSU3::makeSU3Zero();
 }
 
-template<> __device__ __inline__ deviceSU4 _makeZero<deviceSU4>()
-{
-    return deviceSU4::makeSUNZero();
-}
-
-template<> __device__ __inline__ deviceSU5 _makeZero<deviceSU5>()
-{
-    return deviceSU5::makeSUNZero();
-}
-
-template<> __device__ __inline__ deviceSU6 _makeZero<deviceSU6>()
-{
-    return deviceSU6::makeSUNZero();
-}
-
-template<> __device__ __inline__ deviceSU7 _makeZero<deviceSU7>()
-{
-    return deviceSU7::makeSUNZero();
-}
-
-template<> __device__ __inline__ deviceSU8 _makeZero<deviceSU8>()
-{
-    return deviceSU8::makeSUNZero();
-}
-
 template<> __device__ __inline__ deviceSU2Vector _makeZero<deviceSU2Vector>()
 {
     return deviceSU2Vector::makeZeroSU2Vector();
@@ -188,33 +149,53 @@ template<> __device__ __inline__ deviceWilsonVectorSU3 _makeZero<deviceWilsonVec
     return deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 }
 
-template<> __device__ __inline__ deviceSU4Vector _makeZero<deviceSU4Vector>()
-{
-    return deviceSU4Vector::makeZeroSUNVector();
-}
+template<typename T> __device__ __inline__ void _Zero(T& v) = delete;
 
-template<> __device__ __inline__ deviceSU5Vector _makeZero<deviceSU5Vector>()
+template<> __device__ __inline__ void _Zero<INT>(INT& v) { v = 0; }
+template<> __device__ __inline__ void _Zero<UINT>(UINT& v) { v = 0; }
+template<> __device__ __inline__ void _Zero<BYTE>(BYTE& v) { v = 0; }
+template<> __device__ __inline__ void _Zero<Real>(Real& v) { v = F(0.0); }
+template<> __device__ __inline__ void _Zero<CLGComplex>(CLGComplex& v) { v.x = F(0.0); v.y = F(0.0); }
+#if _CLG_DOUBLEFLOAT
+template<> __device__ __inline__ void _Zero<FLOAT>(FLOAT& v) { v = 0.0f; }
+template<> __device__ __inline__ void _Zero<cuComplex>(cuComplex& v)
 {
-    return deviceSU5Vector::makeZeroSUNVector();
+    v.x = 0.0f; v.y = 0.0f;
 }
+#else
+template<> __device__ __inline__ void _Zero<DOUBLE>(DOUBLE& v) { v = 0.0; }
+template<> __device__ __inline__ void _Zero<cuDoubleComplex>(cuDoubleComplex& v)
+{
+    v.x = 0.0; v.y = 0.0;
+}
+#endif
+template<> __device__ __inline__ void _Zero<deviceSU2>(deviceSU2& v) { v.Zero(); }
+template<> __device__ __inline__ void _Zero<deviceSU3>(deviceSU3& v) { v.Zero(); }
+template<INT N, INT NoE> __device__ __inline__ void _Zero(deviceSUN<N, NoE>& v) { v.Zero(); }
+template<INT N, INT NoE> __device__ __inline__ void _Zero(deviceSLNC<N, NoE>& v) { v.Zero(); }
+template<INT N, INT NoE> __device__ __inline__ void _Zero(deviceUN<N, NoE>& v) { v.Zero(); }
+template<INT N, INT NoE> __device__ __inline__ void _Zero(deviceON<N, NoE>& v) { v.Zero(); }
+template<INT N, INT NoE> __device__ __inline__ void _Zero(deviceSON<N, NoE>& v) { v.Zero(); }
+template<INT N> __device__ __inline__ void _Zero(deviceZN<N>& v) { v.Zero(); }
+template<> __device__ __inline__ void _Zero<deviceSU2Vector>(deviceSU2Vector& v) { v.Zero(); }
+template<> __device__ __inline__ void _Zero<deviceSU3Vector>(deviceSU3Vector& v) { v.Zero(); }
+template<INT N, INT NoE> __device__ __inline__ void _Zero(deviceSUNVector<N, NoE>& v) { v.Zero(); }
+template<> __device__ __inline__ void _Zero<deviceWilsonVectorSU3>(deviceWilsonVectorSU3& v) { v.Zero(); }
 
-template<> __device__ __inline__ deviceSU6Vector _makeZero<deviceSU6Vector>()
-{
-    return deviceSU6Vector::makeZeroSUNVector();
-}
 
-template<> __device__ __inline__ deviceSU7Vector _makeZero<deviceSU7Vector>()
-{
-    return deviceSU7Vector::makeZeroSUNVector();
-}
+template<typename T> __device__ __inline__ T _makeAsK(UINT k) = delete;
+template<typename T> __device__ __inline__ void _SetAsK(T& v, UINT k) = delete;
 
-template<> __device__ __inline__ deviceSU8Vector _makeZero<deviceSU8Vector>()
-{
-    return deviceSU8Vector::makeZeroSUNVector();
-}
+template<INT N> __device__ __inline__ void _SetAsK(deviceZN<N>& v, UINT k) { v.SetFromIndex(k); }
+template<INT N> __device__ __inline__ void _SetAsK(deviceDN<N>& v, UINT k) { v.SetFromIndex(k); }
 
 
 template<typename TMatrix, typename TVector> __device__ __inline__ TMatrix _makeContract(const TVector& left, const TVector& right) = delete;
+
+template<> __device__ __inline__ Real _makeContract<Real, Real>(const Real& left, const Real& right)
+{
+    return left * right;
+}
 
 template<> __device__ __inline__ CLGComplex _makeContract<CLGComplex, CLGComplex>(const CLGComplex& left, const CLGComplex& right)
 {
@@ -231,29 +212,9 @@ template<> __device__ __inline__ deviceSU3 _makeContract<deviceSU3, deviceSU3Vec
     return deviceSU3::makeSU3ContractV(left, right);
 }
 
-template<> __device__ __inline__ deviceSU4 _makeContract<deviceSU4, deviceSU4Vector>(const deviceSU4Vector& left, const deviceSU4Vector& right)
+template<> __device__ __inline__ deviceSU3 _makeContract<deviceSU3, deviceWilsonVectorSU3>(const deviceWilsonVectorSU3& left, const deviceWilsonVectorSU3& right)
 {
-    return deviceSU4::makeSUNContractV(left, right);
-}
-
-template<> __device__ __inline__ deviceSU5 _makeContract<deviceSU5, deviceSU5Vector>(const deviceSU5Vector& left, const deviceSU5Vector& right)
-{
-    return deviceSU5::makeSUNContractV(left, right);
-}
-
-template<> __device__ __inline__ deviceSU6 _makeContract<deviceSU6, deviceSU6Vector>(const deviceSU6Vector& left, const deviceSU6Vector& right)
-{
-    return deviceSU6::makeSUNContractV(left, right);
-}
-
-template<> __device__ __inline__ deviceSU7 _makeContract<deviceSU7, deviceSU7Vector>(const deviceSU7Vector& left, const deviceSU7Vector& right)
-{
-    return deviceSU7::makeSUNContractV(left, right);
-}
-
-template<> __device__ __inline__ deviceSU8 _makeContract<deviceSU8, deviceSU8Vector>(const deviceSU8Vector& left, const deviceSU8Vector& right)
-{
-    return deviceSU8::makeSUNContractV(left, right);
+    return deviceSU3::makeSU3Contract(left, right);
 }
 
 //This is to make white noise, so for gauge, it is random generator
@@ -280,31 +241,6 @@ template<> __device__ __inline__ deviceSU3Vector _makeGaussian<deviceSU3Vector>(
     return deviceSU3Vector::makeRandomGaussian(fatIdx);
 }
 
-template<> __device__ __inline__ deviceSU4Vector _makeGaussian<deviceSU4Vector>(UINT fatIdx)
-{
-    return deviceSU4Vector::makeRandomGaussian(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU5Vector _makeGaussian<deviceSU5Vector>(UINT fatIdx)
-{
-    return deviceSU5Vector::makeRandomGaussian(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU6Vector _makeGaussian<deviceSU6Vector>(UINT fatIdx)
-{
-    return deviceSU6Vector::makeRandomGaussian(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU7Vector _makeGaussian<deviceSU7Vector>(UINT fatIdx)
-{
-    return deviceSU7Vector::makeRandomGaussian(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU8Vector _makeGaussian<deviceSU8Vector>(UINT fatIdx)
-{
-    return deviceSU8Vector::makeRandomGaussian(fatIdx);
-}
-
 template<> __device__ __inline__ deviceSU2 _makeGaussian<deviceSU2>(UINT fatIdx)
 {
     return deviceSU2::makeSU2RandomGenerator(fatIdx);
@@ -313,31 +249,6 @@ template<> __device__ __inline__ deviceSU2 _makeGaussian<deviceSU2>(UINT fatIdx)
 template<> __device__ __inline__ deviceSU3 _makeGaussian<deviceSU3>(UINT fatIdx)
 {
     return deviceSU3::makeSU3RandomGenerator(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU4 _makeGaussian<deviceSU4>(UINT fatIdx)
-{
-    return deviceSU4::makeSUNRandomGenerator(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU5 _makeGaussian<deviceSU5>(UINT fatIdx)
-{
-    return deviceSU5::makeSUNRandomGenerator(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU6 _makeGaussian<deviceSU6>(UINT fatIdx)
-{
-    return deviceSU6::makeSUNRandomGenerator(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU7 _makeGaussian<deviceSU7>(UINT fatIdx)
-{
-    return deviceSU7::makeSUNRandomGenerator(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU8 _makeGaussian<deviceSU8>(UINT fatIdx)
-{
-    return deviceSU8::makeSUNRandomGenerator(fatIdx);
 }
 
 template<> __device__ __inline__ deviceWilsonVectorSU3 _makeGaussian<deviceWilsonVectorSU3>(UINT fatIdx)
@@ -362,32 +273,13 @@ template<> __device__ __inline__ deviceSU3 _makeSumGenerator(Real factor)
     return deviceSU3::makeSU3SumGenerator(factor);
 }
 
-template<> __device__ __inline__ deviceSU4 _makeSumGenerator(Real factor)
-{
-    return deviceSU4::makeSUNSumGenerator(factor);
-}
-
-template<> __device__ __inline__ deviceSU5 _makeSumGenerator(Real factor)
-{
-    return deviceSU5::makeSUNSumGenerator(factor);
-}
-
-template<> __device__ __inline__ deviceSU6 _makeSumGenerator(Real factor)
-{
-    return deviceSU6::makeSUNSumGenerator(factor);
-}
-
-template<> __device__ __inline__ deviceSU7 _makeSumGenerator(Real factor)
-{
-    return deviceSU7::makeSUNSumGenerator(factor);
-}
-
-template<> __device__ __inline__ deviceSU8 _makeSumGenerator(Real factor)
-{
-    return deviceSU8::makeSUNSumGenerator(factor);
-}
-
 template<typename T> __device__ __inline__ T _makeZ4(UINT fatIdx) = delete;
+
+template<> __device__ __inline__ Real _makeZ4<Real>(UINT fatIdx)
+{
+    //not supported
+    return F(1.0);
+}
 
 template<> __device__ __inline__ CLGComplex _makeZ4<CLGComplex>(UINT fatIdx)
 {
@@ -402,36 +294,6 @@ template<> __device__ __inline__ deviceSU2Vector _makeZ4<deviceSU2Vector>(UINT f
 template<> __device__ __inline__ deviceSU3Vector _makeZ4<deviceSU3Vector>(UINT fatIdx)
 {
     return deviceSU3Vector::makeRandomZ4(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU4Vector _makeZ4<deviceSU4Vector>(UINT fatIdx)
-{
-    return deviceSU4Vector::makeRandomZ4(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU5Vector _makeZ4<deviceSU5Vector>(UINT fatIdx)
-{
-    return deviceSU5Vector::makeRandomZ4(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU6Vector _makeZ4<deviceSU6Vector>(UINT fatIdx)
-{
-    return deviceSU6Vector::makeRandomZ4(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU7Vector _makeZ4<deviceSU7Vector>(UINT fatIdx)
-{
-    return deviceSU7Vector::makeRandomZ4(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU8Vector _makeZ4<deviceSU8Vector>(UINT fatIdx)
-{
-    return deviceSU8Vector::makeRandomZ4(fatIdx);
-}
-
-template<> __device__ __inline__ deviceWilsonVectorSU3 _makeZ4<deviceWilsonVectorSU3>(UINT fatIdx)
-{
-    return deviceWilsonVectorSU3::makeRandomZ4(fatIdx);
 }
 
 
@@ -458,50 +320,27 @@ template<> __device__ __inline__ deviceSU3 _makeRandom<deviceSU3>(UINT fatIdx)
     return deviceSU3::makeSU3Random(fatIdx);
 }
 
-template<> __device__ __inline__ deviceSU4 _makeRandom<deviceSU4>(UINT fatIdx)
-{
-    return deviceSU4::makeSUNRandom(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU5 _makeRandom<deviceSU5>(UINT fatIdx)
-{
-    return deviceSU5::makeSUNRandom(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU6 _makeRandom<deviceSU6>(UINT fatIdx)
-{
-    return deviceSU6::makeSUNRandom(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU7 _makeRandom<deviceSU7>(UINT fatIdx)
-{
-    return deviceSU7::makeSUNRandom(fatIdx);
-}
-
-template<> __device__ __inline__ deviceSU8 _makeRandom<deviceSU8>(UINT fatIdx)
-{
-    return deviceSU8::makeSUNRandom(fatIdx);
-}
-
 template<> __device__ __inline__ deviceSU2Vector _makeRandom<deviceSU2Vector>(UINT fatIdx) { return deviceSU2Vector::makeRandom(fatIdx); }
 template<> __device__ __inline__ deviceSU3Vector _makeRandom<deviceSU3Vector>(UINT fatIdx) { return deviceSU3Vector::makeRandom(fatIdx); }
-template<> __device__ __inline__ deviceSU4Vector _makeRandom<deviceSU4Vector>(UINT fatIdx) { return deviceSU4Vector::makeRandom(fatIdx); }
-template<> __device__ __inline__ deviceSU5Vector _makeRandom<deviceSU5Vector>(UINT fatIdx) { return deviceSU5Vector::makeRandom(fatIdx); }
-template<> __device__ __inline__ deviceSU6Vector _makeRandom<deviceSU6Vector>(UINT fatIdx) { return deviceSU6Vector::makeRandom(fatIdx); }
-template<> __device__ __inline__ deviceSU7Vector _makeRandom<deviceSU7Vector>(UINT fatIdx) { return deviceSU7Vector::makeRandom(fatIdx); }
-template<> __device__ __inline__ deviceSU8Vector _makeRandom<deviceSU8Vector>(UINT fatIdx) { return deviceSU8Vector::makeRandom(fatIdx); }
 
 template<> __device__ __inline__ deviceWilsonVectorSU3 _makeRandom<deviceWilsonVectorSU3>(UINT fatIdx) { return deviceWilsonVectorSU3::makeRandom(fatIdx); }
 
+/**
+* spin index is only for Wilson Dirac fermion, for staggered fermion, put whatever you like it will has no effect
+*/
+template<typename T> __device__ __inline__ T _makeColorVector(BYTE spin, BYTE colorIdx) = delete;
 
-template<typename T> __device__ __inline__ T _makeColorVector(BYTE colorIdx) = delete;
+template<> __device__ __inline__ Real _makeColorVector<Real>(BYTE spin, BYTE colorIdx)
+{
+    return F(1.0);
+}
 
-template<> __device__ __inline__ CLGComplex _makeColorVector<CLGComplex>(BYTE colorIdx)
+template<> __device__ __inline__ CLGComplex _makeColorVector<CLGComplex>(BYTE spin, BYTE colorIdx)
 {
     return _onec;
 }
 
-template<> __device__ __inline__ deviceSU2Vector _makeColorVector<deviceSU2Vector>(BYTE colorIdx)
+template<> __device__ __inline__ deviceSU2Vector _makeColorVector<deviceSU2Vector>(BYTE spin, BYTE colorIdx)
 {
     if (colorIdx >= 2)
     {
@@ -510,7 +349,7 @@ template<> __device__ __inline__ deviceSU2Vector _makeColorVector<deviceSU2Vecto
     return deviceSU2Vector::makeOneSU2VectorColor(colorIdx);
 }
 
-template<> __device__ __inline__ deviceSU3Vector _makeColorVector<deviceSU3Vector>(BYTE colorIdx)
+template<> __device__ __inline__ deviceSU3Vector _makeColorVector<deviceSU3Vector>(BYTE spin, BYTE colorIdx)
 {
     if (colorIdx >= 3)
     {
@@ -519,53 +358,80 @@ template<> __device__ __inline__ deviceSU3Vector _makeColorVector<deviceSU3Vecto
     return deviceSU3Vector::makeOneSU3VectorColor(colorIdx);
 }
 
-template<> __device__ __inline__ deviceSU4Vector _makeColorVector<deviceSU4Vector>(BYTE colorIdx)
+template<> __device__ __inline__ deviceWilsonVectorSU3 _makeColorVector<deviceWilsonVectorSU3>(BYTE spin, BYTE colorIdx)
 {
-    if (colorIdx >= 4)
-    {
-        return _makeId<deviceSU4Vector>();
-    }
-    return deviceSU4Vector::makeOneSUNVectorColor(colorIdx);
+    return deviceWilsonVectorSU3::makeOneWilsonVectorSU3SpinColor(spin, colorIdx);
 }
 
-template<> __device__ __inline__ deviceSU5Vector _makeColorVector<deviceSU5Vector>(BYTE colorIdx)
-{
-    if (colorIdx >= 5)
-    {
-        return _makeId<deviceSU5Vector>();
-    }
-    return deviceSU5Vector::makeOneSUNVectorColor(colorIdx);
-}
+#define _make_impl(n) \
+template<> __device__ __inline__ deviceSU##n _makeId<deviceSU##n>() { return deviceSU##n::makeSUNId(); } \
+template<> __device__ __inline__ deviceSU##n##Vector _makeId<deviceSU##n##Vector>() { return deviceSU##n##Vector::makeOneSUNVector(); } \
+template<> __device__ __inline__ deviceSU##n _makeZero<deviceSU##n>() { return deviceSU##n::makeSUNZero(); } \
+template<> __device__ __inline__ deviceSU##n##Vector _makeZero<deviceSU##n##Vector>() { return deviceSU##n##Vector::makeZeroSUNVector(); } \
+template<> __device__ __inline__ deviceSU##n _makeContract<deviceSU##n, deviceSU##n##Vector>(const deviceSU##n##Vector& left, const deviceSU##n##Vector& right) { return deviceSU##n::makeSUNContractV(left, right); } \
+template<> __device__ __inline__ deviceSU##n##Vector _makeGaussian<deviceSU##n##Vector>(UINT fatIdx) { return deviceSU##n##Vector::makeRandomGaussian(fatIdx); } \
+template<> __device__ __inline__ deviceSU##n _makeGaussian<deviceSU##n>(UINT fatIdx) { return deviceSU##n::makeSUNRandomGenerator(fatIdx); } \
+template<> __device__ __inline__ deviceSU##n _makeSumGenerator(Real factor) { return deviceSU##n::makeSUNSumGenerator(factor); } \
+template<> __device__ __inline__ deviceSU##n##Vector _makeZ4<deviceSU##n##Vector>(UINT fatIdx) { return deviceSU##n##Vector::makeRandomZ4(fatIdx); } \
+template<> __device__ __inline__ deviceSU##n _makeRandom<deviceSU##n>(UINT fatIdx) { return deviceSU##n::makeSUNRandom(fatIdx); } \
+template<> __device__ __inline__ deviceSU##n##Vector _makeRandom<deviceSU##n##Vector>(UINT fatIdx) { return deviceSU##n##Vector::makeRandom(fatIdx); } \
+template<> __device__ __inline__ deviceSU##n##Vector _makeColorVector<deviceSU##n##Vector>(BYTE spinIdx, BYTE colorIdx) { if (colorIdx >= n) { return _makeId<deviceSU##n##Vector>(); } return deviceSU##n##Vector::makeOneSUNVectorColor(colorIdx); } \
 
-template<> __device__ __inline__ deviceSU6Vector _makeColorVector<deviceSU6Vector>(BYTE colorIdx)
-{
-    if (colorIdx >= 6)
-    {
-        return _makeId<deviceSU6Vector>();
-    }
-    return deviceSU6Vector::makeOneSUNVectorColor(colorIdx);
-}
 
-template<> __device__ __inline__ deviceSU7Vector _makeColorVector<deviceSU7Vector>(BYTE colorIdx)
-{
-    if (colorIdx >= 7)
-    {
-        return _makeId<deviceSU7Vector>();
-    }
-    return deviceSU7Vector::makeOneSUNVectorColor(colorIdx);
-}
+#define _make_all_imp(n) _DEF_F_N(n, _make_impl)
+_make_all_imp(_MAX_SUN)
 
-template<> __device__ __inline__ deviceSU8Vector _makeColorVector<deviceSU8Vector>(BYTE colorIdx)
-{
-    if (colorIdx >= 8)
-    {
-        return _makeId<deviceSU8Vector>();
-    }
-    return deviceSU8Vector::makeOneSUNVectorColor(colorIdx);
-}
+#define _make_slnc_impl(n) \
+template<> __device__ __inline__ deviceSL##n##C _makeId<deviceSL##n##C>() { return deviceSL##n##C::makeSLNCId(); } \
+template<> __device__ __inline__ deviceSL##n##C _makeZero<deviceSL##n##C>() { return deviceSL##n##C::makeSLNCZero(); } \
+template<> __device__ __inline__ deviceSL##n##C _makeContract<deviceSL##n##C, deviceSU##n##Vector>(const deviceSU##n##Vector& left, const deviceSU##n##Vector& right) { return deviceSL##n##C::makeSLNCContractV(left, right); } \
+template<> __device__ __inline__ deviceSL##n##C _makeGaussian<deviceSL##n##C>(UINT fatIdx) { return deviceSL##n##C::makeSLNCRandomGenerator(fatIdx); } \
+template<> __device__ __inline__ deviceSL##n##C _makeSumGenerator(Real factor) { return deviceSL##n##C::makeSLNCSumGenerator(factor); } \
+template<> __device__ __inline__ deviceSL##n##C _makeRandom<deviceSL##n##C>(UINT fatIdx) { return deviceSL##n##C::makeSLNCRandom(fatIdx); }
+
+#define _make_all_imp_slnc(n) _DEF_FSLNC_N(n, _make_slnc_impl)
+_make_all_imp_slnc(_MAX_SLNC)
+
+#define _make_un_impl(n) \
+template<> __device__ __inline__ deviceU##n _makeId<deviceU##n>() { return deviceU##n::makeUNId(); } \
+template<> __device__ __inline__ deviceU##n _makeZero<deviceU##n>() { return deviceU##n::makeUNZero(); } \
+template<> __device__ __inline__ deviceU##n _makeContract<deviceU##n, deviceSU##n##Vector>(const deviceSU##n##Vector& left, const deviceSU##n##Vector& right) { return deviceU##n::makeUNContractV(left, right); } \
+template<> __device__ __inline__ deviceU##n _makeGaussian<deviceU##n>(UINT fatIdx) { return deviceU##n::makeUNRandomGenerator(fatIdx); } \
+template<> __device__ __inline__ deviceU##n _makeSumGenerator(Real factor) { return deviceU##n::makeUNSumGenerator(factor); } \
+template<> __device__ __inline__ deviceU##n _makeRandom<deviceU##n>(UINT fatIdx) { return deviceU##n::makeUNRandom(fatIdx); }
+
+#define _make_all_imp_un(n) _DEF_FUN_N(n, _make_un_impl)
+_make_all_imp_un(_MAX_UN)
+
+#define _make_on_impl(n) \
+template<> __device__ __inline__ deviceO##n _makeId<deviceO##n>() { return deviceO##n::makeONId(); } \
+template<> __device__ __inline__ deviceO##n _makeZero<deviceO##n>() { return deviceO##n::makeONZero(); } \
+template<> __device__ __inline__ deviceO##n _makeContract<deviceO##n, deviceSU##n##Vector>(const deviceSU##n##Vector& left, const deviceSU##n##Vector& right) { return deviceO##n::makeONContractV(left, right); } \
+template<> __device__ __inline__ deviceO##n _makeGaussian<deviceO##n>(UINT fatIdx) { return deviceO##n::makeONRandomGenerator(fatIdx); } \
+template<> __device__ __inline__ deviceO##n _makeSumGenerator(Real factor) { return deviceO##n::makeONSumGenerator(factor); } \
+template<> __device__ __inline__ deviceO##n _makeRandom<deviceO##n>(UINT fatIdx) { return deviceO##n::makeONRandom(fatIdx); }
+
+#define _make_all_imp_on(n) _DEF_FON_N(n, _make_on_impl)
+_make_all_imp_on(_MAX_ON)
+
+#define _make_son_impl(n) \
+template<> __device__ __inline__ deviceSO##n _makeId<deviceSO##n>() { return deviceSO##n::makeSONId(); } \
+template<> __device__ __inline__ deviceSO##n _makeZero<deviceSO##n>() { return deviceSO##n::makeSONZero(); } \
+template<> __device__ __inline__ deviceSO##n _makeContract<deviceSO##n, deviceSU##n##Vector>(const deviceSU##n##Vector& left, const deviceSU##n##Vector& right) { return deviceSO##n::makeSONContractV(left, right); } \
+template<> __device__ __inline__ deviceSO##n _makeGaussian<deviceSO##n>(UINT fatIdx) { return deviceSO##n::makeSONRandomGenerator(fatIdx); } \
+template<> __device__ __inline__ deviceSO##n _makeSumGenerator(Real factor) { return deviceSO##n::makeSONSumGenerator(factor); } \
+template<> __device__ __inline__ deviceSO##n _makeRandom<deviceSO##n>(UINT fatIdx) { return deviceSO##n::makeSONRandom(fatIdx); }
+
+#define _make_all_imp_son(n) _DEF_FSON_N(n, _make_son_impl)
+_make_all_imp_son(_MAX_SON)
 
 template<typename T> __device__ __inline__ void _dagger(T& element) = delete;
 template<typename T> __device__ __inline__ T _daggerC(const T& element) = delete;
+
+template<> __device__ __inline__ void _dagger<Real>(Real& element)
+{
+    //do nothing
+}
 
 template<> __device__ __inline__ void _dagger<CLGComplex>(CLGComplex& element)
 {
@@ -602,9 +468,39 @@ template<INT N, INT NoE> __device__ __inline__ void _dagger(deviceSUN<N, NoE>& e
     element.Dagger();
 }
 
+template<INT N, INT NoE> __device__ __inline__ void _dagger(deviceSLNC<N, NoE>& element)
+{
+    element.Dagger();
+}
+
+template<INT N, INT NoE> __device__ __inline__ void _dagger(deviceUN<N, NoE>& element)
+{
+    element.Dagger();
+}
+
+template<INT N, INT NoE> __device__ __inline__ void _dagger(deviceON<N, NoE>& element)
+{
+    element.Transpose();
+}
+
+template<INT N, INT NoE> __device__ __inline__ void _dagger(deviceSON<N, NoE>& element)
+{
+    element.Transpose();
+}
+
+template<INT N> __device__ __inline__ void _dagger(deviceZN<N>& element)
+{
+    element.Dagger();
+}
+
 template<> __device__ __inline__ void _dagger<deviceWilsonVectorSU3>(deviceWilsonVectorSU3& element)
 {
     element.Conjugate();
+}
+
+template<> __device__ __inline__ Real _daggerC<Real>(const Real& element)
+{
+    return element;
 }
 
 template<> __device__ __inline__ CLGComplex _daggerC<CLGComplex>(const CLGComplex& element)
@@ -642,17 +538,230 @@ template<INT N, INT NoE> __device__ __inline__ deviceSUN<N, NoE> _daggerC(const 
     return element.DaggerC();
 }
 
+template<INT N, INT NoE> __device__ __inline__ deviceSLNC<N, NoE> _daggerC(const deviceSLNC<N, NoE>& element)
+{
+    return element.DaggerC();
+}
+
+template<INT N, INT NoE> __device__ __inline__ deviceUN<N, NoE> _daggerC(const deviceUN<N, NoE>& element)
+{
+    return element.DaggerC();
+}
+
+template<INT N, INT NoE> __device__ __inline__ deviceON<N, NoE> _daggerC(const deviceON<N, NoE>& element)
+{
+    return element.TransposeC();
+}
+
+template<INT N, INT NoE> __device__ __inline__ deviceSON<N, NoE> _daggerC(const deviceSON<N, NoE>& element)
+{
+    return element.TransposeC();
+}
+
+template<INT N> __device__ __inline__ deviceZN<N> _daggerC(const deviceZN<N>& element)
+{
+    return element.DaggerC();
+}
+
+template<> __device__ __inline__ deviceWilsonVectorSU3 _daggerC<deviceWilsonVectorSU3>(const deviceWilsonVectorSU3& element)
+{
+    return element.ConjugateC();
+}
+
+template<typename T> __device__ __inline__ void _oppo(T& element) = delete;
+template<typename T> __device__ __inline__ T _oppoC(const T& element) = delete;
+
+template<> __device__ __inline__ void _oppo<Real>(Real& element)
+{
+    element = -element;
+}
+
+template<> __device__ __inline__ void _oppo<CLGComplex>(CLGComplex& element)
+{
+    element.x = -element.x;
+    element.y = -element.y;
+}
+
+#if _CLG_DOUBLEFLOAT
+template<> __device__ __inline__ void _oppo<FLOAT>(FLOAT& element)
+{
+    element = -element;
+}
+template<> __device__ __inline__ void _oppo<cuComplex>(cuComplex& element)
+{
+    element.x = -element.x;
+    element.y = -element.y;
+}
+#else
+template<> __device__ __inline__ void _oppo<DOUBLE>(DOUBLE& element)
+{
+    element = -element;
+}
+template<> __device__ __inline__ void _oppo<cuDoubleComplex>(cuDoubleComplex& element)
+{
+    element.x = -element.x;
+    element.y = -element.y;
+}
+#endif
+
+template<> __device__ __inline__ void _oppo<deviceSU2Vector>(deviceSU2Vector& element)
+{
+    element.Opposite();
+}
+
+template<> __device__ __inline__ void _oppo<deviceSU3Vector>(deviceSU3Vector& element)
+{
+    element.Opposite();
+}
+
+template<INT N, INT NoE> __device__ __inline__ void _oppo(deviceSUNVector<N, NoE>& element)
+{
+    element.Opposite();
+}
+
+template<> __device__ __inline__ void _oppo<deviceSU2>(deviceSU2& element)
+{
+    element.Opposite();
+}
+
+template<> __device__ __inline__ void _oppo<deviceSU3>(deviceSU3& element)
+{
+    element.Opposite();
+}
+
+template<INT N, INT NoE> __device__ __inline__ void _oppo(deviceSUN<N, NoE>& element)
+{
+    element.Opposite();
+}
+
+template<INT N> __device__ __inline__ void _oppo(deviceZN<N>& element)
+{
+    element.Opposite();
+}
+
+template<> __device__ __inline__ void _oppo<deviceWilsonVectorSU3>(deviceWilsonVectorSU3& element)
+{
+    element.Opposite();
+}
+
+template<INT N, INT NoE> __device__ __inline__ void _oppo(deviceSLNC<N, NoE>& element) { element.MulReal(F(-1.0)); }
+template<INT N, INT NoE> __device__ __inline__ void _oppo(deviceUN<N, NoE>& element) { element.MulReal(F(-1.0)); }
+template<INT N, INT NoE> __device__ __inline__ void _oppo(deviceON<N, NoE>& element) { element.MulReal(F(-1.0)); }
+template<INT N, INT NoE> __device__ __inline__ void _oppo(deviceSON<N, NoE>& element) { element.MulReal(F(-1.0)); }
+
+template<> __device__ __inline__ Real _oppoC<Real>(const Real& element)
+{
+    return -element;
+}
+
+template<> __device__ __inline__ CLGComplex _oppoC<CLGComplex>(const CLGComplex& element)
+{
+    return _make_cuComplex(-element.x, -element.y);
+}
+
+#if _CLG_DOUBLEFLOAT
+template<> __device__ __inline__ FLOAT _oppoC<FLOAT>(const FLOAT& element)
+{
+    return -element;
+}
+template<> __device__ __inline__ cuComplex _oppoC<cuComplex>(const cuComplex& element)
+{
+    return make_cuComplex(-element.x, -element.y);
+}
+#else
+template<> __device__ __inline__ DOUBLE _oppoC<DOUBLE>(const DOUBLE& element)
+{
+    return -element;
+}
+template<> __device__ __inline__ cuDoubleComplex _oppoC<cuDoubleComplex>(const cuDoubleComplex& element)
+{
+    return make_cuDoubleComplex(-element.x, -element.y);
+}
+#endif
+
+template<> __device__ __inline__ deviceSU2Vector _oppoC<deviceSU2Vector>(const deviceSU2Vector& element)
+{
+    return element.OppositeC();
+}
+
+template<> __device__ __inline__ deviceSU3Vector _oppoC<deviceSU3Vector>(const deviceSU3Vector& element)
+{
+    return element.OppositeC();
+}
+
+template<INT N, INT NoE> __device__ __inline__ deviceSUNVector<N, NoE> _oppoC(const deviceSUNVector<N, NoE>& element)
+{
+    return element.OppositeC();
+}
+
+template<> __device__ __inline__ deviceSU2 _oppoC<deviceSU2>(const deviceSU2& element)
+{
+    return element.OppositeC();
+}
+
+template<> __device__ __inline__ deviceSU3 _oppoC<deviceSU3>(const deviceSU3& element)
+{
+    return element.OppositeC();
+}
+
+template<INT N, INT NoE> __device__ __inline__ deviceSUN<N, NoE> _oppoC(const deviceSUN<N, NoE>& element)
+{
+    return element.OppositeC();
+}
+
+template<INT N> __device__ __inline__ deviceZN<N> _oppoC(const deviceZN<N>& element)
+{
+    return element.OppositeC();
+}
+
+template<> __device__ __inline__ deviceWilsonVectorSU3 _oppoC<deviceWilsonVectorSU3>(const deviceWilsonVectorSU3& element)
+{
+    return element.OppositeC();
+}
+
+template<typename T> __device__ __inline__ T _rcpC(const T& element) = delete;
+
+template<> __device__ __inline__ Real _rcpC<Real>(const Real& element)
+{
+    return F(1.0) / element;
+}
+
+template<> __device__ __inline__ CLGComplex _rcpC<CLGComplex>(const CLGComplex& element)
+{
+    return _cuCdivf(_onec, element);
+}
+
+template<> __device__ __inline__ deviceSU2 _rcpC<deviceSU2>(const deviceSU2& element)
+{
+    return element.Inverse();
+}
+
+template<> __device__ __inline__ deviceSU3 _rcpC<deviceSU3>(const deviceSU3& element)
+{
+    return element.Inverse();
+}
+
+template<INT N, INT NoE> __device__ __inline__ deviceSUN<N, NoE> _rcpC(const deviceSUN<N, NoE>& element)
+{
+    return element.Inverse();
+}
+
+template<INT N, INT NoE> __device__ __inline__ deviceSLNC<N, NoE> _rcpC(const deviceSLNC<N, NoE>& element)
+{
+    return element.InverseC();
+}
+
+
 template<typename TLeft, typename TRight> __device__ __inline__ TLeft _addC(const TLeft& left, const TRight& right) = delete;
-template<typename TLeft, typename TRight> __device__ __inline__ void _add(TLeft& left, const TRight& right) = delete;
+template<typename TLeft, typename TRight> __device__ __inline__ void _add(TLeft& left, const TRight& right)
+{
+    left = _addC(left, right);
+}
 
 
 template<> __device__ __inline__ Real _addC<Real, Real>(const Real& left, const Real& right)
 {
     return left + right;
-}
-template<> __device__ __inline__ void _add<Real, Real>(Real& left, const Real& right)
-{
-    left = left + right;
 }
 template<> __device__ __inline__ CLGComplex _addC<CLGComplex, Real>(const CLGComplex& left, const Real& right)
 {
@@ -673,6 +782,83 @@ template<> __device__ __inline__ void _add<CLGComplex, CLGComplex>(CLGComplex& l
     left.x = left.x + right.x;
     left.y = left.y + right.y;
 }
+
+template<> __device__ __inline__ cuComplex _addC<cuComplex, cuDoubleComplex>(const cuComplex& left, const cuDoubleComplex& right)
+{
+    return make_cuComplex(left.x + static_cast<FLOAT>(right.x), left.y + static_cast<FLOAT>(right.y));
+}
+template<> __device__ __inline__ cuDoubleComplex _addC<cuDoubleComplex, cuComplex>(const cuDoubleComplex& left, const cuComplex& right)
+{
+    return make_cuDoubleComplex(left.x + static_cast<DOUBLE>(right.x), left.y + static_cast<DOUBLE>(right.y));
+}
+
+#if _CLG_DOUBLEFLOAT
+template<> __device__ __inline__ FLOAT _addC<FLOAT, Real>(const FLOAT& left, const Real& right)
+{
+    return left + static_cast<FLOAT>(right);
+}
+template<> __device__ __inline__ FLOAT _addC<FLOAT, FLOAT>(const FLOAT& left, const FLOAT& right)
+{
+    return left + right;
+}
+template<> __device__ __inline__ CLGComplex _addC<CLGComplex, FLOAT>(const CLGComplex& left, const FLOAT& right)
+{
+    CLGComplex ret = left;
+    ret.x = ret.x + static_cast<DOUBLE>(right);
+    return ret;
+}
+template<> __device__ __inline__ void _add<CLGComplex, FLOAT>(CLGComplex& left, const FLOAT& right)
+{
+    left.x = left.x + static_cast<DOUBLE>(right);
+}
+template<> __device__ __inline__ cuComplex _addC<cuComplex, FLOAT>(const cuComplex& left, const FLOAT& right)
+{
+    cuComplex ret = left;
+    ret.x = ret.x + right;
+    return ret;
+}
+template<> __device__ __inline__ void _add<cuComplex, FLOAT>(cuComplex& left, const FLOAT& right)
+{
+    left.x = left.x + right;
+}
+template<> __device__ __inline__ cuComplex _addC<cuComplex, cuComplex>(const cuComplex& left, const cuComplex& right)
+{
+    return make_cuComplex(left.x + right.x, left.y + right.y);
+}
+#else
+template<> __device__ __inline__ DOUBLE _addC<DOUBLE, Real>(const DOUBLE& left, const Real& right)
+{
+    return left + static_cast<DOUBLE>(right);
+}
+template<> __device__ __inline__ DOUBLE _addC<DOUBLE, DOUBLE>(const DOUBLE& left, const DOUBLE& right)
+{
+    return left + right;
+}
+template<> __device__ __inline__ CLGComplex _addC<CLGComplex, DOUBLE>(const CLGComplex& left, const DOUBLE& right)
+{
+    CLGComplex ret = left;
+    ret.x = ret.x + static_cast<Real>(right);
+    return ret;
+}
+template<> __device__ __inline__ void _add<CLGComplex, DOUBLE>(CLGComplex& left, const DOUBLE& right)
+{
+    left.x = left.x + static_cast<Real>(right);
+}
+template<> __device__ __inline__ cuDoubleComplex _addC<cuDoubleComplex, DOUBLE>(const cuDoubleComplex& left, const DOUBLE& right)
+{
+    cuDoubleComplex ret = left;
+    ret.x = ret.x + right;
+    return ret;
+}
+template<> __device__ __inline__ void _add<cuDoubleComplex, DOUBLE>(cuDoubleComplex& left, const DOUBLE& right)
+{
+    left.x = left.x + right;
+}
+template<> __device__ __inline__ cuDoubleComplex _addC<cuDoubleComplex, cuDoubleComplex>(const cuDoubleComplex& left, const cuDoubleComplex& right)
+{
+    return make_cuDoubleComplex(left.x + right.x, left.y + right.y);
+}
+#endif
 
 #if _CLG_DOUBLEFLOAT
 #define __DEFINE_TWO_ELEMENT_Func(TYPENAME, FUNC1, FUNC2) \
@@ -746,23 +932,127 @@ template<> __device__ __inline__ void FUNC1<TYPENAME, TYPENAME>(TYPENAME& left, 
 
 __DEFINE_TWO_ELEMENT_Func(deviceSU2Vector, _add, Add)
 __DEFINE_TWO_ELEMENT_Func(deviceSU3Vector, _add, Add)
-__DEFINE_TWO_ELEMENT_Func(deviceSU4Vector, _add, Add)
-__DEFINE_TWO_ELEMENT_Func(deviceSU5Vector, _add, Add)
-__DEFINE_TWO_ELEMENT_Func(deviceSU6Vector, _add, Add)
-__DEFINE_TWO_ELEMENT_Func(deviceSU7Vector, _add, Add)
-__DEFINE_TWO_ELEMENT_Func(deviceSU8Vector, _add, Add)
 __DEFINE_TWO_ELEMENT_Func(deviceSU2, _add, Add)
 __DEFINE_TWO_ELEMENT_Func(deviceSU3, _add, Add)
-__DEFINE_TWO_ELEMENT_Func(deviceSU4, _add, Add)
-__DEFINE_TWO_ELEMENT_Func(deviceSU5, _add, Add)
-__DEFINE_TWO_ELEMENT_Func(deviceSU6, _add, Add)
-__DEFINE_TWO_ELEMENT_Func(deviceSU7, _add, Add)
-__DEFINE_TWO_ELEMENT_Func(deviceSU8, _add, Add)
+
+template<INT N> __device__ __inline__ void _add(deviceZN<N>& left, const deviceZN<N>& right) { left.Add(right); }
+template<INT N> __device__ __inline__ void _add(deviceZN<N>& left, const Real& right) { left.AddReal(right); }
+template<INT N> __device__ __inline__ deviceZN<N> _addC(const deviceZN<N>& left, const deviceZN<N>& right) { return left.AddC(right); }
+template<INT N> __device__ __inline__ deviceZN<N> _addC(const deviceZN<N>& left, const Real& right) { return left.AddRealC(right); }
 
 template<> __device__ __inline__ void _add<deviceWilsonVectorSU3, deviceWilsonVectorSU3>(deviceWilsonVectorSU3& left, const deviceWilsonVectorSU3& right)
 {
     left.Add(right);
 }
+
+template<typename TLeft, typename TRight> __host__ __inline__ TLeft _addCHost(const TLeft& left, const TRight& right) = delete;
+template<typename TLeft, typename TRight> __host__ __inline__ void _addHost(TLeft& left, const TRight& right)
+{
+    left = _addCHost(left, right);
+}
+
+
+template<> __host__ __inline__ Real _addCHost<Real, Real>(const Real& left, const Real& right)
+{
+    return left + right;
+}
+template<> __host__ __inline__ CLGComplex _addCHost<CLGComplex, Real>(const CLGComplex& left, const Real& right)
+{
+    CLGComplex ret = left;
+    ret.x = ret.x + right;
+    return ret;
+}
+template<> __host__ __inline__ void _addHost<CLGComplex, Real>(CLGComplex& left, const Real& right)
+{
+    left.x = left.x + right;
+}
+template<> __host__ __inline__ CLGComplex _addCHost<CLGComplex, CLGComplex>(const CLGComplex& left, const CLGComplex& right)
+{
+    return _cuCaddf(left, right);
+}
+template<> __host__ __inline__ void _addHost<CLGComplex, CLGComplex>(CLGComplex& left, const CLGComplex& right)
+{
+    left.x = left.x + right.x;
+    left.y = left.y + right.y;
+}
+
+template<> __host__ __inline__ cuComplex _addCHost<cuComplex, cuDoubleComplex>(const cuComplex& left, const cuDoubleComplex& right)
+{
+    return make_cuComplex(left.x + static_cast<FLOAT>(right.x), left.y + static_cast<FLOAT>(right.y));
+}
+template<> __host__ __inline__ cuDoubleComplex _addCHost<cuDoubleComplex, cuComplex>(const cuDoubleComplex& left, const cuComplex& right)
+{
+    return make_cuDoubleComplex(left.x + static_cast<DOUBLE>(right.x), left.y + static_cast<DOUBLE>(right.y));
+}
+
+#if _CLG_DOUBLEFLOAT
+template<> __host__ __inline__ FLOAT _addCHost<FLOAT, Real>(const FLOAT& left, const Real& right)
+{
+    return left + static_cast<FLOAT>(right);
+}
+template<> __host__ __inline__ FLOAT _addCHost<FLOAT, FLOAT>(const FLOAT& left, const FLOAT& right)
+{
+    return left + right;
+}
+template<> __host__ __inline__ CLGComplex _addCHost<CLGComplex, FLOAT>(const CLGComplex& left, const FLOAT& right)
+{
+    CLGComplex ret = left;
+    ret.x = ret.x + static_cast<DOUBLE>(right);
+    return ret;
+}
+template<> __host__ __inline__ void _addHost<CLGComplex, FLOAT>(CLGComplex& left, const FLOAT& right)
+{
+    left.x = left.x + static_cast<DOUBLE>(right);
+}
+template<> __host__ __inline__ cuComplex _addCHost<cuComplex, FLOAT>(const cuComplex& left, const FLOAT& right)
+{
+    cuComplex ret = left;
+    ret.x = ret.x + right;
+    return ret;
+}
+template<> __host__ __inline__ void _addHost<cuComplex, FLOAT>(cuComplex& left, const FLOAT& right)
+{
+    left.x = left.x + right;
+}
+template<> __host__ __inline__ cuComplex _addCHost<cuComplex, cuComplex>(const cuComplex& left, const cuComplex& right)
+{
+    return make_cuComplex(left.x + right.x, left.y + right.y);
+}
+#else
+template<> __host__ __inline__ DOUBLE _addCHost<DOUBLE, Real>(const DOUBLE& left, const Real& right)
+{
+    return left + static_cast<DOUBLE>(right);
+}
+template<> __host__ __inline__ DOUBLE _addCHost<DOUBLE, DOUBLE>(const DOUBLE& left, const DOUBLE& right)
+{
+    return left + right;
+}
+template<> __host__ __inline__ CLGComplex _addCHost<CLGComplex, DOUBLE>(const CLGComplex& left, const DOUBLE& right)
+{
+    CLGComplex ret = left;
+    ret.x = ret.x + static_cast<Real>(right);
+    return ret;
+}
+template<> __host__ __inline__ void _addHost<CLGComplex, DOUBLE>(CLGComplex& left, const DOUBLE& right)
+{
+    left.x = left.x + static_cast<Real>(right);
+}
+template<> __host__ __inline__ cuDoubleComplex _addCHost<cuDoubleComplex, DOUBLE>(const cuDoubleComplex& left, const DOUBLE& right)
+{
+    cuDoubleComplex ret = left;
+    ret.x = ret.x + right;
+    return ret;
+}
+template<> __host__ __inline__ void _addHost<cuDoubleComplex, DOUBLE>(cuDoubleComplex& left, const DOUBLE& right)
+{
+    left.x = left.x + right;
+}
+template<> __host__ __inline__ cuDoubleComplex _addCHost<cuDoubleComplex, cuDoubleComplex>(const cuDoubleComplex& left, const cuDoubleComplex& right)
+{
+    return make_cuDoubleComplex(left.x + right.x, left.y + right.y);
+}
+#endif
+
 
 template<typename TLeft, typename TRight> __device__ __inline__ TLeft _subC(const TLeft& left, const TRight& right) = delete;
 template<typename TLeft, typename TRight> __device__ __inline__ void _sub(TLeft& left, const TRight& right) = delete;
@@ -798,62 +1088,252 @@ template<> __device__ __inline__ void _sub<CLGComplex, CLGComplex>(CLGComplex& l
 
 __DEFINE_TWO_ELEMENT_Func(deviceSU2Vector, _sub, Sub)
 __DEFINE_TWO_ELEMENT_Func(deviceSU3Vector, _sub, Sub)
-__DEFINE_TWO_ELEMENT_Func(deviceSU4Vector, _sub, Sub)
-__DEFINE_TWO_ELEMENT_Func(deviceSU5Vector, _sub, Sub)
-__DEFINE_TWO_ELEMENT_Func(deviceSU6Vector, _sub, Sub)
-__DEFINE_TWO_ELEMENT_Func(deviceSU7Vector, _sub, Sub)
-__DEFINE_TWO_ELEMENT_Func(deviceSU8Vector, _sub, Sub)
 __DEFINE_TWO_ELEMENT_Func(deviceSU2, _sub, Sub)
 __DEFINE_TWO_ELEMENT_Func(deviceSU3, _sub, Sub)
-__DEFINE_TWO_ELEMENT_Func(deviceSU4, _sub, Sub)
-__DEFINE_TWO_ELEMENT_Func(deviceSU5, _sub, Sub)
-__DEFINE_TWO_ELEMENT_Func(deviceSU6, _sub, Sub)
-__DEFINE_TWO_ELEMENT_Func(deviceSU7, _sub, Sub)
-__DEFINE_TWO_ELEMENT_Func(deviceSU8, _sub, Sub)
+
+template<INT N> __device__ __inline__ void _sub(deviceZN<N>& left, const deviceZN<N>& right) { left.Sub(right); }
+template<INT N> __device__ __inline__ void _sub(deviceZN<N>& left, const Real& right) { left.SubReal(right); }
+template<INT N> __device__ __inline__ deviceZN<N> _subC(const deviceZN<N>& left, const deviceZN<N>& right) { return left.SubC(right); }
+template<INT N> __device__ __inline__ deviceZN<N> _subC(const deviceZN<N>& left, const Real& right) { return left.SubRealC(right); }
 
 template<> __device__ __inline__ void _sub<deviceWilsonVectorSU3, deviceWilsonVectorSU3>(deviceWilsonVectorSU3& left, const deviceWilsonVectorSU3& right)
 {
     left.Sub(right);
 }
 
+template<typename TLeft, typename TRight> __device__ __inline__ TLeft _divC(const TLeft& left, const TRight& right) = delete;
+template<typename TLeft, typename TRight> __device__ __inline__ void _div(TLeft& left, const TRight& right)
+{
+    left = _divC(left, right);
+}
+template<typename TLeft, typename TRight> __host__ __inline__ TLeft _divCHost(const TLeft& left, const TRight& right) = delete;
+template<typename TLeft, typename TRight> __host__ __inline__ void _divHost(TLeft& left, const TRight& right)
+{
+    left = _divCHost(left, right);
+}
+
+#define __DEFINE_TWO_ELEMENT_Func_Div_Slash(t1, t2) \
+template<> __device__ __inline__ t1 _divC<t1, t2>(const t1& left, const t2& right) \
+{ \
+    return static_cast<t1>(left / right); \
+} \
+template<> __host__ __inline__ t1 _divCHost<t1, t2>(const t1& left, const t2& right) \
+{ \
+    return static_cast<t1>(left / right); \
+}
+
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(Real, Real)
+#if _CLG_DOUBLEFLOAT
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(Real, FLOAT)
+#else
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(Real, DOUBLE)
+#endif
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(Real, INT)
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(Real, UINT)
+#if _CLG_DOUBLEFLOAT
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(FLOAT, Real)
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(FLOAT, FLOAT)
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(FLOAT, INT)
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(FLOAT, UINT)
+#else
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(DOUBLE, Real)
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(DOUBLE, DOUBLE)
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(DOUBLE, INT)
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(DOUBLE, UINT)
+#endif
+
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(INT, Real)
+#if _CLG_DOUBLEFLOAT
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(INT, FLOAT)
+#else
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(INT, DOUBLE)
+#endif
+__DEFINE_TWO_ELEMENT_Func_Div_Slash(INT, INT)
+
+#define __DEFINE_TWO_ELEMENT_Func_Div_FC(t1, t2, method, castint1, castint2, castout) \
+template<> __device__ __inline__ t1 _divC<t1, t2>(const t1& left, const t2& right) \
+{ \
+    return castout(method(castint1(left), castint2(right))); \
+} \
+template<> __host__ __inline__ t1 _divCHost<t1, t2>(const t1& left, const t2& right) \
+{ \
+    return castout(method(castint1(left), castint2(right))); \
+}
+
+#define __DEFINE_TWO_ELEMENT_Func_Div_FC_DH(t1, t2, method, methodhost, castint1, castint2, castout) \
+template<> __device__ __inline__ t1 _divC<t1, t2>(const t1& left, const t2& right) \
+{ \
+    return castout(method(castint1(left), castint2(right))); \
+} \
+template<> __host__ __inline__ t1 _divCHost<t1, t2>(const t1& left, const t2& right) \
+{ \
+    return castout(methodhost(castint1(left), castint2(right))); \
+}
+
+__DEFINE_TWO_ELEMENT_Func_Div_FC_DH(CLGComplex, Real, cuCdivf_cr, cuCdivf_cr_host, , , )
+__DEFINE_TWO_ELEMENT_Func_Div_FC(CLGComplex, CLGComplex, _cuCdivf, , , )
+#if _CLG_DOUBLEFLOAT
+__DEFINE_TWO_ELEMENT_Func_Div_FC_DH(CLGComplex, FLOAT, cuCdivf_cr, cuCdivf_cr_host, , static_cast<Real>, )
+__DEFINE_TWO_ELEMENT_Func_Div_FC(CLGComplex, cuComplex, _cuCdivf, , _cToRealC, )
+#else
+__DEFINE_TWO_ELEMENT_Func_Div_FC_DH(CLGComplex, DOUBLE, cuCdivf_cr, cuCdivf_cr_host, , static_cast<Real>, )
+__DEFINE_TWO_ELEMENT_Func_Div_FC(CLGComplex, cuDoubleComplex, _cuCdivf, , _cToRealC, )
+#endif
+__DEFINE_TWO_ELEMENT_Func_Div_FC_DH(CLGComplex, INT, cuCdivf_cr, cuCdivf_cr_host, , static_cast<Real>, )
+__DEFINE_TWO_ELEMENT_Func_Div_FC_DH(CLGComplex, UINT, cuCdivf_cr, cuCdivf_cr_host, , static_cast<Real>, )
+
+#if _CLG_DOUBLEFLOAT
+__DEFINE_TWO_ELEMENT_Func_Div_FC_DH(cuComplex, Real, cuCdivf_cr, cuCdivf_cr_host, _cToRealC, , _cToFloat)
+__DEFINE_TWO_ELEMENT_Func_Div_FC_DH(cuComplex, FLOAT, cuCdivf_cr, cuCdivf_cr_host, _cToRealC, static_cast<Real>, _cToFloat)
+__DEFINE_TWO_ELEMENT_Func_Div_FC_DH(cuComplex, INT, cuCdivf_cr, cuCdivf_cr_host, _cToRealC, static_cast<Real>, _cToFloat)
+__DEFINE_TWO_ELEMENT_Func_Div_FC_DH(cuComplex, UINT, cuCdivf_cr, cuCdivf_cr_host, _cToRealC, static_cast<Real>, _cToFloat)
+__DEFINE_TWO_ELEMENT_Func_Div_FC(cuComplex, CLGComplex, cuCdivf, , _cToFloat, )
+__DEFINE_TWO_ELEMENT_Func_Div_FC(cuComplex, cuComplex, cuCdivf, , , )
+#else
+__DEFINE_TWO_ELEMENT_Func_Div_FC_DH(cuDoubleComplex, Real, cuCdivf_cd, cuCdivf_cd_host, , static_cast<DOUBLE>, )
+__DEFINE_TWO_ELEMENT_Func_Div_FC_DH(cuDoubleComplex, INT, cuCdivf_cd, cuCdivf_cd_host, , static_cast<DOUBLE>, )
+__DEFINE_TWO_ELEMENT_Func_Div_FC_DH(cuDoubleComplex, UINT, cuCdivf_cd, cuCdivf_cd_host, , static_cast<DOUBLE>, )
+__DEFINE_TWO_ELEMENT_Func_Div_FC_DH(cuDoubleComplex, DOUBLE, cuCdivf_cd, cuCdivf_cd_host, , , )
+__DEFINE_TWO_ELEMENT_Func_Div_FC(cuDoubleComplex, CLGComplex, cuCdiv, , _cToDouble, )
+__DEFINE_TWO_ELEMENT_Func_Div_FC(cuDoubleComplex, cuDoubleComplex, cuCdiv, , , )
+#endif
+
+
+
+#define __DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(t1, t2, methodname, castname) \
+template<INT e, INT me> __device__ __inline__ t1<e, me> _divC(const t1<e, me>& left, const t2& right) \
+{ \
+    return left.Div##methodname##C(castname(right)); \
+} \
+template<INT e, INT me> __device__ __inline__ void _div(t1<e, me>& left, const t2& right) \
+{ \
+    left.Div##methodname(castname(right)); \
+}
+
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUN, Real, Real, )
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUN, INT, Real, static_cast<Real>)
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUN, UINT, Real, static_cast<Real>)
+
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUNVector, Real, Real, )
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUNVector, INT, Real, static_cast<Real>)
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUNVector, UINT, Real, static_cast<Real>)
+
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUN, CLGComplex, Comp, _cToRealC)
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUNVector, CLGComplex, Comp, _cToRealC)
+
+#if _CLG_DOUBLEFLOAT
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUN, FLOAT, Real, static_cast<Real>)
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUNVector, FLOAT, Real, static_cast<Real>)
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUN, cuComplex, Comp, _cToRealC)
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUNVector, cuComplex, Comp, _cToRealC)
+#else
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUN, DOUBLE, Real, static_cast<Real>)
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUNVector, DOUBLE, Real, static_cast<Real>)
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUN, cuDoubleComplex, Comp, _cToRealC)
+__DEFINE_TWO_ELEMENT_Func_Div_t_on_fc(deviceSUNVector, cuDoubleComplex, Comp, _cToRealC)
+#endif
+
+#if defined(__cplusplus) && defined(__CUDACC__)
+template<typename T> __device__ __inline__ void _atomicAdd(T* left, const T& right) = delete;
+
+#define __DEFINE_SINLE_ATOMIC_ADD(t) \
+template<> __device__ __inline__ void _atomicAdd<t>(t* left, const t& right) { atomicAdd(left, right); } \
+
+#define __DEFINE_SINLE_ATOMIC_ADDC(t) \
+template<> __device__ __inline__ void _atomicAdd<t>(t* left, const t& right) { atomicAdd(&(left->x), right.x); atomicAdd(&(left->y), right.y); } \
+
+__DEFINE_SINLE_ATOMIC_ADD(Real)
+#if _CLG_DOUBLEFLOAT
+__DEFINE_SINLE_ATOMIC_ADD(FLOAT)
+#else
+__DEFINE_SINLE_ATOMIC_ADD(DOUBLE)
+#endif
+__DEFINE_SINLE_ATOMIC_ADD(INT)
+__DEFINE_SINLE_ATOMIC_ADD(UINT)
+
+#if _CLG_DOUBLEFLOAT
+__DEFINE_SINLE_ATOMIC_ADDC(cuComplex)
+__DEFINE_SINLE_ATOMIC_ADDC(CLGComplex)
+#else
+__DEFINE_SINLE_ATOMIC_ADDC(cuDoubleComplex)
+__DEFINE_SINLE_ATOMIC_ADDC(CLGComplex)
+#endif
+
+template<INT e, INT me> __device__ __inline__ void _atomicAdd(deviceSUN<e, me>* left, const deviceSUN<e, me>& right) 
+{ 
+    for (INT i = 0; i < e; ++i)
+    {
+        _atomicAdd(left->m_me + i, right.m_me[i]);
+    }
+}
+
+template<INT e, INT me> __device__ __inline__ void _atomicAdd(deviceSUNVector<e, me>* left, const deviceSUNVector<e, me>& right)
+{
+    for (INT i = 0; i < e; ++i)
+    {
+        _atomicAdd(left->m_ve + i, right.m_ve[i]);
+    }
+}
+#endif
+
 template<typename TLeft, typename TRight> __device__ __inline__ TLeft _mulC(const TLeft& left, const TRight& right) = delete;
-template<typename TLeft, typename TRight> __device__ __inline__ void _mul(TLeft& left, const TRight& right) = delete;
+template<typename TLeft, typename TRight> __device__ __inline__ void _mul(TLeft& left, const TRight& right)
+{
+    left = _mulC(left, right);
+}
 
-
-template<> __device__ __inline__ Real _mulC<Real, Real>(const Real& left, const Real& right)
+template<> __device__ __inline__ FLOAT _mulC<FLOAT, FLOAT>(const FLOAT& left, const FLOAT& right)
 {
     return left * right;
 }
-template<> __device__ __inline__ void _mul<Real, Real>(Real& left, const Real& right)
+template<> __device__ __inline__ DOUBLE _mulC<DOUBLE, DOUBLE>(const DOUBLE& left, const DOUBLE& right)
 {
-    left = left * right;
+    return left * right;
+}
+template<> __device__ __inline__ FLOAT _mulC<FLOAT, DOUBLE>(const FLOAT& left, const DOUBLE& right)
+{
+    return left * static_cast<FLOAT>(right);
+}
+template<> __device__ __inline__ DOUBLE _mulC<DOUBLE, FLOAT>(const DOUBLE& left, const FLOAT& right)
+{
+    return left * static_cast<DOUBLE>(right);
 }
 
+template<> __device__ __inline__ Real _mulC<Real, CLGComplex>(const Real& left, const CLGComplex& right)
+{
+    return left * _cuCabsf(right);
+}
 template<> __device__ __inline__ CLGComplex _mulC<CLGComplex, Real>(const CLGComplex& left, const Real& right)
 {
     return cuCmulf_cr(left, right);
 }
-template<> __device__ __inline__ void _mul<CLGComplex, Real>(CLGComplex& left, const Real& right)
-{
-    left = cuCmulf_cr(left, right);
-}
+
+
 #if _CLG_DOUBLEFLOAT
 template<> __device__ __inline__ CLGComplex _mulC<CLGComplex, FLOAT>(const CLGComplex& left, const FLOAT& right)
 {
     return cuCmulf_cr(left, static_cast<Real>(right));
 }
-template<> __device__ __inline__ void _mul<CLGComplex, FLOAT>(CLGComplex& left, const FLOAT& right)
+template<> __device__ __inline__ cuComplex _mulC<cuComplex, FLOAT>(const cuComplex& left, const FLOAT& right)
 {
-    left = cuCmulf_cr(left, static_cast<Real>(right));
+    return _cToFloat(cuCmulf_cr(_cToRealC(left), static_cast<Real>(right)));
+}
+template<> __device__ __inline__ cuComplex _mulC<cuComplex, DOUBLE>(const cuComplex& left, const DOUBLE& right)
+{
+    return _cToFloat(cuCmulf_cr(_cToRealC(left), static_cast<Real>(right)));
 }
 #else
 template<> __device__ __inline__ CLGComplex _mulC<CLGComplex, DOUBLE>(const CLGComplex& left, const DOUBLE& right)
 {
     return cuCmulf_cr(left, static_cast<Real>(right));
 }
-template<> __device__ __inline__ void _mul<CLGComplex, DOUBLE>(CLGComplex& left, const DOUBLE& right)
+template<> __device__ __inline__ cuDoubleComplex _mulC<cuDoubleComplex, FLOAT>(const cuDoubleComplex& left, const FLOAT& right)
 {
-    left = cuCmulf_cr(left, static_cast<Real>(right));
+    return cuCmulf_cd(left, static_cast<DOUBLE>(right));
+}
+template<> __device__ __inline__ cuDoubleComplex _mulC<cuDoubleComplex, DOUBLE>(const cuDoubleComplex& left, const DOUBLE& right)
+{
+    return cuCmulf_cd(left, right);
 }
 #endif
 
@@ -861,26 +1341,57 @@ template<> __device__ __inline__ CLGComplex _mulC<CLGComplex, CLGComplex>(const 
 {
     return _cuCmulf(left, right);
 }
-template<> __device__ __inline__ void _mul<CLGComplex, CLGComplex>(CLGComplex& left, const CLGComplex& right)
+#if _CLG_DOUBLEFLOAT
+template<> __device__ __inline__ CLGComplex _mulC<CLGComplex, cuComplex>(const CLGComplex& left, const cuComplex& right)
 {
-    left = _cuCmulf(left, right);
+    return _cuCmulf(left, _cToRealC(right));
 }
+#else
+template<> __device__ __inline__ CLGComplex _mulC<CLGComplex, cuDoubleComplex>(const CLGComplex& left, const cuDoubleComplex& right)
+{
+    return _cuCmulf(left, _cToRealC(right));
+}
+#endif
 
+#if _CLG_DOUBLEFLOAT
+template<> __device__ __inline__ cuComplex _mulC<cuComplex, CLGComplex>(const cuComplex& left, const CLGComplex& right)
+{
+    return cuCmulf(left, _cToFloat(right));
+}
+template<> __device__ __inline__ cuComplex _mulC<cuComplex, cuComplex>(const cuComplex& left, const cuComplex& right)
+{
+    return cuCmulf(left, right);
+}
+//template<> __device__ __inline__ cuComplex _mulC<cuComplex, cuDoubleComplex>(const cuComplex& left, const cuDoubleComplex& right)
+//{
+//    return cuCmulf(left, _cToFloat(right));
+//}
+#else
+template<> __device__ __inline__ cuDoubleComplex _mulC<cuDoubleComplex, CLGComplex>(const cuDoubleComplex& left, const CLGComplex& right)
+{
+    return cuCmul(left, _cToDouble(right));
+}
+//template<> __device__ __inline__ cuDoubleComplex _mulC<cuDoubleComplex, cuComplex>(const cuDoubleComplex& left, const cuComplex& right)
+//{
+//    return cuCmul(left, _cToDouble(right));
+//}
+template<> __device__ __inline__ cuDoubleComplex _mulC<cuDoubleComplex, cuDoubleComplex>(const cuDoubleComplex& left, const cuDoubleComplex& right)
+{
+    return cuCmul(left, right);
+}
+#endif
 
 __DEFINE_TWO_ELEMENT_Func(deviceSU2Vector, _mul, Mul)
 __DEFINE_TWO_ELEMENT_Func(deviceSU3Vector, _mul, Mul)
-__DEFINE_TWO_ELEMENT_Func(deviceSU4Vector, _mul, Mul)
-__DEFINE_TWO_ELEMENT_Func(deviceSU5Vector, _mul, Mul)
-__DEFINE_TWO_ELEMENT_Func(deviceSU6Vector, _mul, Mul)
-__DEFINE_TWO_ELEMENT_Func(deviceSU7Vector, _mul, Mul)
-__DEFINE_TWO_ELEMENT_Func(deviceSU8Vector, _mul, Mul)
 __DEFINE_TWO_ELEMENT_Func(deviceSU2, _mul, Mul)
 __DEFINE_TWO_ELEMENT_Func(deviceSU3, _mul, Mul)
-__DEFINE_TWO_ELEMENT_Func(deviceSU4, _mul, Mul)
-__DEFINE_TWO_ELEMENT_Func(deviceSU5, _mul, Mul)
-__DEFINE_TWO_ELEMENT_Func(deviceSU6, _mul, Mul)
-__DEFINE_TWO_ELEMENT_Func(deviceSU7, _mul, Mul)
-__DEFINE_TWO_ELEMENT_Func(deviceSU8, _mul, Mul)
+
+template<INT N> __device__ __inline__ void _mul(deviceZN<N>& left, const deviceZN<N>& right) { left.Mul(right); }
+template<INT N> __device__ __inline__ void _mul(deviceZN<N>& left, const Real& right) { left.MulReal(right); }
+template<INT N> __device__ __inline__ void _mul(deviceZN<N>& left, const CLGComplex& right) { left.MulComp(right); }
+template<INT N> __device__ __inline__ deviceZN<N> _mulC(const deviceZN<N>& left, const deviceZN<N>& right) { return left.MulC(right); }
+template<INT N> __device__ __inline__ deviceZN<N> _mulC(const deviceZN<N>& left, const Real& right) { return left.MulRealC(right); }
+template<INT N> __device__ __inline__ deviceZN<N> _mulC(const deviceZN<N>& left, const CLGComplex& right) { return left.MulCompC(right); }
 
 template<> __device__ __inline__ void _mul<deviceWilsonVectorSU3, deviceWilsonVectorSU3>(deviceWilsonVectorSU3& left, const deviceWilsonVectorSU3& right)
 {
@@ -912,6 +1423,103 @@ template<> __device__ __inline__ deviceWilsonVectorSU3 _mulC<deviceWilsonVectorS
     return left.MulRealC(right);
 }
 
+template<typename TLeft, typename TRight> __host__ __inline__ TLeft _mulCHost(const TLeft& left, const TRight& right) = delete;
+template<typename TLeft, typename TRight> __host__ __inline__ void _mulHost(TLeft& left, const TRight& right)
+{
+    left = _mulCHost(left, right);
+}
+
+template<> __host__ __inline__ FLOAT _mulCHost<FLOAT, FLOAT>(const FLOAT& left, const FLOAT& right)
+{
+    return left * right;
+}
+template<> __host__ __inline__ DOUBLE _mulCHost<DOUBLE, DOUBLE>(const DOUBLE& left, const DOUBLE& right)
+{
+    return left * right;
+}
+template<> __host__ __inline__ FLOAT _mulCHost<FLOAT, DOUBLE>(const FLOAT& left, const DOUBLE& right)
+{
+    return left * static_cast<FLOAT>(right);
+}
+template<> __host__ __inline__ DOUBLE _mulCHost<DOUBLE, FLOAT>(const DOUBLE& left, const FLOAT& right)
+{
+    return left * static_cast<DOUBLE>(right);
+}
+
+template<> __host__ __inline__ Real _mulCHost<Real, CLGComplex>(const Real& left, const CLGComplex& right)
+{
+    return left * _cuCabsf(right);
+}
+template<> __host__ __inline__ CLGComplex _mulCHost<CLGComplex, Real>(const CLGComplex& left, const Real& right)
+{
+    return cuCmulf_cr(left, right);
+}
+
+
+#if _CLG_DOUBLEFLOAT
+template<> __host__ __inline__ CLGComplex _mulCHost<CLGComplex, FLOAT>(const CLGComplex& left, const FLOAT& right)
+{
+    return cuCmulf_cr(left, static_cast<Real>(right));
+}
+template<> __host__ __inline__ cuComplex _mulCHost<cuComplex, FLOAT>(const cuComplex& left, const FLOAT& right)
+{
+    return _cToFloat(cuCmulf_cr(_cToRealC(left), static_cast<Real>(right)));
+}
+template<> __host__ __inline__ cuComplex _mulCHost<cuComplex, DOUBLE>(const cuComplex& left, const DOUBLE& right)
+{
+    return _cToFloat(cuCmulf_cr(_cToRealC(left), static_cast<Real>(right)));
+}
+#else
+template<> __host__ __inline__ CLGComplex _mulCHost<CLGComplex, DOUBLE>(const CLGComplex& left, const DOUBLE& right)
+{
+    return cuCmulf_cr(left, static_cast<Real>(right));
+}
+template<> __host__ __inline__ cuDoubleComplex _mulCHost<cuDoubleComplex, FLOAT>(const cuDoubleComplex& left, const FLOAT& right)
+{
+    return cuCmulf_cd(left, static_cast<DOUBLE>(right));
+}
+template<> __host__ __inline__ cuDoubleComplex _mulCHost<cuDoubleComplex, DOUBLE>(const cuDoubleComplex& left, const DOUBLE& right)
+{
+    return cuCmulf_cd(left, right);
+}
+#endif
+
+template<> __host__ __inline__ CLGComplex _mulCHost<CLGComplex, CLGComplex>(const CLGComplex& left, const CLGComplex& right)
+{
+    return _cuCmulf(left, right);
+}
+#if _CLG_DOUBLEFLOAT
+template<> __host__ __inline__ CLGComplex _mulCHost<CLGComplex, cuComplex>(const CLGComplex& left, const cuComplex& right)
+{
+    return _cuCmulf(left, _cToRealC(right));
+}
+#else
+template<> __host__ __inline__ CLGComplex _mulCHost<CLGComplex, cuDoubleComplex>(const CLGComplex& left, const cuDoubleComplex& right)
+{
+    return _cuCmulf(left, _cToRealC(right));
+}
+#endif
+
+#if _CLG_DOUBLEFLOAT
+template<> __host__ __inline__ cuComplex _mulCHost<cuComplex, CLGComplex>(const cuComplex& left, const CLGComplex& right)
+{
+    return cuCmulf(left, _cToFloat(right));
+}
+template<> __host__ __inline__ cuComplex _mulCHost<cuComplex, cuComplex>(const cuComplex& left, const cuComplex& right)
+{
+    return cuCmulf(left, right);
+}
+#else
+template<> __host__ __inline__ cuDoubleComplex _mulCHost<cuDoubleComplex, CLGComplex>(const cuDoubleComplex& left, const CLGComplex& right)
+{
+    return cuCmul(left, _cToDouble(right));
+}
+template<> __host__ __inline__ cuDoubleComplex _mulCHost<cuDoubleComplex, cuDoubleComplex>(const cuDoubleComplex& left, const cuDoubleComplex& right)
+{
+    return cuCmul(left, right);
+}
+#endif
+
 template<typename T> __device__ __inline__ T _dagmulC(const T& left, const T& right) = delete;
 template<typename T> __device__ __inline__ void _dagmul(T& left, const T& right) = delete;
 template<> __device__ __inline__ CLGComplex _dagmulC<CLGComplex>(const CLGComplex& left, const CLGComplex& right)
@@ -936,22 +1544,22 @@ template<> __device__ __inline__ void FUNC1<TYPENAME>(TYPENAME& left, const TYPE
 
 __DEFINE_TWO_ELEMENT_Func2(deviceSU2Vector, _dagmul, DaggerMul)
 __DEFINE_TWO_ELEMENT_Func2(deviceSU3Vector, _dagmul, DaggerMul)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU4Vector, _dagmul, DaggerMul)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU5Vector, _dagmul, DaggerMul)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU6Vector, _dagmul, DaggerMul)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU7Vector, _dagmul, DaggerMul)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU8Vector, _dagmul, DaggerMul)
 __DEFINE_TWO_ELEMENT_Func2(deviceSU2, _dagmul, DaggerMul)
 __DEFINE_TWO_ELEMENT_Func2(deviceSU3, _dagmul, DaggerMul)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU4, _dagmul, DaggerMul)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU5, _dagmul, DaggerMul)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU6, _dagmul, DaggerMul)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU7, _dagmul, DaggerMul)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU8, _dagmul, DaggerMul)
 
+template<INT N> __device__ __inline__ void _dagmul(deviceZN<N>& left, const deviceZN<N>& right) { left.DaggerMul(right); }
+template<INT N> __device__ __inline__ deviceZN<N> _dagmulC(const deviceZN<N>& left, const deviceZN<N>& right) { return left.DaggerMulC(right); }
 
 template<typename T> __device__ __inline__ T _muldagC(const T& left, const T& right) = delete;
 template<typename T> __device__ __inline__ void _muldag(T& left, const T& right) = delete;
+template<> __device__ __inline__ Real _muldagC<Real>(const Real& left, const Real& right)
+{
+    return left * right;
+}
+template<> __device__ __inline__ void _muldag<Real>(Real& left, const Real& right)
+{
+    left = left * right;
+}
 template<> __device__ __inline__ CLGComplex _muldagC<CLGComplex>(const CLGComplex& left, const CLGComplex& right)
 {
     return _cuCmulf(left, _cuConjf(right));
@@ -963,20 +1571,43 @@ template<> __device__ __inline__ void _muldag<CLGComplex>(CLGComplex& left, cons
 
 __DEFINE_TWO_ELEMENT_Func2(deviceSU2Vector, _muldag, MulDagger)
 __DEFINE_TWO_ELEMENT_Func2(deviceSU3Vector, _muldag, MulDagger)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU4Vector, _muldag, MulDagger)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU5Vector, _muldag, MulDagger)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU6Vector, _muldag, MulDagger)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU7Vector, _muldag, MulDagger)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU8Vector, _muldag, MulDagger)
+__DEFINE_TWO_ELEMENT_Func2(deviceWilsonVectorSU3, _muldag, MulDagger)
 __DEFINE_TWO_ELEMENT_Func2(deviceSU2, _muldag, MulDagger)
 __DEFINE_TWO_ELEMENT_Func2(deviceSU3, _muldag, MulDagger)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU4, _muldag, MulDagger)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU5, _muldag, MulDagger)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU6, _muldag, MulDagger)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU7, _muldag, MulDagger)
-__DEFINE_TWO_ELEMENT_Func2(deviceSU8, _muldag, MulDagger)
+
+template<INT N> __device__ __inline__ void _muldag(deviceZN<N>& left, const deviceZN<N>& right) { left.MulDagger(right); }
+template<INT N> __device__ __inline__ deviceZN<N> _muldagC(const deviceZN<N>& left, const deviceZN<N>& right) { return left.MulDaggerC(right); }
+
+template<typename T> __device__ __inline__ void _mul(T& left, const T& right, CLGComplex* buffer) = delete;
+template<typename T> __device__ __inline__ void _muldag(T& left, const T& right, CLGComplex* buffer) = delete;
+
+#define _DEFINE_BUFFER_MUL(TYPENAME) \
+template<> __device__ __inline__ void _mul<TYPENAME>(TYPENAME& left, const TYPENAME& right, CLGComplex* buffer) \
+{ \
+    left.Mul(right, buffer); \
+} \
+template<> __device__ __inline__ void _muldag<TYPENAME>(TYPENAME& left, const TYPENAME& right, CLGComplex* buffer) \
+{ \
+    left.MulDagger(right, buffer); \
+}
+
+template<> __device__ __inline__ void _mul<CLGComplex>(CLGComplex& left, const CLGComplex& right, CLGComplex* buffer)
+{ 
+    _mul(left, right); 
+} 
+template<> __device__ __inline__ void _muldag<CLGComplex>(CLGComplex& left, const CLGComplex& right, CLGComplex* buffer)
+{ 
+    _muldag(left, right);
+}
+_DEFINE_BUFFER_MUL(deviceSU2);
+_DEFINE_BUFFER_MUL(deviceSU3);
 
 template<typename TMatrix, typename TVector> __device__ __inline__ TVector _mulVec(const TMatrix& matrix, const TVector& vector) = delete;
+
+template<> __device__ __inline__ Real _mulVec<Real, Real>(const Real& matrix, const Real& vector)
+{
+    return matrix * vector;
+}
 
 template<> __device__ __inline__ CLGComplex _mulVec<CLGComplex, CLGComplex>(const CLGComplex& matrix, const CLGComplex& vector)
 {
@@ -998,32 +1629,41 @@ template<> __device__ __inline__ deviceWilsonVectorSU3 _mulVec<deviceSU3, device
     return matrix.MulWilsonVector(vector);
 }
 
-template<> __device__ __inline__ deviceSU4Vector _mulVec<deviceSU4, deviceSU4Vector>(const deviceSU4& matrix, const deviceSU4Vector& vector)
+template<typename TMatrix, typename TVector> __device__ __inline__ TVector _dagmulVec(const TMatrix& matrix, const TVector& vector) = delete;
+
+template<> __device__ __inline__ Real _dagmulVec<Real, Real>(const Real& matrix, const Real& vector)
 {
-    return matrix.MulVector(vector);
+    return matrix * vector;
 }
 
-template<> __device__ __inline__ deviceSU5Vector _mulVec<deviceSU5, deviceSU5Vector>(const deviceSU5& matrix, const deviceSU5Vector& vector)
+template<> __device__ __inline__ CLGComplex _dagmulVec<CLGComplex, CLGComplex>(const CLGComplex& matrix, const CLGComplex& vector)
 {
-    return matrix.MulVector(vector);
+    return _cuCmulf(_cuConjf(matrix), vector);
 }
 
-template<> __device__ __inline__ deviceSU6Vector _mulVec<deviceSU6, deviceSU6Vector>(const deviceSU6& matrix, const deviceSU6Vector& vector)
+template<> __device__ __inline__ deviceSU2Vector _dagmulVec<deviceSU2, deviceSU2Vector>(const deviceSU2& matrix, const deviceSU2Vector& vector)
 {
-    return matrix.MulVector(vector);
+    return matrix.DagMulVector(vector);
 }
 
-template<> __device__ __inline__ deviceSU7Vector _mulVec<deviceSU7, deviceSU7Vector>(const deviceSU7& matrix, const deviceSU7Vector& vector)
+template<> __device__ __inline__ deviceSU3Vector _dagmulVec<deviceSU3, deviceSU3Vector>(const deviceSU3& matrix, const deviceSU3Vector& vector)
 {
-    return matrix.MulVector(vector);
+    return matrix.DagMulVector(vector);
 }
 
-template<> __device__ __inline__ deviceSU8Vector _mulVec<deviceSU8, deviceSU8Vector>(const deviceSU8& matrix, const deviceSU8Vector& vector)
+template<> __device__ __inline__ deviceWilsonVectorSU3 _dagmulVec<deviceSU3, deviceWilsonVectorSU3>(const deviceSU3& matrix, const deviceWilsonVectorSU3& vector)
 {
-    return matrix.MulVector(vector);
+    return matrix.DaggerC().MulWilsonVector(vector);
 }
+
+template<typename TMatrix, typename TVector> __device__ __inline__ TVector _transposemulVec(const TMatrix& matrix, const TVector& vector) = delete;
 
 template<typename TMatrix> __device__ __inline__ void _ta(TMatrix& matrix) = delete;
+
+template<> __device__ __inline__ void _ta<Real>(Real& matrix)
+{
+    //do nothing
+}
 
 template<> __device__ __inline__ void _ta<CLGComplex>(CLGComplex& matrix)
 {
@@ -1041,30 +1681,208 @@ template<> __device__ __inline__ void _ta<deviceSU3>(deviceSU3& matrix)
     matrix.Ta();
 }
 
-template<> __device__ __inline__ void _ta<deviceSU4>(deviceSU4& matrix)
+template<INT N, INT NoE> __device__ __inline__ void _ta(deviceSUN<N, NoE>& matrix)
 {
     matrix.Ta();
 }
 
-template<> __device__ __inline__ void _ta<deviceSU5>(deviceSU5& matrix)
+template<INT N> __device__ __inline__ void _ta(deviceZN<N>& matrix)
 {
     matrix.Ta();
 }
 
-template<> __device__ __inline__ void _ta<deviceSU6>(deviceSU6& matrix)
+template<INT N, INT NoE> __device__ __inline__ void _ta(deviceSLNC<N, NoE>& matrix)
 {
     matrix.Ta();
 }
 
-template<> __device__ __inline__ void _ta<deviceSU7>(deviceSU7& matrix)
+template<INT N, INT NoE> __device__ __inline__ void _ta(deviceUN<N, NoE>& matrix)
 {
     matrix.Ta();
 }
 
-template<> __device__ __inline__ void _ta<deviceSU8>(deviceSU8& matrix)
+template<INT N, INT NoE> __device__ __inline__ void _ta(deviceON<N, NoE>& matrix)
 {
     matrix.Ta();
 }
+
+template<INT N, INT NoE> __device__ __inline__ void _ta(deviceSON<N, NoE>& matrix)
+{
+    matrix.Ta();
+}
+
+template<typename TMatrix> __device__ __inline__ void _traceless(TMatrix& matrix) = delete;
+
+template<INT N, INT NoE> __device__ __inline__ void _traceless(deviceSLNC<N, NoE>& matrix)
+{
+    matrix.Traceless();
+}
+
+template<typename TMatrix> __device__ __inline__ void _th(TMatrix& matrix) = delete;
+
+template<> __device__ __inline__ void _th<Real>(Real& matrix)
+{
+    //do nothing
+}
+
+template<> __device__ __inline__ void _th<CLGComplex>(CLGComplex& matrix)
+{
+    matrix.y = F(0.0);
+    //matrix = _make_cuComplex(F(0.0), __cuCargf(matrix));
+}
+
+template<> __device__ __inline__ void _th<deviceSU2>(deviceSU2& matrix)
+{
+    matrix.Th();
+}
+
+template<> __device__ __inline__ void _th<deviceSU3>(deviceSU3& matrix)
+{
+    matrix.Th();
+}
+
+template<INT N, INT NoE> __device__ __inline__ void _th(deviceSUN<N, NoE>& matrix)
+{
+    matrix.Th();
+}
+
+template<INT N> __device__ __inline__ void _th(deviceZN<N>& matrix)
+{
+    matrix.Th();
+}
+
+
+#define _impl_sub_add_mul(n) \
+__DEFINE_TWO_ELEMENT_Func(deviceSU##n##Vector, _add, Add) \
+__DEFINE_TWO_ELEMENT_Func(deviceSU##n, _add, Add) \
+__DEFINE_TWO_ELEMENT_Func(deviceSU##n##Vector, _sub, Sub) \
+__DEFINE_TWO_ELEMENT_Func(deviceSU##n, _sub, Sub) \
+__DEFINE_TWO_ELEMENT_Func(deviceSU##n##Vector, _mul, Mul) \
+__DEFINE_TWO_ELEMENT_Func(deviceSU##n, _mul, Mul) \
+__DEFINE_TWO_ELEMENT_Func2(deviceSU##n##Vector, _dagmul, DaggerMul) \
+__DEFINE_TWO_ELEMENT_Func2(deviceSU##n, _dagmul, DaggerMul) \
+__DEFINE_TWO_ELEMENT_Func2(deviceSU##n##Vector, _muldag, MulDagger) \
+__DEFINE_TWO_ELEMENT_Func2(deviceSU##n, _muldag, MulDagger) \
+_DEFINE_BUFFER_MUL(deviceSU##n); \
+template<> __device__ __inline__ deviceSU##n##Vector _mulVec<deviceSU##n, deviceSU##n##Vector>(const deviceSU##n& matrix, const deviceSU##n##Vector& vector) \
+{ \
+    return matrix.MulVector(vector); \
+} \
+template<> __device__ __inline__ deviceSU##n##Vector _dagmulVec<deviceSU##n, deviceSU##n##Vector>(const deviceSU##n& matrix, const deviceSU##n##Vector& vector) \
+{ \
+    return matrix.DagMulVector(vector); \
+} 
+
+#define _make_all_sub_add_mul(n) _DEF_F_N(n, _impl_sub_add_mul)
+_make_all_sub_add_mul(_MAX_SUN)
+
+#define _impl_slnc_sub_add_mul(n) \
+__DEFINE_TWO_ELEMENT_Func(deviceSL##n##C, _add, Add) \
+__DEFINE_TWO_ELEMENT_Func(deviceSL##n##C, _sub, Sub) \
+__DEFINE_TWO_ELEMENT_Func(deviceSL##n##C, _mul, Mul) \
+__DEFINE_TWO_ELEMENT_Func2(deviceSL##n##C, _dagmul, DaggerMul) \
+__DEFINE_TWO_ELEMENT_Func2(deviceSL##n##C, _muldag, MulDagger) \
+_DEFINE_BUFFER_MUL(deviceSL##n##C); \
+template<> __device__ __inline__ deviceSU##n##Vector _mulVec<deviceSL##n##C, deviceSU##n##Vector>(const deviceSL##n##C & matrix, const deviceSU##n##Vector& vector) \
+{ \
+    return matrix.MulVector(vector); \
+} \
+template<> __device__ __inline__ deviceSU##n##Vector _dagmulVec<deviceSL##n##C, deviceSU##n##Vector>(const deviceSL##n##C & matrix, const deviceSU##n##Vector& vector) \
+{ \
+    return matrix.DagMulVector(vector); \
+} 
+
+#define _make_all_sub_add_mul_slnc(n) _DEF_FSLNC_N(n, _impl_slnc_sub_add_mul)
+_make_all_sub_add_mul_slnc(_MAX_SLNC)
+
+#define _impl_un_sub_add_mul(n) \
+__DEFINE_TWO_ELEMENT_Func(deviceU##n, _add, Add) \
+__DEFINE_TWO_ELEMENT_Func(deviceU##n, _sub, Sub) \
+__DEFINE_TWO_ELEMENT_Func(deviceU##n, _mul, Mul) \
+__DEFINE_TWO_ELEMENT_Func2(deviceU##n, _dagmul, DaggerMul) \
+__DEFINE_TWO_ELEMENT_Func2(deviceU##n, _muldag, MulDagger) \
+_DEFINE_BUFFER_MUL(deviceU##n); \
+template<> __device__ __inline__ deviceSU##n##Vector _mulVec<deviceU##n, deviceSU##n##Vector>(const deviceU##n & matrix, const deviceSU##n##Vector& vector) \
+{ \
+    return matrix.MulVector(vector); \
+} \
+template<> __device__ __inline__ deviceSU##n##Vector _dagmulVec<deviceU##n, deviceSU##n##Vector>(const deviceU##n & matrix, const deviceSU##n##Vector& vector) \
+{ \
+    return matrix.DagMulVector(vector); \
+}
+
+#define _make_all_sub_add_mul_un(n) _DEF_FUN_N(n, _impl_un_sub_add_mul)
+_make_all_sub_add_mul_un(_MAX_UN)
+
+#define _impl_on_sub_add_mul(n) \
+template<> __device__ __inline__ void _add<deviceO##n, deviceO##n>(deviceO##n& left, const deviceO##n& right) { left.Add(right); } \
+template<> __device__ __inline__ void _add<deviceO##n, Real>(deviceO##n& left, const Real& right) { left.AddReal(right); } \
+template<> __device__ __inline__ deviceO##n _addC<deviceO##n, deviceO##n>(const deviceO##n& left, const deviceO##n& right) { return left.AddC(right); } \
+template<> __device__ __inline__ deviceO##n _addC<deviceO##n, Real>(const deviceO##n& left, const Real& right) { return left.AddRealC(right); } \
+template<> __device__ __inline__ void _sub<deviceO##n, deviceO##n>(deviceO##n& left, const deviceO##n& right) { left.Sub(right); } \
+template<> __device__ __inline__ void _sub<deviceO##n, Real>(deviceO##n& left, const Real& right) { left.SubReal(right); } \
+template<> __device__ __inline__ deviceO##n _subC<deviceO##n, deviceO##n>(const deviceO##n& left, const deviceO##n& right) { return left.SubC(right); } \
+template<> __device__ __inline__ deviceO##n _subC<deviceO##n, Real>(const deviceO##n& left, const Real& right) { return left.SubRealC(right); } \
+template<> __device__ __inline__ void _mul<deviceO##n, deviceO##n>(deviceO##n& left, const deviceO##n& right) { left.Mul(right); } \
+template<> __device__ __inline__ void _mul<deviceO##n, Real>(deviceO##n& left, const Real& right) { left.MulReal(right); } \
+template<> __device__ __inline__ deviceO##n _mulC<deviceO##n, deviceO##n>(const deviceO##n& left, const deviceO##n& right) { return left.MulC(right); } \
+template<> __device__ __inline__ deviceO##n _mulC<deviceO##n, Real>(const deviceO##n& left, const Real& right) { return left.MulRealC(right); } \
+template<> __device__ __inline__ deviceSU##n##Vector _mulVec<deviceO##n, deviceSU##n##Vector>(const deviceO##n & matrix, const deviceSU##n##Vector& vector) \
+{ \
+    return matrix.MulVector(vector); \
+} \
+template<> __device__ __inline__ deviceSU##n##Vector _transposemulVec<deviceO##n, deviceSU##n##Vector>(const deviceO##n & matrix, const deviceSU##n##Vector& vector) \
+{ \
+    return matrix.TransposeMulVector(vector); \
+} \
+template<> __device__ __inline__ void _mul<deviceO##n, CLGComplex>(deviceO##n& left, const CLGComplex& right) { left.MulReal(right.x); } \
+template<> __device__ __inline__ deviceO##n _mulC<deviceO##n, CLGComplex>(const deviceO##n& left, const CLGComplex& right) { return left.MulRealC(right.x); } \
+template<> __device__ __inline__ void _add<deviceO##n, CLGComplex>(deviceO##n& left, const CLGComplex& right) { left.AddReal(right.x); } \
+template<> __device__ __inline__ deviceO##n _addC<deviceO##n, CLGComplex>(const deviceO##n& left, const CLGComplex& right) { return left.AddRealC(right.x); } \
+template<> __device__ __inline__ void _sub<deviceO##n, CLGComplex>(deviceO##n& left, const CLGComplex& right) { left.SubReal(right.x); } \
+template<> __device__ __inline__ deviceO##n _subC<deviceO##n, CLGComplex>(const deviceO##n& left, const CLGComplex& right) { return left.SubRealC(right.x); } \
+template<> __device__ __inline__ void _dagmul<deviceO##n>(deviceO##n& left, const deviceO##n& right) { left.TransposeMul(right); } \
+template<> __device__ __inline__ deviceO##n _dagmulC<deviceO##n>(const deviceO##n& left, const deviceO##n& right) { return left.TransposeMulC(right); } \
+template<> __device__ __inline__ void _muldag<deviceO##n>(deviceO##n& left, const deviceO##n& right) { left.MulTranspose(right); } \
+template<> __device__ __inline__ deviceO##n _muldagC<deviceO##n>(const deviceO##n& left, const deviceO##n& right) { return left.MulTransposeC(right); }
+
+#define _make_all_sub_add_mul_on(n) _DEF_FON_N(n, _impl_on_sub_add_mul)
+_make_all_sub_add_mul_on(_MAX_ON)
+
+#define _impl_son_sub_add_mul(n) \
+template<> __device__ __inline__ void _add<deviceSO##n, deviceSO##n>(deviceSO##n& left, const deviceSO##n& right) { left.Add(right); } \
+template<> __device__ __inline__ void _add<deviceSO##n, Real>(deviceSO##n& left, const Real& right) { left.AddReal(right); } \
+template<> __device__ __inline__ deviceSO##n _addC<deviceSO##n, deviceSO##n>(const deviceSO##n& left, const deviceSO##n& right) { return left.AddC(right); } \
+template<> __device__ __inline__ deviceSO##n _addC<deviceSO##n, Real>(const deviceSO##n& left, const Real& right) { return left.AddRealC(right); } \
+template<> __device__ __inline__ void _sub<deviceSO##n, deviceSO##n>(deviceSO##n& left, const deviceSO##n& right) { left.Sub(right); } \
+template<> __device__ __inline__ void _sub<deviceSO##n, Real>(deviceSO##n& left, const Real& right) { left.SubReal(right); } \
+template<> __device__ __inline__ deviceSO##n _subC<deviceSO##n, deviceSO##n>(const deviceSO##n& left, const deviceSO##n& right) { return left.SubC(right); } \
+template<> __device__ __inline__ deviceSO##n _subC<deviceSO##n, Real>(const deviceSO##n& left, const Real& right) { return left.SubRealC(right); } \
+template<> __device__ __inline__ void _mul<deviceSO##n, deviceSO##n>(deviceSO##n& left, const deviceSO##n& right) { left.Mul(right); } \
+template<> __device__ __inline__ void _mul<deviceSO##n, Real>(deviceSO##n& left, const Real& right) { left.MulReal(right); } \
+template<> __device__ __inline__ deviceSO##n _mulC<deviceSO##n, deviceSO##n>(const deviceSO##n& left, const deviceSO##n& right) { return left.MulC(right); } \
+template<> __device__ __inline__ deviceSO##n _mulC<deviceSO##n, Real>(const deviceSO##n& left, const Real& right) { return left.MulRealC(right); } \
+template<> __device__ __inline__ deviceSU##n##Vector _mulVec<deviceSO##n, deviceSU##n##Vector>(const deviceSO##n & matrix, const deviceSU##n##Vector& vector) \
+{ \
+    return matrix.MulVector(vector); \
+} \
+template<> __device__ __inline__ deviceSU##n##Vector _transposemulVec<deviceSO##n, deviceSU##n##Vector>(const deviceSO##n & matrix, const deviceSU##n##Vector& vector) \
+{ \
+    return matrix.TransposeMulVector(vector); \
+} \
+template<> __device__ __inline__ void _mul<deviceSO##n, CLGComplex>(deviceSO##n& left, const CLGComplex& right) { left.MulReal(right.x); } \
+template<> __device__ __inline__ deviceSO##n _mulC<deviceSO##n, CLGComplex>(const deviceSO##n& left, const CLGComplex& right) { return left.MulRealC(right.x); } \
+template<> __device__ __inline__ void _add<deviceSO##n, CLGComplex>(deviceSO##n& left, const CLGComplex& right) { left.AddReal(right.x); } \
+template<> __device__ __inline__ deviceSO##n _addC<deviceSO##n, CLGComplex>(const deviceSO##n& left, const CLGComplex& right) { return left.AddRealC(right.x); } \
+template<> __device__ __inline__ void _sub<deviceSO##n, CLGComplex>(deviceSO##n& left, const CLGComplex& right) { left.SubReal(right.x); } \
+template<> __device__ __inline__ deviceSO##n _subC<deviceSO##n, CLGComplex>(const deviceSO##n& left, const CLGComplex& right) { return left.SubRealC(right.x); } \
+template<> __device__ __inline__ void _dagmul<deviceSO##n>(deviceSO##n& left, const deviceSO##n& right) { left.TransposeMul(right); } \
+template<> __device__ __inline__ deviceSO##n _dagmulC<deviceSO##n>(const deviceSO##n& left, const deviceSO##n& right) { return left.TransposeMulC(right); } \
+template<> __device__ __inline__ void _muldag<deviceSO##n>(deviceSO##n& left, const deviceSO##n& right) { left.MulTranspose(right); } \
+template<> __device__ __inline__ deviceSO##n _muldagC<deviceSO##n>(const deviceSO##n& left, const deviceSO##n& right) { return left.MulTransposeC(right); }
+
+#define _make_all_sub_add_mul_son(n) _DEF_FSON_N(n, _impl_son_sub_add_mul)
+_make_all_sub_add_mul_son(_MAX_SON)
 
 template<typename T> __device__ __inline__ CLGComplex _dot(const T& x, const T& y) = delete;
 
@@ -1110,6 +1928,33 @@ __device__ __inline__ CLGComplex _dot(const deviceSUN<N, NoE>& x, const deviceSU
     return x.DaggerMulC(y).Tr();
 }
 
+template<INT N, INT NoE>
+__device__ __inline__ CLGComplex _dot(const deviceSLNC<N, NoE>& x, const deviceSLNC<N, NoE>& y)
+{
+    return x.DaggerMulC(y).Tr();
+}
+template<INT N, INT NoE>
+__device__ __inline__ CLGComplex _dot(const deviceUN<N, NoE>& x, const deviceUN<N, NoE>& y)
+{
+    return x.DaggerMulC(y).Tr();
+}
+template<INT N, INT NoE>
+__device__ __inline__ CLGComplex _dot(const deviceON<N, NoE>& x, const deviceON<N, NoE>& y)
+{
+    return _make_cuComplex(x.TransposeMulC(y).Tr(), F(0.0));
+}
+template<INT N, INT NoE>
+__device__ __inline__ CLGComplex _dot(const deviceSON<N, NoE>& x, const deviceSON<N, NoE>& y)
+{
+    return _make_cuComplex(x.TransposeMulC(y).Tr(), F(0.0));
+}
+
+template<INT N>
+__device__ __inline__ CLGComplex _dot(const deviceZN<N>& x, const deviceZN<N>& y)
+{
+    return x.DaggerMulC(y).Tr();
+}
+
 template<typename T> __device__ __inline__ Real _lensq(const T& x) = delete;
 
 template<> __device__ __inline__ Real _lensq<Real>(const Real& x)
@@ -1144,8 +1989,35 @@ template<> __device__ __inline__ Real _lensq<deviceSU3>(const deviceSU3& x)
     return x.DaggerMulC(x).ReTr();
 }
 
-template<INT N, INT NoE> 
+template<INT N, INT NoE>
 __device__ __inline__ Real _lensq(const deviceSUN<N, NoE>& x)
+{
+    return x.DaggerMulC(x).ReTr();
+}
+
+template<INT N, INT NoE>
+__device__ __inline__ Real _lensq(const deviceSLNC<N, NoE>& x)
+{
+    return x.DaggerMulC(x).ReTr();
+}
+template<INT N, INT NoE>
+__device__ __inline__ Real _lensq(const deviceUN<N, NoE>& x)
+{
+    return x.DaggerMulC(x).ReTr();
+}
+template<INT N, INT NoE>
+__device__ __inline__ Real _lensq(const deviceON<N, NoE>& x)
+{
+    return x.TransposeMulC(x).Tr();
+}
+template<INT N, INT NoE>
+__device__ __inline__ Real _lensq(const deviceSON<N, NoE>& x)
+{
+    return x.TransposeMulC(x).Tr();
+}
+
+template<INT N>
+__device__ __inline__ Real _lensq(const deviceZN<N>& x)
 {
     return x.DaggerMulC(x).ReTr();
 }
@@ -1177,8 +2049,35 @@ template<> __device__ __inline__ Real _retr<deviceSU3>(const deviceSU3& x)
     return x.ReTr();
 }
 
-template<INT N, INT NoE> 
+template<INT N, INT NoE>
 __device__ __inline__ Real _retr(const deviceSUN<N, NoE>& x)
+{
+    return x.ReTr();
+}
+
+template<INT N, INT NoE>
+__device__ __inline__ Real _retr(const deviceSLNC<N, NoE>& x)
+{
+    return x.ReTr();
+}
+template<INT N, INT NoE>
+__device__ __inline__ Real _retr(const deviceUN<N, NoE>& x)
+{
+    return x.ReTr();
+}
+template<INT N, INT NoE>
+__device__ __inline__ Real _retr(const deviceON<N, NoE>& x)
+{
+    return x.Tr();
+}
+template<INT N, INT NoE>
+__device__ __inline__ Real _retr(const deviceSON<N, NoE>& x)
+{
+    return x.Tr();
+}
+
+template<INT N>
+__device__ __inline__ Real _retr(const deviceZN<N>& x)
 {
     return x.ReTr();
 }
@@ -1206,11 +2105,82 @@ __device__ __inline__ CLGComplex _tr(const deviceSUN<N, NoE>& x)
     return x.Tr();
 }
 
+template<INT N, INT NoE>
+__device__ __inline__ CLGComplex _tr(const deviceSLNC<N, NoE>& x)
+{
+    return x.Tr();
+}
+template<INT N, INT NoE>
+__device__ __inline__ CLGComplex _tr(const deviceUN<N, NoE>& x)
+{
+    return x.Tr();
+}
+template<INT N, INT NoE>
+__device__ __inline__ CLGComplex _tr(const deviceON<N, NoE>& x)
+{
+    return _make_cuComplex(x.Tr(), F(0.0));
+}
+template<INT N, INT NoE>
+__device__ __inline__ CLGComplex _tr(const deviceSON<N, NoE>& x)
+{
+    return _make_cuComplex(x.Tr(), F(0.0));
+}
+
+template<INT N>
+__device__ __inline__ CLGComplex _tr(const deviceZN<N>& x)
+{
+    return x.Tr();
+}
+
+template<> __device__ __inline__ CLGComplex _tr<deviceSU2Vector>(const deviceSU2Vector& x)
+{
+    return x.Sum();
+}
+
+template<> __device__ __inline__ CLGComplex _tr<deviceSU3Vector>(const deviceSU3Vector& x)
+{
+    return x.Sum();
+}
+
+template<INT N, INT NoE>
+__device__ __inline__ CLGComplex _tr(const deviceSUNVector<N, NoE>& x)
+{
+    return x.Sum();
+}
+
+template<> __device__ __inline__ CLGComplex _tr<deviceWilsonVectorSU3>(const deviceWilsonVectorSU3& x)
+{
+    return x.Sum();
+}
+
 template<typename T> __device__ __inline__ void _re(T& v) = delete;
 template<> __device__ __inline__ void _re<CLGComplex>(CLGComplex& v) { v.y = F(0.0); }
 template<> __device__ __inline__ void _re<deviceSU2Vector>(deviceSU2Vector& v) { v.Re(); }
 template<> __device__ __inline__ void _re<deviceSU3Vector>(deviceSU3Vector& v) { v.Re(); }
 template<INT N, INT NoVE> __device__ __inline__ void _re(deviceSUNVector<N, NoVE>& v) { v.Re(); }
+template<INT N, INT NoE> __device__ __inline__ void _re(deviceSLNC<N, NoE>& v) { v.Re(); }
+template<INT N, INT NoE> __device__ __inline__ void _re(deviceUN<N, NoE>& v) { v.Re(); }
+
+template<typename T> __device__ __inline__ void _re2(T& v) = delete;
+template<> __device__ __inline__ void _re2<CLGComplex>(CLGComplex& v) { v.y = F(0.0); v.x = F(2.0) * v.x; }
+template<> __device__ __inline__ void _re2<deviceSU2>(deviceSU2& v) { v.Re2(); }
+template<> __device__ __inline__ void _re2<deviceSU3>(deviceSU3& v) { v.Re2(); }
+template<INT N, INT NoVE> __device__ __inline__ void _re2(deviceSUN<N, NoVE>& v) { v.Re2(); }
+template<INT N> __device__ __inline__ void _re2(deviceZN<N>& v) { v.Re2(); }
+
+template<typename T> __device__ __inline__ void _iim2(T& v) = delete;
+template<> __device__ __inline__ void _iim2<CLGComplex>(CLGComplex& v) { v.y = F(2.0) * v.y;  v.x = F(0.0); }
+template<> __device__ __inline__ void _iim2<deviceSU2>(deviceSU2& v) { v.iIm2(); }
+template<> __device__ __inline__ void _iim2<deviceSU3>(deviceSU3& v) { v.iIm2(); }
+template<INT N, INT NoVE> __device__ __inline__ void _iim2(deviceSUN<N, NoVE>& v) { v.iIm2(); }
+template<INT N> __device__ __inline__ void _iim2(deviceZN<N>& v) { v.iIm2(); }
+
+template<typename T> __device__ __inline__ Real _trim(const T& left, const T& right) = delete;
+template<> __device__ __inline__ Real _trim<CLGComplex>(const CLGComplex& left, const CLGComplex& right) { return left.y * right.y; }
+template<> __device__ __inline__ Real _trim<deviceSU2>(const deviceSU2& left, const deviceSU2& right) { return deviceSU2::TrIm(left, right); }
+template<> __device__ __inline__ Real _trim<deviceSU3>(const deviceSU3& left, const deviceSU3& right) { return deviceSU3::TrIm(left, right); }
+template<INT N, INT NoE>  __device__ __inline__ Real _trim(const deviceSUN<N, NoE>& left, const deviceSUN<N, NoE>& right) { return deviceSUN<N, NoE>::TrIm(left, right); }
+template<INT N>  __device__ __inline__ Real _trim(const deviceZN<N>& left, const deviceZN<N>& right) { return deviceZN<N>::TrIm(left, right); }
 
 template<typename T> __device__ __host__ __inline__  BYTE _dim() = delete;
 
@@ -1218,18 +2188,30 @@ template<> __device__ __host__ __inline__  BYTE _dim<Real>() { return 1; }
 template<> __device__ __host__ __inline__  BYTE _dim<CLGComplex>() { return 1; }
 template<> __device__ __host__ __inline__  BYTE _dim<deviceSU2Vector>() { return 2; }
 template<> __device__ __host__ __inline__  BYTE _dim<deviceSU3Vector>() { return 3; }
-template<> __device__ __host__ __inline__  BYTE _dim<deviceSU4Vector>() { return 4; }
-template<> __device__ __host__ __inline__  BYTE _dim<deviceSU5Vector>() { return 5; }
-template<> __device__ __host__ __inline__  BYTE _dim<deviceSU6Vector>() { return 6; }
-template<> __device__ __host__ __inline__  BYTE _dim<deviceSU7Vector>() { return 7; }
-template<> __device__ __host__ __inline__  BYTE _dim<deviceSU8Vector>() { return 8; }
 template<> __device__ __host__ __inline__  BYTE _dim<deviceSU2>() { return 2; }
 template<> __device__ __host__ __inline__  BYTE _dim<deviceSU3>() { return 3; }
-template<> __device__ __host__ __inline__  BYTE _dim<deviceSU4>() { return 4; }
-template<> __device__ __host__ __inline__  BYTE _dim<deviceSU5>() { return 5; }
-template<> __device__ __host__ __inline__  BYTE _dim<deviceSU6>() { return 6; }
-template<> __device__ __host__ __inline__  BYTE _dim<deviceSU7>() { return 7; }
-template<> __device__ __host__ __inline__  BYTE _dim<deviceSU8>() { return 8; }
+template<> __device__ __host__ __inline__  BYTE _dim<deviceWilsonVectorSU3>() { return 12; }
+
+
+template<typename T> __device__ __host__ __inline__ UINT _generator_count_helper(T*) = delete;
+template<INT N, INT NoE> __device__ __host__ __inline__ UINT _generator_count_helper(deviceSUN<N, NoE>*) { return static_cast<UINT>(N * N - 1); }
+template<INT N, INT NoE> __device__ __host__ __inline__ UINT _generator_count_helper(deviceUN<N, NoE>*) { return static_cast<UINT>(N * N); }
+template<INT N, INT NoE> __device__ __host__ __inline__ UINT _generator_count_helper(deviceON<N, NoE>*) { return static_cast<UINT>(N * (N - 1) / 2); }
+template<INT N, INT NoE> __device__ __host__ __inline__ UINT _generator_count_helper(deviceSON<N, NoE>*) { return static_cast<UINT>(N * (N - 1) / 2); }
+template<INT N, INT NoE> __device__ __host__ __inline__ UINT _generator_count_helper(deviceSLNC<N, NoE>*) { return static_cast<UINT>(2 * (N * N - 1)); }
+template<INT N, INT NoE> __device__ __host__ __inline__ UINT _generator_count_helper(deviceSUNVector<N, NoE>*) { return 0; }
+template<> __device__ __host__ __inline__ UINT _generator_count_helper(deviceSU2*) { return static_cast<UINT>(2 * 2 - 1); }
+template<> __device__ __host__ __inline__ UINT _generator_count_helper(deviceSU3*) { return static_cast<UINT>(3 * 3 - 1); }
+template<> __device__ __host__ __inline__ UINT _generator_count_helper(deviceSU2Vector*) { return 0; }
+template<> __device__ __host__ __inline__ UINT _generator_count_helper(deviceSU3Vector*) { return 0; }
+template<> __device__ __host__ __inline__ UINT _generator_count_helper(deviceWilsonVectorSU3*) { return 0; }
+
+template<> __device__ __host__ __inline__ UINT _generator_count_helper(CLGComplex*) { return 1; }
+template<> __device__ __host__ __inline__ UINT _generator_count_helper(Real*) { return 1; }
+template<INT N> __device__ __host__ __inline__ UINT _generator_count_helper(deviceZN<N>*) { return 1; }
+template<INT N> __device__ __host__ __inline__ UINT _generator_count_helper(deviceDN<N>*) { return 2; }
+
+template<typename T> __device__ __host__ __inline__ UINT _generator_count() { return _generator_count_helper((T*)NULL); }
 
 template<typename T> __device__ __inline__  T _expreal(const T& x, Real a) = delete;
 
@@ -1244,13 +2226,48 @@ template<> __device__ __inline__  deviceSU2 _expreal<deviceSU2>(const deviceSU2&
 
 template<> __device__ __inline__  deviceSU3 _expreal<deviceSU3>(const deviceSU3& x, Real a)
 { 
-    return (0 == _DC_ExpPrecision) ? x.QuickExp(a) : x.ExpReal(a, static_cast<BYTE>(_DC_ExpPrecision));
+    if (0 == _DC_ExpPrecision)
+    {
+        return x.QuickExp(a);
+    }
+    else if (1 == _DC_ExpPrecision)
+    {
+        return x.StrictExpTA(a);
+    }
+    return x.ExpReal(a, static_cast<BYTE>(_DC_ExpPrecision));
 }
 
-template<INT N, INT NoE> 
+template<INT N, INT NoE>
 __device__ __inline__  deviceSUN<N, NoE> _expreal(const deviceSUN<N, NoE>& x, Real a)
 {
     return x.ExpReal(a, _DC_ExpPrecision > N ? _DC_ExpPrecision : (N + 1));
+}
+
+template<INT N, INT NoE>
+__device__ __inline__  deviceSLNC<N, NoE> _expreal(const deviceSLNC<N, NoE>& x, Real a)
+{
+    return x.ExpReal(a, _DC_ExpPrecision > N ? _DC_ExpPrecision : (N + 1));
+}
+template<INT N, INT NoE>
+__device__ __inline__  deviceUN<N, NoE> _expreal(const deviceUN<N, NoE>& x, Real a)
+{
+    return x.ExpReal(a, _DC_ExpPrecision > N ? _DC_ExpPrecision : (N + 1));
+}
+template<INT N, INT NoE>
+__device__ __inline__  deviceON<N, NoE> _expreal(const deviceON<N, NoE>& x, Real a)
+{
+    return x.ExpReal(a, _DC_ExpPrecision > N ? _DC_ExpPrecision : (N + 1));
+}
+template<INT N, INT NoE>
+__device__ __inline__  deviceSON<N, NoE> _expreal(const deviceSON<N, NoE>& x, Real a)
+{
+    return x.ExpReal(a, _DC_ExpPrecision > N ? _DC_ExpPrecision : (N + 1));
+}
+
+template<INT N>
+__device__ __inline__  deviceZN<N> _expreal(const deviceZN<N>& x, Real a)
+{
+    return x.ExpReal(a, N + 1);
 }
 
 template<typename T> __device__ __inline__  T _strictexp(const T& x) = delete;
@@ -1270,10 +2287,45 @@ template<> __device__ __inline__  deviceSU3 _strictexp<deviceSU3>(const deviceSU
     return x.StrictExp();
 }
 
-template<INT N, INT NoE> 
+template<INT N, INT NoE>
 __device__ __inline__  deviceSUN<N, NoE> _strictexp(const deviceSUN<N, NoE>& x)
 {
     return x.StrictExp();
+}
+
+template<INT N, INT NoE>
+__device__ __inline__  deviceSLNC<N, NoE> _strictexp(const deviceSLNC<N, NoE>& x)
+{
+    return x.StrictExp();
+}
+template<INT N, INT NoE>
+__device__ __inline__  deviceUN<N, NoE> _strictexp(const deviceUN<N, NoE>& x)
+{
+    return x.StrictExp();
+}
+
+template<INT N>
+__device__ __inline__  deviceZN<N> _strictexp(const deviceZN<N>& x)
+{
+    return x.StrictExp();
+}
+
+template<INT N>
+__device__ __inline__  deviceDN<N> _strictexp(const deviceDN<N>& x)
+{
+    return x.StrictExp();
+}
+
+template<INT N, INT NoE>
+__device__ __inline__ deviceON<N, NoE> _strictexp(const deviceON<N, NoE>& x)
+{
+    return x.ExpReal(F(1.0));
+}
+
+template<INT N, INT NoE>
+__device__ __inline__ deviceSON<N, NoE> _strictexp(const deviceSON<N, NoE>& x)
+{
+    return x.ExpReal(F(1.0));
 }
 
 template<typename T> __device__ __inline__  T _strictlog(const T& x) = delete;
@@ -1299,7 +2351,45 @@ __device__ __inline__  deviceSUN<N, NoE> _strictlog(const deviceSUN<N, NoE>& x)
     return x.Log();
 }
 
+template<INT N, INT NoE>
+__device__ __inline__  deviceSLNC<N, NoE> _strictlog(const deviceSLNC<N, NoE>& x)
+{
+    return x.Log();
+}
+template<INT N, INT NoE>
+__device__ __inline__  deviceUN<N, NoE> _strictlog(const deviceUN<N, NoE>& x)
+{
+    return x.Log();
+}
+template<INT N, INT NoE>
+__device__ __inline__  deviceON<N, NoE> _strictlog(const deviceON<N, NoE>& x)
+{
+    return x.Log();
+}
+template<INT N, INT NoE>
+__device__ __inline__  deviceSON<N, NoE> _strictlog(const deviceSON<N, NoE>& x)
+{
+    return x.Log();
+}
+
+template<INT N>
+__device__ __inline__  deviceZN<N> _strictlog(const deviceZN<N>& x)
+{
+    return x.Log();
+}
+
+template<INT N>
+__device__ __inline__  deviceDN<N> _strictlog(const deviceDN<N>& x)
+{
+    return x.Log();
+}
+
 template<typename T> __device__ __inline__  void _norm(T& x) = delete;
+template<> __device__ __inline__  void _norm<Real>(Real& x)
+{
+    //meaningless
+    x = F(1.0);
+}
 template<> __device__ __inline__  void _norm<CLGComplex>(CLGComplex& x) 
 { 
     const Real fArg = __cuCargf(x);
@@ -1308,6 +2398,11 @@ template<> __device__ __inline__  void _norm<CLGComplex>(CLGComplex& x)
 template<> __device__ __inline__  void _norm<deviceSU2>(deviceSU2& x) { x.Norm(); }
 template<> __device__ __inline__  void _norm<deviceSU3>(deviceSU3& x) { x.Norm(); }
 template<INT N, INT NoE> __device__ __inline__  void _norm(deviceSUN<N, NoE>& x) { x.Norm(); }
+template<INT N, INT NoE> __device__ __inline__  void _norm(deviceSLNC<N, NoE>& x) { x.NormalizeDet(); }
+template<INT N, INT NoE> __device__ __inline__  void _norm(deviceUN<N, NoE>& x) { x.Norm(); }
+template<INT N, INT NoE> __device__ __inline__  void _norm(deviceON<N, NoE>& x) { x.Norm(); }
+template<INT N, INT NoE> __device__ __inline__  void _norm(deviceSON<N, NoE>& x) { x.Norm(); }
+template<INT N> __device__ __inline__  void _norm(deviceZN<N>& x) { x.Norm(); }
 template<> __device__ __inline__  void _norm<deviceSU2Vector>(deviceSU2Vector& x) { x.Norm(); }
 template<> __device__ __inline__  void _norm<deviceSU3Vector>(deviceSU3Vector& x) { x.Norm(); }
 template<INT N, INT NoE> __device__ __inline__  void _norm(deviceSUNVector<N, NoE>& x) { x.Norm(); }
@@ -1424,6 +2519,20 @@ template<> __device__ __host__ __inline__ Real _element<deviceSU3>(const deviceS
     return F(0.0);
 }
 
+template<> __device__ __host__ __inline__ Real _element<deviceSU3_12>(const deviceSU3_12& x, INT idx)
+{
+    if (idx < 12)
+    {
+        const UINT idxc = (idx >> 1);
+        if (idx & 1)
+        {
+            return x.m_me[idxc].y;
+        }
+        return x.m_me[idxc].x;
+    }
+    return F(0.0);
+}
+
 template<> __device__ __host__ __inline__ Real _element<deviceWilsonVectorSU3>(const deviceWilsonVectorSU3& x, INT idx)
 {
     if (idx < 24)
@@ -1445,6 +2554,61 @@ __device__ __host__ __inline__ Real _element(const deviceSUN<N, NoE>& x, INT idx
         }
         return x.m_me[idxc].x;
     }
+    return F(0.0);
+}
+
+template<INT N, INT NoE>
+__device__ __host__ __inline__ Real _element(const deviceSLNC<N, NoE>& x, INT idx)
+{
+    if (idx < 2 * N * N)
+    {
+        const UINT idxc = (idx >> 1);
+        if (idx & 1)
+        {
+            return x.m_me[idxc].y;
+        }
+        return x.m_me[idxc].x;
+    }
+    return F(0.0);
+}
+template<INT N, INT NoE>
+__device__ __host__ __inline__ Real _element(const deviceUN<N, NoE>& x, INT idx)
+{
+    if (idx < 2 * N * N)
+    {
+        const UINT idxc = (idx >> 1);
+        if (idx & 1)
+        {
+            return x.m_me[idxc].y;
+        }
+        return x.m_me[idxc].x;
+    }
+    return F(0.0);
+}
+template<INT N, INT NoE>
+__device__ __host__ __inline__ Real _element(const deviceON<N, NoE>& x, INT idx)
+{
+    if (idx < N * N)
+    {
+        return x.m_me[idx];
+    }
+    return F(0.0);
+}
+template<INT N, INT NoE>
+__device__ __host__ __inline__ Real _element(const deviceSON<N, NoE>& x, INT idx)
+{
+    if (idx < N * N)
+    {
+        return x.m_me[idx];
+    }
+    return F(0.0);
+}
+
+template<INT N>
+__device__ __host__ __inline__ Real _element(const deviceZN<N>& x, INT idx)
+{
+    if (0 == idx) { return x.m_me.x; }
+    if (1 == idx) { return x.m_me.y; }
     return F(0.0);
 }
 
@@ -1556,6 +2720,20 @@ template<> __device__ __host__ __inline__ void _setelement<deviceSU3>(deviceSU3&
     }
 }
 
+template<> __device__ __host__ __inline__ void _setelement<deviceSU3_12>(deviceSU3_12& x, INT idx, Real v)
+{
+    if (idx < 12)
+    {
+        const UINT idxc = (idx >> 1);
+        if (idx & 1)
+        {
+            x.m_me[idxc].y = v;
+            return;
+        }
+        x.m_me[idxc].x = v;
+    }
+}
+
 template<> __device__ __host__ __inline__ void _setelement<deviceWilsonVectorSU3>(deviceWilsonVectorSU3& x, INT idx, Real v)
 {
     if (idx < 24)
@@ -1579,27 +2757,113 @@ __device__ __host__ __inline__ void _setelement(deviceSUN<N, NoE>& x, INT idx, R
     }
 }
 
-template<typename T> __device__ __host__ __inline__  BYTE _elementdim() = delete;
+template<INT N, INT NoE>
+__device__ __host__ __inline__ void _setelement(deviceSLNC<N, NoE>& x, INT idx, Real v)
+{
+    if (idx < 2 * N * N)
+    {
+        const UINT idxc = (idx >> 1);
+        if (idx & 1)
+        {
+            x.m_me[idxc].y = v;
+            return;
+        }
+        x.m_me[idxc].x = v;
+    }
+}
+template<INT N, INT NoE>
+__device__ __host__ __inline__ void _setelement(deviceUN<N, NoE>& x, INT idx, Real v)
+{
+    if (idx < 2 * N * N)
+    {
+        const UINT idxc = (idx >> 1);
+        if (idx & 1)
+        {
+            x.m_me[idxc].y = v;
+            return;
+        }
+        x.m_me[idxc].x = v;
+    }
+}
+template<INT N, INT NoE>
+__device__ __host__ __inline__ void _setelement(deviceON<N, NoE>& x, INT idx, Real v)
+{
+    if (idx < N * N)
+    {
+        x.m_me[idx] = v;
+    }
+}
+template<INT N, INT NoE>
+__device__ __host__ __inline__ void _setelement(deviceSON<N, NoE>& x, INT idx, Real v)
+{
+    if (idx < N * N)
+    {
+        x.m_me[idx] = v;
+    }
+}
 
-template<> __device__ __host__ __inline__  BYTE _elementdim<Real>() { return 1; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<CLGComplex>() { return 2; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU2Vector>() { return 4; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU3Vector>() { return 6; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU4Vector>() { return 8; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU5Vector>() { return 10; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU6Vector>() { return 12; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU7Vector>() { return 14; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU8Vector>() { return 16; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU2>() { return 8; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU3>() { return 18; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU4>() { return 32; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU5>() { return 50; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU6>() { return 72; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU7>() { return 98; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU8>() { return 128; }
-template<> __device__ __host__ __inline__  BYTE _elementdim<deviceWilsonVectorSU3>() { return 24; }
+template<INT N>
+__device__ __host__ __inline__ void _setelement(deviceZN<N>& x, INT idx, Real v)
+{
+    if (0 == idx) { x.m_me.x = v; return; }
+    if (1 == idx) { x.m_me.y = v; }
+}
+
+template<typename T> __device__ __host__ __inline__  WORD _elementdim() = delete;
+
+template<> __device__ __host__ __inline__  WORD _elementdim<Real>() { return 1; }
+template<> __device__ __host__ __inline__  WORD _elementdim<CLGComplex>() { return 2; }
+template<> __device__ __host__ __inline__  WORD _elementdim<deviceSU2Vector>() { return 4; }
+template<> __device__ __host__ __inline__  WORD _elementdim<deviceSU3Vector>() { return 6; }
+template<> __device__ __host__ __inline__  WORD _elementdim<deviceSU2>() { return 8; }
+template<> __device__ __host__ __inline__  WORD _elementdim<deviceSU3>() { return 18; }
+template<> __device__ __host__ __inline__  WORD _elementdim<deviceSU3_12>() { return 12; }
+template<> __device__ __host__ __inline__  WORD _elementdim<deviceWilsonVectorSU3>() { return 24; }
+
+
+#define _impl_dim_func(n) \
+template<> __device__ __host__ __inline__  BYTE _dim<deviceSU##n##Vector>() { return n; } \
+template<> __device__ __host__ __inline__  BYTE _dim<deviceSU##n>() { return n; } \
+template<> __device__ __host__ __inline__  WORD _elementdim<deviceSU##n##Vector>() { return 2 * n; } \
+template<> __device__ __host__ __inline__  WORD _elementdim<deviceSU##n>() { return 2 * n * n; } \
+
+
+#define _make_all_dim_func(n) _DEF_F_N(n, _impl_dim_func)
+_make_all_dim_func(_MAX_SUN)
+
+#define _impl_dim_func_slnc(n) \
+template<> __device__ __host__ __inline__  BYTE _dim<deviceSL##n##C>() { return n; } \
+template<> __device__ __host__ __inline__  WORD _elementdim<deviceSL##n##C>() { return 2 * n * n; } \
+
+#define _make_all_dim_func_slnc(n) _DEF_FSLNC_N(n, _impl_dim_func_slnc)
+_make_all_dim_func_slnc(_MAX_SLNC)
+
+#define _impl_dim_func_un(n) \
+template<> __device__ __host__ __inline__  BYTE _dim<deviceU##n>() { return n; } \
+template<> __device__ __host__ __inline__  WORD _elementdim<deviceU##n>() { return 2 * n * n; } \
+
+#define _make_all_dim_func_un(n) _DEF_FUN_N(n, _impl_dim_func_un)
+_make_all_dim_func_un(_MAX_UN)
+
+#define _impl_dim_func_on(n) \
+template<> __device__ __host__ __inline__  BYTE _dim<deviceO##n>() { return n; } \
+template<> __device__ __host__ __inline__  WORD _elementdim<deviceO##n>() { return n * n; } \
+
+#define _make_all_dim_func_on(n) _DEF_FON_N(n, _impl_dim_func_on)
+_make_all_dim_func_on(_MAX_ON)
+
+#define _impl_dim_func_son(n) \
+template<> __device__ __host__ __inline__  BYTE _dim<deviceSO##n>() { return n; } \
+template<> __device__ __host__ __inline__  WORD _elementdim<deviceSO##n>() { return n * n; } \
+
+#define _make_all_dim_func_son(n) _DEF_FSON_N(n, _impl_dim_func_son)
+_make_all_dim_func_son(_MAX_SON)
 
 template<typename T> __device__ __host__ __inline__ CLGComplex _vn(const T& v, INT idx) = delete;
+template<> __device__ __host__ __inline__ CLGComplex _vn<Real>(const Real& v, INT idx)
+{
+    return _make_cuComplex(v, F(0.0));
+}
 template<> __device__ __host__ __inline__ CLGComplex _vn<CLGComplex>(const CLGComplex& v, INT idx)
 {
     return v;
@@ -1615,6 +2879,16 @@ template<> __device__ __host__ __inline__ CLGComplex _vn<deviceSU3Vector>(const 
 template<INT N, INT NoVE> __device__ __host__ __inline__ CLGComplex _vn(const deviceSUNVector<N, NoVE>& v, INT idx)
 {
     return v.m_ve[idx];
+}
+
+template<INT N>
+inline CCString appToString(const deviceZN<N>& v)
+{
+    CCString ret;
+    ret.Format(_T("{%f %s %f I}"),
+        v.m_me.x, v.m_me.y > F(0.0) ? _T("+") : _T("-"), appAbs(v.m_me.y)
+    );
+    return ret;
 }
 
 template<>
@@ -1674,6 +2948,19 @@ inline CCString appToString<deviceSU2>(const deviceSU2& v)
     return ret;
 }
 
+template<INT N>
+inline CCString appToString(const deviceDN<N>& v)
+{
+    CCString ret;
+    ret.Format(_T("{{%f %s %f I, %f %s %f I}, {%f %s %f I, %f %s %f I}}"),
+        v.m_me[0].x, v.m_me[0].y > F(0.0) ? _T("+") : _T("-"), appAbs(v.m_me[0].y),
+        v.m_me[1].x, v.m_me[1].y > F(0.0) ? _T("+") : _T("-"), appAbs(v.m_me[1].y),
+        v.m_me[2].x, v.m_me[2].y > F(0.0) ? _T("+") : _T("-"), appAbs(v.m_me[2].y),
+        v.m_me[3].x, v.m_me[3].y > F(0.0) ? _T("+") : _T("-"), appAbs(v.m_me[3].y)
+    );
+    return ret;
+}
+
 template<>
 inline CCString appToString<deviceSU3>(const deviceSU3& v)
 {
@@ -1720,7 +3007,120 @@ inline CCString appToString(const deviceSUN<N, NoE>& v)
     return ret;
 }
 
+template<INT N, INT NoE>
+inline CCString appToString(const deviceUN<N, NoE>& v)
+{
+    CCString ret = _T("{{");
+    for (INT y = 0; y < N; ++y)
+    {
+        for (INT x = 0; x < N; ++x)
+        {
+            CCString stoAdd;
+            stoAdd.Format(_T("%f %s %f I"), v.m_me[y * N + x].x, v.m_me[y * N + x].y > F(0.0) ? _T("+") : _T("-"), appAbs(v.m_me[y * N + x].y));
+            ret = ret + stoAdd;
+            if (x != (N - 1))
+            {
+                ret = ret + _T(", ");
+            }
+            else
+            {
+                if (y != (N - 1))
+                {
+                    ret = ret + _T("},\n {");
+                }
+            }
+        }
+    }
+    ret = ret + _T("}}");
+    return ret;
+}
+
+template<INT N, INT NoE>
+inline CCString appToString(const deviceSLNC<N, NoE>& v)
+{
+    CCString ret = _T("{{");
+    for (INT y = 0; y < N; ++y)
+    {
+        for (INT x = 0; x < N; ++x)
+        {
+            CCString stoAdd;
+            stoAdd.Format(_T("%f %s %f I"), v.m_me[y * N + x].x, v.m_me[y * N + x].y > F(0.0) ? _T("+") : _T("-"), appAbs(v.m_me[y * N + x].y));
+            ret = ret + stoAdd;
+            if (x != (N - 1))
+            {
+                ret = ret + _T(", ");
+            }
+            else
+            {
+                if (y != (N - 1))
+                {
+                    ret = ret + _T("},\n {");
+                }
+            }
+        }
+    }
+    ret = ret + _T("}}");
+    return ret;
+}
+
+template<INT N, INT NoE>
+inline CCString appToString(const deviceON<N, NoE>& v)
+{
+    CCString ret = _T("{{");
+    for (INT y = 0; y < N; ++y)
+    {
+        for (INT x = 0; x < N; ++x)
+        {
+            CCString stoAdd;
+            stoAdd.Format(_T("%f"), v.m_me[y * N + x]);
+            ret = ret + stoAdd;
+            if (x != (N - 1))
+            {
+                ret = ret + _T(", ");
+            }
+            else
+            {
+                if (y != (N - 1))
+                {
+                    ret = ret + _T("},\n {");
+                }
+            }
+        }
+    }
+    ret = ret + _T("}}");
+    return ret;
+}
+
+template<INT N, INT NoE>
+inline CCString appToString(const deviceSON<N, NoE>& v)
+{
+    CCString ret = _T("{{");
+    for (INT y = 0; y < N; ++y)
+    {
+        for (INT x = 0; x < N; ++x)
+        {
+            CCString stoAdd;
+            stoAdd.Format(_T("%f"), v.m_me[y * N + x]);
+            ret = ret + stoAdd;
+            if (x != (N - 1))
+            {
+                ret = ret + _T(", ");
+            }
+            else
+            {
+                if (y != (N - 1))
+                {
+                    ret = ret + _T("},\n {");
+                }
+            }
+        }
+    }
+    ret = ret + _T("}}");
+    return ret;
+}
+
 template<typename T> __device__ __inline__  void _print(const T& x) = delete;
+template<typename T> __device__ __inline__  void _print(const T& x, const char* head) = delete;
 
 template<> __device__ __inline__  void _print<Real>(const Real& x)
 {
@@ -1734,9 +3134,17 @@ template<> __device__ __inline__  void _print<deviceSU2>(const deviceSU2& x)
 {
     x.DebugPrint();
 }
+template<> __device__ __inline__  void _print<deviceSU2>(const deviceSU2& x, const char* head)
+{
+    x.DebugPrint(head);
+}
 template<> __device__ __inline__  void _print<deviceSU3>(const deviceSU3& x)
 {
     x.DebugPrint();
+}
+template<> __device__ __inline__  void _print<deviceSU3>(const deviceSU3& x, const char* head)
+{
+    x.DebugPrint(head);
 }
 template<> __device__ __inline__  void _print<deviceSU2Vector>(const deviceSU2Vector& x)
 {
@@ -1750,12 +3158,277 @@ template<INT N, INT NoE> __device__ __inline__  void _print(const deviceSUN<N, N
 {
     x.DebugPrint();
 }
+template<INT N, INT NoE> __device__ __inline__  void _print(const deviceSUN<N, NoE>& x, const char* head)
+{
+    x.DebugPrint(head);
+}
 template<INT N, INT NoVE> __device__ __inline__  void _print(const deviceSUNVector<N, NoVE>& x)
 {
     x.DebugPrint();
 }
+template<INT N> __device__ __inline__  void _print(const deviceZN<N>& x)
+{
+    x.DebugPrint();
+}
+template<INT N> __device__ __inline__  void _print(const deviceZN<N>& x, const char* head)
+{
+    x.DebugPrint(head);
+}
+
+template<typename T> __device__ __inline__  CLGComplex _detv(const T& x) = delete;
+
+template<> __device__ __inline__  CLGComplex _detv<Real>(const Real& x)
+{
+    return _make_cuComplex(x, F(0.0));
+}
+template<> __device__ __inline__  CLGComplex _detv<CLGComplex>(const CLGComplex& x)
+{
+    return x;
+}
+template<> __device__ __inline__  CLGComplex _detv<deviceSU2>(const deviceSU2& x)
+{
+    return x.Det();
+}
+template<> __device__ __inline__  CLGComplex _detv<deviceSU3>(const deviceSU3& x)
+{
+    return x.Det();
+}
+template<> __device__ __inline__  CLGComplex _detv<deviceSU2Vector>(const deviceSU2Vector& x)
+{
+    return _make_cuComplex(x.Abs(), F(0.0));
+}
+template<> __device__ __inline__  CLGComplex _detv<deviceSU3Vector>(const deviceSU3Vector& x)
+{
+    return _make_cuComplex(x.Abs(), F(0.0));
+}
+template<INT N, INT NoE> __device__ __inline__  CLGComplex _detv(const deviceSUN<N, NoE>& x)
+{
+    return x.Determinent();
+}
+template<INT N, INT NoVE> __device__ __inline__  CLGComplex _detv(const deviceSUNVector<N, NoVE>& x)
+{
+    return _make_cuComplex(x.Abs(), F(0.0));
+}
+template<INT N> __device__ __inline__  CLGComplex _detv(const deviceZN<N>& x)
+{
+    return x.Tr();
+}
+
+template<typename T> __device__ __inline__  Real _absv(const T& x) = delete;
+
+template<> __device__ __inline__  Real _absv<Real>(const Real& x)
+{
+    return abs(x);
+}
+template<> __device__ __inline__  Real _absv<CLGComplex>(const CLGComplex& x)
+{
+    return _cuCabsf(x);
+}
+template<> __device__ __inline__  Real _absv<deviceSU2>(const deviceSU2& x)
+{
+    return _cuCabsf(x.Det());
+}
+template<> __device__ __inline__  Real _absv<deviceSU3>(const deviceSU3& x)
+{
+    return _cuCabsf(x.Det());
+}
+template<> __device__ __inline__  Real _absv<deviceSU2Vector>(const deviceSU2Vector& x)
+{
+    return x.Abs();
+}
+template<> __device__ __inline__  Real _absv<deviceSU3Vector>(const deviceSU3Vector& x)
+{
+    return x.Abs();
+}
+template<INT N, INT NoE> __device__ __inline__  Real _absv(const deviceSUN<N, NoE>& x)
+{
+    return _cuCabsf(x.Determinent());
+}
+template<INT N, INT NoVE> __device__ __inline__  Real _absv(const deviceSUNVector<N, NoVE>& x)
+{
+    return x.Abs();
+}
+template<INT N> __device__ __inline__  Real _absv(const deviceZN<N>& x)
+{
+    return _cuCabsf(x.Tr());
+}
 
 #pragma endregion
+
+// ==============================
+// deviceZN<N> specializations
+// ==============================
+
+#define _make_impl_zn(n) \
+template<> __device__ __inline__ deviceZN<n> _makeId<deviceZN<n>>() { return deviceZN<n>::makeZNId(); } \
+template<> __device__ __inline__ deviceZN<n> _makeZero<deviceZN<n>>() { return deviceZN<n>::makeZNZero(); } \
+template<> __device__ __inline__ deviceZN<n> _makeAsK<deviceZN<n>>(UINT k) { return deviceZN<n>::makeAsK(k); } \
+template<> __device__ __inline__ deviceZN<n> _makeRandom<deviceZN<n>>(UINT fatIdx) { return deviceZN<n>::makeZNRandom(fatIdx); } \
+template<> __device__ __inline__ deviceZN<n> _makeGaussian<deviceZN<n>>(UINT fatIdx) { return deviceZN<n>::makeZNId(); } \
+template<> __device__ __inline__ deviceZN<n> _makeSumGenerator<deviceZN<n>>(Real factor) { return deviceZN<n>::makeZNId(); }
+
+#define _impl_dim_zn(n) \
+template<> __device__ __host__ __inline__ BYTE _dim<deviceZN<n>>() { return 1; } \
+template<> __device__ __host__ __inline__ WORD _elementdim<deviceZN<n>>() { return 2; }
+
+#define _DEF_ZN_SPECIALIZATION(N, unuse) \
+_make_impl_zn(N) \
+_impl_dim_zn(N) 
+
+#define _make_all_imp_zn(n) _DEF_F_ZN(n, _DEF_ZN_SPECIALIZATION)
+_make_all_imp_zn(_MAX_ZN)
+
+
+// ==============================
+// deviceDN<N> specializations
+// ==============================
+
+#define _DEF_DN_MAKE(N) \
+template<> __device__ __inline__ deviceDN<N> _makeId<deviceDN<N>>() { return deviceDN<N>::makeDNId(); } \
+template<> __device__ __inline__ deviceDN<N> _makeZero<deviceDN<N>>() { return deviceDN<N>::makeDNZero(); } \
+template<> __device__ __inline__ deviceDN<N> _makeRandom<deviceDN<N>>(UINT fatIdx) { return deviceDN<N>::makeDNRandom(fatIdx); } \
+template<> __device__ __inline__ deviceDN<N> _makeAsK<deviceDN<N>>(UINT k) { return deviceDN<N>::makeAsK(k); } \
+template<> __device__ __inline__ deviceDN<N> _makeGaussian<deviceDN<N>>(UINT fatIdx) { return deviceDN<N>::makeDNId(); } \
+template<> __device__ __inline__ deviceDN<N> _makeSumGenerator<deviceDN<N>>(Real factor) { return deviceDN<N>::makeDNId(); }
+
+#define _DEF_DN_DIM(N) \
+template<> __device__ __host__ __inline__ BYTE _dim<deviceDN<N>>() { return 2; } \
+template<> __device__ __host__ __inline__ WORD _elementdim<deviceDN<N>>() { return 8; }
+
+
+
+#define _DEF_DN_SPECIALIZATION(N, unuse) \
+_DEF_DN_MAKE(N) \
+_DEF_DN_DIM(N) 
+
+#define _make_all_imp_dn(n) _DEF_F_DN(n, _DEF_DN_SPECIALIZATION)
+_make_all_imp_dn(_MAX_DN)
+
+// --- creation ---
+
+template<INT N> __device__ __inline__ void _Id(deviceDN<N>& v) { v.Id(); }
+template<INT N> __device__ __inline__ void _Zero(deviceDN<N>& v) { v.Zero(); }
+
+// --- dagger ---
+
+template<INT N> __device__ __inline__ void _dagger(deviceDN<N>& element) { element.Dagger(); }
+template<INT N> __device__ __inline__ deviceDN<N> _daggerC(const deviceDN<N>& element) { return element.DaggerC(); }
+
+// --- opposite ---
+
+template<INT N> __device__ __inline__ void _oppo(deviceDN<N>& element) { element.Opposite(); }
+template<INT N> __device__ __inline__ deviceDN<N> _oppoC(const deviceDN<N>& element) { return element.OppositeC(); }
+
+// --- add ---
+
+template<INT N> __device__ __inline__ void _add(deviceDN<N>& left, const deviceDN<N>& right) { left.Add(right); }
+template<INT N> __device__ __inline__ void _add(deviceDN<N>& left, const Real& right) { left.AddReal(right); }
+template<INT N> __device__ __inline__ deviceDN<N> _addC(const deviceDN<N>& left, const deviceDN<N>& right) { return left.AddC(right); }
+template<INT N> __device__ __inline__ deviceDN<N> _addC(const deviceDN<N>& left, const Real& right) { return left.AddRealC(right); }
+
+// --- sub ---
+
+template<INT N> __device__ __inline__ void _sub(deviceDN<N>& left, const deviceDN<N>& right) { left.Sub(right); }
+template<INT N> __device__ __inline__ void _sub(deviceDN<N>& left, const Real& right) { left.SubReal(right); }
+template<INT N> __device__ __inline__ deviceDN<N> _subC(const deviceDN<N>& left, const deviceDN<N>& right) { return left.SubC(right); }
+template<INT N> __device__ __inline__ deviceDN<N> _subC(const deviceDN<N>& left, const Real& right) { return left.SubRealC(right); }
+
+// --- mul ---
+
+template<INT N> __device__ __inline__ void _mul(deviceDN<N>& left, const deviceDN<N>& right) { left.Mul(right); }
+template<INT N> __device__ __inline__ void _mul(deviceDN<N>& left, const Real& right) { left.MulReal(right); }
+template<INT N> __device__ __inline__ void _mul(deviceDN<N>& left, const CLGComplex& right) { left.MulComp(right); }
+template<INT N> __device__ __inline__ deviceDN<N> _mulC(const deviceDN<N>& left, const deviceDN<N>& right) { return left.MulC(right); }
+template<INT N> __device__ __inline__ deviceDN<N> _mulC(const deviceDN<N>& left, const Real& right) { return left.MulRealC(right); }
+template<INT N> __device__ __inline__ deviceDN<N> _mulC(const deviceDN<N>& left, const CLGComplex& right) { return left.MulCompC(right); }
+
+// --- dagmul / muldag ---
+
+template<INT N> __device__ __inline__ void _dagmul(deviceDN<N>& left, const deviceDN<N>& right) { left.DaggerMul(right); }
+template<INT N> __device__ __inline__ deviceDN<N> _dagmulC(const deviceDN<N>& left, const deviceDN<N>& right) { return left.DaggerMulC(right); }
+template<INT N> __device__ __inline__ void _muldag(deviceDN<N>& left, const deviceDN<N>& right) { left.MulDagger(right); }
+template<INT N> __device__ __inline__ deviceDN<N> _muldagC(const deviceDN<N>& left, const deviceDN<N>& right) { return left.MulDaggerC(right); }
+
+// --- ta / th ---
+
+template<INT N> __device__ __inline__ void _ta(deviceDN<N>& matrix) { matrix.Ta(); }
+template<INT N> __device__ __inline__ void _th(deviceDN<N>& matrix) { matrix.Th(); }
+
+// --- reduction ---
+
+template<INT N> __device__ __inline__ CLGComplex _dot(const deviceDN<N>& x, const deviceDN<N>& y)
+{
+    return _cuCaddf(
+        _cuCaddf(_cuCmulf(_cuConjf(x.m_me[0]), y.m_me[0]), _cuCmulf(_cuConjf(x.m_me[1]), y.m_me[1])),
+        _cuCaddf(_cuCmulf(_cuConjf(x.m_me[2]), y.m_me[2]), _cuCmulf(_cuConjf(x.m_me[3]), y.m_me[3]))
+    );
+}
+
+template<INT N> __device__ __inline__ Real _lensq(const deviceDN<N>& x)
+{
+    return _cuCabsf(x.m_me[0]) * _cuCabsf(x.m_me[0])
+         + _cuCabsf(x.m_me[1]) * _cuCabsf(x.m_me[1])
+         + _cuCabsf(x.m_me[2]) * _cuCabsf(x.m_me[2])
+         + _cuCabsf(x.m_me[3]) * _cuCabsf(x.m_me[3]);
+}
+
+template<INT N> __device__ __inline__ Real _retr(const deviceDN<N>& x) { return x.ReTr(); }
+template<INT N> __device__ __inline__ CLGComplex _tr(const deviceDN<N>& x) { return x.Tr(); }
+
+// --- re2 / iim2 / trim ---
+
+template<INT N> __device__ __inline__ void _re2(deviceDN<N>& v) { v.Re2(); }
+template<INT N> __device__ __inline__ void _iim2(deviceDN<N>& v) { v.iIm2(); }
+template<INT N> __device__ __inline__ Real _trim(const deviceDN<N>& left, const deviceDN<N>& right) { return deviceDN<N>::TrIm(left, right); }
+
+// --- exponential / norm ---
+
+template<INT N> __device__ __inline__ deviceDN<N> _expreal(const deviceDN<N>& x, Real a) { return x.ExpReal(a); }
+template<INT N> __device__ __inline__ void _norm(deviceDN<N>& x) { x.Norm(); }
+
+// --- element access ---
+
+template<INT N> __device__ __host__ __inline__ Real _element(const deviceDN<N>& x, INT idx)
+{
+    switch (idx)
+    {
+    case 0: return x.m_me[0].x;
+    case 1: return x.m_me[0].y;
+    case 2: return x.m_me[1].x;
+    case 3: return x.m_me[1].y;
+    case 4: return x.m_me[2].x;
+    case 5: return x.m_me[2].y;
+    case 6: return x.m_me[3].x;
+    case 7: return x.m_me[3].y;
+    default: return F(0.0);
+    }
+}
+
+template<INT N> __device__ __host__ __inline__ void _setelement(deviceDN<N>& x, INT idx, Real v)
+{
+    switch (idx)
+    {
+    case 0: x.m_me[0].x = v; break;
+    case 1: x.m_me[0].y = v; break;
+    case 2: x.m_me[1].x = v; break;
+    case 3: x.m_me[1].y = v; break;
+    case 4: x.m_me[2].x = v; break;
+    case 5: x.m_me[2].y = v; break;
+    case 6: x.m_me[3].x = v; break;
+    case 7: x.m_me[3].y = v; break;
+    default: break;
+    }
+}
+
+// --- print ---
+
+template<INT N> __device__ __inline__ void _print(const deviceDN<N>& x) { x.DebugPrint(); }
+template<INT N> __device__ __inline__ void _print(const deviceDN<N>& x, const char* head) { x.DebugPrint(head); }
+
+// --- detv / absv ---
+
+template<INT N> __device__ __inline__ CLGComplex _detv(const deviceDN<N>& x) { return x.Det(); }
+template<INT N> __device__ __inline__ Real _absv(const deviceDN<N>& x) { return _cuCabsf(x.Det()); }
 
 __END_NAMESPACE
 
@@ -1763,6 +3436,7 @@ __END_NAMESPACE
 #include "DeviceTemplates/DeviceInlineGaugeChair.h"
 #include "DeviceTemplates/DeviceInlineStaggeredGamma.h"
 #include "DeviceTemplates/DeviceInlineStaggeredRotation.h"
+
 
 #endif //#ifndef _DEVICEINLINETEMPLATE_H_
 

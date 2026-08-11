@@ -1,0 +1,97 @@
+from AutoCorrelation import AutoCorrelationSingleVariable
+from JacknifePrograms import *
+import matplotlib.pyplot as plt
+
+from MesonMassEM.Mass.CorrelatedFitGPT import ChiralFit_U, ChiralFit_D
+
+hd = "530"
+typec = 0
+
+if 0 == typec or 1 == typec:
+    folderHeads = f"H:\\MesonMassElectric\\{hd}01\\Chiral\\"
+if 2 == typec:
+    folderHeads = f"H:\\MesonMassElectric\\{hd}01\\Polyakov\\"
+# folderHeads = "H:\\BS01Polyakov\\"
+
+lh = False
+ff = 2
+tt = 2
+
+cv = []
+sv = []
+aq = []
+aqe = []
+bq = []
+tlst = []
+restable = ""
+for i in range(8):
+    if 0 == typec:
+        if lh:
+            fileNames = folderHeads + f"EC{hd}_01_M0__{i}_condensateXSlicepCCLightChiralKS.csv"
+        else:
+            fileNames = folderHeads + f"EC{hd}_01_M0__{i}_condensateXSlicepCCHeavyChiralKS.csv"
+        testarray = LoadMathematicaCSV(fileNames)
+    if 1 == typec:
+        if lh:
+            fileNames = folderHeads + f"EC{hd}_01_M0__{i}_condensateXSlicepCCLightCMTKSGamma4.csv"
+        else:
+            fileNames = folderHeads + f"EC{hd}_01_M0__{i}_condensateXSlicepCCHeavyCMTKSGamma4.csv"
+        testarray = LoadMathematicaCSV(fileNames)
+    if 2 == typec:
+        fileNames = folderHeads + f"EC{hd}_01_M0__{i}_polyakov_XSlice.csv"
+        testarray = LoadMathematicaCSV(fileNames)
+    if 3 == typec:
+        fileNames = f"Data/{hd}01_f{ff}_t{tt}_e{i}.csv"
+        testarrayre = np.loadtxt(fileNames, delimiter=",")
+    if 0 == typec:
+        testarrayre = -np.real(testarray)
+    if 1 == typec:
+        testarrayre = np.imag(testarray)
+    if 2 == typec:
+        testarrayre = np.abs(testarray)
+    if 3 == typec:
+        print(np.shape(testarrayre))
+    if 3 == typec:
+        if 0 != i:
+            testarrayre = testarrayre[100:, :]
+    else:
+        testarrayre = testarrayre[100:,:]
+    res_t = []
+    sliceCount = np.shape(testarrayre)[1]
+    for j in range(sliceCount):
+        v, s, t = AutoCorrelationSingleVariable(testarrayre[:,j], s=2)
+        res_t.append(t)
+    res_t = np.array(res_t)
+    tlst.append(np.max(res_t))
+tlst = np.array(tlst)
+print(tlst.tolist())
+
+"""
+chiral:
+
+chiral580light = [2.314405661598166, 4.026407228363287, 2.4878096122236317, 2.718666556894974, 2.3555386766172144, 2.24332116899659, 3.612663793127009, 2.6971839796743]
+chiral580heavy = [2.3286543520424288, 4.557582921106412, 2.88067129829685, 2.6821055494011548, 3.0617263269463995, 2.8908861894244615, 4.175201818770819, 2.9720750795588575]
+
+c4:
+c4580light = [0.6252497175551867, 3.4395349295712303, 0.9620153511549664, 0.7649628860099947, 0.7090572704859245, 0.7124563773765975, 0.6315473512943123, 0.8190126711434873]
+c4580heavy = [0.6544117840635421, 2.70571338183829, 1.8520896092466903, 0.9911288798271477, 0.7748643932037346, 0.6547663464091934, 0.8058649209334062, 0.6801992003905253]
+
+polyakov:
+p530 = [0.6029984304961401, 0.5965243156398604, 0.5784913864290465, 0.65875253976466, 0.589699822873557, 0.5671786190503038, 0.5913288100050554, 0.6535853729622049]
+p580 = [5.024028375384501, 41.126456042762996, 27.06598166119774, 10.08989122533077, 7.944354294370299, 10.121061163852499, 16.983199382378825, 10.954232229869973]
+
+correlator:
+
+c530f0t0 = [2.285948902957057, 2.6607792442898623, 1.8478398758253403, 2.2794492899911534, 2.0961131530312533, 1.8132810433948607, 1.9923720986173674, 1.8518143464033483]
+c530f1t0 = [2.285948902957057, 3.0107479523465113, 1.8277137616429562, 2.6367173330852105, 2.098015251178347, 1.6955258157207413, 1.9695724541541715, 1.8567276928678647]
+c530f2t0 = [2.285948902957057, 2.8056572029354077, 1.819633046093992, 2.4719808566472743, 1.9782711343176118, 1.8292270752693989, 2.0089689715506918, 1.9268840794639113]
+
+c530f0t1 = [2.993905469023219, 2.1187021962848935, 1.664303464808759, 1.7833009470356764, 1.8239144262145597, 1.4562442158450346, 2.0828454478972622, 1.7941908893094745]
+c530f1t1 = [2.993905469023219, 2.6491636656614896, 1.492491635874706, 1.9985488808251919, 1.964446431339802, 1.4379618172141506, 1.9418846328388188, 1.6932098404303146]
+c530f2t1 = [2.993905469023219, 2.6846575690005907, 1.638125589204941, 2.1260843082442062, 2.184732057238765, 1.657538827471465, 2.275840912051391, 2.020360686825189]
+
+c530f0t2 = [0.9512454897054554, 1.323359711066053, 1.023776174654413, 0.987939326627978, 0.9016497304454527, 0.954393442655693, 1.0792388654362535, 1.3367981382602745]
+c530f1t2 = [0.9512454897054554, 1.3648905642945615, 1.0467122727475582, 1.10662331518123, 1.021043974845783, 1.031507972221973, 1.075244909679624, 1.3469253857440926]
+c530f2t2 = [0.9512454897054554, 1.3907284447056545, 1.0410447284934174, 1.0790127646245045, 0.9495449571776473, 0.9513146604518872, 1.1686126764885985, 1.4016973239310195]
+
+"""

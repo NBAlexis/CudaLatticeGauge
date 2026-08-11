@@ -10,6 +10,7 @@
 // REVISION:
 //  [04/20/2019 nbale]
 //=============================================================================
+#pragma once
 
 #ifndef _CBOUNDARYCONDITIONPERIODICANDDIRICHLETSQUARE_H_
 #define _CBOUNDARYCONDITIONPERIODICANDDIRICHLETSQUARE_H_
@@ -44,7 +45,7 @@ public:
     void BakeRegionTable(UINT* deviceTable) const override;
 
     //It is only neccessary when simulating with holes or inpuries
-    UBOOL NeedToFixBoundary() const override { return TRUE; }
+    //UBOOL NeedToFixBoundary() const override { return TRUE; }
 
     //void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable, BYTE byFieldId) const override;
 

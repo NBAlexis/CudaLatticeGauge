@@ -5,71 +5,102 @@
 // This is the class for all fields, gauge, fermion and spin fields are inherent from it
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/7/2018 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
 #include "WilsonDirac/CFieldFermionWilsonSquareSU3.h"
-#include "Staggered/CFieldFermionKSSU3.h"
+#include "Staggered/CFieldFermionKST.h"
 
 __BEGIN_NAMESPACE
 
-CField::CField() 
+CField::CField()
     : CBase()
     , m_pOwner(NULL)
+    // Default to field id 1, the canonical (always-registered) field. An
+    // ad-hoc field created via appCreate is never assigned an id, and kernels
+    // that index the per-field index tables (e.g. StrictExp) would otherwise
+    // dereference m_pDeviceIndexLinkToSIndex[garbage] -> illegal address.
+    , m_byFieldId(1)
     , m_bDynamic(TRUE)
     , m_fLength(F(1.0))
-    , m_pPool(NULL)
+    // , m_pPool(NULL)
+    , m_pClass(NULL)
 {
-    
+    //I cannot call virtual function in this construction function ...
+    //m_pClass = GetClass();
+    //printf("%s\n", GetClass()->GetName());
 }
 
 void CField::Return()
 {
-    assert(NULL != m_pPool);
-    m_pPool->Return(this);
+    //appAssert(NULL != m_pPool);
+    //m_pPool->Return(this);
+    appGetFieldPool()->Return(this);
 }
 
 CCString CField::SaveToFile(const CCString& fileName, EFieldFileType eType) const
 {
+    if (EFFT_CLGBinCompressed == eType)
+    {
+        return SaveToCompressedFile(fileName);
+    }
+
+    UINT uiSize = 0;
+    BYTE* byToSave = NULL;
     switch (eType)
     {
     case EFFT_CLGBin:
-        {
-            UINT uiSize = 0;
-            BYTE* byToSave = CopyDataOut(uiSize);
-            appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
-            CCString MD5 = CLGMD5Hash(byToSave, uiSize);
-            free(byToSave);
-            return MD5;
-        }
-    case EFFT_CLGBinCompressed:
-        {
-            return SaveToCompressedFile(fileName);
-        }
-    case EFFT_CLGBinFloat:
-        {
-            UINT uiSize = 0;
-            BYTE* byToSave = CopyDataOutFloat(uiSize);
-            appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
-            CCString MD5 = CLGMD5Hash(byToSave, uiSize);
-            free(byToSave);
-            return MD5;
-        }
-    case EFFT_CLGBinDouble:
-        {
-            UINT uiSize = 0;
-            BYTE* byToSave = CopyDataOutDouble(uiSize);
-            appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
-            CCString MD5 = CLGMD5Hash(byToSave, uiSize);
-            free(byToSave);
-            return MD5;
-        }
-    default:
+        byToSave = CopyDataOut(uiSize);
         break;
+    case EFFT_CLGBinFloat:
+        byToSave = CopyDataOutFloat(uiSize);
+        break;
+    case EFFT_CLGBinDouble:
+        byToSave = CopyDataOutDouble(uiSize);
+        break;
+    default:
+        appCrucial(_T("Save for this type not implemented: CFieldGaugeSU3 : %s\n"), __ENUM_TO_STRING(EFieldFileType, eType).c_str());
+        return _T("Not supported");
     }
 
-    appCrucial(_T("Save for this type not implemented: CFieldGaugeSU3 : %s\n"), __ENUM_TO_STRING(EFieldFileType, eType).c_str());
-    return _T("Not supported");
+#if _CLG_MULTI_GPU
+    //Multi-GPU: each rank holds a sub-lattice. Gather to rank 0 in global-site
+    //order so the file on disk is identical to the single-GPU layout (this is the
+    //1-vs-N validation harness, Docs/MultiGPU-Plan.md section 8.5). Non-root ranks
+    //write nothing.
+    if (NULL != appGetComm() && appGetComm()->Size() > 1)
+    {
+        const UINT uiLocalVolume = _HC_Volume;
+        const UINT uiBytesPerSite = (0 == uiLocalVolume) ? 0 : (uiSize / uiLocalVolume);
+        UINT uiGlobalSize = 0;
+        BYTE* byGlobal = appGetComm()->GatherFieldToRoot(byToSave, uiBytesPerSite, uiGlobalSize);
+        free(byToSave);
+
+        if (!appGetComm()->IsRoot())
+        {
+            //Freed on non-root (GatherFieldToRoot returns NULL there). Wait for
+            //root to finish writing so a later load by this rank cannot read a
+            //missing / half-written file (cross-rank read-ahead race).
+            appGetComm()->Barrier();
+            return _T("");
+        }
+        byToSave = byGlobal;
+        uiSize = uiGlobalSize;
+    }
+#endif
+
+    appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
+    CCString MD5 = CLGMD5Hash(byToSave, uiSize);
+    free(byToSave);
+#if _CLG_MULTI_GPU
+    //Pair with the non-root barrier above: release them once the file is on disk.
+    if (NULL != appGetComm() && appGetComm()->Size() > 1)
+    {
+        appGetComm()->Barrier();
+    }
+#endif
+    return MD5;
 }
 
 CCString CField::GetInfos(const CCString& tab) const
@@ -82,118 +113,67 @@ CCString CField::GetInfos(const CCString& tab) const
     return sRet;
 }
 
-void CField::UpdatePooledParamters() const
+//void CField::UpdatePooledParamters() const
+//{
+//    appGetLattice()->ReCopyPooled(m_byFieldId);
+//}
+
+
+CField* CFieldPool::GetOne(const CField* pOrignal)
 {
-    appGetLattice()->ReCopyPooled(m_byFieldId);
+    appAssert(NULL != pOrignal && NULL != pOrignal->m_pClass);
+
+    if (m_pPool.Exist(pOrignal->m_pClass))
+    {
+        TArray<CPooledFields>& fields = m_pPool[pOrignal->m_pClass];
+        for (INT i = 0; i < fields.Num(); ++i)
+        {
+            if (!fields[i].m_bInUse)
+            {
+                fields[i].m_bInUse = TRUE;
+                pOrignal->CopyParamTo(fields[i].m_pField);
+                return fields[i].m_pField;
+            }
+        }
+
+        CField* newOne = dynamic_cast<CField*>(pOrignal->m_pClass->Create());
+        pOrignal->CopyParamTo(newOne);
+        CPooledFields newOneRecord;
+        newOneRecord.m_bInUse = TRUE;
+        newOneRecord.m_pField = newOne;
+        fields.AddItem(newOneRecord);
+
+        return newOne;
+    }
+
+    TArray<CPooledFields> fields;
+    CField* newOne = dynamic_cast<CField*>(pOrignal->m_pClass->Create());
+    pOrignal->CopyParamTo(newOne);
+    CPooledFields newOneRecord;
+    newOneRecord.m_bInUse = TRUE;
+    newOneRecord.m_pField = newOne;
+    fields.AddItem(newOneRecord);
+    m_pPool[pOrignal->m_pClass] = fields;
+
+    return newOne;
 }
 
-CFieldFermion::CFieldFermion()
-    : CField()
-    , m_uiSiteCount(_HC_Volume)
+void CFieldPool::Return(CField* pField)
 {
-    //m_uiLinkeCount = _HC_Volume * _HC_Dir;
-    //m_uiSiteCount = _HC_Volume;
+    appAssert(NULL != pField && NULL != pField->m_pClass && m_pPool.Exist(pField->m_pClass));
+    TArray<CPooledFields>& fields = m_pPool[pField->m_pClass];
+    for (INT i = 0; i < fields.Num(); ++i)
+    {
+        if (fields[i].m_pField == pField)
+        {
+            appAssert(fields[i].m_bInUse);
+            fields[i].m_bInUse = FALSE;
+            return;
+        }
+    }
+    appAssert(FALSE);
 }
 
-CFieldMatrixOperation* CFieldMatrixOperation::Create(EFieldType ef)
-{
-    if (ef == EFT_FermionWilsonSquareSU3)
-    {
-        return new CFieldMatrixOperationWilsonSquareSU3();
-    }
-
-    if (ef == EFT_FermionStaggeredSU3)
-    {
-        return new CFieldMatrixOperationKSSU3();
-    }
-
-    appCrucial(_T("Matrix operation for field type %s not implemented!\n"), __ENUM_TO_STRING(EFieldType, ef).c_str());
-    return NULL;
-}
-
-UBOOL CFieldFermion::RationalApproximation(EFieldOperator op, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const class CRatinalApproximation* pRational)
-{
-    if (NULL == pRational)
-    {
-        return FALSE;
-    }
-    if (pRational->m_uiDegree < 1)
-    {
-        return FALSE;
-    }
-    CMultiShiftSolver* solver = appGetMultiShiftSolver(m_byFieldId);
-    if (NULL == solver)
-    {
-        return FALSE;
-    }
-    TArray<CField*> solutions;
-    TArray<CLGComplex> shifts;
-    for (UINT i = 0; i < pRational->m_uiDegree; ++i)
-    {
-        CField* pPooled = appGetLattice()->GetPooledFieldById(m_byFieldId);
-        solutions.AddItem(pPooled);
-        shifts.AddItem(_make_cuComplex(pRational->m_lstB[i], F(0.0)));
-    }
-
-    solver->Solve(solutions, shifts, this, gaugeNum, bosonNum, gaugeFields, pBoson, op);
-
-    ScalarMultply(pRational->m_fC);
-
-    for (UINT i = 0; i < pRational->m_uiDegree; ++i)
-    {
-        Axpy(pRational->m_lstA[i], solutions[i]);
-        solutions[i]->Return();
-    }
-    return TRUE;
-}
-
-void CFieldFermionKS::InitialOtherParameters(CParameters& params)
-{
-    CFieldFermion::InitialOtherParameters(params);
-
-    params.FetchValueReal(_T("Mass"), m_f2am);
-    if (m_f2am < F(0.00000001))
-    {
-        appCrucial(_T("CFieldFermionKS: Mass is nearly 0!\n"));
-    }
-
-    INT iEachEta = 0;
-    params.FetchValueINT(_T("EachSiteEta"), iEachEta);
-    m_bEachSiteEta = (0 != iEachEta);
-
-    TArray<Real> coeffs;
-    params.FetchValueArrayReal(_T("MD"), coeffs);
-    if (0 == coeffs.Num())
-    {
-        appCrucial(_T("no rational approximation configured for KS fermin MC!\n"));
-        coeffs.AddItem(F(1.0));
-    }
-    m_rMD.Initial(coeffs);
-
-    params.FetchValueArrayReal(_T("MC"), coeffs);
-    if (0 == coeffs.Num())
-    {
-        appCrucial(_T("no rational approximation configured for KS fermin MD!\n"));
-        coeffs.AddItem(F(1.0));
-    }
-    m_rMC.Initial(coeffs);
-
-    //params.FetchValueArrayReal(_T("EN"), coeffs);
-    //m_rEN.Initial(coeffs);
-
-    if (NULL != m_pMDNumerator)
-    {
-        checkCudaErrors(cudaFree(m_pMDNumerator));
-    }
-    checkCudaErrors(cudaMalloc((void**)&m_pMDNumerator, sizeof(Real) * m_rMD.m_uiDegree));
-    Real* hostNumerator = (Real*)appAlloca(sizeof(Real) * m_rMD.m_uiDegree);
-    for (UINT i = 0; i < m_rMD.m_uiDegree; ++i)
-    {
-        hostNumerator[i] = m_rMD.m_lstA[i];
-    }
-    checkCudaErrors(cudaMemcpy(m_pMDNumerator, hostNumerator, sizeof(Real) * m_rMD.m_uiDegree, cudaMemcpyHostToDevice));
-
-}
 
 __END_NAMESPACE
 

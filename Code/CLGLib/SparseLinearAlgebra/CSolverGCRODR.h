@@ -5,6 +5,7 @@
 // This is the class for Sparse Linear Algebra solves.
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [03/15/2019 nbale]
 //=============================================================================
 
@@ -39,7 +40,7 @@ public:
     UBOOL Solve(
         CField* pFieldX, 
         const CField* pFieldB, 
-        INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+        INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
         EFieldOperator uiM, 
         ESolverPhase ePhase = ESP_Once,
         const CField* pStart = NULL) override;
@@ -48,14 +49,14 @@ protected:
 
     void FieldSolveY(TArray<class CField*>& resultY, const CLGComplex* R, UINT uiDim);
 
-    void QRFactorAY(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, EFieldOperator uiM);
+    void QRFactorAY(INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields, EFieldOperator uiM);
 
     void FindPk1() const;
 
     void FindPk2();
 
     virtual void GenerateCUFirstTime(CField* pX, CField* pR, const CField* pFieldB, 
-        INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+        INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
         EFieldOperator uiM);
     void GenerateCU(UBOOL bUpdateCk, UBOOL bJustAfterGMRES);
     void NormUkAndSetD();
@@ -68,7 +69,7 @@ protected:
     * m_pHostHmGm set
     */
     void FirstTimeGMERESSolve(CField* pFieldX, CField* pR, const CField* pFieldB, 
-        INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+        INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
         EFieldOperator uiM);
 
     class CLinearAlgebraHelper* m_pHelper;
@@ -134,7 +135,7 @@ protected:
 
     Real m_fBeta;
     Real m_fDiviation;
-    CLGComplex m_cLastDiviation;
+    DOUBLE m_fLastDiviation;
 
     class CFieldMatrixOperation* m_pFieldMatrix;
 };

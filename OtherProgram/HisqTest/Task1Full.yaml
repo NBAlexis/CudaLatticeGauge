@@ -1,0 +1,81 @@
+JobTask1Full:
+
+    MaxThreadPerBlock : 128
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    Profiler : 0
+    ExponentialPrecision : 6
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [16, 16, 16, 16]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    FermionFieldCount : 1
+    ActionListLength : 2
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+        RectOverPlaq : -0.05
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_Zero
+        Mass : 0.22
+        Epsilon : -0.11
+        Naik : -0.03708333333333333
+        FieldId : 2
+        PoolNumber : 4
+        Even : 0
+        Period : [1, 1, 1, -1]
+        MC : [0.0]
+        MD : [0.0]
+
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 1000
+        MaxDim : 20
+        Accuracy : 1e-12
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 50
+        MaxStep : 10000
+        Accuracy : 1e-12
+        AbsoluteAccuracy : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 7.3
+
+    Action2:
+        ActionName : CActionFermionHISQCombined
+        FieldIds : [2]
+
+    GaugeSmearing:
+        SmearingName : CGaugeSmearingHISQSU3
+        Iterate : 1
+        HasT : 1
+        FieldId : 1
+        Update : 1
+        Proj : 1
+        ProjSUN : 0
+        UseCaylayHamilton : 1

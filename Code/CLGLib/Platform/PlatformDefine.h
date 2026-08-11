@@ -48,8 +48,9 @@
 
 // Undo any Windows defines.
 #undef BYTE
+//#undef SCHAR
 #undef WORD
-#undef DWORD
+//#undef DWORD
 #undef INT
 #undef Real
 #undef VOID
@@ -67,14 +68,15 @@ typedef long long               LONGLONG;
 typedef unsigned long long      ULONGLONG;
 
 // Unsigned base types.
-typedef unsigned char        BYTE;        // 8-bit  unsigned.
-typedef unsigned short        WORD;        // 16-bit unsigned.
+typedef unsigned char       BYTE;        // 8-bit  unsigned.
+typedef unsigned short      WORD;        // 16-bit unsigned.
 typedef unsigned int        UINT;        // 32-bit unsigned.
-typedef unsigned long        DWORD;        // 32-bit unsigned.
-typedef unsigned long long    QWORD;        // 64-bit unsigned.
+//typedef unsigned int        DWORD;        // 32-bit unsigned. I cannot re-use typedef
+typedef unsigned long long  QWORD;        // 64-bit unsigned.
 
+#undef SCHAR
                                         // Signed base types.
-typedef    signed char            SBYTE;        // 8-bit  signed.
+typedef signed char         SCHAR;        // 8-bit  signed.
 typedef signed short        SWORD;        // 16-bit signed.
 typedef signed int          INT;        // 32-bit signed.
 typedef signed long long    SQWORD;        // 64-bit signed.
@@ -84,18 +86,18 @@ typedef size_t              SIZE_T;
 typedef char                ANSICHAR;    // An ANSI character.
                                         //typedef unsigned short      UNICHAR;    // A UNICODE character.
 typedef short               UNICHAR;
-typedef unsigned char        ANSICHARU;    // An ANSI character.
+typedef unsigned char       ANSICHARU;    // An ANSI character.
 typedef unsigned short      UNICHARU;    // A UNICODE character.
 
                                         // Other base types.
 typedef signed int           UBOOL;        // Boolean 0 (FALSE) or 1 (TRUE).
 typedef float                FLOAT;        // 32-bit IEEE floating point.
-typedef double                DOUBLE;        // 64-bit IEEE double.
+typedef double               DOUBLE;        // 64-bit IEEE double.
                                         //TODO even undef SIZE_T not work..
                                         //typedef unsigned long       SIZE_T;     // Corresponds to C SIZE_T.
 
 #ifdef _CLG_X64
-typedef unsigned long long    PTRINT;        // Integer large enough to hold a pointer.
+typedef unsigned long long  PTRINT;        // Integer large enough to hold a pointer.
 #else
 typedef unsigned int        PTRINT;        // Integer large enough to hold a pointer.
 #endif
@@ -200,6 +202,19 @@ FORCEINLINE void appGetPath(TCHAR* outchar, UINT bufferSize)
     }
 #endif
 }
+
+//odd numbers of a b are true
+#define _UBOOLXOR(a, b) ((a) ^ (b))
+#define _UBOOLXOR3(a, b, c) ((a) ^ (b) ^ (c))
+#define _UBOOLXOR4(a, b, c, d) ((a) ^ (b) ^ (c) ^ (d))
+
+#ifndef max
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#endif
+
+#ifndef min
+#define min(a,b)            (((a) < (b)) ? (a) : (b))
+#endif
 
 __END_NAMESPACE
 

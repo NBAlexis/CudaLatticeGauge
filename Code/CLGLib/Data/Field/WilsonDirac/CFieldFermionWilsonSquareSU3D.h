@@ -25,7 +25,7 @@ public:
 
     CFieldFermionWilsonSquareSU3D() : CFieldFermionWilsonSquareSU3() {}
 
-    void FixBoundary() override;
+    void FixBoundary(EFixBoundary eType) override;
 
     /**
     * For test
@@ -35,12 +35,17 @@ public:
 
     CCString GetInfos(const CCString& tab) const override;
 
+    UBOOL IsDirichlet() const override
+    {
+        return TRUE;
+    }
+
 protected:
 
     void PrepareForHMCS(const CFieldGauge* pGauge) override;
     void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, BYTE byGaugeFieldId,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
-    void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const override;
+    void DerivateDOperator(DOUBLE fCoeff, void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const override;
 
     
 

@@ -6,8 +6,10 @@
 // Periodic boundary is assumed
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [08/03/2020 nbale]
 //=============================================================================
+#pragma once
 
 #ifndef _CACTIONGAUGEPLAQUETTE_BOOST_H_
 #define _CACTIONGAUGEPLAQUETTE_BOOST_H_
@@ -31,7 +33,7 @@ public:
 
 protected:
 
-    DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;
+    DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStaple = NULL) override;
     UBOOL CalculateForceOnGaugeSingleField(const class CFieldGauge* pGauge, class CFieldGauge* pForce, class CFieldGauge* pStaple, ESolverPhase ePhase) const override;
     void PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
 

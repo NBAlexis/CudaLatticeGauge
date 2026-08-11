@@ -10,6 +10,7 @@
 // 2 3
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/5/2018 nbale]
 //=============================================================================
 
@@ -27,6 +28,7 @@
 //self^dagger.self
 #define __LINE_MULDN_ME2(a, b, c, d) _cuCaddf(_cuCmulf(_cuConjf(m_me[a]), m_me[c]), _cuCmulf(_cuConjf(m_me[b]), m_me[d]))
 
+#define _CLGCMPFMT_SU2 "%s%s{{" _CLGCMPFMT ", " _CLGCMPFMT "},\n {" _CLGCMPFMT ", " _CLGCMPFMT "}};\n"
 
 __BEGIN_NAMESPACE
 
@@ -53,7 +55,7 @@ extern "C" {
 
         __device__ void DebugPrint(const char* header = NULL) const
         {
-            printf("%s%s{{%1.7f%s%1.7f I, %1.7f%s%1.7f I},\n {%1.7f%s%1.7f I, %1.7f%s%1.7f I}};\n",
+            printf(_CLGCMPFMT_SU2,
                 NULL == header ? "" : header,
                 NULL == header ? "" : "=",
 
@@ -99,7 +101,7 @@ extern "C" {
             ret.m_me[0] = _make_cuComplex(F(1.0), F(0.0));
             ret.m_me[1] = _make_cuComplex(F(0.0), F(0.0));
             ret.m_me[2] = _make_cuComplex(F(0.0), F(0.0));
-            ret.m_me[3] = _make_cuComplex(F(0.0), F(0.0));
+            ret.m_me[3] = _make_cuComplex(F(1.0), F(0.0));
             return ret;
         }
 
@@ -198,17 +200,6 @@ extern "C" {
                 ret.m_me[3] = _make_cuComplex(-half, F(0.0));
             }
             break;
-            case 3:
-            {
-                /**
-                *     0     0     1
-                * =   0     0     0
-                *     1     0     0
-                */
-                ret.m_me[2] = _make_cuComplex(half, F(0.0));
-                ret.m_me[6] = _make_cuComplex(half, F(0.0));
-            }
-            break;
             default:
             {
                 ret.m_me[0] = _make_cuComplex(half, F(0.0));
@@ -249,6 +240,23 @@ extern "C" {
             ret.m_me[2] = _cuCmulf(_cuConjf(left.m_ve[0]), right.m_ve[1]);
             ret.m_me[3] = _cuCmulf(_cuConjf(left.m_ve[1]), right.m_ve[1]);           
             return ret;
+        }
+
+
+        __device__ __inline__ void Zero()
+        {
+            m_me[0] = _make_cuComplex(F(0.0), F(0.0));
+            m_me[1] = _make_cuComplex(F(0.0), F(0.0));
+            m_me[2] = _make_cuComplex(F(0.0), F(0.0));
+            m_me[3] = _make_cuComplex(F(0.0), F(0.0));
+        }
+
+        __device__ __inline__ void Id()
+        {
+            m_me[0] = _make_cuComplex(F(1.0), F(0.0));
+            m_me[1] = _make_cuComplex(F(0.0), F(0.0));
+            m_me[2] = _make_cuComplex(F(0.0), F(0.0));
+            m_me[3] = _make_cuComplex(F(1.0), F(0.0));
         }
 
 #pragma endregion create
@@ -325,6 +333,17 @@ extern "C" {
             memcpy(m_me, res, sizeof(CLGComplex) * 4);
         }
 
+        __device__ __inline__ void Mul(const deviceSU2& right, CLGComplex* res)
+        {
+            res[0] = __LINE_MUL2(0, 1, 0, 2);
+            res[1] = __LINE_MUL2(0, 1, 1, 3);
+            memcpy(m_me, res, sizeof(CLGComplex) * 2);
+
+            res[0] = __LINE_MUL2(2, 3, 0, 2);
+            res[1] = __LINE_MUL2(2, 3, 1, 3);
+            memcpy(m_me + 2, res, sizeof(CLGComplex) * 2);
+        }
+
         /**
         * low reg count version of multiply
         */
@@ -388,6 +407,17 @@ extern "C" {
             memcpy(m_me, res, sizeof(CLGComplex) * 4);
         }
 
+        __device__ __inline__ void MulDagger(const deviceSU2& right, CLGComplex* res)
+        {
+            res[0] = __LINE_MULND2(0, 1, 0, 1);
+            res[1] = __LINE_MULND2(0, 1, 2, 3);
+            memcpy(m_me, res, sizeof(CLGComplex) * 2);
+
+            res[2] = __LINE_MULND2(2, 3, 0, 1);
+            res[3] = __LINE_MULND2(2, 3, 2, 3);
+            memcpy(m_me + 2, res, sizeof(CLGComplex) * 2);
+        }
+
         __device__ __inline__ deviceSU2 MulDaggerC(const deviceSU2& right) const
         {
             deviceSU2 ret;
@@ -432,6 +462,14 @@ extern "C" {
             return ret;
         }
 
+        __device__ __inline__ deviceSU2Vector DagMulVector(const deviceSU2Vector& v) const
+        {
+            deviceSU2Vector ret;
+            ret.m_ve[0] = _cuCaddf(_cuCmulf(_cuConjf(m_me[0]), v.m_ve[0]), _cuCmulf(_cuConjf(m_me[2]), v.m_ve[1]));
+            ret.m_ve[1] = _cuCaddf(_cuCmulf(_cuConjf(m_me[1]), v.m_ve[0]), _cuCmulf(_cuConjf(m_me[3]), v.m_ve[1]));
+            return ret;
+        }
+
         __device__ __inline__ deviceSU2 AddC(const deviceSU2& right) const { deviceSU2 ret(*this); ret.Add(right); return ret; }
         __device__ __inline__ deviceSU2 AddCompC(const CLGComplex& right) const { deviceSU2 ret(*this); ret.AddComp(right); return ret; }
         __device__ __inline__ deviceSU2 AddRealC(const Real& right) const { deviceSU2 ret(*this); ret.AddReal(right); return ret; }
@@ -464,6 +502,11 @@ extern "C" {
         __device__ static __inline__ CLGComplex Determinent(const CLGComplex* u)
         {
             return _cuCsubf(_cuCmulf(u[0], u[3]), _cuCmulf(u[1], u[2]));
+        }
+
+        __device__ __inline__ CLGComplex Det() const
+        {
+            return Determinent(m_me);
         }
 
         __device__ __inline__ CLGComplex Tr() const
@@ -527,6 +570,21 @@ extern "C" {
             return tmp;
         }
 
+        __device__ __inline__ void Opposite()
+        {
+            m_me[0] = _make_cuComplex(-m_me[0].x, -m_me[0].y);
+            m_me[1] = _make_cuComplex(-m_me[1].x, -m_me[1].y);
+            m_me[2] = _make_cuComplex(-m_me[2].x, -m_me[2].y);
+            m_me[3] = _make_cuComplex(-m_me[3].x, -m_me[3].y);
+        }
+
+        __device__ __inline__ deviceSU2 OppositeC() const
+        {
+            deviceSU2 ret(*this);
+            ret.Opposite();
+            return ret;
+        }
+
         __device__ __inline deviceSU2 Transpose() const
         {
 
@@ -555,49 +613,65 @@ extern "C" {
             m_me[3].y = m_me[3].y - sub;
         }
 
+        __device__ __inline__ void Th()
+        {
+            m_me[1].x = F(0.5) * (m_me[1].x + m_me[2].x);
+            m_me[1].y = F(0.5) * (m_me[1].y - m_me[2].y);
+            m_me[2].x = m_me[1].x;
+            m_me[2].y = -m_me[1].y;
+            Real sub = F(0.5) * (m_me[0].x + m_me[3].x);
+            m_me[0].x = m_me[0].x - sub;
+            m_me[0].y = F(0.0);
+            m_me[3].x = m_me[3].x - sub;
+            m_me[3].y = F(0.0);
+        }
+
         /**
         * Return Tr[Im[a].Im[b]] 
         * It is used in topological charge
         */
-        //__device__ __inline__ static Real TrIm(const deviceSU2& a, const deviceSU2&b)
-        //{
-        //    //0,1,2 * 0,3,6
-        //    Real ret = a.m_me[0].y * b.m_me[0].y + a.m_me[1].y * b.m_me[3].y + a.m_me[2].y * b.m_me[6].y;
-        //    //3,4,5 * 1,4,7
-        //    ret += a.m_me[3].y * b.m_me[1].y + a.m_me[4].y * b.m_me[4].y + a.m_me[5].y * b.m_me[7].y;
-        //    //6,7,8 * 2,5,8
-        //    ret += a.m_me[6].y * b.m_me[2].y + a.m_me[7].y * b.m_me[5].y + a.m_me[8].y * b.m_me[8].y;
+        __device__ __inline__ static Real TrIm(const deviceSU2& a, const deviceSU2&b)
+        {
+            //0,1 * 0,2
+            Real ret = a.m_me[0].y * b.m_me[0].y + a.m_me[1].y * b.m_me[2].y;
+            //2,3 * 1,3
+            ret += a.m_me[2].y * b.m_me[3].y + a.m_me[1].y * b.m_me[3].y;
 
-        //    return ret;
-        //}
+            return ret;
+        }
 
         /**
         * res = U - U^dagger
         * It is like a matrix Im(M)
         * res = 2i Im(M), so is called iIm2
         */
-        //__device__ __inline__ void iIm2()
-        //{
-        //    //0 1 2
-        //    //3 4 5
-        //    //6 7 8
+        __device__ __inline__ void iIm2()
+        {
+            //0 1
+            //2 3
 
-        //    //new [1] = [1] - conj([3])
-        //    //new [3] = [3] - conj([1]) = -conj(new [1])
-        //    const CLGComplex new1 = _cuCsubf(m_me[1], _cuConjf(m_me[3]));
-        //    const CLGComplex new2 = _cuCsubf(m_me[2], _cuConjf(m_me[6]));
-        //    const CLGComplex new5 = _cuCsubf(m_me[5], _cuConjf(m_me[7]));
-        //    m_me[1] = _make_cuComplex(_cuCrealf(new1), _cuCimagf(new1));
-        //    m_me[3] = _make_cuComplex(-_cuCrealf(m_me[1]), _cuCimagf(m_me[1]));
-        //    m_me[2] = _make_cuComplex(_cuCrealf(new2), _cuCimagf(new2));
-        //    m_me[6] = _make_cuComplex(-_cuCrealf(m_me[2]), _cuCimagf(m_me[2]));
-        //    m_me[5] = _make_cuComplex(_cuCrealf(new5), _cuCimagf(new5));
-        //    m_me[7] = _make_cuComplex(-_cuCrealf(m_me[5]), _cuCimagf(m_me[5]));
+            //new [1] = [1] - conj([3])
+            //new [3] = [3] - conj([1]) = -conj(new [1])
+            m_me[1] = _cuCsubf(m_me[1], _cuConjf(m_me[2]));
+            m_me[2] = _make_cuComplex(-_cuCrealf(m_me[1]), _cuCimagf(m_me[1]));
 
-        //    m_me[0] = _make_cuComplex(F(0.0), F(2.0) * m_me[0].y);
-        //    m_me[4] = _make_cuComplex(F(0.0), F(2.0) * m_me[4].y);
-        //    m_me[8] = _make_cuComplex(F(0.0), F(2.0) * m_me[8].y);
-        //}
+            m_me[0] = _make_cuComplex(F(0.0), F(2.0) * m_me[0].y);
+            m_me[3] = _make_cuComplex(F(0.0), F(2.0) * m_me[3].y);
+        }
+
+        __device__ __inline__ void Re2()
+        {
+            //0 1
+            //2 3
+
+            //new [1] = [1] - conj([3])
+            //new [3] = [3] - conj([1]) = -conj(new [1])
+            m_me[1] = _cuCaddf(m_me[1], _cuConjf(m_me[2]));
+            m_me[2] = _make_cuComplex(_cuCrealf(m_me[1]), -_cuCimagf(m_me[1]));
+
+            m_me[0] = _make_cuComplex(F(2.0) * m_me[0].x, F(0.0));
+            m_me[3] = _make_cuComplex(F(2.0) * m_me[3].x, F(0.0));
+        }
 
         /**
         * return -i(U-U^dagger) = ((-iU)+(-iU)dagger)
@@ -872,6 +946,10 @@ extern "C" {
             const Real cc = a * m_me[1].y;
 
             const Real L = _sqrt(aa * aa + bb * bb + cc * cc);
+            if (L < _CLG_FLT_MIN_)
+            {
+                return makeSU2Id();
+            }
             const Real cs = _cos(L);
             const Real sn = _sin(L) / L;
             const Real asn = aa * sn;
@@ -996,6 +1074,20 @@ extern "C" {
             ret.m_me[3] = __cuCexpf(c2);
             ret.MulDagger(v);
             ret = v.MulC(ret);
+            return ret;
+        }
+
+        __device__ __inline__ deviceSU2 Inverse() const
+        {
+            const CLGComplex oneoverdet = _cuCdivf(_onec, Det());
+            const CLGComplex minusoneoverdet = _make_cuComplex(-oneoverdet.x, -oneoverdet.y);
+
+            deviceSU2 ret;
+            ret.m_me[0] = _cuCmulf(m_me[3], oneoverdet);
+            ret.m_me[1] = _cuCmulf(m_me[1], minusoneoverdet);
+            ret.m_me[2] = _cuCmulf(m_me[2], minusoneoverdet);
+            ret.m_me[3] = _cuCmulf(m_me[0], oneoverdet);
+
             return ret;
         }
 

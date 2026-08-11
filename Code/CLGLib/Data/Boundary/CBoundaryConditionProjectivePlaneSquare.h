@@ -8,6 +8,7 @@
 // REVISION:
 //  [09/10/2020 nbale]
 //=============================================================================
+#pragma once
 
 #ifndef _CBOUNDARYCONDITIONPROJECTIVEPLANESQUARE_H_
 #define _CBOUNDARYCONDITIONPROJECTIVEPLANESQUARE_H_

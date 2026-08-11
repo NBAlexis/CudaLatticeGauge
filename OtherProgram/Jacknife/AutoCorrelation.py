@@ -50,7 +50,7 @@ def tau(W, cw, s):
     where vF is in (34):  vF = GammaF(0) (here we use the enlarged cF(0))
     so, (2tau_int_F+1)/(2tau_int_F-1) = (2cF(W)+2vF)/(2cF(W)-2vF) = (cF(W)+cF(0))/(cF(W)-vF(0))
     """
-    cwsum = cw[W] + cw[0]
+    cwsum = max(1.0e-15, cw[W] + cw[0])
     cwdif = max(1.0e-12, cw[W] - cw[0])
     return s / np.log(cwsum / cwdif)
 
@@ -60,6 +60,7 @@ def gw(W, cw, s, n):
     Equation (52)
     """
     tauW = tau(W, cw, s)
+    # tobeexp = min(1.0e2, -W / tauW)
     return np.exp(-W / tauW) - tauW / np.sqrt(W * n)
 
 

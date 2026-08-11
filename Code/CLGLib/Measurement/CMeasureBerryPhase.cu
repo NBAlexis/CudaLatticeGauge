@@ -9,8 +9,9 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "Tools/Math/DeviceInlineTemplate.h"
 #include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3.h"
-#include "Data/Field/Staggered/CFieldFermionKSSU3.h"
+#include "Data/Field/Staggered/CFieldFermionKST.h"
 #include "CMeasureBerryPhase.h"
 
 __BEGIN_NAMESPACE
@@ -89,6 +90,35 @@ _kernelBerryConnectWilsonDiracSU3(
 }
 
 
+/**
+* const UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x); \
+* sSite4.x = static_cast<SCHAR> (_ixy / _DC_Ly); \
+* sSite4.y = static_cast<SCHAR> (_ixy % _DC_Ly); \
+* sSite4.z = static_cast<SCHAR>(threadIdx.y + blockIdx.y * blockDim.y); \
+* sSite4.w = static_cast<SCHAR>(threadIdx.z + blockIdx.z * blockDim.z); \
+* const UINT uiSiteIndex = _ixy * _DC_GridDimZT + sSite4.z * _DC_Lt + sSite4.w;
+* 
+* blocks are multiplied by Lx, Ly, Lz
+* threads are the normal
+* 
+* x = blockIdxX2
+* y = blockIdxY2
+* z = blockIdxZ2
+* 
+* t = threadIdx.z + blockIdxZ1 * blockDim.z
+* 
+* _ixy = (threadIdx.x + blockIdxX1 * blockDim.x) 
+* px = static_cast<SCHAR> (_ixy / _DC_Ly)
+* py = static_cast<SCHAR> (_ixy % _DC_Ly)
+* pz = threadIdx.y + blockIdxY1 * blockDim.y
+* 
+* uiSiteIndexP is the site index to save
+* uiSiteIndexX is the site index to read
+* 
+* uiSiteIndexP = (threadIdx.x + blockIdxX1 * blockDim.x) * _DC_GridDimZT + (threadIdx.y + blockIdxY1 * blockDim.y) * _DC_Lt + (threadIdx.z + blockIdxZ1 * blockDim.z)
+* uiSiteIndexX = (blockIdxX2 * _DC_Ly + blockIdxY2) * _DC_GridDimZT + blockIdxZ2 * _DC_Lt + (threadIdx.z + blockIdxZ1 * blockDim.z)
+* 
+*/
 __global__ void _CLG_LAUNCH_BOUND
 _kernelMomentumFieldKSSU3(
     const deviceSU3Vector* __restrict__ pInverseD,
@@ -172,9 +202,9 @@ _kernelBerryCurvatureU1(
 {
     SSmallInt4 sSite4; 
     const UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x); 
-    sSite4.x = static_cast<SBYTE> (_ixy / _DC_Ly); 
-    sSite4.y = static_cast<SBYTE> (_ixy % _DC_Ly); 
-    sSite4.z = static_cast<SBYTE>(threadIdx.y + blockIdx.y * blockDim.y); 
+    sSite4.x = static_cast<SCHAR> (_ixy / _DC_Ly); 
+    sSite4.y = static_cast<SCHAR> (_ixy % _DC_Ly); 
+    sSite4.z = static_cast<SCHAR>(threadIdx.y + blockIdx.y * blockDim.y); 
     sSite4.w = byT;
     const UINT uiSiteSpatial = _ixy * _DC_Lz + sSite4.z;
 
@@ -182,10 +212,10 @@ _kernelBerryCurvatureU1(
     #pragma unroll
     for (BYTE dir = 0; dir < 3; ++dir)
     {
-        //it is xy, yz, zt and tz plaqutte
-        const INT iDir1 = ((dir + 1) % 3) + 1;
-        const INT iDir2 = ((dir + 2) % 3) + 1;
-        const INT path[4] = { iDir1, iDir2, -iDir1, -iDir2 };
+        //it is xy, yz, and zx plaqutte
+        const SCHAR iDir1 = ((dir + 1) % 3) + 1; //2, 3, 1
+        const SCHAR iDir2 = ((dir + 2) % 3) + 1; //3, 1, 2
+        const SCHAR path[4] = { iDir1, iDir2, static_cast<SCHAR>(- iDir1), static_cast<SCHAR>(-iDir2)};
         const Real curve = _deviceLinkU1ArgSum(pU1Field, sSite4, 4, byGaugeFieldId, path);
         fArgSum += curve;// *curve; // __cuCargf(pU1Field[_deviceGetSiteIndex(sSite4) * 4 + dir])* curve;
     }
@@ -198,7 +228,7 @@ _kernelBerryCurvatureU1XY(
     BYTE byGaugeFieldId,
     const CLGComplex* __restrict__ pU1Field,
     BYTE byT,
-    INT dir1, INT dir2,
+    SCHAR dir1, SCHAR dir2,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE* pRes
 #else
@@ -208,13 +238,13 @@ _kernelBerryCurvatureU1XY(
 {
     SSmallInt4 sSite4;
     const UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x);
-    sSite4.x = static_cast<SBYTE> (_ixy / _DC_Ly);
-    sSite4.y = static_cast<SBYTE> (_ixy % _DC_Ly);
-    sSite4.z = static_cast<SBYTE>(threadIdx.y + blockIdx.y * blockDim.y);
+    sSite4.x = static_cast<SCHAR> (_ixy / _DC_Ly);
+    sSite4.y = static_cast<SCHAR> (_ixy % _DC_Ly);
+    sSite4.z = static_cast<SCHAR>(threadIdx.y + blockIdx.y * blockDim.y);
     sSite4.w = byT;
     const UINT uiSiteSpatial = _ixy * _DC_Lz + sSite4.z;
 
-    const INT path[4] = { dir1, dir2, -dir1, -dir2 };
+    const SCHAR path[4] = { dir1, dir2, static_cast<SCHAR>(-dir1), static_cast<SCHAR>(-dir2) };
     pRes[uiSiteSpatial] = _deviceLinkU1ArgSum(pU1Field, sSite4, 4, byGaugeFieldId, path);
 }
 
@@ -231,12 +261,12 @@ void CMeasureBerryPhase::CalculateMomentumSpacePhiWilsonDiracForPoint(const SSma
 
     const dim3 block(_HC_DecompX * _HC_Lx, _HC_DecompY * _HC_Ly, _HC_DecompZ * _HC_Lz);
     const dim3 threads(_HC_DecompLx, _HC_DecompLy, _HC_DecompLz);
-    CFieldFermionWilsonSquareSU3* sourcefield = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_pMomentumField->m_byFieldId));
+    CFieldFermionWilsonSquareSU3* sourcefield = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_pMomentumField->m_byFieldId, _T(__FILE__), __LINE__));
     CFieldFermionWilsonSquareSU3* momentumfield = dynamic_cast<CFieldFermionWilsonSquareSU3*>(m_pMomentumField);
     sourcefield->InitialAsSource(source);
-    sourcefield->InverseD(gaugeNum, bosonNum, gaugeFields, bosonFields);
+    sourcefield->InverseD(gaugeNum, bosonNum, 0, gaugeFields, bosonFields, NULL);
 
-    _kernelMomentumFieldWilsonDiracSU3 << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelMomentumFieldWilsonDiracSU3, block, threads, 
         sourcefield->m_pDeviceData,
         momentumfield->m_pDeviceData,
         xprime
@@ -259,7 +289,7 @@ void CMeasureBerryPhase::CalculateU1FieldWilsonDirac()
     CFieldFermionWilsonSquareSU3* momentumfield = dynamic_cast<CFieldFermionWilsonSquareSU3*>(m_pMomentumField);
     m_pU1Field->InitialField(EFIT_Identity);
     preparethread;
-    _kernelBerryConnectWilsonDiracSU3 << <block, threads>> > (
+    _LAUNCH_KERNEL(_kernelBerryConnectWilsonDiracSU3, block, threads, 
         momentumfield->m_byFieldId, 
         momentumfield->m_pDeviceData, 
         m_pU1Field->m_pDeviceData);
@@ -277,12 +307,12 @@ void CMeasureBerryPhase::CalculateMomentumSpacePhiKSForPoint(const SSmallInt4& x
 
     const dim3 block(_HC_DecompX * _HC_Lx, _HC_DecompY * _HC_Ly, _HC_DecompZ * _HC_Lz);
     const dim3 threads(_HC_DecompLx, _HC_DecompLy, _HC_DecompLz);
-    CFieldFermionKSSU3* sourcefield = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_pMomentumField->m_byFieldId));
+    CFieldFermionKSSU3* sourcefield = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_pMomentumField->m_byFieldId, _T(__FILE__), __LINE__));
     CFieldFermionKSSU3* momentumfield = dynamic_cast<CFieldFermionKSSU3*>(m_pMomentumField);
     sourcefield->InitialAsSource(source);
-    sourcefield->InverseD(gaugeNum, bosonNum, gaugeFields, bosonFields);
+    sourcefield->InverseD(gaugeNum, bosonNum, 0, gaugeFields, bosonFields, NULL);
 
-    _kernelMomentumFieldKSSU3 << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelMomentumFieldKSSU3, block, threads, 
         sourcefield->m_pDeviceData,
         momentumfield->m_pDeviceData,
         xprime
@@ -305,7 +335,7 @@ void CMeasureBerryPhase::CalculateU1FieldKS()
     CFieldFermionKSSU3* momentumfield = dynamic_cast<CFieldFermionKSSU3*>(m_pMomentumField);
     m_pU1Field->InitialField(EFIT_Identity);
     preparethread;
-    _kernelBerryConnectKSSU3 << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelBerryConnectKSSU3, block, threads, 
         momentumfield->m_byFieldId,
         momentumfield->m_pDeviceData,
         m_pU1Field->m_pDeviceData);
@@ -319,14 +349,11 @@ void CMeasureBerryPhase::CalculateBerryPhase()
     TArray<DOUBLE> res;
     TArray<DOUBLE> resXY;
     TArray<DOUBLE> resXZ;
-    TArray<DOUBLE> resXT;
     TArray<DOUBLE> resYZ;
-    TArray<DOUBLE> resYT;
-    TArray<DOUBLE> resZT;
 
     for (BYTE byT = 0; byT < _HC_Lt; ++byT)
     {
-        _kernelBerryCurvatureU1 << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelBerryCurvatureU1, block, threads, 
             m_pU1Field->m_byFieldId,
             m_pU1Field->m_pDeviceData,
             byT,
@@ -335,7 +362,7 @@ void CMeasureBerryPhase::CalculateBerryPhase()
 
         res.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
 
-        _kernelBerryCurvatureU1XY << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelBerryCurvatureU1XY, block, threads, 
             m_pU1Field->m_byFieldId,
             m_pU1Field->m_pDeviceData,
             byT,
@@ -345,7 +372,7 @@ void CMeasureBerryPhase::CalculateBerryPhase()
 
         resXY.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
 
-        _kernelBerryCurvatureU1XY << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelBerryCurvatureU1XY, block, threads, 
             m_pU1Field->m_byFieldId,
             m_pU1Field->m_pDeviceData,
             byT,
@@ -355,17 +382,7 @@ void CMeasureBerryPhase::CalculateBerryPhase()
 
         resXZ.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
 
-        _kernelBerryCurvatureU1XY << <block, threads >> > (
-            m_pU1Field->m_byFieldId,
-            m_pU1Field->m_pDeviceData,
-            byT,
-            1, 4,
-            _D_RealThreadBuffer
-            );
-
-        resXT.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
-
-        _kernelBerryCurvatureU1XY << <block, threads >> > (
+        _LAUNCH_KERNEL(_kernelBerryCurvatureU1XY, block, threads, 
             m_pU1Field->m_byFieldId,
             m_pU1Field->m_pDeviceData,
             byT,
@@ -375,34 +392,39 @@ void CMeasureBerryPhase::CalculateBerryPhase()
 
         resYZ.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
 
-        _kernelBerryCurvatureU1XY << <block, threads >> > (
-            m_pU1Field->m_byFieldId,
-            m_pU1Field->m_pDeviceData,
-            byT,
-            2, 4,
-            _D_RealThreadBuffer
-            );
-
-        resYT.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
-
-        _kernelBerryCurvatureU1XY << <block, threads >> > (
-            m_pU1Field->m_byFieldId,
-            m_pU1Field->m_pDeviceData,
-            byT,
-            3, 4,
-            _D_RealThreadBuffer
-            );
-
-        resZT.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
     }
+
+    //P4-3.8: the per-t values are LOCAL spatial partial sums (ReduceReal over
+    //this rank's volume); reduce the arrays across ranks so the profiles are
+    //global. Requires t NOT split (each rank then holds the same t index set);
+    //a split t would need a global-t gather.
+#if _CLG_MULTI_GPU
+    if (NULL != appGetComm())
+    {
+        if (appGetComm()->GpuGrid()[3] > 1)
+        {
+            appCrucial(_T("CMeasureBerryPhase: the t-profile is not supported on multi-GPU with a split t direction. Rejected.\n"));
+            return;
+        }
+        GlobalSumRealArray(res.GetData(), res.Num());
+        GlobalSumRealArray(resXY.GetData(), resXY.Num());
+        GlobalSumRealArray(resXZ.GetData(), resXZ.Num());
+        GlobalSumRealArray(resYZ.GetData(), resYZ.Num());
+    }
+#endif
 
     m_lstData.AddItem(res);
     m_lstDataXY.AddItem(resXY);
     m_lstDataXZ.AddItem(resXZ);
-    m_lstDataXT.AddItem(resXT);
     m_lstDataYZ.AddItem(resYZ);
-    m_lstDataYT.AddItem(resYT);
-    m_lstDataZT.AddItem(resZT);
+
+    if (NULL != m_pOwner)
+    {
+        m_pOwner->AddOneConfigurationResult(this, _T("BerryPhaseTotal"), res);
+        m_pOwner->AddOneConfigurationResult(this, _T("BerryPhaseXY"), resXY);
+        m_pOwner->AddOneConfigurationResult(this, _T("BerryPhaseXZ"), resXZ);
+        m_pOwner->AddOneConfigurationResult(this, _T("BerryPhaseYZ"), resYZ);
+    }
 }
 
 void CMeasureBerryPhase::AllocateBuffers()
@@ -411,7 +433,7 @@ void CMeasureBerryPhase::AllocateBuffers()
 
     //TODO: Not create boundary condition for U1, use the one as same as the default gauge
     m_pU1Field->m_byFieldId = 1;
-    m_pMomentumField = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
+    m_pMomentumField = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId(), _T(__FILE__), __LINE__));
 }
 
 CMeasureBerryPhase::~CMeasureBerryPhase()
@@ -435,14 +457,14 @@ void CMeasureBerryPhase::Initial(class CMeasurementManager* pOwner, class CLatti
     AllocateBuffers();
 }
 
-void CMeasureBerryPhase::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldGauge* const*)
+void CMeasureBerryPhase::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields, const CFieldGauge* const*)
 {
     if (m_bGuageFixing && NULL != appGetLattice()->m_pGaugeFixing)
     {
         TArray<CFieldGauge*> fixedgauges;
         for (INT i = 0; i < gaugeNum; ++i)
         {
-            CFieldGauge* fixedgauge = dynamic_cast<CFieldGauge*>(appGetLattice()->GetPooledCopy(gaugeFields[i]));
+            CFieldGauge* fixedgauge = dynamic_cast<CFieldGauge*>(appGetLattice()->GetPooledCopy(gaugeFields[i], _T(__FILE__), __LINE__));
             if (fixedgauge->IsDynamic())
             {
                 appGetLattice()->m_pGaugeFixing->GaugeFixing(fixedgauge);
@@ -516,20 +538,6 @@ void CMeasureBerryPhase::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, con
 
         appGeneral(_T("\n"));
 
-        appGeneral(_T("Berry phaseZT: {"));
-
-        for (INT t = 0; t < _HC_Lti; ++t)
-        {
-            if (m_bShowResult)
-            {
-                appGeneral(_T("%2.18f%s"),
-                    m_lstDataZT[m_uiConfigurationCount][t],
-                    t == (_HC_Lti - 1) ? _T("}") : _T(", ")
-                );
-            }
-        }
-
-        appGeneral(_T("\n"));
         appPopLogDate();
     }
 
@@ -548,10 +556,7 @@ void CMeasureBerryPhase::Reset()
     m_lstData.Reset();
     m_lstDataXY.Reset();
     m_lstDataXZ.Reset();
-    m_lstDataXT.Reset();
     m_lstDataYZ.Reset();
-    m_lstDataYT.Reset();
-    m_lstDataZT.Reset();
 }
 
 __END_NAMESPACE

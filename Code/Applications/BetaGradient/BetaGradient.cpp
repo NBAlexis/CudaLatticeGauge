@@ -13,7 +13,7 @@
 int main(int argc, char * argv[])
 {
     CParameters params;
-#if _CLG_DEBUG
+#if _CLG_DEBUG && _CLG_WIN
     CYAMLParser::ParseFile(_T("BetaGradient.yaml"), params);
 #else
     CYAMLParser::ParseFile(_T("../Debug/BetaGradient.yaml"), params);
@@ -79,6 +79,30 @@ int main(int argc, char * argv[])
         {
             CParameters workingParam1 = params.GetParameter(_T("JobGaugeFixing"));
             res = GaugeFixing(workingParam1);
+        }
+        break;
+    case EBGJ_MCGGaugeFixing:
+        {
+            CParameters workingParam1 = params.GetParameter(_T("JobMCGGaugeFixing"));
+            res = MCGGaugeFixing(workingParam1);
+        }
+        break;
+    case EBGJ_SimulateAtGradient:
+        {
+            CParameters workingParam1 = params.GetParameter(_T("JobSimulateAtGradient"));
+            res = SimulateAtGradient(workingParam1);
+        }
+        break;
+    case EBGJ_SimulateTemperatureDistri:
+        {
+            CParameters workingParam1 = params.GetParameter(_T("JobSimulateTemperatureDistri"));
+            res = SimulateTempDist(workingParam1);
+        }
+        break;
+    case EBGJ_MeasureTemperatureDistri:
+        {
+            CParameters workingParam1 = params.GetParameter(_T("JobMeasureTemperatureDistri"));
+            res = MeasurementTemperatureDistri(workingParam1);
         }
         break;
     default:

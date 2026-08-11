@@ -5,11 +5,15 @@
 // This is the class for the gauge fields
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [10/13/2020 nbale]
 //=============================================================================
+#pragma once
 
 #ifndef _CFIELDGAUGE_U1_REAL_H_
 #define _CFIELDGAUGE_U1_REAL_H_
+
+#include "CFieldGaugeLink.h"
 
 __BEGIN_NAMESPACE
 
@@ -18,14 +22,22 @@ __CLG_REGISTER_HELPER_HEADER(CFieldGaugeU1Real)
 __DEFINE_ENUM(EU1RealType,
     EURT_None,
     EURT_ImagineChemical,
+    //Ez on t-link
     EURT_E_t,
+    //Ez on z-link
     EURT_E_z,
+    //Bz on x-link
     EURT_Bp_x,
+    //Bz on y-link
     EURT_Bp_y,
+    //Bz on xy-link
     EURT_Bp_xy,
     EURT_Bp_x_notwist,
     EURT_Bp_y_notwist,
     EURT_Bp_xy_notwist,
+
+    //Ex on t-link, Bz on y-link, x-link twisted
+    EURT_ExBz_ty,
     );
 
 class CLGAPI CFieldGaugeU1Real : public CFieldGauge
@@ -51,17 +63,11 @@ public:
     void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStaple, Real betaOverN) const override;
     void CalculateOnlyStaple(CFieldGauge* pStaple) const override;
     void MakeRandomGenerator() override;
-#if !_CLG_DOUBLEFLOAT
     DOUBLE CalculatePlaqutteEnergy(DOUBLE betaOverN) const override;
+    DOUBLE CalculatePlaqutteEnergyOriginal(DOUBLE betaOverN) const override;
     DOUBLE CalculatePlaqutteEnergyUseClover(DOUBLE betaOverN) const override;
-    DOUBLE CalculatePlaqutteEnergyUsingStable(DOUBLE betaOverN, const CFieldGauge* pStaple) const override;
+    DOUBLE CalculatePlaqutteEnergyUsingStaple(DOUBLE betaOverN, const CFieldGauge* pStaple) const override;
     DOUBLE CalculateKinematicEnergy() const override;
-#else
-    Real CalculatePlaqutteEnergy(Real betaOverN) const override;
-    Real CalculatePlaqutteEnergyUseClover(Real betaOverN) const override;
-    Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStaple) const override;
-    Real CalculateKinematicEnergy() const override;
-#endif
 
 #pragma endregion
 
@@ -75,7 +81,8 @@ public:
     void AxpyMinus(const CField* x) override;
     void Axpy(Real a, const CField* x) override;
     void Axpy(const CLGComplex& a, const CField* x) override;
-    void Mul(const CField* other, UBOOL bDagger = TRUE) override;
+    void Mul(const CField* other, UBOOL bDaggerLeft = TRUE, UBOOL bDaggerRight = FALSE) override;
+    void LeftMul(const CField* other, UBOOL bDaggerLeft = TRUE, UBOOL bDaggerRight = FALSE) override;
     void ScalarMultply(const CLGComplex& a) override;
     void ScalarMultply(Real a) override;
 
@@ -90,6 +97,8 @@ public:
      * iA = U.TA() / 2
      */
     void TransformToIA() override;
+
+    void TA() override;
 
     /**
      * U=exp(iA)
@@ -106,20 +115,22 @@ public:
 
     //No need to normalize
     void ElementNormalize() override { ; }
-#if !_CLG_DOUBLEFLOAT
     cuDoubleComplex Dot(const CField* other) const override;
-#else
-    CLGComplex Dot(const CField* other) const override;
-#endif
+    DOUBLE GetLength() const override;
     BYTE* CopyDataOut(UINT &uiSize) const override;
     BYTE* CopyDataOutFloat(UINT& uiSize) const override;
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;
     CCString GetInfos(const CCString &tab) const override;
 
-    void PolyakovOnSpatialSite(cuDoubleComplex* buffer) const override;
+    void PolyakovOnSpatialSite(cuDoubleComplex* buffer, BYTE byDir = 3) const override;
 
     Real* m_pDeviceData;
     EFieldInitialType m_eInitialType;
+
+    //Improve-1: this field's own buffer handle (pool copies each bind theirs).
+    CHaloBufferHandle m_HaloBuffer;
+    CHaloBufferHandle* GetHaloBufferHandle() override { return &m_HaloBuffer; }
+    const CHaloBufferHandle* GetHaloBufferHandle() const override { return &m_HaloBuffer; }
 
     _GetData
 
@@ -136,6 +147,8 @@ public:
     */
     Real CheckZero(BYTE dir1, BYTE dir2, const TArray<BYTE>& linkdirs) const;
     void DebugPrintSlice(BYTE dir1, BYTE dir2, const TArray<BYTE>& linkdirs) const;
+    const Real* GetFmunu() const { return m_pFmunu; }
+    void CopyBufferTo(CField* pTarget) const override;
 
     EU1RealType m_eChemical;
     EU1RealType m_eE;
@@ -144,12 +157,19 @@ public:
     Real m_feEz;
     Real m_feBz;
     UBOOL m_bXYShiftCenter;
+    UBOOL m_bCacheFmunu;
+    Real* m_pFmunu;
+
+    //Improve-1 (I6, appendix A.1): the lazy Fmunu buffer is component-major
+    //and read strictly site-locally; its LocalOnly handle is bound on
+    //allocation (OnEMChanged / CopyBufferTo) so writes stay versioned.
+    CHaloBufferHandle m_FmunuHaloBuffer;
 
 protected:
 
     void SetByArray(Real* array);
+    void OnEMChanged();
 };
-
 
 __END_NAMESPACE
 

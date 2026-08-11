@@ -1,0 +1,178 @@
+\subsection{\label{sec:cw}\index{clover Wilson Dirac fermion}The update for clover Wilson Dirac fermion}
+
+\textbf{\textcolor[rgb]{1,0,0}{In the previous sections there are some mistakes, so I will try to sort out everything in this section. But I'll keep the mistakes in the previous sections until I'm sure I understand everything and I'm sure I get things correct now.}}
+
+
+\subsubsection{\label{sec:cw.rhmcAndHmc}Revisit of force of HMC and RHMC}
+
+I find it difficult to consider objects like $\partial U^{\dagger} / \partial U$, I think the correct way should be considering $U^{\dagger}$ and $U$ as independent variables, but all as functions of $\omega _a$. \textcolor[rgb]{0,0,1}{\textbf{The force is then $F=i\dot{\omega }_aT_a$, where $\dot{\omega}_a=-\partial S/\partial \omega _a$}}.
+
+By using,
+\begin{equation}
+\begin{split}
+&\frac{\partial U_{\mu}}{\partial \omega_{\mu}^a}=iT^aU_{\mu},\;\;\frac{\partial U^{\dagger}_{\mu}}{\partial \omega_{\mu}^a}=-iU^{\dagger}_{\mu}T^a,\\
+\end{split}
+\end{equation}
+
+it is,
+\begin{equation}
+\begin{split}
+&\frac{\partial S}{\partial \omega _a}={\rm tr}\left[\frac{\partial S}{\partial U}\frac{\partial U}{\partial \omega_a}+\frac{\partial S}{\partial U^{\dagger}}\frac{\partial U^{\dagger}}{\partial \omega_a}\right]
+\end{split}
+\end{equation}
+note that $\partial S/\partial \omega _a$ is a scalar, $S,\omega _a$ are both scalars, and both $\frac{\partial S}{\partial U}$ and $\frac{\partial U}{\partial \omega_a}$ are matrices.
+
+So,
+\begin{equation}
+\begin{split}
+&F=-i\frac{\partial S}{\partial \omega _a}T_a=-i{\rm tr}\left[\frac{\partial S}{\partial U}iT^aU-\frac{\partial S}{\partial U^{\dagger}}iU^{\dagger}T^a\right]T_a\\
+&=-i{\rm tr}\left[i\frac{\partial S}{\partial U}T^aU-i\frac{\partial S}{\partial U^{\dagger}}U^{\dagger}T^a\right]T_a\\
+&=-i{\rm tr}\left[i\frac{\partial S}{\partial U}T^aU+\left(i\frac{\partial S}{\partial U}T^aU\right)^{\dagger}\right]T_a\\
+&=-2i{\rm tr}\left[{\rm Re}\left[i\frac{\partial S}{\partial U}T^aU\right]\right]T_a\\
+\end{split}
+\end{equation}
+
+for any matrix \textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&2i \sum _a T_a {\rm Im tr}[T_a M] = -2 i \sum _a T_a {\rm Re tr}[i T_a M] = \{M\}_{TA}\\
+\end{split}
+\end{equation}
+}
+So, \textcolor[rgb]{0,0,1}{as long as $\partial S / \partial U^{\dagger} = \left(\partial S/ \partial U\right)^{\dagger}$,
+\begin{equation}
+\begin{split}
+&F= \{U{}^i{}_j \frac{\partial S}{\partial U{}^k{}_j}\}_{TA}\\
+\end{split}
+\end{equation}
+here, when calculating $\partial S/ \partial U$, the $U^{\dagger}$ is considered as independent of $U$.}
+
+Then we can use the result in Sec.~\ref{sec:derivate_on_effective_gauge_2}, \textbf{Note that, different from the case of staggered fermion, $DD^{\dagger}\neq D^{\dagger}D$ in the case of Wilson-Dirac fermion, so in the following, we use $DD^{\dagger}$ because $\psi^{\dagger}(D^{\dagger})^{-1}D^{-1}\psi = \psi^{\dagger}\left(DD^{\dagger}\right)^{-1}\psi$.}
+\begin{equation}
+\begin{split}
+&S=(\psi ^{\dagger}){}_m \left(c+\sum _i\frac{a_i}{DD^{\dagger}+b_i}\right){}^m{}_k \psi{}^k\\
+&\phi  = \frac{1}{DD^{\dagger}+b_s}\psi, \;\;\;\phi _d = D^{\dagger}\frac{1}{DD^{\dagger}+b_s}\psi,\\
+&\frac{\partial}{\partial U{}^i{}_l}S=-\sum _sa_s{} \left\{\phi ^{\dagger}{}_p\left(\frac{\partial D{}^p{}_h}{\partial U{}^i{}_l} \right) \phi _d {}^h+ 
+\phi _d^{\dagger}{}_h\left(\frac{\partial D^{\dagger}{}^h{}_q}{\partial U{}^i{}_l}\right) \phi {}^q\right\}\\
+\end{split}
+\end{equation}
+
+For HMC,
+\begin{equation}
+\begin{split}
+&S=(\psi ^{\dagger}){}_m \left((DD^{\dagger})^{-1}\right){}^m{}_k \psi{}^k\\
+&\phi  = \frac{1}{DD^{\dagger}}\psi, \;\;\;\phi _d = D^{\dagger}\frac{1}{DD^{\dagger}}\psi,\\
+&\frac{\partial}{\partial U{}^i{}_l}S=-\left\{\phi ^{\dagger}{}_p\left(\frac{\partial D{}^p{}_h}{\partial U{}^i{}_l} \right) \phi _d {}^h+ 
+\phi _d^{\dagger}{}_h\left(\frac{\partial D^{\dagger}{}^h{}_q}{\partial U{}^i{}_l}\right) \phi {}^q\right\}\\
+\end{split}
+\end{equation}
+
+\subsubsection{\label{sec:cw.rhmc}The force of RHMC of Wilson-Dirac fermion}
+
+Using $\kappa=1/(2am_f+8)$, the Wilson-Dirac fermion operator is,
+\begin{equation}
+\begin{split}
+&D=1-\kappa\sum _{\mu}\left((1-\gamma _{\mu})U_{\mu}(x _L)\delta _{x _L,(x+\mu)_R}+(1+\gamma _{\mu})U_{\mu}^{-1}(x _L-\mu)\delta _{x_L,(x-\mu)_R}\right)\\
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+&\frac{\partial}{\partial U{}^i{}_l(n,\mu)}S=\kappa\sum _sa_s{} \left\{\phi ^{\dagger}(n+\mu){}_p(1+\gamma ^{\dagger}_{\mu})\delta {}^p{}_i\delta {}^h{}_l \phi _d(n) {}^h+\phi ^{\dagger}_d(n+\mu){}_p(1-\gamma _{\mu})\delta {}^p{}_i\delta {}^h{}_l \phi (n) {}^h\right\}\\
+&=\kappa\sum _sa_s{} \left\{\phi ^{\dagger}(n+\mu){}_i(1+\gamma _{\mu}) \phi _d(n) {}^l+\phi ^{\dagger}_d(n+\mu){}_i(1-\gamma _{\mu}) \phi (n) {}^l\right\}\\
+&=\kappa\sum _sa_s{} \left\{(1+\gamma _{\mu}) \phi _d(n) {}^l\phi ^{\dagger}(n+\mu){}_i+(1-\gamma _{\mu}) \phi (n) {}^l\phi ^{\dagger}_d(n+\mu){}_i\right\}\\
+\end{split}
+\end{equation}
+
+For HMC, just remove $\sum _sa_s$ and use the correct definition of $\phi,\phi_d$.
+
+\subsubsection{\label{sec:cw.rhmccw}The force of RHMC of clover Wilson-Dirac fermion}
+
+Start from the clover term, which is defined using,
+\begin{equation}
+\begin{split}
+&F_{\mu\nu}=\frac{1}{8i}\left(P_{\mu\nu}-P_{\mu\nu}^{\dagger}\right)\\
+\end{split}
+\end{equation}
+There are different definitions of $P_{\mu\nu}$, the original one was,
+\begin{equation}
+\begin{split}
+&P_{\mu\nu}=U_{\mu,\nu}+U_{\nu,-\mu}-U_{\mu,-\nu}-U_{-\nu,-\mu}\\
+\end{split}
+\end{equation}
+Using $U_{a,b}=U_{b,a}^{\dagger}$, it is equivalent to use,
+\begin{equation}
+\begin{split}
+&P^a_{\mu\nu}=U_{\mu,\nu}-U_{\mu,\nu}-U_{\mu,-\nu}+U_{-\mu,-\nu}\\
+\end{split}
+\end{equation}
+or
+\begin{equation}
+\begin{split}
+&P^b_{\mu\nu}=U_{\mu,\nu}+U_{\nu,-\mu}+U_{-\nu,\mu}+U_{-\mu,-\nu}\\
+\end{split}
+\end{equation}
+
+The first definition~($P^a_{\mu\nu}$), $\mu$ is always in front of $\nu$.
+
+The second definition, all signs are sum, and all are $U_{\mu\nu}$ plaquette~(but disconnect at different positions).
+
+The force come from each plaquette disconnected at four cornels.
+
+Denoting, $L_{\mu,\nu,k}$ as the plaquette disconnected at the position $k$, i.e.,
+\begin{equation}
+\begin{split}
+&L_{\mu,\nu,0}(n) = \bar{\psi}_l(n) U_{\mu,\nu,-\mu,-\nu}(n) \sigma _{\mu\nu}\psi_r(n)\\
+&L_{\mu,\nu,1}(n) = \bar{\psi}_l(n+\mu) U_{\nu,-\mu,-\nu,\mu}(n+\mu) \sigma _{\mu\nu}\psi_r(n+\mu)\\
+&L_{\mu,\nu,2}(n) = \bar{\psi}_l(n+\mu+\nu) U_{-\mu,-\nu,\mu,\nu}(n+\mu+\nu) \sigma _{\mu\nu}\psi_r(n+\mu+\nu)\\
+&L_{\mu,\nu,3}(n) = \bar{\psi}_l(n+\nu) U_{-\nu,\mu,\nu,-\mu}(n+\nu) \sigma _{\mu\nu}\psi_r(n+\nu)\\
+&\sum _n \bar{\psi}_l\sigma _{\mu\nu}P^b_{\mu\nu}\psi _r = \sum _{n,k}L_{\mu,\nu,k}(n)\\
+&\sum _n \bar{\psi}_l\sigma _{\mu\nu}\left(P^b_{\mu\nu}\right)^{\dagger}\psi _r = \sum _{n,k}L_{\mu,-\nu,k}(n)\\
+\end{split}
+\end{equation}
+
+Note, denote the staple as $St_{\mu,\nu,k}$, where $k$ is the insertion of $\sigma _{\mu\nu}\psi_r \bar{\psi}_l$
+\begin{equation}
+\begin{split}
+&\frac{\partial }{\partial U_{\mu}}L_{\mu,\nu,k}(n) = St_{\mu,\nu,k}\\
+&\frac{\partial }{\partial U_{\nu}}L_{\mu,\nu,k}(n) = St_{\nu,-\mu,k}\\
+&\frac{\partial }{\partial U_{\mu}}L_{\mu,-\nu,k}(n) = St_{\mu,-\nu,k}\\
+&\frac{\partial }{\partial U_{\nu}}L_{\mu,-\nu,k}(n) = St_{\nu,\mu,k}\\
+\end{split}
+\end{equation}
+\textbf{The actual minus sign of $\nu$-link comes from the fact that it should be $\sigma _{\nu\mu}$. So for all $\mu > \nu$ in staple, there is an extra minus sign.}
+
+so, 
+\begin{equation}
+\begin{split}
+&\frac{\partial }{\partial U_{\mu}}\bar{\psi} _l\sigma _{\mu\nu} F_{\mu\nu} \psi _r= \sum _{k,\pm \nu\neq \mu} (-1)^{if\;\nu <\mu} \times (\pm 1)\times St_{\mu,\pm \nu, k}
+\end{split}
+\end{equation}
+
+And, 
+\begin{equation}
+\begin{split}
+&F_{\mu\nu}^{\dagger}=F_{\mu\nu}, \sigma _{\mu\nu,E}^{\dagger}=\sigma _{\mu\nu,E}, \left(\gamma _4 \sigma _{\mu\nu}^{\textcolor[rgb]{1,0,0}{M}}\right)^{\dagger}=\left(\gamma _4 \sigma _{\mu\nu}^{\textcolor[rgb]{1,0,0}{M}}\right)\\
+\end{split}
+\end{equation}
+
+\textcolor[rgb]{1,0,0}{Although both $\sigma _{\mu\nu}^{E,M}$ are $\gamma _5$-hermitian, only $\bar{\psi}\sigma _{\mu\nu}^M \psi$ is hermitian.}
+
+\subsubsection{\label{sec:cw.rhmceven}The force of RHMC of Wilson-Dirac fermion with even pseudofermion}
+
+\textbf{we do not use even-pseudofermion because I'm not sure whether the $\kappa$ term can be decoupled in $D^{\dagger}D$.}
+
+\subsubsection{\label{sec:cw.stoutlink}STOUT link smearing}
+
+The definition of Stout smearing is,
+\begin{equation}
+\begin{split}
+&U_{\nu}^{(n+1)}(x)=\exp\left(i\rho Q_{\mu}^{(n)}(x)\right)U_{\nu}^{(n)}(x)\\
+&Q_{\mu}^{(n)}(x)=\frac{1}{2i}\left(W_{\mu}^{(n)}(x)-\frac{1}{N_c}{\rm tr}\left[W_{\mu}^{(n)}(x)\right]\right)\\
+&W_{\mu}^{(n)}(x)=S_{\mu}^{(n)}(x)U_{\mu}^{(n)\dagger}(x)-U_{\mu}^{(n)}(x)S_{\mu}^{(n)\dagger}(x)\\
+&S_{\mu}^{(n)}(x)=\sum_{\nu\neq \mu}\left(U_{\nu}^{(n)}(x)U_{\mu}^{(n)}(x+\nu)U_{\nu}^{(n)\dagger}(x+\mu)+U_{\nu}^{(n)\dagger}(x-\nu)U_{\mu}^{(n)}(x-\nu)U_{\nu}^{(n)}(x+\mu-\nu)\right)\\
+\end{split}
+\end{equation}
+
+\subsubsection{\label{sec:cw.stoutlinkforce}STOUT link smearing force}
+

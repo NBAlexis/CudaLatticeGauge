@@ -8,7 +8,9 @@
 // REVISION:
 //  [09/10/2022 nbale]
 //=============================================================================
-#include "CFieldFermionKSSU3.h"
+#pragma once
+
+#include "CFieldFermionKST.h"
 
 #ifndef _CFIELDFERMIONKSSU3GAMMA_H_
 #define _CFIELDFERMIONKSSU3GAMMA_H_
@@ -32,7 +34,12 @@ protected:
     void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, BYTE byGaugeFieldId, Real f2am,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
 
-    void ApplyGammaKSS(const CFieldGauge* pGauge, EGammaMatrix eGamma) override;
+    void DOperatorKSOnEvenOrOdd(void* pTargetBuffer, const void* pGaugeBuffer, BYTE byGaugeFieldId, UBOOL bEven, Real f2am,
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
+
+    void CalculateForceEvenOddS(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const override;
+
+    void ApplyGammaS(const CFieldGauge* pGauge, EGammaMatrix eGamma) override;
 
 public:
 
@@ -58,57 +65,7 @@ public:
     Real m_fCoeffSigma24;
     Real m_fCoeffSigma34;
 
-    INT* m_pDevicePathBuffer;
-
-    /**
-     * This is for simulation, 2a is already multiplied.
-     * 2a qbar Gamma q
-     * for example, gamma_i  -> 1 x chichi
-     *              sigma ij -> 1/2 x chichi
-     *              gamma 5i -> 1/4 x chichi
-     *              gamma 5  -> 1/8 x chichi
-     * 
-     * Note: 2a is multiplied, therefore when measuring, one should use half coefficient
-     * Note: Gamma_mu, and Sigma _ ij, the "i" is already multiplied so that no sign problem when simulating, it should be "-i" if recover the sign problem
-     * Note: SIGMA31 is SIGMA13
-     *       SIGMA41 is SIGMA14
-     *       SIGMA42 is SIGMA24
-     *       SIGMA43 is SIGMA34
-     * 
-     */
-    static void appApplyGammaKS(
-        void* pTargetBuffer,
-        const void* pBuffer,
-        const void* pGaugeBuffer,
-        EGammaMatrix eGamma,
-        UBOOL bShiftCenter,
-        UBOOL bDagger,
-        Real fGammaCoeff,
-        EOperatorCoefficientType eOCT,
-        Real fRealCoeff,
-        CLGComplex cCmpCoeff,
-        BYTE byFieldID,
-        BYTE byGaugeFieldID);
-
-    /**
-     * devicePathBuffer must be larger than 4
-     */
-    static void GammaKSForce(
-        void* pForce,
-        const void* pGaugeBuffer,
-        const deviceSU3Vector* const* pRationalFields,
-        const Real* pRationalNumerator,
-        UINT uiRationalDegree,
-        Real fCoeff,
-        EGammaMatrix eGamma,
-        INT* devicePathBuffer,
-        BYTE byFieldID,
-        BYTE byGaugeFieldID);
-
-    /**
-     * every time set gamma coefficient, update the parameters of pooled
-     */
-    //void UpdatePooledParamters() const;
+    SCHAR* m_pDevicePathBuffer;
 
 };
 

@@ -7,31 +7,20 @@
 // This is only for Dirichlet.
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [07/06/2019 nbale]
 //=============================================================================
 #include "CFieldGaugeLink.h"
-
-#define __DEFINE_GAUGE_LINKD(N) \
-__CLG_REGISTER_HELPER_HEADER(CFieldGaugeSU##N##D) \
-class CLGAPI CFieldGaugeSU##N##D : public CFieldGaugeLinkD<deviceSU##N, N> \
-{ \
-    __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldGaugeSU##N##D) \
-public: \
-    EFieldType GetFieldType() const override { return EFT_GaugeSU##N; } \
-};
 
 #ifndef _CFIELDGAUGELINKDIRICHLET_H_
 #define _CFIELDGAUGELINKDIRICHLET_H_
 
 __BEGIN_NAMESPACE
 
-template<typename deviceGauge, INT matrixN>
-class __DLL_EXPORT CFieldGaugeLinkD : public CFieldGaugeLink<deviceGauge, matrixN>
+template<class CFeildG>
+class __DLL_EXPORT CFieldGaugeLinkD : public CFeildG
 {
 public:
-
-#pragma region HMC
-
     void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStaple, Real betaOverN) const override
     {
         if (NULL == pForce || this->GetFieldType() != pForce->GetFieldType())
@@ -45,95 +34,185 @@ public:
             return;
         }
 
-        CFieldGaugeLink<deviceGauge, matrixN>* pForceSU3 = dynamic_cast<CFieldGaugeLink<deviceGauge, matrixN>*>(pForce);
-        CFieldGaugeLink<deviceGauge, matrixN>* pStableSU3 = NULL == pStaple ? NULL : dynamic_cast<CFieldGaugeLink<deviceGauge, matrixN>*>(pStaple);
+        CFeildG* pForceSU3 = dynamic_cast<CFeildG*>(pForce);
+        CFeildG* pStapleSU3 = NULL == pStaple ? NULL : dynamic_cast<CFeildG*>(pStaple);
 
-        CFieldGaugeKernel<deviceGauge, matrixN>::CalculateForceAndStaple_D(
+        CFeildG::_GaugeKernel::CalculateForceAndStaple_D(
             this->m_pDeviceData,
             this->m_byFieldId,
             pForceSU3->m_pDeviceData,
-            NULL == pStableSU3 ? NULL : pStableSU3->m_pDeviceData,
+            NULL == pStapleSU3 ? NULL : pStapleSU3->m_pDeviceData,
             betaOverN);
+    }
+
+    void CalculateForceAnisotropy(CFieldGauge* pForce, DOUBLE betaOverN, DOUBLE xi) const override
+    {
+        if (NULL == pForce || this->GetFieldType() != pForce->GetFieldType())
+        {
+            appCrucial("CFieldGaugeLink<deviceGauge, matrixN>: force field is not SU3");
+            return;
+        }
+        CFeildG* pForceSU3 = dynamic_cast<CFeildG*>(pForce);
+        CFeildG::_GaugeKernel::CalculateForceAnisotropy_D(
+            this->m_pDeviceData,
+            this->m_byFieldId,
+            pForceSU3->m_pDeviceData,
+            betaOverN,
+            xi);
+    }
+
+    void CalculateForceAndStapleClover(CFieldGauge* pForce, CFieldGauge* pStaple, Real betaOverN) const override
+    {
+        if (NULL == pForce || this->GetFieldType() != pForce->GetFieldType())
+        {
+            appCrucial("CFieldGaugeLink<deviceGauge, matrixN>: force field is not SU3");
+            return;
+        }
+        if (NULL != pStaple && this->GetFieldType() != pStaple->GetFieldType())
+        {
+            appCrucial("CFieldGaugeLink<deviceGauge, matrixN>: stape field is not SU3");
+            return;
+        }
+
+        CFeildG* pForceSU3 = dynamic_cast<CFeildG*>(pForce);
+        CFeildG* pStapleSU3 = NULL == pStaple ? NULL : dynamic_cast<CFeildG*>(pStaple);
+
+        CFeildG::_GaugeKernel::CalculateForceAndStapleClover_D(
+            this->m_pDeviceData,
+            this->m_byFieldId,
+            pForceSU3->m_pDeviceData,
+            NULL == pStapleSU3 ? NULL : pStapleSU3->m_pDeviceData,
+            betaOverN);
+    }
+
+    void CalculateForceCloverAnisotropy(CFieldGauge* pForce, DOUBLE betaOverN, DOUBLE xi) const override
+    {
+        if (NULL == pForce || this->GetFieldType() != pForce->GetFieldType())
+        {
+            appCrucial("CFieldGaugeLink<deviceGauge, matrixN>: force field is not SU3");
+            return;
+        }
+        CFeildG* pForceSU3 = dynamic_cast<CFeildG*>(pForce);
+        CFeildG::_GaugeKernel::CalculateForceCloverAnisotropy_D(
+            this->m_pDeviceData,
+            this->m_byFieldId,
+            pForceSU3->m_pDeviceData,
+            betaOverN,
+            xi);
     }
 
     void CalculateOnlyStaple(CFieldGauge* pStaple) const override
     {
         if (NULL == pStaple || this->GetFieldType() != pStaple->GetFieldType())
         {
-            appCrucial("CFieldGaugeLink<deviceGauge, matrixN>: stable field is not SU3");
+            appCrucial("CFieldGaugeLink<deviceGauge, matrixN>: staple field is not SU3");
             return;
         }
-        CFieldGaugeLink<deviceGauge, matrixN>* pStableSU3 = dynamic_cast<CFieldGaugeLink<deviceGauge, matrixN>*>(pStaple);
-        CFieldGaugeKernel<deviceGauge, matrixN>::CalculateOnlyStaple_D(this->m_pDeviceData, this->m_byFieldId, pStableSU3->m_pDeviceData);
+        CFeildG* pStapleSU3 = dynamic_cast<CFeildG*>(pStaple);
+        CFeildG::_GaugeKernel::CalculateOnlyStaple_D(this->m_pDeviceData, this->m_byFieldId, pStapleSU3->m_pDeviceData);
     }
 
     DOUBLE CalculatePlaqutteEnergy(DOUBLE betaOverN) const override
     {
-        return CFieldGaugeKernel<deviceGauge, matrixN>::CalculatePlaqutteEnergy_D(this->m_pDeviceData, this->m_byFieldId, betaOverN);
+        return CFeildG::_GaugeKernel::CalculatePlaqutteEnergy_D(this->m_pDeviceData, this->m_byFieldId, betaOverN);
     }
 
-    DOUBLE CalculateKinematicEnergy() const override
+    DOUBLE CalculatePlaqutteEnergyOriginal(DOUBLE betaOverN) const override
     {
-        return CCommonKernelLink<deviceGauge>::CalcKineticEnery(this->m_pDeviceData, this->m_byFieldId);
+        _RECORD(CFieldGaugeLink::CalculatePlaqutteEnergyOriginal);
+        appWarning("Dirichlet boundary gauge not fully support u0 yet! the result will be larger than this.\n");
+        return CFeildG::_GaugeKernel::CalculatePlaqutteEnergy_D(this->m_pDeviceData, this->m_byFieldId, betaOverN);
     }
 
-    DOUBLE CalculatePlaqutteEnergyUsingStable(DOUBLE betaOverN, const CFieldGauge* pStaple) const override
+    DOUBLE CalculatePlaqutteEnergyAnisotropy(DOUBLE betaOverN, DOUBLE xi) const override
+    {
+        return CFeildG::_GaugeKernel::CalculatePlaqutteEnergyAnisotropy_D(this->m_pDeviceData, this->m_byFieldId, betaOverN, xi);
+    }
+
+    DOUBLE CalculatePlaqutteEnergyUsingStaple(DOUBLE betaOverN, const CFieldGauge* pStaple) const override
     {
         return CalculatePlaqutteEnergy(betaOverN);
     }
 
-#pragma endregion
+    /**
+    * for test
+    */
+    //DOUBLE CalculatePlaqutteEnergyUseClover(DOUBLE betaOverN) const override
+    //{
+    //    return CalculatePlaqutteEnergy(betaOverN);
+    //}
 
-#pragma region BLAS
+    DOUBLE CalculateKinematicEnergy() const override 
+    { 
+        if (abs(_HC_GaugeMomentumFactor - F(1.0)) > _CLG_FLT_EPSILON)
+        {
+            return CFeildG::_LinkKernel::CalcKineticEnery(this->m_pDeviceData, this->m_byFieldId) / _HC_GaugeMomentumFactor;
+        }
+        return CFeildG::_LinkKernel::CalcKineticEnery(this->m_pDeviceData, this->m_byFieldId);
+    } 
 
-    void FixBoundary() override
+    void InitialField(EFieldInitialType eInitialType) override
     {
-        appDetailed(_T("CFieldGaugeLinkD<deviceGauge, matrixN>::FixBoundary()\n"));
-        CCommonKernelLink<deviceGauge>::FixBoundary(this->m_pDeviceData, this->m_byFieldId);
+        CFeildG::_LinkKernel::InitialBufferD(this->m_pDeviceData, this->m_byFieldId, eInitialType);
+        if ((EFIT_RandomGenerator == eInitialType || EFIT_RandomGaussian == eInitialType) && abs(_HC_GaugeMomentumFactor - F(1.0)) > _CLG_FLT_EPSILON)
+        {
+            CFeildG::ScalarMultply(static_cast<Real>(sqrt(_HC_GaugeMomentumFactor)));
+        }
     }
 
-#pragma endregion
+    void FixBoundary(EFixBoundary eType) override
+    {
+        //appDetailed(_T("CFieldGaugeLinkD<deviceGauge, matrixN>::FixBoundary()\n"));
+        if (EFB_Field == eType)
+        {
+            CFeildG::_LinkKernel::FixBoundary(this->m_pDeviceData, this->m_byFieldId);
+        }
+        else
+        {
+            CFeildG::_LinkKernel::FixBoundaryZero(this->m_pDeviceData, this->m_byFieldId);
+        }
+    }
 
     CCString GetInfos(const CCString& tab) const override
     {
-        CCString sRet = CFieldGaugeLink<deviceGauge, matrixN>::GetInfos(tab);
+        CCString sRet = CFeildG::GetInfos(tab);
         SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(this->m_byFieldId);
         sRet = sRet + tab + appToString(boundary) + _T("\n");
-
         return sRet;
+    }
+
+    UBOOL IsDirichlet() const override
+    {
+        return TRUE;
     }
 };
 
-__CLG_REGISTER_HELPER_HEADER(CFieldGaugeU1D)
-
-class CLGAPI CFieldGaugeU1D : public CFieldGaugeLinkD<CLGComplex, 1>
-{
-    __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldGaugeU1D)
-public:
-    EFieldType GetFieldType() const override { return EFT_GaugeU1; }
-
-    void InitialWithByteCompressed(const CCString& sFileName) override;
-    CCString SaveToCompressedFile(const CCString& fileName) const override;
+#define _DEFINE_Gauge_Dirichlet(N) \
+__CLG_REGISTER_HELPER_HEADER(CFieldGauge##N##D) \
+class CLGAPI CFieldGauge##N##D : public CFieldGaugeLinkD<CFieldGauge##N> \
+{ \
+    __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldGauge##N##D) \
 };
 
-__CLG_REGISTER_HELPER_HEADER(CFieldGaugeSU2D)
+_DEFINE_Gauge_Dirichlet(U1)
+_DEFINE_Gauge_Dirichlet(SU2)
+_DEFINE_Gauge_Dirichlet(SU3)
 
-class CLGAPI CFieldGaugeSU2D : public CFieldGaugeLinkD<deviceSU2, 2>
-{
-    __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldGaugeSU2D)
-public:
-    EFieldType GetFieldType() const override { return EFT_GaugeSU2; }
-
-    void InitialWithByteCompressed(const CCString& sFileName) override;
-    CCString SaveToCompressedFile(const CCString& fileName) const override;
-};
-
-__DEFINE_GAUGE_LINKD(4)
-__DEFINE_GAUGE_LINKD(5)
-__DEFINE_GAUGE_LINKD(6)
-__DEFINE_GAUGE_LINKD(7)
-__DEFINE_GAUGE_LINKD(8)
-
+#if _CLG_SU4_GAUGE
+_DEFINE_Gauge_Dirichlet(SU4)
+#endif
+#if _CLG_SU5_GAUGE
+_DEFINE_Gauge_Dirichlet(SU5)
+#endif
+#if _CLG_SU6_GAUGE
+_DEFINE_Gauge_Dirichlet(SU6)
+#endif
+#if _CLG_SU7_GAUGE
+_DEFINE_Gauge_Dirichlet(SU7)
+#endif
+#if _CLG_SU8_GAUGE
+_DEFINE_Gauge_Dirichlet(SU8)
+#endif
 
 __END_NAMESPACE
 

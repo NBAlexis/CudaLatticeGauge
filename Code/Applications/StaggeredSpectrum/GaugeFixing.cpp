@@ -43,6 +43,22 @@ INT StaggeredGaugeFixing(CParameters& params)
     params.FetchStringValue(_T("LoadPrefix"), sLoadPrefix);
     appGeneral(_T("load prefix: %s\n"), sLoadPrefix.c_str());
 
+    CCString sSaveType = _T("EFFT_CLGBin");
+    EFieldFileType eSaveType = EFFT_CLGBin;
+    if (params.FetchStringValue(_T("SaveType"), sSaveType))
+    {
+        eSaveType = __STRING_TO_ENUM(EFieldFileType, sSaveType);
+    }
+    appGeneral(_T("save type: %s\n"), __ENUM_TO_STRING(EFieldFileType, eSaveType).c_str());
+
+    CCString sLoadType = _T("EFFT_CLGBin");
+    EFieldFileType eLoadType = EFFT_CLGBin;
+    if (params.FetchStringValue(_T("LoadType"), sLoadType))
+    {
+        eLoadType = __STRING_TO_ENUM(EFieldFileType, sLoadType);
+    }
+    appGeneral(_T("load type: %s\n"), __ENUM_TO_STRING(EFieldFileType, eLoadType).c_str());
+
     if (bOnlyCheck)
     {
         appGeneral(_T("====== Start: %d to %d ======\n"), iIndexStart, iIndexEnd);
@@ -50,8 +66,8 @@ INT StaggeredGaugeFixing(CParameters& params)
         for (UINT uiIndex = iIndexStart; uiIndex <= iIndexEnd; ++uiIndex)
         {
             CCString sSaveFile;
-            sSaveFile.Format(_T("%sMatching_%d.con"), sSavePrefix.c_str(), uiIndex);
-            appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sSaveFile, EFFT_CLGBin);
+            sSaveFile.Format(_T("%s_%d.con"), sSavePrefix.c_str(), uiIndex);
+            appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sSaveFile, eSaveType);
 
 #if !_CLG_DOUBLEFLOAT
             const DOUBLE fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField[0]);
@@ -79,16 +95,16 @@ INT StaggeredGaugeFixing(CParameters& params)
                 {
                     appGeneral(_T("\nNot good enough : %d \n"), uiIndex);
                     appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField[0]);
-                    appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile);
+                    appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile, eSaveType);
                 }
                 else
                 {
                     appGeneral(_T("\nBad : %d \n"), uiIndex);
                     CCString sLoadFile;
-                    sLoadFile.Format(_T("%sMatching_%d.con"), sLoadPrefix.c_str(), uiIndex);
-                    appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sLoadFile, EFFT_CLGBin);
+                    sLoadFile.Format(_T("%s_%d.con"), sLoadPrefix.c_str(), uiIndex);
+                    appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sLoadFile, eLoadType);
                     appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField[0]);
-                    appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile);
+                    appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile, eSaveType);
                 }
             }
             else
@@ -104,12 +120,12 @@ INT StaggeredGaugeFixing(CParameters& params)
         {
             CCString sLoadFile;
             CCString sSaveFile;
-            sLoadFile.Format(_T("%sMatching_%d.con"), sLoadPrefix.c_str(), uiIndex);
-            sSaveFile.Format(_T("%sMatching_%d.con"), sSavePrefix.c_str(), uiIndex);
+            sLoadFile.Format(_T("%s_%d.con"), sLoadPrefix.c_str(), uiIndex);
+            sSaveFile.Format(_T("%s_%d.con"), sSavePrefix.c_str(), uiIndex);
             appGeneral(_T("Fixing : %d \n"), uiIndex);
-            appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sLoadFile, EFFT_CLGBin);
+            appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sLoadFile, eLoadType);
             appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField[0]);
-            appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile);
+            appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile, eSaveType);
         }
     }
 

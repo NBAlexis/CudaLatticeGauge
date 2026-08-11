@@ -13,9 +13,11 @@ JobSimulate:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 28
-    EquvibStep : 1000
-    SaveStartIndex : 150
+    MaxThreadPerBlock : 128
+    BeforeEquvibStep : 0
+    EquvibStep : 1500
+    SaveStartIndex : 0
+    ExponentialPrecision : 8
 
     SavePrefix : ./P4980204_
 
@@ -40,22 +42,22 @@ JobSimulate:
         ReportMeasure : 0
         Adaptive : 1
         MinMaxStep : [4, 50]
-        GrowReduceThreshold : [-0.3, 0.02]
+        GrowReduceThreshold : [-0.4, 0.03]
 
         DebugForce : 0
         InnerLeapfrog : 1
-        IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorNestedForceGradient
         IntegratorStepLength : 1
         IntegratorStep : 10
-        NestedStep : 20
+        NestedStep : 40
 
     Gauge:
 
         FieldName : CFieldGaugeSU3
         # FieldInitialType : EFIT_Random
-        FieldInitialType : EFIT_ReadFromFile
+        FieldInitialType : EFIT_Random
         GaugeFileType : EFFT_CLGBin
-        GaugeFileName : ./P4980204_Matching_122.con
+        # GaugeFileName : ./P4980204_Matching_122.con
 
         Period : [1, 1, 1, 1]
 
@@ -80,19 +82,11 @@ JobSimulate:
 
         # MC is to prepare
         # This is x^{1/16}
-        # MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
+        MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
 
         # MD is to calculate force
         # This is x^{-1/8}
-        # MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
-
-        # MC is to prepare
-        # This is x^{1/8}
-        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
-
-        # MD is to calculate force
-        # This is x^{-1/4}
-        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+        MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
 
     FermionField2:
         
@@ -111,19 +105,11 @@ JobSimulate:
 
         # MC is to prepare
         # This is x^{1/16}
-        # MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
+        MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
 
         # MD is to calculate force
         # This is x^{-1/8}
-        # MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
-
-        # MC is to prepare
-        # This is x^{1/8}
-        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
-
-        # MD is to calculate force
-        # This is x^{-1/4}
-        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+        MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
 
     FermionField3:
         
@@ -142,19 +128,11 @@ JobSimulate:
 
         # MC is to prepare
         # This is x^{1/16}
-        # MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
+        MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
 
         # MD is to calculate force
         # This is x^{-1/8}
-        # MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
-
-        # MC is to prepare
-        # This is x^{1/8}
-        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
-
-        # MD is to calculate force
-        # This is x^{-1/4}
-        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+        MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
 
     FermionField4:
         
@@ -171,21 +149,9 @@ JobSimulate:
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
 
-        # MC is to prepare
-        # This is (x+0.0375/x)^{-1/4}
-        # MC : [0.9883908285644297, -0.006904795410014326, 0.011951446614057276]
+        MC : [0.993749087967288, -0.0034856512040810196, 0.009918173853934044]
 
-        # MD is to calculate force
-        # This is (x+0.0375/x)^{1/2}
-        # MD : [1.0187866320412073, 0.015082426781553434, 0.002799952674759453]
-
-                # MC is to prepare
-        # This is (x+0.0384/x)^{-1/4}
-        MC : [0.988087846183097, -0.0070337572362839966, 0.012149695891461821]
-
-        # MD is to calculate force
-        # This is (x+0.0384/x)^{1/2}
-        MD : [1.0192839071626443, 0.015390840632470528, 0.0028328749479887365]
+        MD : [1.0119629737342375, 0.007203713634228462, 0.005031141338395787]
 
 
     MSSolver:
@@ -229,7 +195,7 @@ JobSimulate:
         # DiviationStep : 20
         DiviationStep : 50
         MaxStep : 500
-        Accuracy : 0.000001
+        Accuracy : 0.00001
         AbsoluteAccuracy : 1
         
         NestedSolver :
@@ -245,7 +211,7 @@ JobSimulate:
             MaxDim : 15
 
             # SolverName : CSLASolverGCRODR
-            Accuracy : 0.0000001
+            Accuracy : 0.00001
             # MDim : 26
             # KDim : 5
             # RecalculateR : 5
@@ -290,28 +256,30 @@ JobMeasure:
     ## Verbose will always show in stdout
     ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
     ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
-    VerboseLevel : GENERAL
+    VerboseLevel : PARANOIAC
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    LoadDouble : 1
+    # {EFFT_CLGBinFloat}
+    LoadType : EFFT_CLGBinFloat
 
-    StartN : 201
-    EndN : 205
+    StartN : 1
+    EndN : 5
     # {ESSM_Polyakov, ESSM_Wilson, ESSM_Correlator, ESSM_CorrelatorSimple, ESSM_Chiral}
-    MeasureType : ESSM_CorrelatorSimple
-    SavePrefix : G:\SRMatching\Torus\472\GF\GFT47204509_
+    MeasureType : ESSM_Correlator
+    SavePrefix : G:\c24P31\c24P31_col
     # Chiral, Meson, MesonSimple, Polyakov, Wilson
-    CSVSavePrefix : ./T47204509_
+    CSVSavePrefix : ./c24P31_
     UseZ4 : 1
-    StochasticFieldCount : 10
+    StochasticFieldCount : 20
+    MaxThreadPerBlock : 128
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 48]
+    LatticeLength : [24, 24, 24, 48]
     LatticeIndex : CIndexSquare
-    # LatticeBoundary : CBoundaryConditionTorusSquare
-    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
@@ -360,7 +328,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.2
+        Mass : 0.07
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
@@ -391,7 +359,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.2
+        Mass : 0.07
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
@@ -422,7 +390,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.2
+        Mass : 0.07
         FieldId : 4
         PoolNumber : 15
         EachSiteEta : 1
@@ -453,7 +421,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.04
+        Mass : 0.001888
         FieldId : 5
         PoolNumber : 15
         EachSiteEta : 1
@@ -592,8 +560,8 @@ JobMeasure:
     Action1:
    
         ActionName : CActionGaugePlaquette
-        CloverEnergy : 1
-        Beta : 4.82
+        # CloverEnergy : 1
+        Beta : 5.5
 
     Action2:
 
@@ -622,15 +590,16 @@ JobMeasure:
     Measure2:
 
         MeasureName : CMeasureMesonCorrelatorStaggered
-        ShowResult : 0
+        ShowResult : 1
         GaugeFixing : 0
         FieldId : 5
 
     Measure3:
 
-        MeasureName : CMeasureMesonCorrelatorStaggeredSimple
+        MeasureName : CMeasureMesonCorrelatorStaggeredSimple2
         ShowResult : 0
         FieldId : 5
+        Source : EFS_Wall
 
     Measure4:
 

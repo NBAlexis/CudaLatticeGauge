@@ -25,7 +25,19 @@
     printf("Error at %s:%d\n",__FILE__,__LINE__);\
     return;}} while(0)
 
+
+#define _CLG_USE_MRG32K3A 0
+#define _CLG_USE_PHILOX4 0
+#define _CLG_USE_QUASI_SOBOL32 0
+#if _CLG_DTK
+#define _CLG_USE_SCRAMBLED_SOBOL32 0
+#else
+#define _CLG_USE_SCRAMBLED_SOBOL32 1
+#endif
+
 __BEGIN_NAMESPACE
+
+__device__ __inline__ static UINT _deviceGetSiteFromLink(UINT linkIndex);
 
 __DEFINE_ENUM (ERandom,
     ER_Schrage,
@@ -71,7 +83,7 @@ public:
     */
     CRandom(UINT uiSeed, ERandom er) 
         : m_eRandomType(er)
-        , m_uiFatIdDivide(1)
+        //, m_uiFatIdDivide(1)
         , m_uiHostSeed(uiSeed)
     { 
         switch (er)
@@ -81,44 +93,52 @@ public:
                     InitialTableSchrage(uiSeed);
                 }
                 break;
+#if _CLG_USE_MRG32K3A
             case ER_MRG32K3A:
                 {
                     CURAND_CALL(curandCreateGenerator(&m_HGen, CURAND_RNG_PSEUDO_MRG32K3A));
                     CURAND_CALL(curandSetPseudoRandomGeneratorSeed(m_HGen, uiSeed));
-                    checkCudaErrors(cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
+                    checkCudaErrors(__cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
                     InitialStatesMRG(uiSeed);
                 }
                 break;
+#endif
+#if _CLG_USE_PHILOX4
             case ER_PHILOX4_32_10:
                 {
                     CURAND_CALL(curandCreateGenerator(&m_HGen, CURAND_RNG_PSEUDO_PHILOX4_32_10));
                     CURAND_CALL(curandSetPseudoRandomGeneratorSeed(m_HGen, uiSeed));
-                    checkCudaErrors(cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
+                    checkCudaErrors(__cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
                     InitialStatesPhilox(uiSeed);
                 }
                 break;
+#endif
+#if _CLG_USE_QUASI_SOBOL32
             case ER_QUASI_SOBOL32:
                 {
                     //for sobol, on the host, we use XORWOW
                     CURAND_CALL(curandCreateGenerator(&m_HGen, CURAND_RNG_QUASI_SOBOL32));
-                    checkCudaErrors(cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
+                    checkCudaErrors(__cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
                     InitialStatesSobol32(uiSeed);
                 }
                 break;
+#endif
+#if _CLG_USE_SCRAMBLED_SOBOL32
             case ER_SCRAMBLED_SOBOL32:
                 {
                     //for sobol, on the host, we use XORWOW
                     CURAND_CALL(curandCreateGenerator(&m_HGen, CURAND_RNG_QUASI_SCRAMBLED_SOBOL32));
-                    checkCudaErrors(cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
+                    checkCudaErrors(__cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
                     InitialStatesScrambledSobol32(uiSeed);
                 }
                 break;
+#endif
             case ER_XORWOW:
             default:
                 {
                     CURAND_CALL(curandCreateGenerator(&m_HGen, CURAND_RNG_PSEUDO_XORWOW));
                     CURAND_CALL(curandSetPseudoRandomGeneratorSeed(m_HGen, uiSeed));
-                    checkCudaErrors(cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
+                    checkCudaErrors(__cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
                     InitialStatesXORWOW(uiSeed);
                 }
                 break;
@@ -129,30 +149,86 @@ public:
 
     ~CRandom();
 
+#if _CLG_MULTI_GPU
+    /**
+     * P4-2.5 fix: temporarily rebuild the curand state arrays for the GLOBAL
+     * lattice (rank0 global fixer context). The device state arrays are allocated
+     * for the LOCAL lattice volume (Random.cu, sized by _HC_Volume at init); under
+     * the temporary global context the fixer kernels index them by GLOBAL site
+     * index -> out-of-bounds reads -> NaN (verified on CGaugeFixingRandom -n2:
+     * m_pG nan 324/73728). Enter saves the local arrays and rebuilds all enabled
+     * types at the global volume (_deviceGlobalSiteSeedIndex degenerates to
+     * identity there because MGEnter zeroes the offsets, so the reseeded states
+     * are globally consistent); Exit restores the local arrays.
+     */
+    void EnterGlobalContext();
+    void ExitGlobalContext();
+#endif
+
     /**
     * Note that this gives [0, 1), and curand_uniform gives (0, 1]
     */
-    __device__ __inline__ Real _deviceRandomF(UINT fatIndex) const
+    __device__ __inline__ Real _deviceRandomF(UINT linkIndex) const
     {
         switch (m_eRandomType)
         {
             case ER_Schrage:
-                return AM * _deviceRandomUISchrage(fatIndex);
+                return AM * _deviceRandomUISchrage(linkIndex);
+#if _CLG_USE_MRG32K3A
             case ER_MRG32K3A:
-                return 1 - curand_uniform(&(m_pDeviceRandStatesMRG[fatIndex]));
+                return 1 - curand_uniform(&(m_pDeviceRandStatesMRG[linkIndex]));
+#endif
+#if _CLG_USE_PHILOX4
             case ER_PHILOX4_32_10:
-                return 1 - curand_uniform(&(m_pDeviceRandStatesPhilox[fatIndex]));
+                return 1 - curand_uniform(&(m_pDeviceRandStatesPhilox[linkIndex]));
+#endif
+#if _CLG_USE_QUASI_SOBOL32
             case ER_QUASI_SOBOL32:
-                return 1 - curand_uniform(&(m_pDeviceRandStatesSobol32[(fatIndex / m_uiFatIdDivide)]));
+                return 1 - curand_uniform(&(m_pDeviceRandStatesSobol32[_deviceGetSiteFromLink(linkIndex)]));
+#endif
+#if _CLG_USE_SCRAMBLED_SOBOL32
             case ER_SCRAMBLED_SOBOL32:
-                return 1 - curand_uniform(&(m_pDeviceRandStatesScrambledSobol32[fatIndex / m_uiFatIdDivide]));
+                return 1 - curand_uniform(&(m_pDeviceRandStatesScrambledSobol32[_deviceGetSiteFromLink(linkIndex)]));
+#endif
             case ER_XORWOW:
             default:
-                return 1 - curand_uniform(&(m_pDeviceRandStatesXORWOW[fatIndex / m_uiFatIdDivide]));
+                return 1 - curand_uniform(&(m_pDeviceRandStatesXORWOW[_deviceGetSiteFromLink(linkIndex)]));
         }
 
         //return 0;
     }
+
+#if !_CLG_DOUBLEFLOAT
+    __device__ __inline__ DOUBLE _deviceRandomDOUBLE(UINT linkIndex) const
+    {
+        switch (m_eRandomType)
+        {
+        case ER_Schrage:
+            return AMD * _deviceRandomUISchrage(linkIndex);
+#if _CLG_USE_MRG32K3A
+        case ER_MRG32K3A:
+            return 1.0 - curand_uniform(&(m_pDeviceRandStatesMRG[linkIndex]));
+#endif
+#if _CLG_USE_PHILOX4
+        case ER_PHILOX4_32_10:
+            return 1.0 - curand_uniform(&(m_pDeviceRandStatesPhilox[linkIndex]));
+#endif
+#if _CLG_USE_QUASI_SOBOL32
+        case ER_QUASI_SOBOL32:
+            return 1.0 - curand_uniform(&(m_pDeviceRandStatesSobol32[_deviceGetSiteFromLink(linkIndex)]));
+#endif
+#if _CLG_USE_SCRAMBLED_SOBOL32
+        case ER_SCRAMBLED_SOBOL32:
+            return 1.0 - curand_uniform(&(m_pDeviceRandStatesScrambledSobol32[_deviceGetSiteFromLink(linkIndex)]));
+#endif
+        case ER_XORWOW:
+        default:
+            return 1.0 - curand_uniform(&(m_pDeviceRandStatesXORWOW[_deviceGetSiteFromLink(linkIndex)]));
+        }
+
+        //return 0;
+    }
+#endif
 
     /**
     * Although in bridge++, it says the deviation is 1/_sqrt(2)
@@ -185,14 +261,26 @@ public:
         return _make_cuComplex(_deviceRandomF(fatIndex) * F(2.0) - F(1.0), _deviceRandomF(fatIndex) * F(2.0) - F(1.0));
     }
 
+    /**
+    * Box-Muller method:
+    * z0 = sqrt(-2 ln u1) cos(2pi u2)
+    * z1 = sqrt(-2 ln u1) sin(2pi u2)
+    * they are two independent standard normal random variables
+    * 
+    * If one want exp(-x^2) distributed, just simply times 1/sqrt(2)
+    */
     __device__ __inline__ CLGComplex _deviceRandomGaussC(UINT fatIndex) const
     {
         const Real f1 = _deviceRandomF(fatIndex);
         const Real f2 = _deviceRandomF(fatIndex) * PI2;
 
         const Real oneMinusf1 = F(1.0) - f1;
-        const Real inSqrt = -F(2.0) * _log(oneMinusf1 > F(0.0) ? oneMinusf1 : (_CLG_FLT_MIN));
-        const Real amplitude = (inSqrt > F(0.0) ? _sqrt(inSqrt) : F(0.0)) * InvSqrt2;
+        //const Real inSqrt = -F(2.0) * _log(oneMinusf1 > F(0.0) ? oneMinusf1 : (_CLG_FLT_MIN));
+        //const Real amplitude = (inSqrt > F(0.0) ? _sqrt(inSqrt) : F(0.0)) * InvSqrt2;
+        //it seems that, we do not need to times InvSqrt2 here, just remove the F(2.0) above
+        const Real inSqrt = -_log(oneMinusf1 > F(0.0) ? oneMinusf1 : (_CLG_FLT_MIN));
+        const Real amplitude = (inSqrt > F(0.0) ? _sqrt(inSqrt) : F(0.0));
+
         return _make_cuComplex(_cos(f2) * amplitude, _sin(f2) * amplitude);
     }
 
@@ -235,24 +323,65 @@ public:
     FLOAT m_hostBuffer[1];
     curandGenerator_t m_HGen;
     ERandom m_eRandomType;
-    UINT m_uiFatIdDivide;
+    //UINT m_uiFatIdDivide;
 
 protected:
 
     void InitialStatesXORWOW(UINT uiSeed);
+#if _CLG_USE_PHILOX4
     void InitialStatesPhilox(UINT uiSeed);
+#endif
+#if _CLG_USE_MRG32K3A
     void InitialStatesMRG(UINT uiSeed);
+#endif
+#if _CLG_USE_QUASI_SOBOL32
     void InitialStatesSobol32(UINT uiSeed);
+#endif
     void InitialStatesScrambledSobol32(UINT uiSeed);
 
-    curandState* m_pDeviceRandStatesXORWOW;
-    curandStatePhilox4_32_10_t* m_pDeviceRandStatesPhilox;
-    curandStateMRG32k3a* m_pDeviceRandStatesMRG;
+#if _CLG_MULTI_GPU
+    //P4-2.5 fix: saved LOCAL (decomposed) state arrays while EnterGlobalContext
+    //holds the temporary GLOBAL ones; ExitGlobalContext restores them.
+    curandState* m_pSavedRandStatesXORWOW;
+#if _CLG_USE_PHILOX4
+    curandStatePhilox4_32_10_t* m_pSavedRandStatesPhilox;
+#endif
+#if _CLG_USE_MRG32K3A
+    curandStateMRG32k3a* m_pSavedRandStatesMRG;
+#endif
+#if _CLG_USE_QUASI_SOBOL32
+    curandStateSobol32* m_pSavedRandStatesSobol32;
+#endif
+#if _CLG_USE_SCRAMBLED_SOBOL32
+    curandStateScrambledSobol32* m_pSavedRandStatesScrambledSobol32;
+#endif
+#if _CLG_USE_QUASI_SOBOL32 || _CLG_USE_SCRAMBLED_SOBOL32
+    curandDirectionVectors32_t* m_pSavedSobolDirVec;
+#endif
+#if _CLG_USE_SCRAMBLED_SOBOL32
+    UINT* m_pSavedSobelConsts;
+#endif
+#endif
 
-    curandStateSobol32* m_pDeviceRandStatesSobol32;
+    curandState* m_pDeviceRandStatesXORWOW;
+#if _CLG_USE_PHILOX4
+    curandStatePhilox4_32_10_t* m_pDeviceRandStatesPhilox;
+#endif
+#if _CLG_USE_MRG32K3A
+    curandStateMRG32k3a* m_pDeviceRandStatesMRG;
+#endif
+
+#if _CLG_USE_QUASI_SOBOL32 || _CLG_USE_SCRAMBLED_SOBOL32
     curandDirectionVectors32_t* m_pDeviceSobolDirVec;
     UINT* m_pDeviceSobelConsts;
+#endif
+
+#if _CLG_USE_QUASI_SOBOL32
+    curandStateSobol32* m_pDeviceRandStatesSobol32;
+#endif
+#if _CLG_USE_SCRAMBLED_SOBOL32
     curandStateScrambledSobol32* m_pDeviceRandStatesScrambledSobol32;
+#endif
 
 #pragma region Schrage
 
@@ -270,6 +399,18 @@ public:
         devicePtr[uiFatIndex] = (1664525UL * (uiFatIndex + uiSeed) + 1013904223UL) & 0xffffffffUL;
     }
 
+    /**
+    * Host-side Schrage draw, seeded by RandomSeed so it is reproducible across
+    * processes (unlike HostRandomF which is std::random_device-seeded). Made
+    * public so CHMC can draw its Metropolis rand from a rank-invariant stream
+    * under _CLG_MULTI_GPU.
+    */
+    __host__ __inline__ UINT GetRandomUISchrage()
+    {
+        m_uiHostSeed = (1664525UL * m_uiHostSeed + 1013904223UL) & 0xffffffffUL;
+        return m_uiHostSeed;
+    }
+
 protected:
 
     void InitialTableSchrage(UINT uiSeed);
@@ -280,12 +421,6 @@ protected:
         return m_pDeviceSeedTable[fatIndex];
     }
 
-    __host__ __inline__ UINT GetRandomUISchrage()
-    {
-        m_uiHostSeed = (1664525UL * m_uiHostSeed + 1013904223UL) & 0xffffffffUL;
-        return m_uiHostSeed;
-    }
-
     UINT m_uiHostSeed;
 
 #pragma endregion
@@ -293,6 +428,12 @@ protected:
 };
 
 __DefineRandomFuncion(Real, F)
+
+#if !_CLG_DOUBLEFLOAT
+__DefineRandomFuncion(DOUBLE, DOUBLE)
+#else
+#define _deviceRandomDOUBLE(fatidx) (static_cast<DOUBLE>(_deviceRandomF(fatidx)))
+#endif
 
 __DefineRandomFuncion(Real, GaussF)
 

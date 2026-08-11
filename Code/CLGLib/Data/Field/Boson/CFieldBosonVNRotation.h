@@ -7,6 +7,8 @@
 // REVISION:
 //  [07/13/2024 nbale]
 //=============================================================================
+#pragma once
+
 #include "CFieldBosonVN.h"
 
 #define __DEFINE_ROTATION_BOSON(N) \
@@ -114,7 +116,7 @@ public:
     }
 
     DOUBLE m_fOmega;
-    INT* m_pDevicePath;
+    SCHAR* m_pDevicePath;
     UBOOL m_bShiftCenter;
     _deviceCoeffFunctionPointerTwoSites m_pfCx;
     _deviceCoeffFunctionPointerTwoSites m_pfCy;
@@ -166,7 +168,7 @@ public:
 
 #pragma region +2 Re[Omega y pt px ]
 
-        INT hostPath[2] = { 1, 4 };
+        SCHAR hostPath[2] = { 1, 4 };
         CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyPathBuffer(m_pDevicePath, hostPath, 2);
         this->OneLinkForceGauge(
             (const deviceDataGauge*)gauge->GetData(),
@@ -414,7 +416,7 @@ protected:
 #pragma region +2 Re[Omega y pt px ]
 
         //====== +2 Re[Omega y pt px ]
-        INT hostPath[2] = { 1, 4 };
+        SCHAR hostPath[2] = { 1, 4 };
         CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyPathBuffer(m_pDevicePath, hostPath, 2);
         this->OneLink(
             pSourceVN->m_pDeviceData,
@@ -648,11 +650,22 @@ public:
 
 __DEFINE_ROTATION_BOSON(2)
 __DEFINE_ROTATION_BOSON(3)
+
+#if _CLG_SU4_BOSON
 __DEFINE_ROTATION_BOSON(4)
+#endif
+#if _CLG_SU5_BOSON
 __DEFINE_ROTATION_BOSON(5)
+#endif
+#if _CLG_SU6_BOSON
 __DEFINE_ROTATION_BOSON(6)
+#endif
+#if _CLG_SU7_BOSON
 __DEFINE_ROTATION_BOSON(7)
+#endif
+#if _CLG_SU8_BOSON
 __DEFINE_ROTATION_BOSON(8)
+#endif
 
 __END_NAMESPACE
 

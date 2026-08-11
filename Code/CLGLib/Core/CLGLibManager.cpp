@@ -5,15 +5,21 @@
 // This is the class for global start-up, control, shut-down
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/3/2018 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "Update/CStapleCache.h"
 
 #define __CheckTag(tagname,...) iTag = 0; if (params.FetchValueINT(tagname, iTag) && (0 != iTag)) {__VA_ARGS__;}
 
 #define __FetchIntWithDefaultSub(paramname, tagname, defaultv) if (!paramname.FetchValueINT(tagname, iVaules)) { iVaules = defaultv; }
 
+#define __FetchRealWithDefaultSub(paramname, tagname, defaultv) if (!paramname.FetchValueReal(tagname, fValues)) { fValues = defaultv; }
+
 #define __FetchIntWithDefault(tagname, defaultv) __FetchIntWithDefaultSub(params, tagname, defaultv)
+
+#define __FetchRealWithDefault(tagname, defaultv) __FetchRealWithDefaultSub(params, tagname, defaultv)
 
 #define __FetchStringWithDefaultSub(paramname, tagname, defaultv) if (!paramname.FetchStringValue(tagname, sValues)) { sValues = defaultv; }
 
@@ -51,27 +57,29 @@ void CCLGLibManager::SetupLog(CParameters &params)
 
 void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
 {
+    //Improve-1: every (re)bake of the lattice/process-grid/halo constants is a
+    //new layout generation; handles Bound earlier snapshot the old one and
+    //their halos must not be reused (multi-GPU-improve1.md 3.1).
+    ++m_ullLayoutGeneration;
+
     INT iVaules = 0;
+    Real fValues = F(0.0);
     CCString sValues;
 
 #pragma region Lattice Size and Threads
 
     __FetchIntWithDefault(_T("Dim"), 4);
-    assert(iVaules > 1 && iVaules < 5);
+    appAssert(iVaules > 1 && iVaules < 5);
     m_InitialCache.constIntegers[ECI_Dim] = static_cast<UINT>(iVaules);
 
     __FetchIntWithDefault(_T("Dir"), 4);
-    assert(iVaules > 1);
+    appAssert(iVaules > 1);
     m_InitialCache.constIntegers[ECI_Dir] = static_cast<UINT>(iVaules);
 
-#if _CLG_DEBUG
     __FetchIntWithDefault(_T("MaxThreadPerBlock"), _CLG_LAUNCH_MAX_THREAD);
-#else
-    __FetchIntWithDefault(_T("MaxThreadPerBlock"), _CLG_LAUNCH_MAX_THREAD);
-#endif
     if (iVaules > 0)
     {
-        CCommonData::m_uiMaxThreadPerBlock = static_cast<UINT>(iVaules);
+        CCommonData::m_uiMaxThreadPerBlock = iVaules;
     }
 
     TArray<INT> intValues;
@@ -137,12 +145,100 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     }
 #endif
 
+    //==================================
+    // multi-GPU: read and validate the process grid against the GLOBAL lattice.
+    // Phase 0 only validates and records the topology; the constants below are
+    // still the global lattice. Switching them to per-rank sub-lattice sizes is
+    // Phase 1 (see Docs/MultiGPU-Plan.md).
+    //==================================
+    {
+        UINT uiGlobalLattice[4] = {
+            static_cast<UINT>(intValues[0]), static_cast<UINT>(intValues[1]),
+            static_cast<UINT>(intValues[2]), static_cast<UINT>(intValues[3]) };
+        UINT uiGpuGrid[4] = { 1, 1, 1, 1 };
+
+        TArray<INT> gridValues;
+        if (params.FetchValueArrayINT(_T("GpuGrid"), gridValues) && gridValues.Num() >= 4)
+        {
+            for (UINT i = 0; i < 4; ++i)
+            {
+                uiGpuGrid[i] = static_cast<UINT>(gridValues[i] < 1 ? 1 : gridValues[i]);
+            }
+        }
+
+        //Halo width: widest stencil reach in one direction. Naik (HISQ) needs 2,
+        //so be conservative here rather than guessing small (section 8.3).
+        UINT uiHaloWidth = 2;
+        INT iHaloWidth = 0;
+        if (params.FetchValueINT(_T("HaloWidth"), iHaloWidth))
+        {
+            //Improve-1 (multi-GPU-improve1.md 3.8): an explicitly configured
+            //width must be inside [1, kCacheIndexEdge] -- the boundary/index
+            //bakes cover at most kCacheIndexEdge layers, so a wider halo could
+            //never be filled. Out-of-range used to fall back to the default
+            //silently, which hides a mis-configured run; fail instead. (An
+            //absent key still keeps the default above.)
+            if (iHaloWidth < 1 || iHaloWidth > CIndexData::kCacheIndexEdge)
+            {
+                appCrucial(_T("HaloWidth %d is out of range [1, %d]; the index bake cannot represent such a halo.\n"),
+                    iHaloWidth, static_cast<INT>(CIndexData::kCacheIndexEdge));
+                _FAIL_EXIT;
+            }
+            uiHaloWidth = static_cast<UINT>(iHaloWidth);
+        }
+
+        if (NULL != m_pComm && !m_pComm->SetGpuGrid(uiGpuGrid, uiGlobalLattice, uiHaloWidth))
+        {
+            //SetGpuGrid already reported which hard constraint failed. An invalid
+            //decomposition would silently produce wrong physics, so stop here
+            //rather than continue. (This function returns void.)
+            appCrucial(_T("GpuGrid validation failed, cannot continue.\n"));
+            _FAIL_EXIT;
+        }
+
+        //Phase 1: remember the GLOBAL lattice, then shrink intValues to this
+        //rank's SUB-LATTICE. Everything below (ECI_Lx, volumes, strides, thread
+        //decomposition, field allocation) is then automatically per-rank.
+        //The global sizes stay available for position-dependent physics and for
+        //gather/scatter -- see Docs/MultiGPU-Plan.md section 1.4-R1.
+        for (UINT i = 0; i < 4; ++i)
+        {
+            m_InitialCache.constIntegers[ECI_GlobalLx + i] = uiGlobalLattice[i];
+            m_InitialCache.constIntegers[ECI_GpuGridX + i] = uiGpuGrid[i];
+            m_InitialCache.constIntegers[ECI_GlobalOffsetX + i] =
+                (NULL == m_pComm) ? 0 : m_pComm->GlobalOffset()[i];
+            intValues[i] = static_cast<INT>(uiGlobalLattice[i] / uiGpuGrid[i]);
+        }
+
+        //Improve-1 (multi-GPU-improve1.md 3.8): on a split direction the halo
+        //is the ONLY source of cross-rank neighbours, so the sub-lattice must
+        //be at least HaloWidth long there; a thinner slice would need the same
+        //neighbour rank on both sides (or skip a rank entirely) and the
+        //face-exchange bookkeeping breaks.
+        for (UINT i = 0; i < 4; ++i)
+        {
+            if (uiGpuGrid[i] > 1 && uiGlobalLattice[i] / uiGpuGrid[i] < uiHaloWidth)
+            {
+                appCrucial(_T("Split direction %d: local length %d (= global %d / grid %d) is smaller than HaloWidth %d.\n"),
+                    static_cast<INT>(i), static_cast<INT>(uiGlobalLattice[i] / uiGpuGrid[i]),
+                    static_cast<INT>(uiGlobalLattice[i]), static_cast<INT>(uiGpuGrid[i]),
+                    static_cast<INT>(uiHaloWidth));
+                _FAIL_EXIT;
+            }
+        }
+
+        m_InitialCache.constIntegers[ECI_HaloWidth] = uiHaloWidth;
+    }
+
     m_InitialCache.constIntegers[ECI_Lx] = static_cast<UINT>(intValues[0]);
     m_InitialCache.constIntegers[ECI_Ly] = static_cast<UINT>(intValues[1]);
     m_InitialCache.constIntegers[ECI_Lz] = static_cast<UINT>(intValues[2]);
     m_InitialCache.constIntegers[ECI_Lt] = static_cast<UINT>(intValues[3]);
     m_InitialCache.constIntegers[ECI_Volume] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[2] * intValues[3]);
     m_InitialCache.constIntegers[ECI_Volume_xyz] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[2]);
+    m_InitialCache.constIntegers[ECI_Volume_xyt] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[3]);
+    m_InitialCache.constIntegers[ECI_Volume_xzt] = static_cast<UINT>(intValues[0] * intValues[2] * intValues[3]);
+    m_InitialCache.constIntegers[ECI_Volume_yzt] = static_cast<UINT>(intValues[1] * intValues[2] * intValues[3]);
     m_InitialCache.constIntegers[ECI_MultX] = static_cast<UINT>(intValues[1] * intValues[2] * intValues[3]);
     m_InitialCache.constIntegers[ECI_MultY] = static_cast<UINT>(intValues[2] * intValues[3]);
     m_InitialCache.constIntegers[ECI_MultZ] = static_cast<UINT>(intValues[3]);
@@ -161,31 +257,36 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
             m_InitialCache.constSignedIntegers[ECSI_CenterZ] = intValues[2];
             m_InitialCache.constSignedIntegers[ECSI_CenterT] = intValues[3];
             SSmallInt4 sCenter(
-                static_cast<SBYTE>(intValues[0]),
-                static_cast<SBYTE>(intValues[1]),
-                static_cast<SBYTE>(intValues[2]),
-                static_cast<SBYTE>(intValues[3]));
+                static_cast<SCHAR>(intValues[0]),
+                static_cast<SCHAR>(intValues[1]),
+                static_cast<SCHAR>(intValues[2]),
+                static_cast<SCHAR>(intValues[3]));
             m_InitialCache.constIntegers[ECI_Center] = sCenter.m_uiData;
         }
     }
     else
     {
-        m_InitialCache.constSignedIntegers[ECSI_CenterX] = static_cast<INT>(m_InitialCache.constIntegers[ECI_Lx] / 2);;
-        m_InitialCache.constSignedIntegers[ECSI_CenterY] = static_cast<INT>(m_InitialCache.constIntegers[ECI_Ly] / 2);;
-        m_InitialCache.constSignedIntegers[ECSI_CenterZ] = static_cast<INT>(m_InitialCache.constIntegers[ECI_Lz] / 2);;
-        m_InitialCache.constSignedIntegers[ECSI_CenterT] = static_cast<INT>(m_InitialCache.constIntegers[ECI_Lt] / 2);;
+        //Default rotation center = centre of the GLOBAL lattice. Under a
+        //multi-GPU decomposition ECI_Lx.. are local lengths, so using them
+        //here would give every rank its own local centre (wrong force
+        //coefficients for position-dependent actions, e.g. Acceleration g*t).
+        m_InitialCache.constSignedIntegers[ECSI_CenterX] = static_cast<INT>(m_InitialCache.constIntegers[ECI_GlobalLx] / 2);;
+        m_InitialCache.constSignedIntegers[ECSI_CenterY] = static_cast<INT>(m_InitialCache.constIntegers[ECI_GlobalLy] / 2);;
+        m_InitialCache.constSignedIntegers[ECSI_CenterZ] = static_cast<INT>(m_InitialCache.constIntegers[ECI_GlobalLz] / 2);;
+        m_InitialCache.constSignedIntegers[ECSI_CenterT] = static_cast<INT>(m_InitialCache.constIntegers[ECI_GlobalLt] / 2);;
         SSmallInt4 sCenter(
-            static_cast<SBYTE>(m_InitialCache.constSignedIntegers[ECSI_CenterX]),
-            static_cast<SBYTE>(m_InitialCache.constSignedIntegers[ECSI_CenterY]),
-            static_cast<SBYTE>(m_InitialCache.constSignedIntegers[ECSI_CenterZ]),
-            static_cast<SBYTE>(m_InitialCache.constSignedIntegers[ECSI_CenterT]));
+            static_cast<SCHAR>(m_InitialCache.constSignedIntegers[ECSI_CenterX]),
+            static_cast<SCHAR>(m_InitialCache.constSignedIntegers[ECSI_CenterY]),
+            static_cast<SCHAR>(m_InitialCache.constSignedIntegers[ECSI_CenterZ]),
+            static_cast<SCHAR>(m_InitialCache.constSignedIntegers[ECSI_CenterT]));
         m_InitialCache.constIntegers[ECI_Center] = sCenter.m_uiData;
     }
 
     m_InitialCache.constIntegers[ECI_PlaqutteCount] = m_InitialCache.constIntegers[ECI_Volume] * m_InitialCache.constIntegers[ECI_Dir] * (m_InitialCache.constIntegers[ECI_Dir] - 1) / 2;
     m_InitialCache.constIntegers[ECI_LinkCount] = m_InitialCache.constIntegers[ECI_Volume] * m_InitialCache.constIntegers[ECI_Dir];
 
-    m_InitialCache.constFloats[ECF_InverseSqrtLink16] = F(1.0) / _sqrt(F(16.0) * m_InitialCache.constIntegers[ECI_LinkCount]);
+    __FetchRealWithDefault(_T("GaugeMomentumFactor"), F(1.0));
+    m_InitialCache.constFloats[ECF_GaugeMomentumFactor] = fValues;
     
     UBOOL bAutoDecompose = TRUE;
     __FetchIntWithDefault(_T("ThreadAutoDecompose"), 1);
@@ -263,11 +364,82 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
         , m_InitialCache.constIntegers[ECI_DecompLz]
     );
 
+    const UINT constrainx = min(deviceConstraints[0], deviceConstraints[1]);
+    const UINT threadsneed = m_InitialCache.constIntegers[ECI_Volume];
+    const UINT cdir = m_InitialCache.constIntegers[ECI_Dir];
+    UINT uib = threadsneed > constrainx ? appCeil(threadsneed, constrainx) : 1;
+    UINT uit = threadsneed > constrainx ? appCeil(threadsneed, uib) : threadsneed;
+    UINT uitd = cdir * (constrainx / cdir);
+    UINT uibd = (threadsneed * cdir + uitd - 1) / uitd;
+    m_InitialCache.constIntegers[ECI_DecompAllBlock] = uib;
+    m_InitialCache.constIntegers[ECI_DecompAllThread] = uit;
+    m_InitialCache.constIntegers[ECI_DecompAllBlockDir] = uibd;
+    m_InitialCache.constIntegers[ECI_DecompAllThreadDir] = uitd;
+
+    const UINT threadsneedhalf = m_InitialCache.constIntegers[ECI_Volume] / 2;
+    m_InitialCache.constIntegers[ECI_VolumeHalf] = threadsneedhalf;
+    uib = threadsneedhalf > constrainx ? appCeil(threadsneedhalf, constrainx) : 1;
+    uit = threadsneedhalf > constrainx ? appCeil(threadsneedhalf, uib) : threadsneedhalf;
+    uitd = cdir * (constrainx / cdir);
+    uibd = (threadsneedhalf * cdir + uitd - 1) / uitd;
+    m_InitialCache.constIntegers[ECI_DecompAllBlockHalf] = uib;
+    m_InitialCache.constIntegers[ECI_DecompAllThreadHalf] = uit;
+    m_InitialCache.constIntegers[ECI_DecompAllBlockDirHalf] = uibd;
+    m_InitialCache.constIntegers[ECI_DecompAllThreadDirHalf] = uitd;
+
+    TArray<UINT> latticeDim2;
+    latticeDim2.AddItem(m_InitialCache.constIntegers[ECI_Lx]);
+    latticeDim2.AddItem(m_InitialCache.constIntegers[ECI_Ly]);
+    latticeDim2.AddItem(m_InitialCache.constIntegers[ECI_Lz]);
+    TArray <UINT> decomp2 = _getDecompose(deviceConstraints, latticeDim2);
+    m_InitialCache.constIntegers[ECI_DecompX3D] = decomp2[0];
+    m_InitialCache.constIntegers[ECI_DecompY3D] = decomp2[1];
+    m_InitialCache.constIntegers[ECI_DecompZ3D] = decomp2[2];
+    m_InitialCache.constIntegers[ECI_DecompLx3D] = decomp2[3];
+    m_InitialCache.constIntegers[ECI_DecompLy3D] = decomp2[4];
+    m_InitialCache.constIntegers[ECI_DecompLz3D] = decomp2[5];
+
+    TArray<UINT> latticeDim3;
+    latticeDim3.AddItem(m_InitialCache.constIntegers[ECI_Lx]);
+    latticeDim3.AddItem(m_InitialCache.constIntegers[ECI_Ly]);
+    latticeDim3.AddItem(m_InitialCache.constIntegers[ECI_Lt]);
+    TArray <UINT> decomp3 = _getDecompose(deviceConstraints, latticeDim3);
+    m_InitialCache.constIntegers[ECI_DecompX3DXYT] = decomp3[0];
+    m_InitialCache.constIntegers[ECI_DecompY3DXYT] = decomp3[1];
+    m_InitialCache.constIntegers[ECI_DecompZ3DXYT] = decomp3[2];
+    m_InitialCache.constIntegers[ECI_DecompLx3DXYT] = decomp3[3];
+    m_InitialCache.constIntegers[ECI_DecompLy3DXYT] = decomp3[4];
+    m_InitialCache.constIntegers[ECI_DecompLz3DXYT] = decomp3[5];
+
+    TArray<UINT> latticeDim4;
+    latticeDim4.AddItem(m_InitialCache.constIntegers[ECI_Lx]);
+    latticeDim4.AddItem(m_InitialCache.constIntegers[ECI_Lz]);
+    latticeDim4.AddItem(m_InitialCache.constIntegers[ECI_Lt]);
+    TArray <UINT> decomp4 = _getDecompose(deviceConstraints, latticeDim4);
+    m_InitialCache.constIntegers[ECI_DecompX3DXZT] = decomp4[0];
+    m_InitialCache.constIntegers[ECI_DecompY3DXZT] = decomp4[1];
+    m_InitialCache.constIntegers[ECI_DecompZ3DXZT] = decomp4[2];
+    m_InitialCache.constIntegers[ECI_DecompLx3DXZT] = decomp4[3];
+    m_InitialCache.constIntegers[ECI_DecompLy3DXZT] = decomp4[4];
+    m_InitialCache.constIntegers[ECI_DecompLz3DXZT] = decomp4[5];
+
+    TArray<UINT> latticeDim5;
+    latticeDim5.AddItem(m_InitialCache.constIntegers[ECI_Ly]);
+    latticeDim5.AddItem(m_InitialCache.constIntegers[ECI_Lz]);
+    latticeDim5.AddItem(m_InitialCache.constIntegers[ECI_Lt]);
+    TArray <UINT> decomp5 = _getDecompose(deviceConstraints, latticeDim5);
+    m_InitialCache.constIntegers[ECI_DecompX3DYZT] = decomp5[0];
+    m_InitialCache.constIntegers[ECI_DecompY3DYZT] = decomp5[1];
+    m_InitialCache.constIntegers[ECI_DecompZ3DYZT] = decomp5[2];
+    m_InitialCache.constIntegers[ECI_DecompLx3DYZT] = decomp5[3];
+    m_InitialCache.constIntegers[ECI_DecompLy3DYZT] = decomp5[4];
+    m_InitialCache.constIntegers[ECI_DecompLz3DYZT] = decomp5[5];
+
 #pragma endregion
 
 #pragma region Fill constant table
 
-    __FetchIntWithDefault(_T("RandomSeed"), 1234567);
+    __FetchIntWithDefault(_T("RandomSeed"), 81192);
     m_InitialCache.constIntegers[ECI_RandomSeed] = static_cast<UINT>(iVaules);
     CCString sRandomSeedType;
     if (params.FetchStringValue(_T("RandomSeedType"), sRandomSeedType))
@@ -279,17 +451,17 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
         }
     }
 
-    __FetchIntWithDefault(_T("ExponentialPrecision"), 0);
+    __FetchIntWithDefault(_T("ExponentialPrecision"), 8);
 #if !_CLG_DOUBLEFLOAT
-    if (iVaules < 8)
+    if (1 != iVaules && iVaules < 8)
     {
-        appCrucial(_T("Single point float generally does not support quick exponential.\n You may need to set ExponentialPrecision : n with n >= 8\n"));
+        appWarning(_T("Single point float generally does not support quick exponential.\n You may need to set ExponentialPrecision : n with n >= 8\n"));
     }
 #endif
     m_InitialCache.constIntegers[ECI_ExponentPrecision] = static_cast<UINT>(iVaules);
 
-    __FetchIntWithDefault(_T("CacheStaple"), 1);
-    CCommonData::m_bStoreStaple = (0 != iVaules);
+    //__FetchIntWithDefault(_T("CacheStaple"), 0);
+    //CCommonData::m_bStoreStaple = (0 != iVaules);
 
     __FetchIntWithDefault(_T("StochasticGaussian"), 0);
     CCommonData::m_bStochasticGaussian = (0 != iVaules);
@@ -308,6 +480,9 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
 
     __FetchIntWithDefault(_T("BosonFieldCount"), 0);
     m_InitialCache.constIntegers[ECI_BosonFieldCount] = static_cast<UINT>(iVaules);
+
+    __FetchIntWithDefault(_T("Tensor2FieldCount"), 0);
+    m_InitialCache.constIntegers[ECI_Tensor2FieldCount] = static_cast<UINT>(iVaules);
 
     __FetchIntWithDefault(_T("OtherGaugeFieldCount"), 0);
     m_InitialCache.constIntegers[ECI_OtherGaugeField] = static_cast<UINT>(iVaules);
@@ -336,6 +511,12 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     m_InitialCache.constIntegers[ECI_SummationDecompose] = static_cast<UINT>(iVaules);
     appDetailed(_T("Summation decompose: %d\n"), m_InitialCache.constIntegers[ECI_SummationDecompose]);
 
+    __FetchIntWithDefault(_T("Profiler"), 0);
+    m_InitialCache.constIntegers[ECI_Profiler] = static_cast<UINT>(iVaules);
+
+    __FetchIntWithDefault(_T("MILC_StaggeredPhase"), 0);
+    m_InitialCache.constIntegers[ECI_MILC_StaggeredPhase] = static_cast<UINT>(iVaules);
+
     memcpy(m_pCudaHelper->m_ConstIntegers, m_InitialCache.constIntegers, sizeof(UINT) * kContentLength);
     memcpy(m_pCudaHelper->m_ConstSignedIntegers, m_InitialCache.constSignedIntegers, sizeof(INT)* kContentLength);
     memcpy(m_pCudaHelper->m_ConstFloats, m_InitialCache.constFloats, sizeof(Real) * kContentLength);
@@ -345,6 +526,7 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
 #pragma endregion
 
     m_pCudaHelper->CreateGammaMatrix();
+    _CHECKCUDA;
 }
 
 void CCLGLibManager::InitialRandom(CParameters &)
@@ -353,7 +535,7 @@ void CCLGLibManager::InitialRandom(CParameters &)
     //CCString sValues;
 
     m_pLatticeData->m_pRandom = new CRandom(m_InitialCache.constIntegers[ECI_RandomSeed], m_InitialCache.eR);
-    checkCudaErrors(cudaMalloc((void**)&(m_pLatticeData->m_pDeviceRandom), sizeof(CRandom)));
+    checkCudaErrors(__cudaMalloc((void**)&(m_pLatticeData->m_pDeviceRandom), sizeof(CRandom)));
     checkCudaErrors(cudaMemcpy(m_pLatticeData->m_pDeviceRandom, m_pLatticeData->m_pRandom, sizeof(CRandom), cudaMemcpyHostToDevice));
     appGeneral(_T("Create the %s random with seed:%d\n"), __ENUM_TO_STRING(ERandom, m_InitialCache.eR).c_str(), m_InitialCache.constIntegers[ECI_RandomSeed]);
 
@@ -391,6 +573,8 @@ CField* CCLGLibManager::CreateGaugeFields(class CParameters& params) const
 
     pGauge->m_byFieldId = byFieldId;
     pGauge->m_pOwner = m_pLatticeData;
+    //Improve-1: keep the halo handle's tag id in sync (identity unchanged).
+    if (NULL != pGauge->GetHaloBufferHandle()) { pGauge->GetHaloBufferHandle()->SetFieldId(byFieldId); }
     if (EFIT_ReadFromFile == eGaugeInitial)
     {
         CCString sFileType, sFileName;
@@ -413,10 +597,10 @@ CField* CCLGLibManager::CreateGaugeFields(class CParameters& params) const
     if (params.FetchValueArrayINT(_T("Period"), periodic))
     {
         SBoundCondition bc;
-        bc.m_sPeriodic.x = static_cast<SBYTE>(periodic[0]);
-        bc.m_sPeriodic.y = static_cast<SBYTE>(periodic[1]);
-        bc.m_sPeriodic.z = static_cast<SBYTE>(periodic[2]);
-        bc.m_sPeriodic.w = static_cast<SBYTE>(periodic[3]);
+        bc.m_sPeriodic.x = static_cast<SCHAR>(periodic[0]);
+        bc.m_sPeriodic.y = static_cast<SCHAR>(periodic[1]);
+        bc.m_sPeriodic.z = static_cast<SCHAR>(periodic[2]);
+        bc.m_sPeriodic.w = static_cast<SCHAR>(periodic[3]);
         m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
         checkCudaErrors(cudaDeviceSynchronize());
     }
@@ -435,7 +619,7 @@ CField* CCLGLibManager::CreateGaugeFields(class CParameters& params) const
     m_pLatticeData->m_pFieldMap.SetAt(byFieldId, pGauge);
     m_pLatticeData->m_pOtherFields.AddItem(pGauge);
     m_pLatticeData->m_eFieldInitialTypes.AddItem(eGaugeInitial);
-    m_pLatticeData->CreateFieldPool(byFieldId, 0);
+    //m_pLatticeData->CreateFieldPool(byFieldId, 0);
     checkCudaErrors(cudaDeviceSynchronize());
     appGeneral(_T("Create the gauge %s (field id %d) with initial: %s\n"), sGaugeClassName.c_str(), byFieldId, sValues.c_str());
     return pGauge;
@@ -470,6 +654,8 @@ CField* CCLGLibManager::CreateBosonFields(class CParameters& params) const
 
     pBoson->m_byFieldId = byFieldId;
     pBoson->m_pOwner = m_pLatticeData;
+    //Improve-1: keep the halo handle's tag id in sync (identity unchanged).
+    if (NULL != pBoson->GetHaloBufferHandle()) { pBoson->GetHaloBufferHandle()->SetFieldId(byFieldId); }
     //checkCudaErrors(cudaDeviceSynchronize());
     //pBoson->InitialField(eFieldInitial);
     //checkCudaErrors(cudaDeviceSynchronize());
@@ -482,10 +668,10 @@ CField* CCLGLibManager::CreateBosonFields(class CParameters& params) const
     if (params.FetchValueArrayINT(_T("Period"), periodic))
     {
         SBoundCondition bc;
-        bc.m_sPeriodic.x = static_cast<SBYTE>(periodic[0]);
-        bc.m_sPeriodic.y = static_cast<SBYTE>(periodic[1]);
-        bc.m_sPeriodic.z = static_cast<SBYTE>(periodic[2]);
-        bc.m_sPeriodic.w = static_cast<SBYTE>(periodic[3]);
+        bc.m_sPeriodic.x = static_cast<SCHAR>(periodic[0]);
+        bc.m_sPeriodic.y = static_cast<SCHAR>(periodic[1]);
+        bc.m_sPeriodic.z = static_cast<SCHAR>(periodic[2]);
+        bc.m_sPeriodic.w = static_cast<SCHAR>(periodic[3]);
         m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
         checkCudaErrors(cudaDeviceSynchronize());
     }
@@ -500,14 +686,76 @@ CField* CCLGLibManager::CreateBosonFields(class CParameters& params) const
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
-    __FetchIntWithDefault(_T("PoolNumber"), 0);
+    //__FetchIntWithDefault(_T("PoolNumber"), 0);
     //if (iVaules > 0)
     //{
-    m_pLatticeData->CreateFieldPool(byFieldId, iVaules);
+    //m_pLatticeData->CreateFieldPool(byFieldId, iVaules);
     checkCudaErrors(cudaDeviceSynchronize());
     //}
     appGeneral(_T("Create the boson field %s with id %d and initial: %s\n"), sBosonClassName.c_str(), byFieldId, sValues.c_str());
     return pBoson;
+}
+
+CField* CCLGLibManager::CreateTensor2Fields(class CParameters& params) const
+{
+    INT iVaules = 0;
+    CCString sValues;
+
+    CCString sTensor2ClassName;
+    __FetchStringWithDefault(_T("FieldName"), _T("CFieldTensor2SU3"));
+    sTensor2ClassName = sValues;
+    __FetchStringWithDefault(_T("FieldInitialType"), _T("EFIT_Random"));
+    const EFieldInitialType eFieldInitial = __STRING_TO_ENUM(EFieldInitialType, sValues);
+    checkCudaErrors(cudaDeviceSynchronize());
+    CBase* pTensor2Field = appCreate(sTensor2ClassName);
+    CFieldTensor2* pTensor2 = (NULL != pTensor2Field) ? (dynamic_cast<CFieldTensor2*>(pTensor2Field)) : NULL;
+    if (NULL == pTensor2)
+    {
+        appCrucial(_T("Unable to create the tensor2 field! with name %s!"), sTensor2ClassName.c_str());
+        return NULL;
+    }
+
+    __FetchIntWithDefault(_T("FieldId"), -1);
+    BYTE byFieldId = static_cast<BYTE>(iVaules);
+    if (byFieldId >= kMaxFieldCount || byFieldId <= 1 || m_pLatticeData->m_pFieldMap.Exist(byFieldId))
+    {
+        appCrucial(_T("Unable to create the tensor2 field! with wrong field ID %s %d! Using default: %d\n"), sTensor2ClassName.c_str(), byFieldId, m_byLoadingFieldId);
+        byFieldId = m_byLoadingFieldId;
+    }
+
+    pTensor2->m_byFieldId = byFieldId;
+    pTensor2->m_pOwner = m_pLatticeData;
+    //Improve-1: keep the halo handle's tag id in sync (identity unchanged).
+    if (NULL != pTensor2->GetHaloBufferHandle()) { pTensor2->GetHaloBufferHandle()->SetFieldId(byFieldId); }
+    pTensor2->InitialOtherParameters(params);
+    m_pLatticeData->m_pFieldMap.SetAt(byFieldId, pTensor2);
+    m_pLatticeData->m_pOtherFields.AddItem(pTensor2);
+    m_pLatticeData->m_pTensor2Field.AddItem(pTensor2);
+    m_pLatticeData->m_eFieldInitialTypes.AddItem(eFieldInitial);
+    TArray<INT> periodic;
+    if (params.FetchValueArrayINT(_T("Period"), periodic))
+    {
+        SBoundCondition bc;
+        bc.m_sPeriodic.x = static_cast<SCHAR>(periodic[0]);
+        bc.m_sPeriodic.y = static_cast<SCHAR>(periodic[1]);
+        bc.m_sPeriodic.z = static_cast<SCHAR>(periodic[2]);
+        bc.m_sPeriodic.w = static_cast<SCHAR>(periodic[3]);
+        m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
+        checkCudaErrors(cudaDeviceSynchronize());
+    }
+    else
+    {
+        SBoundCondition bc;
+        bc.m_sPeriodic.x = 1;
+        bc.m_sPeriodic.y = 1;
+        bc.m_sPeriodic.z = 1;
+        bc.m_sPeriodic.w = 1;
+        m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
+        checkCudaErrors(cudaDeviceSynchronize());
+    }
+
+    appGeneral(_T("Create the tensor2 field %s with id %d and initial: %s\n"), sTensor2ClassName.c_str(), byFieldId, sValues.c_str());
+    return pTensor2;
 }
 
 CField* CCLGLibManager::CreateFermionFields(class CParameters& params) const
@@ -539,6 +787,8 @@ CField* CCLGLibManager::CreateFermionFields(class CParameters& params) const
 
     pFermion->m_byFieldId = byFieldId;
     pFermion->m_pOwner = m_pLatticeData;
+    //Improve-1: keep the halo handle's tag id in sync (identity unchanged).
+    if (NULL != pFermion->GetHaloBufferHandle()) { pFermion->GetHaloBufferHandle()->SetFieldId(byFieldId); }
     //pFermion->InitialField(eFieldInitial);
     pFermion->InitialOtherParameters(params);
     m_pLatticeData->m_pFieldMap.SetAt(byFieldId, pFermion);
@@ -549,10 +799,10 @@ CField* CCLGLibManager::CreateFermionFields(class CParameters& params) const
     if (params.FetchValueArrayINT(_T("Period"), periodic))
     {
         SBoundCondition bc;
-        bc.m_sPeriodic.x = static_cast<SBYTE>(periodic[0]);
-        bc.m_sPeriodic.y = static_cast<SBYTE>(periodic[1]);
-        bc.m_sPeriodic.z = static_cast<SBYTE>(periodic[2]);
-        bc.m_sPeriodic.w = static_cast<SBYTE>(periodic[3]);
+        bc.m_sPeriodic.x = static_cast<SCHAR>(periodic[0]);
+        bc.m_sPeriodic.y = static_cast<SCHAR>(periodic[1]);
+        bc.m_sPeriodic.z = static_cast<SCHAR>(periodic[2]);
+        bc.m_sPeriodic.w = static_cast<SCHAR>(periodic[3]);
         m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
         checkCudaErrors(cudaDeviceSynchronize());
     }
@@ -567,10 +817,10 @@ CField* CCLGLibManager::CreateFermionFields(class CParameters& params) const
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
-    __FetchIntWithDefault(_T("PoolNumber"), 0);
+    //__FetchIntWithDefault(_T("PoolNumber"), 0);
     //if (iVaules > 0)
     //{
-        m_pLatticeData->CreateFieldPool(byFieldId, iVaules);
+        //m_pLatticeData->CreateFieldPool(byFieldId, iVaules);
     //}
     checkCudaErrors(cudaDeviceSynchronize());
     appGeneral(_T("Create the fermion field %s with id %d and initial: %s\n"), sFermionClassName.c_str(), byFieldId, sValues.c_str());
@@ -601,6 +851,7 @@ void CCLGLibManager::CreateBoundaryFields(class CParameters& params, const CCStr
     }
     __FetchIntWithDefault(_T("FieldId"), defaultId);
     const BYTE byFieldId = static_cast<BYTE>(iVaules);
+    m_pLatticeData->m_pAllBoundaryFields.AddItem(pBC);
     m_pLatticeData->m_pBoundaryFieldMap.SetAt(byFieldId, pBC);
     checkCudaErrors(cudaDeviceSynchronize());
     appGeneral(_T("Create the boundary field %s with initial: %s\n"), sFieldClassName.c_str(), sValues.c_str());
@@ -699,6 +950,11 @@ void CCLGLibManager::CreateUpdator(class CParameters& params) const
         pHMC->m_pIntegrator = integrator;
         m_pLatticeData->m_pUpdator = pHMC;
     }
+    else if (NULL != updator && EUT_Heatbath == updator->GetUpdatorType())
+    {
+        updator->Initial(m_pLatticeData, params);
+        m_pLatticeData->m_pUpdator = updator;
+    }
     else
     {
         appCrucial(_T("Failed to create Updator! s = %s"), sValues.c_str());
@@ -778,10 +1034,21 @@ void CCLGLibManager::CreateGaugeSmearing(class CParameters& params) const
 {
     CCString sSmearingName = _T("CGaugeSmearingAPEStout");
     params.FetchStringValue(_T("SmearingName"), sSmearingName);
-    m_pLatticeData->m_pGaugeSmearing = dynamic_cast<CGaugeSmearing*>(appCreate(sSmearingName));
-    if (NULL != m_pLatticeData->m_pGaugeSmearing)
+    CGaugeSmearing* pSmearing = dynamic_cast<CGaugeSmearing*>(appCreate(sSmearingName));
+    if (NULL != pSmearing)
     {
-        m_pLatticeData->m_pGaugeSmearing->Initial(m_pLatticeData, params);
+        pSmearing->Initial(m_pLatticeData, params);
+    }
+}
+
+void CCLGLibManager::CreateGaugeStapleCache(class CParameters& params) const
+{
+    CCString sStapleCacheName = _T("CStapleCacheSU3");
+    params.FetchStringValue(_T("StapleCacheName"), sStapleCacheName);
+    CStapleCache* pCache = dynamic_cast<CStapleCache*>(appCreate(sStapleCacheName));
+    if (NULL != pCache)
+    {
+        pCache->Initial(m_pLatticeData, params);
     }
 }
 
@@ -798,7 +1065,7 @@ void CCLGLibManager::CreateGaugeFixing(class CParameters& params) const
 
 void CCLGLibManager::InitialFieldBuffer() const
 {
-    assert(m_pLatticeData->m_eFieldInitialTypes.Num() == m_pLatticeData->m_pOtherFields.Num());
+    appAssert(m_pLatticeData->m_eFieldInitialTypes.Num() == m_pLatticeData->m_pOtherFields.Num());
     for (INT i = 0; i < m_pLatticeData->m_pOtherFields.Num(); ++i)
     {
         if (EFIT_ReadFromFile != m_pLatticeData->m_eFieldInitialTypes[i])
@@ -830,7 +1097,7 @@ void CCLGLibManager::InitialIndexBuffer() const
     checkCudaErrors(cudaGetLastError());
     if (m_pLatticeData->m_pOtherFields.Num() > 0)
     {
-        UBOOL bHasStaggeredFermion = FALSE;
+        //UBOOL bHasStaggeredFermion = FALSE;
         //UBOOL bPlaqCached = FALSE;
         for (BYTE i = 1; i < kMaxFieldCount; ++i)
         {
@@ -850,24 +1117,38 @@ void CCLGLibManager::InitialIndexBuffer() const
                 checkCudaErrors(cudaGetLastError());
             }
 
-            if (NULL != pf && !pf->IsGaugeField())
+            //move index is only used by the hopping of boson and fermion fields
+            if (NULL != pf && (pf->IsBosonField() || pf->IsFermionField()))
             {
                 m_pLatticeData->m_pIndex->BakeMoveIndex(m_pLatticeData->m_pIndexCache, i);
                 checkCudaErrors(cudaDeviceSynchronize());
                 checkCudaErrors(cudaGetLastError());
+                //if (NULL != dynamic_cast<const CFieldFermionKS*>(pf))
+                //{
+                //    bHasStaggeredFermion = TRUE;
+                //}
+
                 if (NULL != dynamic_cast<const CFieldFermionKS*>(pf))
                 {
-                    bHasStaggeredFermion = TRUE;
+                    m_pLatticeData->m_pIndex->BakeNaikTable(m_pLatticeData->m_pIndexCache, i);
+                    checkCudaErrors(cudaDeviceSynchronize());
+                    checkCudaErrors(cudaGetLastError());
                 }
             }
         }
-        if (bHasStaggeredFermion)
+        //if (bHasStaggeredFermion)
         {
+            //always bake it, so that we have even-odd as eta_5
             m_pLatticeData->m_pIndex->BakeEtaMuTable(m_pLatticeData->m_pIndexCache);
             checkCudaErrors(cudaDeviceSynchronize());
             checkCudaErrors(cudaGetLastError());
         }
     }
+
+    //m_pLatticeData->m_pIndex->BakeEvenOddTable(m_pLatticeData->m_pIndexCache);
+    //checkCudaErrors(cudaDeviceSynchronize());
+    //checkCudaErrors(cudaGetLastError());
+
     m_pLatticeData->m_pIndex->CalculateSiteCount(m_pLatticeData->m_pIndexCache);
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
@@ -882,11 +1163,43 @@ void CCLGLibManager::InitialIndexBuffer() const
 UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
 {
     //==================================
+    // multi-GPU: MPI must come up before device selection, because the rank
+    // decides which device this process takes. On a single-GPU build this is a
+    // lone rank with a [1,1,1,1] grid, so nothing below changes behaviour.
+    //==================================
+    m_pComm = new CLGComm();
+    m_pHaloManager = new CHaloManager();
+    m_pComm->Initial(NULL, NULL);
+
+    //==================================
     // set device
     //==================================
     m_iDeviceId = 0;
     m_byLoadingFieldId = 1;
-    if (params.FetchValueINT(_T("DeviceIndex"), m_iDeviceId))
+    UBOOL bDeviceSet = params.FetchValueINT(_T("DeviceIndex"), m_iDeviceId);
+
+#if _CLG_MULTI_GPU
+    if (m_pComm->Size() > 1)
+    {
+        //One process per GPU. DevicePerNode lets a single-GPU test machine
+        //oversubscribe (all ranks share device 0) for 1-vs-N comparison runs --
+        //see Docs/MultiGPU-Plan.md section 4.5.
+        INT iDevicePerNode = 0;
+        if (!params.FetchValueINT(_T("DevicePerNode"), iDevicePerNode) || iDevicePerNode < 1)
+        {
+            INT iDeviceCount = 1;
+            if (cudaSuccess != cudaGetDeviceCount(&iDeviceCount) || iDeviceCount < 1)
+            {
+                iDeviceCount = 1;
+            }
+            iDevicePerNode = iDeviceCount;
+        }
+        m_iDeviceId = static_cast<INT>(m_pComm->Rank() % static_cast<UINT>(iDevicePerNode));
+        bDeviceSet = TRUE;
+    }
+#endif
+
+    if (bDeviceSet)
     {
         checkCudaErrors(cudaSetDevice(m_iDeviceId));
         checkCudaErrors(cudaDeviceSynchronize());
@@ -895,7 +1208,8 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
 
         cudaDeviceProp deviceProp;
         cudaGetDeviceProperties(&deviceProp, m_iDeviceId);
-        appGeneral("\nDevice %d: \"%s\"\n", m_iDeviceId, deviceProp.name);
+        appGeneral("\nRank %d uses Device %d: \"%s\"\n",
+            static_cast<INT>(m_pComm->Rank()), m_iDeviceId, deviceProp.name);
     }
 
     //==================================
@@ -904,7 +1218,8 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     m_pLatticeData = new CLatticeData();
     m_pFileSystem = new CFileSystem();
     m_pBuffer = new CCudaBuffer();
-    UBOOL bGaugeBoundaryFieldCreated = FALSE;
+    m_pFieldPool = new CFieldPool();
+    //UBOOL bGaugeBoundaryFieldCreated = FALSE;
     //Allocate Buffer
     Real fBufferSize = F(0.0);
     if (params.FetchValueReal(_T("AllocateBuffer"), fBufferSize))
@@ -912,23 +1227,19 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
         if (fBufferSize > F(0.1) && fBufferSize < F(32.0))
         {
             m_pBuffer->Initial(static_cast<FLOAT>(fBufferSize));
-            checkCudaErrors(cudaDeviceSynchronize());
-            checkCudaErrors(cudaGetLastError());
+            _CHECKCUDA;
         }
     }
 
     InitialLatticeAndConstant(params);
-    checkCudaErrors(cudaDeviceSynchronize());
-    checkCudaErrors(cudaGetLastError());
+    _CHECKCUDA;
     InitialRandom(params);
-    checkCudaErrors(cudaDeviceSynchronize());
-    checkCudaErrors(cudaGetLastError());
+    _CHECKCUDA;
     if (params.Exist(_T("LatticeIndex")))
     {
         CreateIndexAndBoundary(params);
     }
-    checkCudaErrors(cudaDeviceSynchronize());
-    checkCudaErrors(cudaGetLastError());
+    _CHECKCUDA;
     if (params.Exist(_T("Gauge")))
     {
         CParameters gauge = params.GetParameter(_T("Gauge"));
@@ -944,7 +1255,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     {
         CParameters gaugeboundary = params.GetParameter(_T("GaugeBoundary"));
         CreateBoundaryFields(gaugeboundary, _T("CFieldBoundaryGaugeSU3"));
-        bGaugeBoundaryFieldCreated = TRUE;
+        //bGaugeBoundaryFieldCreated = TRUE;
     }
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
@@ -1004,6 +1315,26 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
         }
     }
 
+    if (m_InitialCache.constIntegers[ECI_Tensor2FieldCount] > 0)
+    {
+        for (UINT i = 1; i <= m_InitialCache.constIntegers[ECI_Tensor2FieldCount]; ++i)
+        {
+            CCString sTensor2SubParamName;
+            sTensor2SubParamName.Format(_T("Tensor2Field%d"), i);
+            if (params.Exist(sTensor2SubParamName))
+            {
+                CParameters tensor2Field = params.GetParameter(sTensor2SubParamName);
+                const CField* pLoaded = CreateTensor2Fields(tensor2Field);
+                if (NULL != pLoaded)
+                {
+                    m_byLoadingFieldId = pLoaded->m_byFieldId + 1;
+                }
+            }
+            checkCudaErrors(cudaDeviceSynchronize());
+            checkCudaErrors(cudaGetLastError());
+        }
+    }
+
     if (m_InitialCache.constIntegers[ECI_FermionFieldLength] > 0)
     {
         for (UINT i = 1; i <= m_InitialCache.constIntegers[ECI_FermionFieldLength]; ++i)
@@ -1047,10 +1378,10 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
 
-    if (NULL != m_pLatticeData->m_pIndex && m_pLatticeData->m_pIndex->NeedToFixBoundary() && !bGaugeBoundaryFieldCreated)
-    {
-        appCrucial(_T("Using Dirichlet boundary without specify a gauge boundary!\n"));
-    }
+    //if (NULL != m_pLatticeData->m_pIndex && m_pLatticeData->m_pIndex->NeedToFixBoundary() && !bGaugeBoundaryFieldCreated)
+    //{
+    //    appCrucial(_T("Using Dirichlet boundary without specify a gauge boundary!\n"));
+    //}
 
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
@@ -1094,35 +1425,54 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
             CreateMultiShiftSolver(solver);
         }
     }
-    checkCudaErrors(cudaDeviceSynchronize());
-    checkCudaErrors(cudaGetLastError());
+    _CHECKCUDA;
     if (params.Exist(_T("GaugeSmearing")))
     {
         CParameters gaugesmearing = params.GetParameter(_T("GaugeSmearing"));
         CreateGaugeSmearing(gaugesmearing);
     }
-    checkCudaErrors(cudaDeviceSynchronize());
-    checkCudaErrors(cudaGetLastError());
+    for (INT i = 0; i < kMaxFieldCount; ++i)
+    {
+        CCString smearingname = _T("GaugeSmearing") + appToString(i);
+        if (params.Exist(smearingname))
+        {
+            CParameters smearingparam = params.GetParameter(smearingname);
+            CreateGaugeSmearing(smearingparam);
+        }
+    }
+    _CHECKCUDA;
+    if (params.Exist(_T("StapleCache")))
+    {
+        CParameters staplecache = params.GetParameter(_T("StapleCache"));
+        CreateGaugeStapleCache(staplecache);
+    }
+    for (INT i = 0; i < kMaxFieldCount; ++i)
+    {
+        CCString staplecachename = _T("StapleCache") + appToString(i);
+        if (params.Exist(staplecachename))
+        {
+            CParameters staplecache = params.GetParameter(staplecachename);
+            CreateGaugeStapleCache(staplecache);
+        }
+    }
+    _CHECKCUDA;
     if (params.Exist(_T("GaugeFixing")))
     {
         CParameters gaugesmearing = params.GetParameter(_T("GaugeFixing"));
         CreateGaugeFixing(gaugesmearing);
     }
-    checkCudaErrors(cudaDeviceSynchronize());
-    checkCudaErrors(cudaGetLastError());
+    _CHECKCUDA;
     if (params.Exist(_T("Updator")))
     {
         CParameters updator = params.GetParameter(_T("Updator"));
         CreateUpdator(updator);
     }
-    checkCudaErrors(cudaDeviceSynchronize());
-    checkCudaErrors(cudaGetLastError());
+    _CHECKCUDA;
     if (m_InitialCache.constIntegers[ECI_MeasureListLength] > 0)
     {
         CreateMeasurement(params);
     }
-    checkCudaErrors(cudaDeviceSynchronize());
-    checkCudaErrors(cudaGetLastError());
+    _CHECKCUDA;
 
     appGeneral(_T("\n =========== Initialized ! ==============\n"));
     return TRUE;
@@ -1130,13 +1480,33 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
 
 void CCLGLibManager::Quit()
 {
+    //for gauge field to be return
+    //for (INT i = 0; i < kMaxFieldCount; ++i)
+    //{
+    //    appSafeDelete(appGetLattice()->m_pGaugeSmearing[i]);
+    //}
+
+    appPrintAllErrors();
+
+    GRASet.Quit();
     appSafeDelete(m_pLatticeData);
     appSafeDelete(m_pCudaHelper);
     appSafeDelete(m_pFileSystem);
+    for (INT i = 0; i < m_lstBufferCaches.Num(); ++i)
+    {
+        appSafeDelete(m_lstBufferCaches[i]);
+    }
+    m_lstBufferCaches.RemoveAll();
+    appSafeDelete(m_pFieldPool);
     appSafeDelete(m_pBuffer);
 
     //checkCudaErrors(cudaSetDevice(m_iDeviceId));
     checkCudaErrors(cudaDeviceReset());
+
+    //Multi-GPU: tear down after the device is released. The CLGComm destructor
+    //calls MPI_Finalize when needed; on single-GPU builds both are no-ops.
+    appSafeDelete(m_pHaloManager);
+    appSafeDelete(m_pComm);
 }
 
 UBOOL CLGAPI appInitialCLG(const TCHAR* paramFileName)
@@ -1157,7 +1527,7 @@ void CLGAPI appQuitCLG()
 }
 
 void CLGAPI appFailQuitCLG()
-{
+{    
     GCLGManager.Quit();
     _FAIL_EXIT;
 }

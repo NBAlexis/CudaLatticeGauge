@@ -13,6 +13,7 @@ __DEFINE_ENUM(EGradientMeasureJob,
     EGMJ_Polyakov,
     EGMJ_Chiral,
     EGMJ_Meson,
+    EGMJ_BerryPhase,
     EGMJ_DoubleToFloat,
     )
 
@@ -70,6 +71,9 @@ INT Measurement(CParameters& params)
     TArray<Real> lstChemical;
     params.FetchValueArrayReal(_T("Chemical"), lstChemical);
 
+    TArray<Real> lstMagnetic;
+    params.FetchValueArrayReal(_T("Magnetic"), lstMagnetic);
+
     iVaule = 0;
     params.FetchValueINT(_T("SubFolder"), iVaule);
     UBOOL bSubFolder = 0 != iVaule;
@@ -122,6 +126,8 @@ INT Measurement(CParameters& params)
     CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     CMeasureChiralCondensateKS* pCCHeavy = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     CMeasureMesonCorrelatorStaggeredSimple2* pMeson = dynamic_cast<CMeasureMesonCorrelatorStaggeredSimple2*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
+    CMeasureBerryPhase* pBerryPhaseU = dynamic_cast<CMeasureBerryPhase*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
+    CMeasureBerryPhase* pBerryPhaseD = dynamic_cast<CMeasureBerryPhase*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
 
     CFieldFermionKSSU3GammaEM* pU = NULL;
     CFieldFermionKSSU3GammaEM* pD = NULL;
@@ -137,10 +143,10 @@ INT Measurement(CParameters& params)
 
     if (EGMJ_Chiral == eJob)
     {
-        pF1Light = dynamic_cast<CFieldFermionKSSU3GammaEM*>(appGetLattice()->GetPooledFieldById(2));
-        pF2Light = dynamic_cast<CFieldFermionKSSU3GammaEM*>(appGetLattice()->GetPooledFieldById(2));
-        pF1Heavy = dynamic_cast<CFieldFermionKSSU3GammaEM*>(appGetLattice()->GetPooledFieldById(3));
-        pF2Heavy = dynamic_cast<CFieldFermionKSSU3GammaEM*>(appGetLattice()->GetPooledFieldById(3));
+        pF1Light = dynamic_cast<CFieldFermionKSSU3GammaEM*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+        pF2Light = dynamic_cast<CFieldFermionKSSU3GammaEM*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+        pF1Heavy = dynamic_cast<CFieldFermionKSSU3GammaEM*>(appGetLattice()->GetPooledFieldById(3, _T(__FILE__), __LINE__));
+        pF2Heavy = dynamic_cast<CFieldFermionKSSU3GammaEM*>(appGetLattice()->GetPooledFieldById(3, _T(__FILE__), __LINE__));
     }
 
     appPushLogDate(FALSE);
@@ -156,13 +162,15 @@ INT Measurement(CParameters& params)
 
     for (INT uiOmega = iListStart; uiOmega < lstElectric.Num() && uiOmega < iListEnd; ++uiOmega)
     {
-        appGeneral(_T("\n========= Electric =%f Chemical = %f  ==========\n"), lstElectric[uiOmega], lstChemical[uiOmega]);
+        appGeneral(_T("\n========= Electric =%f Chemical = %f Magnetic = %f ==========\n"), lstElectric[uiOmega], lstChemical[uiOmega], lstMagnetic[uiOmega]);
 
         pU->m_fCoeffGamma54 = lstChemical[uiOmega];
-        pU->UpdatePooledParamters();
+        //pU->UpdatePooledParamters();
         pD->m_fCoeffGamma54 = lstChemical[uiOmega];
-        pD->UpdatePooledParamters();
-        pU1->InitialU1Real(EURT_None, EURT_E_t, EURT_None, F(0.0), lstElectric[uiOmega], F(0.0), FALSE);
+        //pD->UpdatePooledParamters();
+        EU1RealType eEzType = pU1->m_eE;
+        EU1RealType eBzType = pU1->m_eB;
+        pU1->InitialU1Real(EURT_None, eEzType, eBzType, F(0.0), lstElectric[uiOmega], lstMagnetic[uiOmega], FALSE);
 
         pPL->Reset();
         pCCLight->Reset();
@@ -171,6 +179,9 @@ INT Measurement(CParameters& params)
         pCCHeavy->SetFieldCount(iFieldCount);
 
         pMeson->Reset();
+
+        pBerryPhaseU->Reset();
+        pBerryPhaseD->Reset();
 
         appGeneral(_T("(*"));
         for (UINT uiN = iStartN; uiN <= iEndN; ++uiN)
@@ -239,10 +250,10 @@ INT Measurement(CParameters& params)
                     {
                         pF1Light->InitialField(EFIT_RandomGaussian);
                     }
-                    pF1Light->FixBoundary();
+                    pF1Light->FixBoundary(EFB_Field);
                     pF1Light->CopyTo(pF2Light);
                     pF1Light->InverseD(_FIELDS);
-                    pF1Light->FixBoundary();
+                    pF1Light->FixBoundary(EFB_Field);
                     if (bSaveFermion)
                     {
                         CCString sFermionFile = "";
@@ -281,10 +292,10 @@ INT Measurement(CParameters& params)
                     {
                         pF1Heavy->InitialField(EFIT_RandomGaussian);
                     }
-                    pF1Heavy->FixBoundary();
+                    pF1Heavy->FixBoundary(EFB_Field);
                     pF1Heavy->CopyTo(pF2Heavy);
                     pF1Heavy->InverseD(_FIELDS);
-                    pF1Heavy->FixBoundary();
+                    pF1Heavy->FixBoundary(EFB_Field);
                     if (bSaveFermion)
                     {
                         CCString sFermionFile = "";
@@ -322,6 +333,12 @@ INT Measurement(CParameters& params)
                     pMeson->OnConfigurationAccepted(_FIELDS, NULL);
                 }
                 break;
+            case EGMJ_BerryPhase:
+                {
+                    pBerryPhaseU->OnConfigurationAccepted(_FIELDS, NULL);
+                    pBerryPhaseD->OnConfigurationAccepted(_FIELDS, NULL);
+                }
+                break;
             default:
                 break;
             }
@@ -346,144 +363,142 @@ INT Measurement(CParameters& params)
         {
         case EGMJ_Polyakov:
         {
-            CCString sFileNameWrite1;
-            CCString sFileNameWrite2;
-            sFileNameWrite1.Format(_T("%s_%d_polyakov.csv"), sCSVSavePrefix.c_str(), uiOmega);
-            sFileNameWrite2.Format(_T("%s_%d_polyakov_ZSlice.csv"), sCSVSavePrefix.c_str(), uiOmega);
-
-            //extract result
-            TArray<CLGComplex> polyOut;
-            TArray<TArray<CLGComplex>> polyakovOmgZSlice;
-            for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-            {
-                polyOut.AddItem(pPL->m_lstLoop[j]);
-
-                if (pPL->m_bMeasureZSlice)
-                {
-                    TArray<CLGComplex> thisConfigurationZSlice;
-                    for (UINT i = 0; i < _HC_Lz; ++i)
-                    {
-                        thisConfigurationZSlice.AddItem(pPL->m_lstPZSlice[j * _HC_Lz + i]);
-                    }
-                    polyakovOmgZSlice.AddItem(thisConfigurationZSlice);
-                }
-            }
-            WriteStringFileComplexArray(sFileNameWrite1, polyOut);
-            WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgZSlice);
+            pPL->Export(sCSVSavePrefix, iStartN, iEndN, uiOmega, iListStart);
         }
         break;
         case EGMJ_Chiral:
         {
-            _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
+            _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega);
             if (pCCLight->m_bMeasureConnect)
             {
-                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
+                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega);
             }
 
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma1);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma2);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma5);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma51);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma52);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma53);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma54);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma12);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma13);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma14);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma23);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma24);
-            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma34);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma1, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma2, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma5, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma51, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma52, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma53, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma54, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma12, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma13, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma14, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma23, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma24, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma34, uiOmega);
 
-            _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiOmega);
             if (pCCHeavy->m_bMeasureConnect)
             {
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiOmega);
             }
 
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma1);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma2);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma5);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma51);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma52);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma53);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma54);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma12);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma13);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma14);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma23);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma24);
-            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma34);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma1, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma2, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma5, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma51, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma52, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma53, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma54, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma12, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma13, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma14, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma23, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma24, uiOmega);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma34, uiOmega);
 
         }
         break;
         case EGMJ_Meson:
         {
-            static const TCHAR* heads[40] =
+            static const TCHAR* heads1[4] =
             {
-                "PSuu",
-                "PSud",
-                "PSdu",
-                "PSdd",
-                "VTuu",
-                "VTud",
-                "VTdu",
-                "VTdd",
-                "PVuu",
-                "PVud",
-                "PVdu",
-                "PVdd",
-                "Suu",
-                "Sud",
-                "Sdu",
-                "Sdd",
-
-                "VTuux",
-                "VTudx",
-                "VTdux",
-                "VTddx",
-                "VTuuy",
-                "VTudy",
-                "VTduy",
-                "VTddy",
-                "VTuuz",
-                "VTudz",
-                "VTduz",
-                "VTddz",
-
-                "PVuuxy",
-                "PVudxy",
-                "PVduxy",
-                "PVddxy",
-                "PVuuyz",
-                "PVudyz",
-                "PVduyz",
-                "PVddyz",
-                "PVuuxz",
-                "PVudxz",
-                "PVduxz",
-                "PVddxz",
+                "uu",
+                "ud",
+                "du",
+                "dd"
             };
-            for (INT i = 0; i < 40; ++i)
-            {
-                TArray<TArray<DOUBLE>> onemesonconfig;
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    TArray<DOUBLE> onemeson_oneconfig;
-                    for (INT uiT = 0; uiT < _HC_Lti - 1; ++uiT)
-                    {
-                        onemeson_oneconfig.AddItem(pMeson->m_lstResults[j][i][uiT]);
-                    }
-                    onemesonconfig.AddItem(onemeson_oneconfig);
-                }
 
-                CCString sFileNameMeson;
-                sFileNameMeson.Format(_T("%s_%s_%d.csv"), sCSVSavePrefix.c_str(), heads[i], uiOmega);
-                WriteStringFileRealArray2(sFileNameMeson, onemesonconfig);
+            for (INT i = 0; i < 16; ++i)
+            {
+                for (INT j = 0; j < 4; ++j)
+                {
+                    TArray<TArray<DOUBLE>> onemesonconfig;
+                    TArray<TArray<DOUBLE>> onemesonconfigX;
+                    TArray<TArray<DOUBLE>> onemesonconfigY;
+                    TArray<TArray<DOUBLE>> onemesonconfigZ;
+
+                    for (UINT k = 0; k < (iEndN - iStartN + 1); ++k)
+                    {
+                        TArray<DOUBLE> onemeson_oneconfig;
+                        TArray<DOUBLE> onemeson_oneconfigX;
+                        TArray<DOUBLE> onemeson_oneconfigY;
+                        TArray<DOUBLE> onemeson_oneconfigZ;
+
+                        for (INT uiT = 0; uiT < _HC_Lti; ++uiT)
+                        {
+                            onemeson_oneconfig.AddItem(pMeson->m_lstResults[k][i * 4 + j][uiT]);
+                        }
+                        for (INT uiX = 0; uiX < _HC_Lxi; ++uiX)
+                        {
+                            onemeson_oneconfigX.AddItem(pMeson->m_lstResultsX[k][i * 4 + j][uiX]);
+                        }
+                        for (INT uiY = 0; uiY < _HC_Lyi; ++uiY)
+                        {
+                            onemeson_oneconfigY.AddItem(pMeson->m_lstResultsY[k][i * 4 + j][uiY]);
+                        }
+                        for (INT uiZ = 0; uiZ < _HC_Lzi; ++uiZ)
+                        {
+                            onemeson_oneconfigZ.AddItem(pMeson->m_lstResultsZ[k][i * 4 + j][uiZ]);
+                        }
+                        onemesonconfig.AddItem(onemeson_oneconfig);
+                        onemesonconfigX.AddItem(onemeson_oneconfigX);
+                        onemesonconfigY.AddItem(onemeson_oneconfigY);
+                        onemesonconfigZ.AddItem(onemeson_oneconfigZ);
+                    }
+
+                    CCString sFileNameMeson;
+                    CCString sFileNameMesonX;
+                    CCString sFileNameMesonY;
+                    CCString sFileNameMesonZ;
+                    sFileNameMeson.Format(_T("%sT_%s%d_%d.csv"), sCSVSavePrefix.c_str(), heads1[j], i, uiOmega);
+                    sFileNameMesonX.Format(_T("%sX_%s%d_%d.csv"), sCSVSavePrefix.c_str(), heads1[j], i, uiOmega);
+                    sFileNameMesonY.Format(_T("%sY_%s%d_%d.csv"), sCSVSavePrefix.c_str(), heads1[j], i, uiOmega);
+                    sFileNameMesonZ.Format(_T("%sZ_%s%d_%d.csv"), sCSVSavePrefix.c_str(), heads1[j], i, uiOmega);
+                    WriteRealArray2(sFileNameMeson, onemesonconfig);
+                    WriteRealArray2(sFileNameMesonX, onemesonconfigX);
+                    WriteRealArray2(sFileNameMesonY, onemesonconfigY);
+                    WriteRealArray2(sFileNameMesonZ, onemesonconfigZ);
+                }
             }
+        }
+        break;
+        case EGMJ_BerryPhase:
+        {
+            CCString sFileNameMeson;
+            sFileNameMeson.Format(_T("%s_berryphaseU_%d.csv"), sCSVSavePrefix.c_str(), uiOmega);
+            WriteRealArray2(sFileNameMeson, pBerryPhaseU->m_lstData);
+            sFileNameMeson.Format(_T("%s_berryphaseUXY_%d.csv"), sCSVSavePrefix.c_str(), uiOmega);
+            WriteRealArray2(sFileNameMeson, pBerryPhaseU->m_lstDataXY);
+            sFileNameMeson.Format(_T("%s_berryphaseUXZ_%d.csv"), sCSVSavePrefix.c_str(), uiOmega);
+            WriteRealArray2(sFileNameMeson, pBerryPhaseU->m_lstDataXZ);
+            sFileNameMeson.Format(_T("%s_berryphaseUYZ_%d.csv"), sCSVSavePrefix.c_str(), uiOmega);
+            WriteRealArray2(sFileNameMeson, pBerryPhaseU->m_lstDataYZ);
+
+            sFileNameMeson.Format(_T("%s_berryphaseD_%d.csv"), sCSVSavePrefix.c_str(), uiOmega);
+            WriteRealArray2(sFileNameMeson, pBerryPhaseD->m_lstData);
+            sFileNameMeson.Format(_T("%s_berryphaseDXY_%d.csv"), sCSVSavePrefix.c_str(), uiOmega);
+            WriteRealArray2(sFileNameMeson, pBerryPhaseD->m_lstDataXY);
+            sFileNameMeson.Format(_T("%s_berryphaseDXZ_%d.csv"), sCSVSavePrefix.c_str(), uiOmega);
+            WriteRealArray2(sFileNameMeson, pBerryPhaseD->m_lstDataXZ);
+            sFileNameMeson.Format(_T("%s_berryphaseDYZ_%d.csv"), sCSVSavePrefix.c_str(), uiOmega);
+            WriteRealArray2(sFileNameMeson, pBerryPhaseD->m_lstDataYZ);
+
         }
         break;
         default:

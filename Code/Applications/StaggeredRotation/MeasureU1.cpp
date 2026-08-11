@@ -140,7 +140,7 @@ INT MeasurementU1(CParameters& params)
     
     //CCommonData::m_fBeta = fBeta;
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
-    CMeasurePolyakovU1XY* pPL = dynamic_cast<CMeasurePolyakovU1XY*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
+    CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureChiralCondensateKS* pCCHeavy = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     //CMeasureAngularMomentumKS* pFALight = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
@@ -151,7 +151,6 @@ INT MeasurementU1(CParameters& params)
     //CMeasureWilsonLoopXY* pWilson = dynamic_cast<CMeasureWilsonLoopXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(9));
 
     //CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
-    //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
 
     CActionGaugePlaquetteRotatingU1* pAG = dynamic_cast<CActionGaugePlaquetteRotatingU1*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
     CFieldFermionKSU1R* pLight = dynamic_cast<CFieldFermionKSU1R*>(appGetLattice()->GetFieldById(2));
@@ -164,10 +163,10 @@ INT MeasurementU1(CParameters& params)
 
     if (EDJKSU1_Chiral == eJob)
     {
-        pF1Light = dynamic_cast<CFieldFermionKSU1*>(appGetLattice()->GetPooledFieldById(2));
-        pF2Light = dynamic_cast<CFieldFermionKSU1*>(appGetLattice()->GetPooledFieldById(2));
-        pF1Heavy = dynamic_cast<CFieldFermionKSU1*>(appGetLattice()->GetPooledFieldById(3));
-        pF2Heavy = dynamic_cast<CFieldFermionKSU1*>(appGetLattice()->GetPooledFieldById(3));
+        pF1Light = dynamic_cast<CFieldFermionKSU1*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+        pF2Light = dynamic_cast<CFieldFermionKSU1*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+        pF1Heavy = dynamic_cast<CFieldFermionKSU1*>(appGetLattice()->GetPooledFieldById(3, _T(__FILE__), __LINE__));
+        pF2Heavy = dynamic_cast<CFieldFermionKSU1*>(appGetLattice()->GetPooledFieldById(3, _T(__FILE__), __LINE__));
     }
 
     appPushLogDate(FALSE);
@@ -302,10 +301,10 @@ INT MeasurementU1(CParameters& params)
                         {
                             pF1Light->InitialField(EFIT_RandomGaussian);
                         }
-                        pF1Light->FixBoundary();
+                        pF1Light->FixBoundary(EFB_Field);
                         pF1Light->CopyTo(pF2Light);
                         pF1Light->InverseD(_FIELDS);
-                        pF1Light->FixBoundary();
+                        pF1Light->FixBoundary(EFB_Field);
                         if (bSaveFermion)
                         {
                             CCString sFermionFile = "";
@@ -351,10 +350,10 @@ INT MeasurementU1(CParameters& params)
                         {
                             pF1Heavy->InitialField(EFIT_RandomGaussian);
                         }
-                        pF1Heavy->FixBoundary();
+                        pF1Heavy->FixBoundary(EFB_Field);
                         pF1Heavy->CopyTo(pF2Heavy);
                         pF1Heavy->InverseD(_FIELDS);
-                        pF1Heavy->FixBoundary();
+                        pF1Heavy->FixBoundary(EFB_Field);
                         if (bSaveFermion)
                         {
                             CCString sFermionFile = "";
@@ -570,74 +569,19 @@ INT MeasurementU1(CParameters& params)
         {
             case EDJKSU1_Polyakov:
             {
-                CCString sFileNameWrite1;
-                CCString sFileNameWrite2;
-                CCString sFileNameWrite3;
-                sFileNameWrite1.Format(_T("%s_polyakov_Nt%d_R.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-                sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                sFileNameWrite3.Format(_T("%s_polyakovabs_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-
-                //extract result
-                assert(static_cast<INT>(iEndN - iStartN + 1)* pPL->m_lstR.Num() == pPL->m_lstP.Num());
-
-                if (uiOmega == iStartOmega)
-                {
-                    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                    {
-                        lstR.AddItem(F(0.5) * _hostsqrt(static_cast<Real>(pPL->m_lstR[i])));
-                    }
-                    WriteStringFileRealArray(sFileNameWrite1, lstR);
-                }
-
-                TArray<TArray<CLGComplex>> polyakovOmgR;
-                TArray<CLGComplex> polyIn;
-                TArray<CLGComplex> polyOut;
-
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    TArray<CLGComplex> thisConfiguration;
-                    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                    {
-                        thisConfiguration.AddItem(pPL->m_lstP[j * pPL->m_lstR.Num() + i]);
-                    }
-                    polyakovOmgR.AddItem(thisConfiguration);
-                    polyIn.AddItem(pPL->m_lstLoopInner[j]);
-                    polyOut.AddItem(pPL->m_lstLoop[j]);
-                }
-                lstPolyIn.AddItem(polyIn);
-                lstPolyOut.AddItem(polyOut);
-                WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgR);
-
-                TArray<TArray<Real>> polyakovOmgRAbs;
-                TArray<Real> polyInAbs;
-                TArray<Real> polyOutAbs;
-
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    TArray<Real> thisConfiguration;
-                    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                    {
-                        thisConfiguration.AddItem(pPL->m_lstPAbs[j * pPL->m_lstR.Num() + i]);
-                    }
-                    polyakovOmgRAbs.AddItem(thisConfiguration);
-                    polyInAbs.AddItem(pPL->m_lstLoopAbsInner[j]);
-                    polyOutAbs.AddItem(pPL->m_lstLoopAbs[j]);
-                }
-                lstPolyInAbs.AddItem(polyInAbs);
-                lstPolyOutAbs.AddItem(polyOutAbs);
-                WriteStringFileRealArray2(sFileNameWrite3, polyakovOmgRAbs);
+                pPL->Export(sCSVSavePrefix, iStartN, iEndN, uiOmega, iStartOmega);
             }
             break;
             case EDJKSU1_Chiral:
             {
-                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiOmega, O);
+                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiOmega);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiOmega);
 
                 if (uiOmega == iStartOmega)
                 {

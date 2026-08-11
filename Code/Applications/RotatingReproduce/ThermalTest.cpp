@@ -49,8 +49,38 @@ INT TestThermal(CParameters& params)
     params.FetchValueINT(_T("Additive"), iVaule);
     UBOOL bAdditive = 0 != iVaule;
 
+    iVaule = 0;
+    params.FetchValueINT(_T("ReplenishMode"), iVaule);
+    UBOOL bReplenishMode = 0 != iVaule;
+
+    iVaule = 0;
+    params.FetchValueINT(_T("ReplenishSubFolder"), iVaule);
+    UBOOL bReplenishSubFolder = 0 != iVaule;
+
+    CCString sReplenishSubFolderPrefix;
+    params.FetchStringValue(_T("ReplenishSubFolderPrefix"), sReplenishSubFolderPrefix);
+    appGeneral(_T("Replenish sub folder prefix: %s\n"), sReplenishSubFolderPrefix.c_str());
+
+    CCString sReplenishLoadPrefix;
+    params.FetchStringValue(_T("ReplenishLoadFile"), sReplenishLoadPrefix);
+    appGeneral(_T("Replenish load file prefix: %s\n"), sReplenishLoadPrefix.c_str());
+
     TArray<Real> old_polyakovs;
     params.FetchValueArrayReal(_T("Polyakovs"), old_polyakovs);
+
+    TArray<TArray<INT>> replenishIndex;
+    if (bReplenishMode)
+    {
+        for (UINT i = iOmegaStart; i <= iAfterEquib; ++i)
+        {
+            TArray<INT> onelineindex;
+            CCString sKeyName;
+            sKeyName.Format(_T("ReplenishIndex%d"), i);
+            params.FetchValueArrayINT(sKeyName, onelineindex);
+            appGeneral(_T("load key = %s, data = %s\n"), sKeyName.c_str(), appToString(onelineindex).c_str());
+            replenishIndex.AddItem(onelineindex);
+        }
+    }
 
     CCString sSavePrefix;
     params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
@@ -125,7 +155,7 @@ INT TestThermal(CParameters& params)
         {
             appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sOldFileNames[uiNt - iMinNt], EFFT_CLGBin);
             pPL->OnConfigurationAccepted(_FIELDS, NULL);
-            Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fOldFilePolyakov[uiNt - iMinNt]);
+            Real fError = static_cast<Real>(appAbs(cuCabs(pPL->m_lstLoop[0]) - fOldFilePolyakov[uiNt - iMinNt]));
             if (fError < F(1E-05))
             {
                 appGeneral(_T("\n ================ Bake using old file =================\n"));
@@ -134,11 +164,16 @@ INT TestThermal(CParameters& params)
             else
             {
                 appGeneral(_T("\n ================ have the initial file, but not matching.... %2.12f, %2.12f, diff=%f ===========\n"), 
-                    _cuCabsf(pPL->m_lstLoop[0]), fOldFilePolyakov[uiNt - iMinNt], fError);
+                    cuCabs(pPL->m_lstLoop[0]), fOldFilePolyakov[uiNt - iMinNt], fError);
             }
         }
         
         if (bAdditive)
+        {
+            bNeedBake = FALSE;
+        }
+
+        if (bReplenishMode)
         {
             bNeedBake = FALSE;
         }
@@ -170,7 +205,7 @@ INT TestThermal(CParameters& params)
             appGeneral(_T("\n|<P>|,arg<P>={\n"));
             for (INT i = 0; i < pPL->m_lstLoop.Num(); ++i)
             {
-                appGeneral(_T("{%f, %f},\n"), _cuCabsf(pPL->m_lstLoop[i]), __cuCargf(pPL->m_lstLoop[i]));
+                appGeneral(_T("{%f, %f},\n"), cuCabs(pPL->m_lstLoop[i]), cuCarg(pPL->m_lstLoop[i]));
             }
             appGeneral(_T("}\n"));
             appPopLogDate();
@@ -191,7 +226,7 @@ INT TestThermal(CParameters& params)
             if (NULL != pGauageAction)
             {
                 pGauageAction->SetGaugeOmega(fSep * uiOmega);
-                pFermion->SetFermionOmega(F(0.0));
+                pFermion->SetFermionOmega(fSep * uiOmega);
             }
 
             if (bAdditive)
@@ -209,7 +244,7 @@ INT TestThermal(CParameters& params)
                 sFileName.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, iSaveStartIndex - 1);
                 appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, EFFT_CLGBin);
                 pPL->OnConfigurationAccepted(_FIELDS, NULL);
-                Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fPolyaOld);
+                Real fError = static_cast<Real>(appAbs(cuCabs(pPL->m_lstLoop[0]) - fPolyaOld));
                 if (fError < F(1E-05))
                 {
                     appGeneral(_T("\n ================ using old file start from %d =================\n"), iSaveStartIndex);
@@ -217,10 +252,68 @@ INT TestThermal(CParameters& params)
                 else
                 {
                     appGeneral(_T("\n ================ have the initial file, but not matching.... %2.12f, %2.12f, diff=%f ===========\n"),
-                        _cuCabsf(pPL->m_lstLoop[0]), fPolyaOld, fError);
+                        cuCabs(pPL->m_lstLoop[0]), fPolyaOld, fError);
                     appFailQuitCLG();
                     return 1;
                 }
+            }
+            else if (bReplenishMode)
+            {
+                appGeneral(_T("%s\n"), appToString(replenishIndex[uiOmega - iOmegaStart]).c_str());
+                for (INT i = 0; i < replenishIndex[uiOmega - iOmegaStart].Num(); ++i)
+                {
+                    const INT thisIndex = replenishIndex[uiOmega - iOmegaStart][i];
+
+                    CCString sLoadFileName;
+                    if (bReplenishSubFolder)
+                    {
+                        sLoadFileName.Format(_T("%s/O%d/%sRotate_Nt%d_O%d_%d.con"), sReplenishSubFolderPrefix.c_str(), uiOmega, sReplenishLoadPrefix.c_str(), _HC_Lt, uiOmega, thisIndex - 1);
+                    }
+                    else
+                    {
+                        sLoadFileName.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sReplenishLoadPrefix.c_str(), _HC_Lt, uiOmega, thisIndex - 1);
+                    }
+                    
+                    appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sLoadFileName, EFFT_CLGBin);
+                    appGeneral(_T("Load File Polyakov "));
+                    pPL->Reset();
+                    pPL->OnConfigurationAccepted(_FIELDS, NULL);
+                    appGeneral(_T("File loaded %s, with |P| = %f\n"), sLoadFileName.c_str(), cuCabs(pPL->m_lstLoop[0]));
+
+                    appGetLattice()->m_pMeasurements->Reset();
+                    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+                    appGetLattice()->m_pUpdator->Update(1, TRUE);
+                    UINT uiAcce = 0; 
+                    while (uiAcce < 1)
+                    {
+                        uiAcce = appGetLattice()->m_pUpdator->GetConfigurationCount();
+                    }
+                    
+                    sFileName.Format(_T("Rotate_Nt%d_O%d_%d"), uiNt, uiOmega, thisIndex);
+                    sFileName = sSavePrefix + sFileName;
+
+                    //=================================
+                    //Save config
+                    const CCString MD5 = appGetLattice()->m_pGaugeField[0]->SaveToFile(sFileName + _T(".con"));
+
+                    //=================================
+                    //Save info
+                    appGetTimeNow(buff1, 256);
+                    appGetTimeUtc(buff2, 256);
+                    sInfo.Format(_T("TimeStamp : %d\nTime : %s\nTimeUTC : %s\nMD5 : %s\n"),
+                        appGetTimeStamp(),
+                        buff1,
+                        buff2,
+                        MD5.c_str());
+                    sInfo = sInfo + appGetLattice()->GetInfos(_T(""));
+                    appGetFileSystem()->WriteAllText(sFileName + _T(".txt"), sInfo);
+                
+                    //appGetLattice()->m_pMeasurements->Report();
+                }
+                
+                ++uiOmega;
+                //next omega
+                continue;
             }
 
             UINT iConfigNumberNow = 0;
@@ -279,6 +372,15 @@ INT TestThermal(CParameters& params)
 
             appGetLattice()->m_pMeasurements->Reset();
             appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+        }
+
+        if (bReplenishMode)
+        {
+            appPopLogDate();
+
+            appGeneral(_T("\n=====================================\n========= Nt=%d finished! ==========\n"), uiNt);
+            appQuitCLG();
+            break;
         }
 
         appGeneral(_T("\n========= Nt=%d finished! ==========\n\n"), uiNt);

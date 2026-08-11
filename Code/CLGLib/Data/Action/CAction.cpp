@@ -5,6 +5,7 @@
 // Some common implementations
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [04/25/2024 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -35,12 +36,12 @@ void CAction::Initial(class CLatticeData* pOwner, const CParameters& param, BYTE
     }
 }
 
-DOUBLE CAction::Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldGauge* const* stableFields)
+DOUBLE CAction::Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields, const CFieldGauge* const* stapleFields)
 {
     if (1 == m_byGaugeFieldIds.Num() && 0 == m_byBosonFieldIds.Num())
     {
         INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0]);
-        return EnergySingleField(bBeforeEvolution, gaugeFields[idx], (NULL == stableFields) ? NULL : stableFields[idx]);
+        return EnergySingleField(bBeforeEvolution, gaugeFields[idx], (NULL == stapleFields) ? NULL : stapleFields[idx]);
     }
     appCrucial(_T("Energy not implemented!\n"));
     return 0.0;

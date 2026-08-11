@@ -4,6 +4,7 @@
 // DESCRIPTION:
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/2/2018 nbale]
 //=============================================================================
 
@@ -56,9 +57,9 @@ UINT TestRandom(CParameters& sParam)
 // debug mode: TestRandomSchrage > TestRandomScrambledSOBOL32 > TestRandomXORWOW
 //=====================================================================================
 
-__REGIST_TEST(TestRandom, Random, TestRandomSchrage, Schrage);
+___REGIST_TEST(TestRandom, Random, TestRandomSchrage, Schrage, _TEST_MULTIGPU);
 
-__REGIST_TEST(TestRandom, Random, TestRandomXORWOW, XORWOW);
+___REGIST_TEST(TestRandom, Random, TestRandomXORWOW, XORWOW, _TEST_MULTIGPU);
 
 //__REGIST_TEST(TestRandom, Random, TestRandomMRG32K3A);
 
@@ -66,7 +67,9 @@ __REGIST_TEST(TestRandom, Random, TestRandomXORWOW, XORWOW);
 
 //__REGIST_TEST(TestRandom, Random, TestRandomSOBOL32);
 
-__REGIST_TEST(TestRandom, Random, TestRandomScrambledSOBOL32, ScrambledSOBOL32);
+#if _CLG_USE_SCRAMBLED_SOBOL32
+___REGIST_TEST(TestRandom, Random, TestRandomScrambledSOBOL32, ScrambledSOBOL32, _TEST_MULTIGPU);
+#endif
 
 
 
@@ -145,8 +148,9 @@ __REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorXORWOW, GeneratorXORWOW)
 
 //__REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorSOBOL32);
 
+#if _CLG_USE_SCRAMBLED_SOBOL32
 __REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorScrambledSOBOL32, GeneratorScrambledSOBOL32);
-
+#endif
 
 UINT TestSeed(CParameters& sParam)
 {

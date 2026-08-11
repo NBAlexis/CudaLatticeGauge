@@ -65,7 +65,15 @@ _kernelDFermionKSACC_GZPT(
         deviceSU3Vector right = _deviceGMUPNUOptimized(pGauge, sSite4, byGaugeFieldId, 2, 3, bPlusZ, bPlusT).MulVector(pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
 
         //right.MulComp(_make_cuComplex(F(0.0), fG * sSite4.z));
-        right.MulReal(F(0.5) * (sSite4.w + sTargetSite.w));
+        //The 0.5*(t + t') coefficient must use GLOBAL t (identity on single-GPU):
+        //sSite4 is the local coordinate and sTargetSite may be a halo slot, so
+        //the raw values differ per rank under a t split and the fermion D then
+        //disagrees with the gauge side (which uses the global t). Resolve both.
+        {
+            const INT iGlobalT = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex)).w;
+            const INT iGlobalT2 = _deviceSIndexToGlobalInt4(sTargetBigIndex).w;
+            right.MulReal(F(0.5) * static_cast<Real>(iGlobalT + iGlobalT2));
+        }
 
         if (!bPlusT)
         {
@@ -100,6 +108,8 @@ _kernelDFermionKSACC_GZPT(
     case EOCT_Complex:
         result.MulComp(cCoeff);
         break;
+    default:
+        break;
     }
 
     pResultData[uiSiteIndex].Add(result);
@@ -110,8 +120,13 @@ _kernelDFermionKSACC_GZPT(
  * 1. we need to obtain V_(n, n1) , V_(n, n2)
  * 2. we need phi(n1), phi(n2), phid(n1), phid(n2)
  *
- * byContribution: 0 for mu, 1 for tau, 2 for both mu and tau
- *
+ * byContribution
+ * 0 only right-t
+ * 1 only right-z
+ * 2 right-t left-z
+ * 3 only left-z
+ * 4 nothing
+ * 
  * iTau = 1 for +t, -1 for -t
  */
 __global__ void _CLG_LAUNCH_BOUND
@@ -123,10 +138,11 @@ _kernelDFermionKSForce_Acc(
     const Real* __restrict__ pNumerators,
     UINT uiRational,
     BYTE byFieldId,
+    BYTE byGaugeFieldId,
     Real fG,
     INT iZ,
-    INT pathLdir1, INT pathLdir2, INT pathLdir3, BYTE Llength,
-    INT pathRdir1, INT pathRdir2, INT pathRdir3, BYTE Rlength,
+    SCHAR pathLdir1, SCHAR pathLdir2, SCHAR pathLdir3, BYTE Llength,
+    SCHAR pathRdir1, SCHAR pathRdir2, SCHAR pathRdir3, BYTE Rlength,
     BYTE byContribution)
 {
     intokernalInt4;
@@ -134,8 +150,8 @@ _kernelDFermionKSForce_Acc(
 
     //=================================
     // 1. Find n1, n2
-    INT Ldirs[3] = { pathLdir1, pathLdir2, pathLdir3 };
-    INT Rdirs[3] = { pathRdir1, pathRdir2, pathRdir3 };
+    SCHAR Ldirs[3] = { pathLdir1, pathLdir2, pathLdir3 };
+    SCHAR Rdirs[3] = { pathRdir1, pathRdir2, pathRdir3 };
     SSmallInt4 site_n1 = _deviceSmallInt4OffsetC(sSite4, Ldirs, Llength);
     SSmallInt4 site_n2 = _deviceSmallInt4OffsetC(sSite4, Rdirs, Rlength);
     const SIndex& sn1 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(site_n1)];
@@ -143,12 +159,90 @@ _kernelDFermionKSForce_Acc(
 
     site_n1 = __deviceSiteIndexToInt4(sn1.m_uiSiteIndex);
     site_n2 = __deviceSiteIndexToInt4(sn2.m_uiSiteIndex);
-    const Real fNv = fG * F(0.5) * (site_n1.w + site_n2.w);
+    //GLOBAL t for the 0.5*(t_n1 + t_n2) coefficient (identity on single-GPU):
+    //site_n1/n2 are local coordinates and may be halo slots under a t split.
+    //Improve-1 (3.7): 32-bit global coordinate.
+    const Real fNv = fG * F(0.5) * static_cast<Real>(
+        _deviceSIndexToGlobalInt4(sn1).w
+        + _deviceSIndexToGlobalInt4(sn2).w);
+    INT etaTau = (sn1.NeedToOpposite() ^ sn2.NeedToOpposite());
+    etaTau += (pEtaTable[sn1.m_uiSiteIndex] >> 2);
 
     //=================================
     // 2. Find V(n,n1), V(n,n2)
-    const deviceSU3 vnn1 = _deviceLink(pGauge, sSite4, Llength, 1, Ldirs);
-    const deviceSU3 vnn2 = _deviceLink(pGauge, sSite4, Rlength, 1, Rdirs);
+    if (2 == byContribution || 3 == byContribution)
+    {
+        const deviceSU3 vnn1 = _deviceLinkTSkipOne(pGauge, sSite4, Llength, byGaugeFieldId, Ldirs);
+        const deviceSU3 vnn2 = _deviceLinkT(pGauge, sSite4, Rlength, byGaugeFieldId, Rdirs);
+
+        const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 2);
+
+        for (BYTE rfieldId = 0; rfieldId < uiRational; ++rfieldId)
+        {
+            const deviceSU3Vector* phi_i = pFermionPointers[rfieldId];
+            const deviceSU3Vector* phi_id = pFermionPointers[rfieldId + uiRational];
+
+            //=================================
+            // 3. Find phi_{1,2,3,4}(n1), phi_i(n2)
+            deviceSU3Vector phi1 = (Llength > 1) ? _mulVec(vnn1, phi_id[sn1.m_uiSiteIndex]) : phi_id[sn1.m_uiSiteIndex];
+            deviceSU3Vector phi2 = (Rlength > 0) ? _mulVec(vnn2, phi_i[sn2.m_uiSiteIndex]) : phi_i[sn2.m_uiSiteIndex];
+
+            deviceSU3 res = _makeContract<deviceSU3, deviceSU3Vector>(phi1, phi2);
+            //This Add is required by partial(D^+D)
+            phi1 = (Rlength > 0) ? _mulVec(vnn2, phi_id[sn2.m_uiSiteIndex]) : phi_id[sn2.m_uiSiteIndex];
+            phi2 = (Llength > 1) ? _mulVec(vnn1, phi_i[sn1.m_uiSiteIndex]) : phi_i[sn1.m_uiSiteIndex];
+
+            _sub(res, _makeContract<deviceSU3, deviceSU3Vector>(phi2, phi1));
+            if (etaTau & 1)
+            {
+                res.MulReal(-OneOver12 * fNv * pNumerators[rfieldId]);
+            }
+            else
+            {
+                res.MulReal(OneOver12 * fNv * pNumerators[rfieldId]);
+            }
+            _sub(pForce[linkIndex], res);
+        }
+    }
+
+    if (0 == byContribution || 1 == byContribution || 2 == byContribution)
+    {
+        const deviceSU3 vnn1 = _deviceLinkT(pGauge, sSite4, Llength, byGaugeFieldId, Ldirs);
+        const deviceSU3 vnn2 = _deviceLinkTSkipOne(pGauge, sSite4, Rlength, byGaugeFieldId, Rdirs);
+
+        const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, (1 == byContribution) ? 2 : 3);
+
+        for (BYTE rfieldId = 0; rfieldId < uiRational; ++rfieldId)
+        {
+            const deviceSU3Vector* phi_i = pFermionPointers[rfieldId];
+            const deviceSU3Vector* phi_id = pFermionPointers[rfieldId + uiRational];
+
+            //=================================
+            // 3. Find phi_{1,2,3,4}(n1), phi_i(n2)
+            deviceSU3Vector phi1 = (Llength > 0) ? _mulVec(vnn1, phi_id[sn1.m_uiSiteIndex]) : phi_id[sn1.m_uiSiteIndex];
+            deviceSU3Vector phi2 = (Rlength > 1) ? _mulVec(vnn2, phi_i[sn2.m_uiSiteIndex]) : phi_i[sn2.m_uiSiteIndex];
+
+            deviceSU3 res = _makeContract<deviceSU3, deviceSU3Vector>(phi2, phi1);
+            //This Add is required by partial(D^+D)
+            phi1 = (Rlength > 1) ? _mulVec(vnn2, phi_id[sn2.m_uiSiteIndex]) : phi_id[sn2.m_uiSiteIndex];
+            phi2 = (Llength > 0) ? _mulVec(vnn1, phi_i[sn1.m_uiSiteIndex]) : phi_i[sn1.m_uiSiteIndex];
+
+            _sub(res, _makeContract<deviceSU3, deviceSU3Vector>(phi1, phi2));
+            if (etaTau & 1)
+            {
+                res.MulReal(-OneOver12 * fNv * pNumerators[rfieldId]);
+            }
+            else
+            {
+                res.MulReal(OneOver12 * fNv * pNumerators[rfieldId]);
+            }
+            _sub(pForce[linkIndex], res);
+}
+    }
+
+#if 0
+    const deviceSU3 vnn1 = _deviceLinkT(pGauge, sSite4, Llength, 1, Ldirs);
+    const deviceSU3 vnn2 = _deviceLinkT(pGauge, sSite4, Rlength, 1, Rdirs);
 
     for (BYTE rfieldId = 0; rfieldId < uiRational; ++rfieldId)
     {
@@ -161,16 +255,6 @@ _kernelDFermionKSForce_Acc(
         deviceSU3Vector phi3 = vnn1.MulVector(phi_i[sn1.m_uiSiteIndex]);
         deviceSU3Vector phi4 = vnn2.MulVector(phi_id[sn2.m_uiSiteIndex]);
 
-        //if (sn1.NeedToOpposite())
-        //{
-        //    phi1.MulReal(F(-1.0));
-        //    phi3.MulReal(F(-1.0));
-        //}
-        //if (sn2.NeedToOpposite())
-        //{
-        //    phi2.MulReal(F(-1.0));
-        //    phi4.MulReal(F(-1.0));
-        //}
         deviceSU3 res = deviceSU3::makeSU3ContractV(phi1, phi2);
         res.Add(deviceSU3::makeSU3ContractV(phi4, phi3));
         res.Ta();
@@ -207,6 +291,7 @@ _kernelDFermionKSForce_Acc(
             }
         }
     }
+#endif
 }
 
 
@@ -225,7 +310,7 @@ void CFieldFermionKSSU3Acc::DOperatorKS(void* pTargetBuffer, const void* pBuffer
     const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
 
     preparethread;
-    _kernelDFermionKSACC_GZPT << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDFermionKSACC_GZPT, block, threads, 
         pSource,
         pGauge,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
@@ -253,7 +338,7 @@ void CFieldFermionKSSU3Acc::DerivateD0(
 
     preparethread;
 
-    INT dirs[6][3] =
+    SCHAR dirs[6][3] =
     {
         {3, 4, 4},
         {4, 3, 4},
@@ -264,40 +349,49 @@ void CFieldFermionKSSU3Acc::DerivateD0(
     };
 
     INT iZ[6] = { 1, 1, 1, -1, -1, -1 };
+
+    /* byContribution
+     * 0 only right-t
+     * 1 only right-z
+     * 2 right-t left-z
+     * 3 only left-z
+     * 4 nothing
+     */
     BYTE contributionOf[6][4] =
     {
-        {1, 0, 0, 3},
-        {0, 1, 0, 3},
-        {0, 0, 1, 3},
-        {0, 0, 3, 1},
-        {0, 3, 2, 3},
-        {3, 2, 0, 3},
+        {1, 0, 0, 4},
+        {0, 1, 0, 4},
+        {0, 0, 1, 4},
+        {0, 0, 4, 3},
+        {0, 4, 2, 4},
+        {4, 2, 0, 4},
     };
 
     for (INT pathidx = 0; pathidx < 6; ++pathidx)
     {
         for (INT iSeperation = 0; iSeperation < 4; ++iSeperation)
         {
-            if (3 == contributionOf[pathidx][iSeperation])
+            if (4 == contributionOf[pathidx][iSeperation])
             {
                 continue;
             }
 
-            INT L[3] = { 0, 0, 0 };
-            INT R[3] = { 0, 0, 0 };
+            SCHAR L[3] = { 0, 0, 0 };
+            SCHAR R[3] = { 0, 0, 0 };
             BYTE LLength = 0;
             BYTE RLength = 0;
 
             Seperate(dirs[pathidx], iSeperation, L, R, LLength, RLength);
 
-            _kernelDFermionKSForce_Acc << <block, threads >> > (
+            _LAUNCH_KERNEL(_kernelDFermionKSForce_Acc, block, threads, 
                 (const deviceSU3*)pGaugeBuffer,
                 (deviceSU3*)pForce,
                 appGetLattice()->m_pIndexCache->m_pEtaMu,
-                m_pRationalFieldPointers,
-                m_pMDNumerator,
-                m_rMD.m_uiDegree,
+                CRationalFieldPointer::GetInstance()->GetRationPoint<deviceSU3Vector>(m_byRationFieldPointerBufferLength),
+                GRASet.m_pRASet[m_iMDIndex]->m_pDeviceData,
+                GRASet.m_pRASet[m_iMDIndex]->m_uiDegree,
                 m_byFieldId,
+                byGaugeFieldId,
                 CCommonData::m_fG,
                 iZ[pathidx],
                 L[0], L[1], L[2], LLength,
@@ -310,9 +404,9 @@ void CFieldFermionKSSU3Acc::DerivateD0(
 
 #pragma endregion
 
-void CFieldFermionKSSU3Acc::CopyTo(CField* U) const
+void CFieldFermionKSSU3Acc::CopyParamTo(CField* U) const
 {
-    CFieldFermionKSSU3::CopyTo(U);
+    CFieldFermionKSSU3::CopyParamTo(U);
 }
 
 CCString CFieldFermionKSSU3Acc::GetInfos(const CCString& tab) const

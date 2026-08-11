@@ -18,7 +18,7 @@ void TestPlaqutteEnergy()
 
     const DOUBLE fE1 = pGuageField->CalculatePlaqutteEnergy(5.0);
     const DOUBLE fE2 = pGuageField->CalculatePlaqutteEnergyUseClover(5.0);
-    const DOUBLE fE3 = pGuageField->CalculatePlaqutteEnergyUsingStable(5.0, pCopy);
+    const DOUBLE fE3 = pGuageField->CalculatePlaqutteEnergyUsingStaple(5.0, pCopy);
 
     appGeneral(_T("============ TestPlaqutteEnergy ===========\n"));
     appGeneral(_T("E1: %f, E2: %f, E3: %f\n"), fE1, fE2, fE3);
@@ -27,27 +27,27 @@ void TestPlaqutteEnergy()
     appSafeDelete(pCopy);
 }
 
-void TestXYTerm()
-{
-    CActionGaugePlaquetteRotating* pActionR = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList[0]);
-    const DOUBLE fXY1 = pActionR->XYTerm1(appGetLattice()->m_pGaugeField[0]);
-    const DOUBLE fXY2 = pActionR->XYTerm2(appGetLattice()->m_pGaugeField[0]);
-
-    appGeneral(_T("================= TestXYTerm ==============\n"));
-    appGeneral(_T("E1: %f, E2: %f\n"), fXY1, fXY2);
-    appGeneral(_T("===========================================\n"));
-}
+//void TestXYTerm()
+//{
+//    CActionGaugePlaquetteRotating* pActionR = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList[0]);
+//    const DOUBLE fXY1 = pActionR->XYTerm1(appGetLattice()->m_pGaugeField[0]);
+//    const DOUBLE fXY2 = pActionR->XYTerm2(appGetLattice()->m_pGaugeField[0]);
+//
+//    appGeneral(_T("================= TestXYTerm ==============\n"));
+//    appGeneral(_T("E1: %f, E2: %f\n"), fXY1, fXY2);
+//    appGeneral(_T("===========================================\n"));
+//}
 
 void TestSigma12()
 {
     CFieldFermionWilsonSquareSU3* pFermionCopy = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetFieldById(2)->GetCopy());
     CFieldFermionWilsonSquareSU3* pFermionCopy2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetFieldById(2)->GetCopy());
 
-    pFermionCopy->ApplyGamma(GAMMA2);
-    pFermionCopy->ApplyGamma(GAMMA1);
+    pFermionCopy->ApplyGamma(0, 0, NULL, NULL, GAMMA2);
+    pFermionCopy->ApplyGamma(0, 0, NULL, NULL, GAMMA1);
     pFermionCopy->ScalarMultply(_imgc);
 
-    pFermionCopy2->ApplyGamma(SIGMA12E);
+    pFermionCopy2->ApplyGamma(0, 0, NULL, NULL, SIGMA12E);
 
     const DOUBLE fAmp1 = pFermionCopy2->Dot(pFermionCopy2).x;
     pFermionCopy2->AxpyMinus(pFermionCopy);
@@ -74,7 +74,7 @@ INT RotationTest(CParameters& params)
 
     TestPlaqutteEnergy();
 
-    TestXYTerm();
+    //TestXYTerm();
 
     TestSigma12();
 

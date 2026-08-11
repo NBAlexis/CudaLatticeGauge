@@ -5,6 +5,7 @@
 // This is the Approximate force gradient integrator for HMC
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [08/19/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -102,29 +103,29 @@ void CIntegratorNested11Stage::NestedEvaluate(UBOOL bLast)
     const Real fOneMinus2ThetaRho = (F(1.0) - F(2.0) * (m_fTheta + m_fRho)) * m_fNestedStepLength;
 
     appDetailed("  11Stage nested sub step 0\n");
-    UpdatePG(fVarThetaT, FALSE);
+    UpdatePG(fVarThetaT);
 
     for (UINT uiStep = 1; uiStep < m_uiNestedStep + 1; ++uiStep)
     {
         UpdateU(fRhoT);
-        UpdatePG(fLambdaT, FALSE);
+        UpdatePG(fLambdaT);
         UpdateU(fThetaT);
-        UpdatePG(fOneMinus2LambdaTheta, FALSE);
+        UpdatePG(fOneMinus2LambdaTheta);
         UpdateU(fOneMinus2ThetaRho);
-        UpdatePG(fOneMinus2LambdaTheta, FALSE);
+        UpdatePG(fOneMinus2LambdaTheta);
         UpdateU(fThetaT);
-        UpdatePG(fLambdaT, FALSE);
+        UpdatePG(fLambdaT);
         UpdateU(fRhoT);
 
         if (uiStep < m_uiNestedStep)
         {
             appDetailed("  11Stage nested sub step %d\n", uiStep);
-            UpdatePG(f2VarThetaT, FALSE);
+            UpdatePG(f2VarThetaT);
         }
         else
         {
             appDetailed("  11Stage nested last step %d\n", uiStep);
-            UpdatePG(fVarThetaT, bLast);
+            UpdatePG(fVarThetaT);
         }
     }
 }

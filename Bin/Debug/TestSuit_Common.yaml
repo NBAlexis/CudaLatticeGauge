@@ -1,25 +1,85 @@
 
+# TestDebug
 TestDebug:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [4, 4, 4, 4]
+    LatticeLength : [12, 12, 12, 12]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
 
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    MeasureListLength : 1
+    FermionFieldCount : 1
+    ActionListLength : 1
 
     Gauge:
     
-        FieldName : CFieldGaugeSU3D
-        FieldInitialType : EFIT_Random
-        Period : [1, 1, 0, 1]
+        FieldName : CFieldGaugeSU3TreeImproved
+        # FieldInitialType : EFIT_Random
+        FieldInitialType : EFIT_ReadFromFile
+        GaugeFileType : EFFT_CLGBin
+        GaugeFileName : ./cfg_100_double.con
+        Period : [1, 1, 1, 1]
+        RectOverPlaq : -0.06465425053335877
 
     GaugeBoundary:
 
         FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_RandomGaussian
+        # 2am = 0.4, am = 0.2
+        # Mass is absorbed into rational approximation
+        Mass : 0.2
+        Epsilon : 0.0
+        FieldId : 2
+        Even : 0
+        Period : [1, 1, 1, -1]
+
+        # This is (x+4*0.2^2)^{1/8} for 1.0e-15 to 90, error = 1.9502339601578542e-10
+        MC : [2.801975884988497, -0.004016230858636841, -0.01503109844810006, -0.042917166150815346, -0.11686887029040936, -0.3173416473090168, -0.8795534701297926, -2.582810647575678, -8.76934338087226, -43.612719302071845, -774.7326800599722, 0.18143140540265368, 0.28207174681925934, 0.5444597469913547, 1.1811309687358265, 2.7174071496388885, 6.47768801882857, 16.049787708769138, 42.905534322410084, 140.00048111605153, 940.0781029788685]
+        # This is (x+4*0.2^2)^{-1/4} for 1.0e-15 to 90, error = 3.6196789360790877e-10
+        MD : [0.1261334215451492, 0.026680050344128108, 0.0544115295736606, 0.10095150595864467, 0.1899223108623967, 0.36417796903122185, 0.7148893270430604, 1.4666481052949947, 3.3311435690353886, 9.780497174854746, 62.574692204598115, 0.17259311291663107, 0.2543403530045024, 0.4756170210039413, 1.015386045574159, 2.3170721987790284, 5.4907783549553235, 13.488980297878523, 35.369875886208334, 109.27126320186774, 582.6008915144995]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.0000000001
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 7.29
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingHISQSU3
+        Iterate : 1
+        HasT : 1
+        FieldId : 1
+        Update : 1
+        Proj : 1
+        ProjSUN : 0
+        # Origin : 0.0
+        # Fat3 : 0.0
+        # Fat5 : 0.0
+        # Fat7 : 0.0
+        # Lepage : 1.0
+        UseCaylayHamilton : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
 
 TestOperators:
 
@@ -96,7 +156,7 @@ TestOperators:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Measure1:
@@ -189,7 +249,7 @@ TestQuickAxpy:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Measure1:
@@ -204,7 +264,7 @@ TestAngularMomentum:
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
-    RandomSeedType : ERST_Timestamp
+    #RandomSeedType : ERST_Timestamp  # fixed default seed for reproducibility
     RandomType : ER_Schrage
     RandomSeed : 7654321
     ActionListLength : 2
@@ -252,7 +312,7 @@ TestAngularMomentum:
         Omega : 0.2
 
     Action2:
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     GaugeFixing:
@@ -260,17 +320,19 @@ TestAngularMomentum:
         Name : CGaugeFixingCoulombCornell
         Alpha : 0.08
         MaxIterate : 3000
-        FFT : 1
+        FFT : 0
 
     Solver:
 
-        SolverName : CSLASolverGCRODR
+        MaxDim : 30
+        # SolverName : CSLASolverGCRODR
+        SolverName : CSLASolverGMRES
         SolverForFieldId : 2
         MDim : 25
         KDim : 5
         RecalculateR : 5
         DeflateSpace : EEDT_SVD
-        Accuracy : 0.00001
+        Accuracy : 0.0000001
 
         Restart : 100
         AbsoluteAccuracy : 1
@@ -434,7 +496,7 @@ TestGamm5Hermiticity:
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
 
     Measure1:
@@ -546,6 +608,148 @@ TestAnitiHermiticity:
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
+
+TestAnitiHermiticityKSSU3R:
+
+    # massless CFieldFermionKSSU3R (rotating KS) in torus + shift-center-half,
+    # build the full D0 matrix and check D^dagger = -D
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    ExponentialPrecision : 4
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+
+    Updator:
+
+        UpdatorType : CHMC
+
+        Metropolis : 1
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 1
+        IntegratorStep : 40
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        FieldName : CFieldFermionKSSU3R
+
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.5
+        FieldId : 2
+        PoolNumber : 15
+
+        ShiftCoord : 1
+        Omega : 0.5
+
+        Period : [1, 1, 1, -1]
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 3
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+TestAnitiHermiticityHISQSU3R:
+
+    # massless CFieldFermionHISQSU3R (rotating HISQ) in torus + shift-center-half,
+    # build the full D0 matrix and check D^dagger = -D
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    MILC_StaggeredPhase : 1
+    ExponentialPrecision : 4
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+
+    Updator:
+
+        UpdatorType : CHMC
+
+        Metropolis : 1
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 1
+        IntegratorStep : 40
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        FieldName : CFieldFermionHISQSU3R
+
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.5
+        FieldId : 2
+        PoolNumber : 15
+
+        ShiftCoord : 1
+        Omega : 0.5
+
+        Period : [1, 1, 1, -1]
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 3
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingHISQSU3
+        FieldId : 1
+        Update : 1
 
 TestBosonHermiticity:
 

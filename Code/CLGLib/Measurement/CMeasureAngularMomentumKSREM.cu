@@ -65,7 +65,7 @@ _kernelDFermionKS_PR_XYTermCopyREM(
             this_eta_tau = this_eta_tau + 1;
         }
 
-        deviceSU3Vector right = _deviceVXXTauOptimizedEM(pGauge, pU1, sSite4, fCharge,
+        deviceSU3Vector right = _deviceVXXTauOptimizedEMT(pGauge, pU1, sSite4, fCharge,
             byGaugeFieldId, bXorY, bPlusMu, bPlusTau).MulVector(
                 pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
 
@@ -106,7 +106,9 @@ _kernelDFermionKS_PR_XYTau_TermCopyREM(
 
     pResultData[uiSiteIndex] = deviceSU3Vector::makeZeroSU3Vector();
 
+#ifndef _CLG_DTK
     #pragma unroll
+#endif
     for (UINT idx = 0; idx < 8; ++idx)
     {
         const UBOOL bPlusX = (0 != (idx & 1));
@@ -121,7 +123,7 @@ _kernelDFermionKS_PR_XYTau_TermCopyREM(
         //We have anti-periodic boundary, so we need to use index out of lattice to get the correct sign
         const SIndex& sTargetBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sOffset)];
 
-        const deviceSU3Vector right = _deviceVXYTOptimizedEM(
+        const deviceSU3Vector right = _deviceVXYTOptimizedEMT(
             pGauge, pU1, sSite4, fCharge,
             byGaugeFieldId, bPlusX, bPlusY, bPlusT)
             .MulVector(pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
@@ -129,7 +131,7 @@ _kernelDFermionKS_PR_XYTau_TermCopyREM(
 
         //eta124 of site is almost always -target, so use left or right is same
         //The only exception is on the boundary
-        INT eta124 = bPlusT ? (sSite4.y + sSite4.z) : (site_target.y + site_target.z + 1);
+        INT eta124 = bPlusT ? _deviceEta3(sSite4, 2) : (_deviceEta3(site_target, 2) + 1);
 
         if (sTargetBigIndex.NeedToOpposite())
         {
@@ -212,12 +214,18 @@ _kernelKSApplyGammaEtaCopyREM(
     //pMe[uiSiteIndex].MulReal(F(0.5));
 
     //Here it is gamma _4 psi, we still need r x Aphys times it
-    const Real fY = static_cast<Real>(sSite4.y - _DC_Centery + F(0.5));
-    const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx + F(0.5));
+    //Multi-GPU (P4-1.6): the angular-momentum lever arms x, y must be GLOBAL;
+    //identity on single-GPU (offsets 0). The site stays local for the
+    //index-table lookups below.
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
+    const INT iXg = sSite4G.x;
+    const INT iYg = sSite4G.y;
+    const Real fY = static_cast<Real>(iYg - _DC_Centery + F(0.5));
+    const Real fX = static_cast<Real>(iXg - _DC_Centerx + F(0.5));
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //x ay - y ax
-    deviceSU3 midY = _deviceGetGaugeBCSU3DirZero(byGaugeFieldId, pAphys, uiBigIdx, 1);
-    deviceSU3 midX = _deviceGetGaugeBCSU3DirZero(byGaugeFieldId, pAphys, uiBigIdx, 0);
+    deviceSU3 midY = _deviceGetGaugeBCDirZeroT(byGaugeFieldId, pAphys, uiBigIdx, 1);
+    deviceSU3 midX = _deviceGetGaugeBCDirZeroT(byGaugeFieldId, pAphys, uiBigIdx, 0);
     midY.MulReal(fX);
     midX.MulReal(fY);
     midY.Sub(midX);
@@ -242,7 +250,7 @@ void CMeasureAngularMomentumKSREM::ApplyOrbitalMatrix(
     }
 
     preparethread;
-    _kernelDFermionKS_PR_XYTermCopyREM << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDFermionKS_PR_XYTermCopyREM, block, threads, 
         pInverseZ4,
         pGauge,
         pU1->m_pDeviceData,
@@ -269,7 +277,7 @@ void CMeasureAngularMomentumKSREM::ApplySpinMatrix(
     }
 
     preparethread;
-    _kernelDFermionKS_PR_XYTau_TermCopyREM << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDFermionKS_PR_XYTau_TermCopyREM, block, threads, 
         pInverseZ4,
         pGauge,
         pU1->m_pDeviceData,
@@ -290,7 +298,7 @@ void CMeasureAngularMomentumKSREM::ApplyPotentialMatrix(deviceSU3Vector* pApplie
         appCrucial(_T("CMeasureAMomentumStochastic: A phys undefined.\n"));
     }
     preparethread;
-    _kernelKSApplyGammaEtaCopyREM << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelKSApplyGammaEtaCopyREM, block, threads, 
         byGaugeFieldId,
         pAppliedBuffer,
         pInverseZ4,
@@ -301,6 +309,66 @@ void CMeasureAngularMomentumKSREM::ApplyPotentialMatrix(deviceSU3Vector* pApplie
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pAphys->m_pDeviceData,
         pFieldREM->m_fQ);
+}
+
+void CMeasureAngularMomentumKSREM::OnConfigurationAcceptedZ4SingleField(
+    const class CFieldGauge* pAcceptGauge, 
+    const class CFieldGauge* pCorrespondingStaple, 
+    const class CFieldFermion* pZ4, 
+    const class CFieldFermion* pInverseZ4, 
+    UBOOL bStart, 
+    UBOOL bEnd)
+{
+    CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4SingleField(pAcceptGauge, pCorrespondingStaple, pZ4, pInverseZ4, bStart, bEnd);
+
+    if (bEnd && NULL != m_pOwner)
+    {
+        const UINT uiConfigIdx = m_uiConfigurationCount - 1;
+
+        m_pOwner->AddOneConfigurationResult(this, _T("OrbitalCondAll"), m_lstCondAll[OrbitalKS][uiConfigIdx]);
+        m_pOwner->AddOneConfigurationResult(this, _T("SpinCondAll"), m_lstCondAll[SpinKS][uiConfigIdx]);
+        m_pOwner->AddOneConfigurationResult(this, _T("PotentialCondAll"), m_lstCondAll[PotentialKS][uiConfigIdx]);
+
+        m_pOwner->AddOneConfigurationResult(this, _T("OrbitalCondIn"), m_lstCondIn[OrbitalKS][uiConfigIdx]);
+        m_pOwner->AddOneConfigurationResult(this, _T("SpinCondIn"), m_lstCondIn[SpinKS][uiConfigIdx]);
+        m_pOwner->AddOneConfigurationResult(this, _T("PotentialCondIn"), m_lstCondIn[PotentialKS][uiConfigIdx]);
+
+        const UINT uiRCount = m_lstR.Num();
+        if (uiRCount > 0)
+        {
+            const UINT uiRStart = uiConfigIdx * uiRCount;
+            TArray<CLGComplex> orbitalR;
+            TArray<CLGComplex> spinR;
+            TArray<CLGComplex> potentialR;
+            for (UINT j = 0; j < uiRCount; ++j)
+            {
+                orbitalR.AddItem(m_lstCond[OrbitalKS][uiRStart + j]);
+                spinR.AddItem(m_lstCond[SpinKS][uiRStart + j]);
+                potentialR.AddItem(m_lstCond[PotentialKS][uiRStart + j]);
+            }
+            m_pOwner->AddOneConfigurationResult(this, _T("OrbitalCondR"), orbitalR);
+            m_pOwner->AddOneConfigurationResult(this, _T("SpinCondR"), spinR);
+            m_pOwner->AddOneConfigurationResult(this, _T("PotentialCondR"), potentialR);
+        }
+
+        if (m_bMeasureZSlice)
+        {
+            const UINT uiZSliceCount = _HC_Lz;
+            const UINT uiZSliceStart = uiConfigIdx * uiZSliceCount;
+            TArray<CLGComplex> orbitalZSlice;
+            TArray<CLGComplex> spinZSlice;
+            TArray<CLGComplex> potentialZSlice;
+            for (UINT j = 0; j < uiZSliceCount; ++j)
+            {
+                orbitalZSlice.AddItem(m_lstCondZSlice[OrbitalKS][uiZSliceStart + j]);
+                spinZSlice.AddItem(m_lstCondZSlice[SpinKS][uiZSliceStart + j]);
+                potentialZSlice.AddItem(m_lstCondZSlice[PotentialKS][uiZSliceStart + j]);
+            }
+            m_pOwner->AddOneConfigurationResult(this, _T("OrbitalZSlice"), orbitalZSlice);
+            m_pOwner->AddOneConfigurationResult(this, _T("SpinZSlice"), spinZSlice);
+            m_pOwner->AddOneConfigurationResult(this, _T("PotentialZSlice"), potentialZSlice);
+        }
+    }
 }
 
 

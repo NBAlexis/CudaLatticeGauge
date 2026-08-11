@@ -152,7 +152,7 @@ CCString CFileSystem::ReadAllText(const TCHAR* sFilename)
         UNICHAR* new_data = (UNICHAR*)(malloc(buf_len));
         INT ret_len = appAnsiToUnicode(new_data, (ANSICHAR*)string_start/*with terminator*/, buf_len/*out buffer bytes*/);
         memset(new_data, 0, buf_len);
-        assert(ret_len <= buf_len);
+        appAssert(ret_len <= buf_len);
         free(file_data);
         file_data = (BYTE*)new_data;
         string_start = (BYTE*)new_data;
@@ -171,7 +171,7 @@ CCString CFileSystem::ReadAllText(const TCHAR* sFilename)
         ANSICHAR* new_data = (ANSICHAR*)(malloc(buf_len)); //double the output buffer for pure multi-byte system
         memset(new_data, 0, buf_len);
         INT ret_len = appUnicodeToAnsi(new_data, (UNICHAR*)string_start/*with terminator*/, buf_len/*out buffer bytes*/);
-        assert(ret_len <= buf_len);
+        appAssert(ret_len <= buf_len);
         free(file_data);
         file_data = (BYTE*)new_data;
         string_start = (BYTE*)new_data;

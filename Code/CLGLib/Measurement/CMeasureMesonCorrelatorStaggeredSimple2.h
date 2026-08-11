@@ -22,12 +22,15 @@ class CLGAPI CMeasureMesonCorrelatorStaggeredSimple2 : public CMeasure
     __CLGDECLARE_CLASS(CMeasureMesonCorrelatorStaggeredSimple2)
 public:
 
-    enum { _kMesonCorrelatorTypeSimple2 = 10 };
+    enum { _kMesonCorrelatorTypeSimple2 = 16 };
 
     CMeasureMesonCorrelatorStaggeredSimple2() : CMeasure()
         , m_pDevicePropogators(NULL)
         , m_pResPropogators(NULL)
-        , m_bWallSource(TRUE)
+        , m_pResPropogatorsX(NULL)
+        , m_pResPropogatorsY(NULL)
+        , m_pResPropogatorsZ(NULL)
+        , m_eSource(EFS_Point)
         , m_byFieldID2(0)
     {
         
@@ -35,7 +38,7 @@ public:
     ~CMeasureMesonCorrelatorStaggeredSimple2();
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
 
-    void OnConfigurationAccepted(INT gn, INT bn, const CFieldGauge* const* gs, const CFieldBoson* const* bs, const CFieldGauge* const* stp) override;
+    void OnConfigurationAccepted(INT gn, INT bn, INT tensor2Num, const CFieldGauge* const* gs, const CFieldBoson* const* bs, const CFieldTensor2* const* tensor2Fields, const CFieldGauge* const* stp) override;
     void Report() override;
     void Reset() override;
 
@@ -56,28 +59,30 @@ protected:
 
     Real* m_pDevicePropogators;
 
-#if !_CLG_DOUBLEFLOAT
+    //This is _kMesonCorrelatorTypeSimple2 x (Lt - 1) x (flavour^2)
+    //In the case of flavour=2, it is uu, ud, du, dd
     DOUBLE* m_pResPropogators;
-#else
-    //This is 4 x (Lt - 1)
-    Real* m_pResPropogators;
-#endif
+
+    //This is _kMesonCorrelatorTypeSimple2 x (Lz - 1) x (flavour^2)
+    DOUBLE* m_pResPropogatorsX;
+    DOUBLE* m_pResPropogatorsY;
+    DOUBLE* m_pResPropogatorsZ;
 
 public:
 
-#if !_CLG_DOUBLEFLOAT
     TArray<TArray<DOUBLE>> m_lstAverageResults;
+    TArray<TArray<DOUBLE>> m_lstAverageResultsX;
+    TArray<TArray<DOUBLE>> m_lstAverageResultsY;
+    TArray<TArray<DOUBLE>> m_lstAverageResultsZ;
 
     //m_lstResults[conf][type][t]
     //for nf = 1 + 1, type is: type1uu, type1ud, type1dd, type1du, type2uu, type2ud, type2dd, type2du, ...
     TArray<TArray<TArray<DOUBLE>>> m_lstResults;
-#else
-    TArray<TArray<Real>> m_lstAverageResults;
+    TArray<TArray<TArray<DOUBLE>>> m_lstResultsX;
+    TArray<TArray<TArray<DOUBLE>>> m_lstResultsY;
+    TArray<TArray<TArray<DOUBLE>>> m_lstResultsZ;
 
-    //m_lstResults[conf][type][t]
-    TArray<TArray<TArray<Real>>> m_lstResults;
-#endif
-    UBOOL m_bWallSource;
+    EFermionBosonSource m_eSource;
     BYTE m_byFieldID2;
 };
 

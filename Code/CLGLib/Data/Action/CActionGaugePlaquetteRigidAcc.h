@@ -14,8 +14,10 @@
 // S = (1+gz)(f12^2 + f13^2 + f23^2) + (1/(1+gz))(f01^2+f02^2+f03^2)
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [07/31/2020 nbale]
 //=============================================================================
+#pragma once
 
 #ifndef _CACTIONGAUGEPLAQUETTE_RIGIDACC_H_
 #define _CACTIONGAUGEPLAQUETTE_RIGIDACC_H_
@@ -41,7 +43,7 @@ public:
 
 protected:
 
-    DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;
+    DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStaple = NULL) override;
     UBOOL CalculateForceOnGaugeSingleField(const class CFieldGauge* pGauge, class CFieldGauge* pForce, class CFieldGauge* pStaple, ESolverPhase ePhase) const override;
     void PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
 
@@ -61,19 +63,23 @@ protected:
  */
 static __device__ __inline__ Real _deviceGnRigidAccSpatialLeft(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
 {
-    const Real ret = fG * (sSite.z - _DC_Centerz) + F(1.0);
+    //Multi-GPU: f(n) = 1 + g z needs the GLOBAL z, and the z+1 wrap plus the
+    //Dirichlet surface tests must use the global extent/coordinate
+    //(P4-1.4/1.4-R1). Identity on single-GPU (offset 0, GlobalLz == Lz).
+    const INT iGz = static_cast<INT>(sSite.z) + static_cast<INT>(_DC_OffsetZ);
+    const Real ret = fG * (iGz - _DC_Centerz) + F(1.0);
 
     if (mu == 2 || nu == 2)
     {
-        const SBYTE zp1 = (static_cast<SBYTE>(_DC_Lz - 1) == sSite.z) ? 0 : (sSite.z + 1);
-        const Real ret2 = fG * (zp1 - _DC_Centerz) + F(1.0);
+        const INT iGzp1 = (static_cast<INT>(_DC_GlobalLz) - 1 == iGz) ? 0 : (iGz + 1);
+        const Real ret2 = fG * (iGzp1 - _DC_Centerz) + F(1.0);
         if (bDirichlet)
         {
-            if (0 == sSite.z)
+            if (0 == iGz)
             {
                 return ret2 * F(0.5);
             }
-            else if (0 == zp1)
+            else if (0 == iGzp1)
             {
                 return ret * F(0.5);
             }
@@ -88,19 +94,21 @@ static __device__ __inline__ Real _deviceGnRigidAccSpatialLeft(const SSmallInt4&
  */
 static __device__ __inline__ Real _deviceGnRigidAccSpatialRight(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
 {
-    const Real ret = fG * (sSite.z - _DC_Centerz) + F(1.0);
+    //Multi-GPU: global z/wrap/surface tests (P4-1.4); identity on single-GPU.
+    const INT iGz = static_cast<INT>(sSite.z) + static_cast<INT>(_DC_OffsetZ);
+    const Real ret = fG * (iGz - _DC_Centerz) + F(1.0);
     if (2 == mu)
     {
-        const SBYTE zp1 = (static_cast<SBYTE>(_DC_Lz - 1) == sSite.z) ? 0 : (sSite.z + 1);
-        const Real ret2 = fG * (zp1 - _DC_Centerz) + F(1.0);
+        const INT iGzp1 = (static_cast<INT>(_DC_GlobalLz) - 1 == iGz) ? 0 : (iGz + 1);
+        const Real ret2 = fG * (iGzp1 - _DC_Centerz) + F(1.0);
 
         if (bDirichlet)
         {
-            if (0 == sSite.z)
+            if (0 == iGz)
             {
                 return ret2 * F(0.5);
             }
-            else if (0 == zp1)
+            else if (0 == iGzp1)
             {
                 return ret * F(0.5);
             }
@@ -111,17 +119,17 @@ static __device__ __inline__ Real _deviceGnRigidAccSpatialRight(const SSmallInt4
 
     if (2 == nu)
     {
-        const SBYTE zm1 = (0 == sSite.z) ? (static_cast<SBYTE>(_DC_Lz) - 1) : (sSite.z - 1);
-        const Real ret2 = fG * (zm1 - _DC_Centerz) + F(1.0);
+        const INT iGzm1 = (0 == iGz) ? (static_cast<INT>(_DC_GlobalLz) - 1) : (iGz - 1);
+        const Real ret2 = fG * (iGzm1 - _DC_Centerz) + F(1.0);
 
         if (bDirichlet)
         {
-            if (0 == sSite.z)
+            if (0 == iGz)
             {
                 printf("should never be here!\n");
                 return ret * F(0.5);
             }
-            else if (1 == sSite.z)
+            else if (1 == iGz)
             {
                 return ret * F(0.5);
             }
@@ -140,19 +148,21 @@ static __device__ __inline__ Real _deviceGnRigidAccSpatialRight(const SSmallInt4
  */
 static __device__ __inline__ Real _deviceGnRigidAccTimeLeft(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
 {
-    const Real ret = F(1.0) / (fG * (sSite.z - _DC_Centerz) + F(1.0));
+    //Multi-GPU: global z/wrap/surface tests (P4-1.4); identity on single-GPU.
+    const INT iGz = static_cast<INT>(sSite.z) + static_cast<INT>(_DC_OffsetZ);
+    const Real ret = F(1.0) / (fG * (iGz - _DC_Centerz) + F(1.0));
 
     if (mu == 2 || nu == 2)
     {
-        const SBYTE zp1 = (static_cast<SBYTE>(_DC_Lz - 1) == sSite.z) ? 0 : (sSite.z + 1);
-        const Real ret2 = F(1.0) / (fG * (zp1 - _DC_Centerz) + F(1.0));
+        const INT iGzp1 = (static_cast<INT>(_DC_GlobalLz) - 1 == iGz) ? 0 : (iGz + 1);
+        const Real ret2 = F(1.0) / (fG * (iGzp1 - _DC_Centerz) + F(1.0));
         if (bDirichlet)
         {
-            if (0 == sSite.z)
+            if (0 == iGz)
             {
                 return ret2 * F(0.5);
             }
-            else if (0 == zp1)
+            else if (0 == iGzp1)
             {
                 return ret * F(0.5);
             }
@@ -167,19 +177,21 @@ static __device__ __inline__ Real _deviceGnRigidAccTimeLeft(const SSmallInt4& sS
  */
 static __device__ __inline__ Real _deviceGnRigidAccTimeRight(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
 {
-    const Real ret = F(1.0) / (fG * (sSite.z - _DC_Centerz) + F(1.0));
+    //Multi-GPU: global z/wrap/surface tests (P4-1.4); identity on single-GPU.
+    const INT iGz = static_cast<INT>(sSite.z) + static_cast<INT>(_DC_OffsetZ);
+    const Real ret = F(1.0) / (fG * (iGz - _DC_Centerz) + F(1.0));
     if (2 == mu)
     {
-        const SBYTE zp1 = (static_cast<SBYTE>(_DC_Lz - 1) == sSite.z) ? 0 : (sSite.z + 1);
-        const Real ret2 = F(1.0) / (fG * (zp1 - _DC_Centerz) + F(1.0));
+        const INT iGzp1 = (static_cast<INT>(_DC_GlobalLz) - 1 == iGz) ? 0 : (iGz + 1);
+        const Real ret2 = F(1.0) / (fG * (iGzp1 - _DC_Centerz) + F(1.0));
 
         if (bDirichlet)
         {
-            if (0 == sSite.z)
+            if (0 == iGz)
             {
                 return ret2 * F(0.5);
             }
-            else if (0 == zp1)
+            else if (0 == iGzp1)
             {
                 return ret * F(0.5);
             }
@@ -190,17 +202,17 @@ static __device__ __inline__ Real _deviceGnRigidAccTimeRight(const SSmallInt4& s
 
     if (2 == nu)
     {
-        const SBYTE zm1 = (0 == sSite.z) ? (static_cast<SBYTE>(_DC_Lz) - 1) : (sSite.z - 1);
-        const Real ret2 = F(1.0) / (fG * (zm1 - _DC_Centerz) + F(1.0));
+        const INT iGzm1 = (0 == iGz) ? (static_cast<INT>(_DC_GlobalLz) - 1) : (iGz - 1);
+        const Real ret2 = F(1.0) / (fG * (iGzm1 - _DC_Centerz) + F(1.0));
 
         if (bDirichlet)
         {
-            if (0 == sSite.z)
+            if (0 == iGz)
             {
                 printf("should never be here!\n");
                 return ret * F(0.5);
             }
-            else if (1 == sSite.z)
+            else if (1 == iGz)
             {
                 return ret * F(0.5);
             }

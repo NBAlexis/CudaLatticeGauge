@@ -5,6 +5,7 @@
 // This is the class for all fields, gauge, fermion and spin fields are inherent from it
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [08/15/2022 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -48,7 +49,7 @@ _kernelPlaqutteEnergySU3_UseCloverGradient(
     {
         for (BYTE byDir2 = byDir1 + 1; byDir2 < _DC_Dir; ++byDir2)
         {
-            fRes += _deviceCloverRetr(pDeviceData, sSite4, __bi(sSite4), byDir1, byDir2, byFieldId);
+            fRes += _deviceCloverRetrT(pDeviceData, sSite4, __bi(sSite4), byDir1, byDir2, byFieldId);
         }
     }
 #if !_CLG_DOUBLEFLOAT
@@ -64,14 +65,12 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedIndex,
-    UINT plaqLength, UINT plaqCount,
+#if !_CLG_ASSUME_SQUARE_LATTICE
+    BYTE plaqLength, BYTE plaqCountPerLink,
+#endif
     deviceSU3* pStapleData, //can be NULL
     deviceSU3* pForceData,
-#if !_CLG_DOUBLEFLOAT
     const DOUBLE* __restrict__ betaOverN
-#else
-    const Real* __restrict__ betaOverN
-#endif
 )
 {
     intokernalInt4;
@@ -85,8 +84,10 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
 
     //Real test_force = F(0.0);
     //betaOverN = betaOverN * F(-0.5);
+#if !_CLG_ASSUME_SQUARE_LATTICE
     const UINT plaqLengthm1 = plaqLength - 1;
-    UINT plaqCountAll = plaqCount * plaqLengthm1;
+    UINT plaqCountAllLink = plaqCountPerLink * plaqLengthm1;
+#endif
 
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
@@ -99,18 +100,18 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
         deviceSU3 res = deviceSU3::makeSU3Zero();
 
         //there are 6 staples, each is sum of two plaquttes
-        SBYTE z1 = 0;
-        SBYTE z2 = 0;
+        SCHAR z1 = 0;
+        SCHAR z2 = 0;
         BYTE zNotFound = 1;
-        for (INT i = 0; i < plaqCount; ++i)
+        for (INT i = 0; i < plaqCountPerLink; ++i)
         {
             BYTE diricCount = 0;
-            const SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
+            const SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAllLink];
             if (first.IsDirichlet())
             {
                 ++diricCount;
             }
-            deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
+            deviceSU3 toAdd(_deviceGetGaugeBCT(byFieldId, pDeviceData, first));
 
             const SSmallInt4 firstn = __deviceSiteIndexToInt4(first.m_uiSiteIndex);
             z1 = firstn.z;
@@ -127,13 +128,13 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
 
             for (INT j = 1; j < plaqLengthm1; ++j)
             {
-                const SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
+                const SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAllLink];
                 if (nextlink.IsDirichlet())
                 {
                     ++diricCount;
                 }
                 //deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
-                deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, nextlink));
+                deviceSU3 toMul(_deviceGetGaugeBCT(byFieldId, pDeviceData, nextlink));
 
                 if (nextlink.NeedToDagger())
                 {
@@ -205,16 +206,16 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
         //staple calculated
         if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, static_cast<BYTE>(idir)))
         {
-            deviceSU3 force(pDeviceData[linkIndex]);
-            force.MulDagger(res);
+            //deviceSU3 force(pDeviceData[linkIndex]);
+            //force.MulDagger(res);
             //test_force += F(-2.0) * betaOverN * __SU3Generators[8].MulC(force).ImTr();
-            force.Ta();
+            //force.Ta();
 
             //this is the average over 4 cornels, so this is different for different dirs
             //force.MulReal(betaOverN);
 
             //force is additive
-            pForceData[linkIndex].Add(force);
+            pForceData[linkIndex].Add(res);
         }
     }
 }
@@ -230,12 +231,12 @@ CActionGaugePlaquetteGradient::CActionGaugePlaquetteGradient()
 
 DOUBLE CActionGaugePlaquetteGradient::CalculatePlaqutteEnergyUseClover(const CFieldGaugeSU3* pGauge) const
 {
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGauge->m_byFieldId]);
+    appAssert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGauge->m_byFieldId]);
     //pGauge->FixBoundary();
     //pGauge->DebugPrintMe();
 
     preparethread;
-    _kernelPlaqutteEnergySU3_UseCloverGradient << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelPlaqutteEnergySU3_UseCloverGradient, block, threads, 
         pGauge->m_byFieldId,
         pGauge->m_pDeviceData,
         m_pDeviceBetaArray,
@@ -248,17 +249,27 @@ void CActionGaugePlaquetteGradient::CalculateForceAndStaple(const CFieldGaugeSU3
 {
     preparethread;
 
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache[pGauge->m_byFieldId]);
-
-    _kernelStapleAtSiteSU3CacheIndexGradient << <block, threads >> > (
+    appAssert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache[pGauge->m_byFieldId]);
+    deviceSU3* emptyStaple = NULL;
+#if !_CLG_ASSUME_SQUARE_LATTICE
+    _LAUNCH_KERNEL(_kernelStapleAtSiteSU3CacheIndexGradient, block, threads, 
         pGauge->m_byFieldId,
         pGauge->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pStappleCache[pGauge->m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
-        NULL,
+        emptyStaple,
         pForce->m_pDeviceData,
         m_pDeviceBetaArray);
+#else
+    _LAUNCH_KERNEL(_kernelStapleAtSiteSU3CacheIndexGradient, block, threads,
+        pGauge->m_byFieldId,
+        pGauge->m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[pGauge->m_byFieldId],
+        emptyStaple,
+        pForce->m_pDeviceData,
+        m_pDeviceBetaArray);
+#endif
 }
 
 void CActionGaugePlaquetteGradient::PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate)
@@ -272,8 +283,12 @@ void CActionGaugePlaquetteGradient::PrepareForHMCSingleField(const CFieldGauge* 
             return;
         }
 
-        assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGauge->m_byFieldId]);
+        appAssert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGauge->m_byFieldId]);
         m_fLastEnergy = CalculatePlaqutteEnergyUseClover(pGaugeSU3);
+        //I9: the cached "before" energy must be the GLOBAL action (the clover
+        //energy above sums only this rank's local sub-lattice), or HMC sees a
+        //constant ΔH offset. No-op on a lone rank.
+        appGlobalSum(m_fLastEnergy);
     }
 }
 
@@ -281,7 +296,6 @@ void CActionGaugePlaquetteGradient::Initial(class CLatticeData* pOwner, const CP
 {
     CAction::Initial(pOwner, param, byId);
 
-#if !_CLG_DOUBLEFLOAT
     param.FetchValueArrayDOUBLE(_T("Beta"), m_fBetaArray);
     for (INT i = 0; i < _HC_Lzi; ++i)
     {
@@ -297,41 +311,20 @@ void CActionGaugePlaquetteGradient::Initial(class CLatticeData* pOwner, const CP
             }
             else
             {
-                m_fBetaArray.AddItem(m_fBetaArray.Num() - 1);
+                m_fBetaArray.AddItem(m_fBetaArray[m_fBetaArray.Num() - 1]);
             }
         }
     }
-#else
-    param.FetchValueArrayReal(_T("Beta"), m_fBetaArray);
-    for (INT i = 0; i < _HC_Lzi; ++i)
-    {
-        if (i < m_fBetaArray.Num())
-        {
-            m_fBetaArray[i] = m_fBetaArray[i] / static_cast<Real>(GetDefaultMatrixN());
-        }
-        else
-        {
-            if (0 == i)
-            {
-                m_fBetaArray.AddItem(F(5.0) / static_cast<Real>(GetDefaultMatrixN()));
-            }
-            else
-            {
-                m_fBetaArray.AddItem(m_fBetaArray.Num() - 1);
-            }
-        }
-    }
-#endif
+
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceBetaArray, sizeof(DOUBLE) * _HC_Lz));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceBetaArray, sizeof(DOUBLE) * _HC_Lz));
     checkCudaErrors(cudaMemcpy(m_pDeviceBetaArray, m_fBetaArray.GetData(), sizeof(DOUBLE) * _HC_Lz, cudaMemcpyHostToDevice));
 }
 
 void CActionGaugePlaquetteGradient::SetBetaList(const TArray<DOUBLE>& fBeta)
 {
     m_fBetaArray = fBeta;
-#if !_CLG_DOUBLEFLOAT
     for (INT i = 0; i < _HC_Lzi; ++i)
     {
         if (i < m_fBetaArray.Num())
@@ -346,33 +339,11 @@ void CActionGaugePlaquetteGradient::SetBetaList(const TArray<DOUBLE>& fBeta)
             }
             else
             {
-                m_fBetaArray.AddItem(m_fBetaArray.Num() - 1);
+                m_fBetaArray.AddItem(m_fBetaArray[m_fBetaArray.Num() - 1]);
             }
         }
     }
     checkCudaErrors(cudaMemcpy(m_pDeviceBetaArray, m_fBetaArray.GetData(), sizeof(DOUBLE) * _HC_Lz, cudaMemcpyHostToDevice));
-#else
-    for (INT i = 0; i < _HC_Lzi; ++i)
-    {
-        if (i < m_fBetaArray.Num())
-        {
-            m_fBetaArray[i] = m_fBetaArray[i] / static_cast<Real>(GetDefaultMatrixN());
-        }
-        else
-        {
-            if (0 == i)
-            {
-                m_fBetaArray.AddItem(F(5.0) / static_cast<Real>(GetDefaultMatrixN()));
-            }
-            else
-            {
-                m_fBetaArray.AddItem(m_fBetaArray.Num() - 1);
-            }
-        }
-    }
-    checkCudaErrors(cudaMemcpy(m_pDeviceBetaArray, m_fBetaArray.GetData(), sizeof(Real)* _HC_Lz, cudaMemcpyHostToDevice));
-#endif
-
 }
 
 UBOOL CActionGaugePlaquetteGradient::CalculateForceOnGaugeSingleField(const CFieldGauge * pGauge, CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
@@ -393,7 +364,7 @@ UBOOL CActionGaugePlaquetteGradient::CalculateForceOnGaugeSingleField(const CFie
 /**
 * The implementation depends on the type of gauge field
 */
-DOUBLE CActionGaugePlaquetteGradient::EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+DOUBLE CActionGaugePlaquetteGradient::EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStaple)
 {
     if (bBeforeEvolution)
     {
@@ -407,6 +378,8 @@ DOUBLE CActionGaugePlaquetteGradient::EnergySingleField(UBOOL bBeforeEvolution, 
         return m_fNewEnergy;
     }
     m_fNewEnergy = CalculatePlaqutteEnergyUseClover(pGaugeSU3);
+    //I9: local partial sum -> global action (see PrepareForHMCSingleField).
+    appGlobalSum(m_fNewEnergy);
     return m_fNewEnergy;
 }
 

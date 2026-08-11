@@ -90,6 +90,39 @@ static __device__ __inline__ Real _deviceChairTermT(const deviceGauge* __restric
     const SSmallInt4& n_m_rho_m_nu = _deviceSmallInt4OffsetC(n_m_rho, __bck(nu));
     const SSmallInt4& n_m_nu_p_rho = _deviceSmallInt4OffsetC(n_m_nu, __fwd(rho));
 
+#if _CLG_ASSUME_SQUARE_LATTICE
+    const UINT n_bi4 = uiBigIndex << 2U;
+    const UINT n_p_nu_bi4 = __bi4(n_p_nu);
+    const UINT n_m_mu_bi4 = __bi4(n_m_mu);
+    const UINT n_m_rho_bi4 = __bi4(n_m_rho);
+    const UINT n_m_nu_bi4 = __bi4(n_m_nu);
+    const UINT n_m_mu_m_nu_bi4 = __bi4(n_m_mu_m_nu);
+    const UINT n_m_rho_m_nu_bi4 = __bi4(n_m_rho_m_nu);
+
+    const SIndex& n__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_bi4 | mu];
+    const SIndex& n_p_mu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_mu) | nu];
+    const SIndex& n_p_nu__rho = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_p_nu_bi4 | rho];
+    const SIndex& n_m_mu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_mu_bi4 | mu];
+    const SIndex& n_m_mu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_mu_bi4 | nu];
+    const SIndex& n_m_mu_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_m_mu_p_nu) | mu];
+    const SIndex& n_m_rho__rho = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_rho_bi4 | rho];
+    const SIndex& n_m_mu_m_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_mu_m_nu_bi4 | mu];
+    const SIndex& n_m_nu__rho = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 | rho];
+    const SIndex& n_m_nu_p_rho__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_m_nu_p_rho) | nu];
+    const SIndex& n_m_rho_m_nu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_rho_m_nu_bi4 | nu];
+
+    const SIndex n_m_mu__mu_dag = n_m_mu__mu.DaggerC();
+
+    SIndex n_p_nu__mu_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_p_nu_bi4 | mu];
+    SIndex n_p_rho__nu_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_rho) | nu];
+    SIndex n__rho_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_bi4 | rho];
+    SIndex n_m_rho_p_nu__rho_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_m_rho_p_nu) | rho];
+    SIndex n_m_rho__nu_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_rho_bi4 | nu];
+    SIndex n_p_mu_m_nu__nu_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_mu_m_nu) | nu];
+    SIndex n_m_nu__mu_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 | mu];
+    SIndex n_m_mu_m_nu__nu_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_mu_m_nu_bi4 | nu];
+    SIndex n_m_rho_m_nu__rho_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_rho_m_nu_bi4 | rho];
+#else
     const UINT n_bi4 = uiBigIndex * _DC_Dir;
     const UINT n_p_nu_bi4 = __bi4(n_p_nu);
     const UINT n_m_mu_bi4 = __bi4(n_m_mu);
@@ -121,6 +154,7 @@ static __device__ __inline__ Real _deviceChairTermT(const deviceGauge* __restric
     SIndex n_m_nu__mu_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + mu];
     SIndex n_m_mu_m_nu__nu_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_mu_m_nu_bi4 + nu];
     SIndex n_m_rho_m_nu__rho_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_rho_m_nu_bi4 + rho];
+#endif
 
     n_p_nu__mu_dag.m_byTag = n_p_nu__mu_dag.m_byTag ^ _kDaggerOrOpposite;
     n_p_rho__nu_dag.m_byTag = n_p_rho__nu_dag.m_byTag ^ _kDaggerOrOpposite;
@@ -237,7 +271,19 @@ static __device__ __inline__ deviceGauge _deviceStapleTermGfactorT(
 
     if (bTorus)
     {
+#if _CLG_MULTI_GPU
+        //P4-5.4: on multi-GPU the position table may have redirected n_m_nu to a
+        //HALO slot (m_uiSiteIndex >= _DC_Volume). __deviceSiteIndexToInt4 indexes
+        //m_pSiteMappingTable which is sized to the LOCAL volume only, so decoding
+        //a halo slot would read out of bounds (cudaErrorIllegalAddress on
+        //multi-direction splits, e.g. [2,2,1,1]). Keep the raw (possibly
+        //out-of-range) local coordinate: the _deviceFi/_deviceFiShifted helpers
+        //below re-derive the baked SIndex through __bi() and resolve it with
+        //_deviceSIndexToGlobalInt4, which handles halo slots.
+        (void)n_m_nu;
+#else
         n_m_nu = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(n_m_nu)].m_uiSiteIndex);
+#endif
     }
 
     const Real fRFactor = bShifted

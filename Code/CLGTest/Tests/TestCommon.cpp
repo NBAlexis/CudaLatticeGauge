@@ -6,6 +6,7 @@
 //     Test the operations on fields
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [02/10/2019 nbale]
 //=============================================================================
 
@@ -17,10 +18,10 @@ UINT TestOperators(CParameters& )
 
     //test Ddagger
     //CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField[0]);
-    CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
-    CFieldFermionWilsonSquareSU3* pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
-    CFieldFermionWilsonSquareSU3* pF3 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
-    CFieldFermionWilsonSquareSU3* pF4 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+    CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+    CFieldFermionWilsonSquareSU3* pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+    CFieldFermionWilsonSquareSU3* pF3 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+    CFieldFermionWilsonSquareSU3* pF4 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
     pF1->InitialField(EFIT_RandomGaussian);
     pF2->InitialField(EFIT_RandomGaussian);
 
@@ -47,19 +48,22 @@ UINT TestOperators(CParameters& )
     {
         ++uiErrors;
     }
-    if (appAbs(dot3.x / (12 * _HC_Volume)) > 0.01f)
+    //Cross inner products are statistical: |f1.f2|/(12V) fluctuates with
+    //sigma ~ 1/sqrt(12V) ~ 0.009 at V=512, the same order as the old 0.01
+    //tolerance, so the check was flaky. Widen to ~5 sigma.
+    if (appAbs(dot3.x / (12 * _HC_Volume)) > 0.05f)
     {
         ++uiErrors;
     }
-    if (appAbs(dot3.y / (12 * _HC_Volume)) > 0.01f)
+    if (appAbs(dot3.y / (12 * _HC_Volume)) > 0.05f)
     {
         ++uiErrors;
     }
-    if (appAbs(dot4.x / (12 * _HC_Volume)) > 0.01f)
+    if (appAbs(dot4.x / (12 * _HC_Volume)) > 0.05f)
     {
         ++uiErrors;
     }
-    if (appAbs(dot4.y / (12 * _HC_Volume)) > 0.01f)
+    if (appAbs(dot4.y / (12 * _HC_Volume)) > 0.05f)
     {
         ++uiErrors;
     }
@@ -111,25 +115,25 @@ UINT TestALogDefinition(CParameters&)
     return 0;
 }
 
-___REGIST_TEST(TestSmallMatrix, Verify, TestSmallMatrix, SmallMatrix, _TEST_NOCHECK);
+___REGIST_TEST(TestSmallMatrix, Verify, TestSmallMatrix, SmallMatrix, _TEST_NOCHECK | _TEST_MULTIGPU);
 
 __REGIST_TEST(TestOperators, Misc, TestOperators, Operators);
 
 //__REGIST_TEST(TestQuickAxpy, Misc, TestQuickAxpy);
 
-__REGIST_TEST(TestALogDefinition, Misc, TestALogDefinition, ALog);
+___REGIST_TEST(TestALogDefinition, Misc, TestALogDefinition, ALog, _TEST_MULTIGPU);
 
 //__REGIST_TEST(TestDirichletDOperator, Misc, TestRotationOperator);
 
 UINT TestGammaMatrix(CParameters&)
 {
-    CFieldFermionWilsonSquareSU3* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+    CFieldFermionWilsonSquareSU3* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
 
     for (UINT i = 0; i < 1000; ++i)
     {
         for (UINT j = 0; j < EGM_MAX; ++j)
         {
-            pFermion->ApplyGamma((EGammaMatrix)j);
+            pFermion->ApplyGamma(0, 0, NULL, NULL, (EGammaMatrix)j);
         }
     }
 
@@ -143,7 +147,7 @@ UINT TestGamma5Hermiticity(CParameters& param)
     param.FetchValueINT(_T("GAMM5Test"), iG5);
 
     CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField[0]);
-    CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+    CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
     UINT uiErrors = pF1->TestGamma5Hermitian(pGauge, 0 != iG5);
     //CCudaHelper::DebugFunction();
     pF1->Return();
@@ -155,7 +159,15 @@ UINT TestAnitiHermiticity(CParameters&)
 {
     //test Ddagger
     //CFieldGauge* pGauge = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField);
-    CFieldFermionKS* pF1 = dynamic_cast<CFieldFermionKS*>(appGetLattice()->GetPooledFieldById(2));
+    CFieldFermionKS* pF1 = dynamic_cast<CFieldFermionKS*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
+
+    //the D operator of HISQ uses the smeared Naik links, trigger the smearing once if it is configured
+    CGaugeSmearing* pSmearing = appGetGaugeSmearing(1);
+    if (NULL != pSmearing && pSmearing->CalledWhenUpdate())
+    {
+        pSmearing->GaugeSmearingC(appGetLattice()->m_pGaugeField[0]);
+    }
+
     UINT uiErrors = pF1->TestAntiHermitian(_FIELDS);
     appGeneral(_T("=== Tested Fermion: \n %s \n"), pF1->GetInfos(_T("     ")).c_str());
     pF1->Return();
@@ -167,7 +179,7 @@ UINT TestBosonHermiticity(CParameters&)
 {
     //test Ddagger
     //CFieldGauge* pGauge = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField);
-    CFieldBoson* pF1 = dynamic_cast<CFieldBoson*>(appGetLattice()->GetPooledFieldById(2));
+    CFieldBoson* pF1 = dynamic_cast<CFieldBoson*>(appGetLattice()->GetPooledFieldById(2, _T(__FILE__), __LINE__));
     UINT uiErrors = pF1->CheckHermitian(_FIELDS);
     appGeneral(_T("=== Tested Boson: \n %s \n"), pF1->GetInfos(_T("     ")).c_str());
     pF1->Return();
@@ -185,11 +197,15 @@ UINT TestDebugFunction(CParameters&)
     return 0;
 }
 
-___REGIST_TEST(TestGamma5Hermiticity, Tools, TestGamm5Hermiticity, Gamm5Hermiticity, _TEST_NOCHECK);
+__REGIST_TEST(TestGamma5Hermiticity, Tools, TestGamm5Hermiticity, Gamm5Hermiticity);
 
-___REGIST_TEST(TestAnitiHermiticity, Tools, TestAnitiHermiticity, AnitiHermiticity, _TEST_NOCHECK);
+__REGIST_TEST(TestAnitiHermiticity, Tools, TestAnitiHermiticity, AnitiHermiticity);
 
-___REGIST_TEST(TestBosonHermiticity, Tools, TestBosonHermiticity, BosonHermiticity, _TEST_NOCHECK);
+__REGIST_TEST(TestAnitiHermiticity, Tools, TestAnitiHermiticityKSSU3R, AnitiHermiticityKSSU3R);
+
+__REGIST_TEST(TestAnitiHermiticity, Tools, TestAnitiHermiticityHISQSU3R, AnitiHermiticityHISQSU3R);
+
+__REGIST_TEST(TestBosonHermiticity, Tools, TestBosonHermiticity, BosonHermiticity);
 
 ___REGIST_TEST(TestDebugFunction, Tools, TestDebug, Debug, _TEST_NOCHECK);
 
@@ -227,13 +243,23 @@ UINT TestGaugeInvarience(CParameters&)
     {
         Real fEnergy = static_cast<Real>(appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->Energy(FALSE, _FIELDS, NULL));
         appGeneral(_T("Action%d, Before:%2.20f, After:%2.20f\n"), i, beforeGaugeTransform[i], fEnergy);
-        if (appAbs(beforeGaugeTransform[i] - fEnergy) > F(0.0000001))
+        //Total action is O(1e3); a random SU(3) gauge transform introduces
+        //round-off that float summation amplifies to ~1e-4..1e-3, far above
+        //the old 1e-7 (only viable in double). Use a float/double split.
+        const Real fTol = static_cast<Real>(
+#if !_CLG_DOUBLEFLOAT
+            F(0.001)
+#else
+            F(0.0000001)
+#endif
+        );
+        if (appAbs(beforeGaugeTransform[i] - fEnergy) > fTol)
         {
             ++uiError;
         }
     }
 
-    return 0;
+    return uiError;
 }
 
 __REGIST_TEST(TestGaugeInvarience, Misc, TestGaugeInvarience, GaugeInvarience);
@@ -477,10 +503,10 @@ UINT TestBackgroundField(CParameters&)
     pU1->DebugPrintSlice(0, 1, xy);
     appGeneral(_T("\n\n"));
 
-    return 0;
+    return uiError;
 }
 
-___REGIST_TEST(TestBackgroundField, Tools, TestBackgroundField, PrintBackgroundField, _TEST_NOCHECK);
+__REGIST_TEST(TestBackgroundField, Tools, TestBackgroundField, PrintBackgroundField);
 
 UINT TestPlaqutteTable(CParameters&)
 {
@@ -489,8 +515,47 @@ UINT TestPlaqutteTable(CParameters&)
     return 0;
 }
 
-___REGIST_TEST(TestPlaqutteTable, Tools, TestPlaqutteTable, PlaqutteTable, _TEST_NOCHECK);
+___REGIST_TEST(TestPlaqutteTable, Tools, TestPlaqutteTable, PlaqutteTable, _TEST_NOCHECK | _TEST_MULTIGPU);
 
+UINT TestSU3_12CopyTo(CParameters&)
+{
+    UINT uiErrors = 0;
+
+    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField[0]);
+    if (NULL == pGauge)
+    {
+        appCrucial(_T("TestSU3_12CopyTo: no gauge field found\n"));
+        return 1;
+    }
+
+    // SU3 -> SU3_12 -> SU3 round-trip
+    CFieldGaugeSU3_12* pSU3_12 = new CFieldGaugeSU3_12();
+    pGauge->CopyBufferTo(pSU3_12);
+
+    // MSE: ||SU3_12-expanded - original||^2 / (linkCount * 18)
+    UINT uiLinkCount = _HC_Volume * _HC_Dir;
+    DOUBLE fMSE = CFieldGaugeSU3_12::SU3_12MSE(
+        static_cast<const deviceSU3_12*>(pSU3_12->GetData()),
+        static_cast<const deviceSU3*>(pGauge->GetData()),
+        uiLinkCount);
+    fMSE /= static_cast<DOUBLE>(uiLinkCount * 18);
+    appGeneral(_T("SU3_12 round-trip MSE: %e\n"), fMSE);
+
+    if (fMSE > 1e-10)
+    {
+        appCrucial(_T("FAILED: round-trip MSE = %e\n"), fMSE);
+        ++uiErrors;
+    }
+    else
+    {
+        appGeneral(_T("PASSED\n"));
+    }
+
+    appSafeDelete(pSU3_12);
+    return uiErrors;
+}
+
+//__REGIST_TEST(TestSU3_12CopyTo, Updator, TestSU3_12CopyTo, SU312CopyTo);
 
 
 //=============================================================================

@@ -10,6 +10,7 @@
 // 
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [04/22/2019 nbale]
 //=============================================================================
 
@@ -23,7 +24,7 @@ class CLGAPI CIndexData
 public:
     enum 
     { 
-        kCacheIndexEdge = 2, 
+        kCacheIndexEdge = 4, 
         kCacheIndexSmallDataCount = 8, 
 
         kMultX = 0,
@@ -38,15 +39,21 @@ public:
         : m_pSmallData(NULL)
         , m_byRegionTable(NULL)
         , m_pMappingTable(NULL)
+        , m_pSiteMappingTable(NULL)
         , m_pEtaMu(NULL)
+        , m_pGlobalCoordinateTable(NULL)
+        , m_pHaloGatherIndex(NULL)
+        , m_uiHaloSiteCount(0)
         , m_uiSiteXYZT(1)
         , m_uiSiteXYZ(1)
         , m_uiLinkNumber(1)
+        //, m_uiEvenOddTable(NULL)
     {
-        checkCudaErrors(cudaMalloc((void**)&m_pSmallData, sizeof(UINT) * kCacheIndexSmallDataCount));
-        checkCudaErrors(cudaMalloc((void**)&m_pMappingTable, sizeof(SSmallInt4)
+        checkCudaErrors(__cudaMalloc((void**)&m_pSmallData, sizeof(UINT) * kCacheIndexSmallDataCount));
+        checkCudaErrors(__cudaMalloc((void**)&m_pMappingTable, sizeof(SSmallInt4)
             * (_HC_Lx + 2 * kCacheIndexEdge) * (_HC_Ly + 2 * kCacheIndexEdge)
             * (_HC_Lz + 2 * kCacheIndexEdge) * (_HC_Lt + 2 * kCacheIndexEdge) ));
+        checkCudaErrors(__cudaMalloc((void**)&m_pSiteMappingTable, sizeof(SSmallInt4) * _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt));
 
         //checkCudaErrors(cudaMalloc((void**)&m_pBondInfoTable, sizeof(BYTE)
         //    * (_HC_Lx + 2 * kCacheIndexEdge) * (_HC_Ly + 2 * kCacheIndexEdge)
@@ -55,10 +62,10 @@ public:
         //memset(m_pBondInfoTable, 0, sizeof(BYTE*) * kMaxFieldCount);
 
         //region id is a byte, so max is 256
-        checkCudaErrors(cudaMalloc((void**)&m_byRegionTable, sizeof(UINT) * 256));
+        checkCudaErrors(__cudaMalloc((void**)&m_byRegionTable, sizeof(UINT) * 256));
 
-        checkCudaErrors(cudaMalloc((void**)&m_pDeviceIndexPositionToSIndex, sizeof(SIndex*) * kMaxFieldCount));
-        checkCudaErrors(cudaMalloc((void**)&m_pDeviceIndexLinkToSIndex, sizeof(SIndex*) * kMaxFieldCount));
+        checkCudaErrors(__cudaMalloc((void**)&m_pDeviceIndexPositionToSIndex, sizeof(SIndex*) * kMaxFieldCount));
+        checkCudaErrors(__cudaMalloc((void**)&m_pDeviceIndexLinkToSIndex, sizeof(SIndex*) * kMaxFieldCount));
         memset(m_pIndexPositionToSIndex, 0, sizeof(SIndex*) * kMaxFieldCount);
         memset(m_pIndexLinkToSIndex, 0, sizeof(SIndex*) * kMaxFieldCount);
 
@@ -67,17 +74,22 @@ public:
 
         memset(m_pGaugeMoveCache, 0, sizeof(SIndex*) * kMaxFieldCount);
         memset(m_pMoveCache, 0, sizeof(SIndex*) * kMaxFieldCount);
+        memset(m_pNaikCache, 0, sizeof(SIndex*) * kMaxFieldCount);
 
         memset(m_uiSiteNumber, 0, sizeof(UINT) * kMaxFieldCount);
+
+        //checkCudaErrors(cudaMalloc((void**)&m_uiEvenOddTable, sizeof(UINT) * _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt));
+
         checkCudaErrors(cudaDeviceSynchronize());
 
     }
 
     ~CIndexData()
     {
-        checkCudaErrors(cudaFree(m_pSmallData));
-        checkCudaErrors(cudaFree(m_pMappingTable));
-        checkCudaErrors(cudaFree(m_byRegionTable));
+        checkCudaErrors(__cudaFree(m_pSmallData));
+        checkCudaErrors(__cudaFree(m_pMappingTable));
+        checkCudaErrors(__cudaFree(m_pSiteMappingTable));
+        checkCudaErrors(__cudaFree(m_byRegionTable));
 
         cudaSafeFree(m_pEtaMu);
 
@@ -91,50 +103,62 @@ public:
 
             if (NULL != m_pPlaqutteCache[i])
             {
-                checkCudaErrors(cudaFree(m_pPlaqutteCache[i]));
+                checkCudaErrors(__cudaFree(m_pPlaqutteCache[i]));
                 m_pPlaqutteCache[i] = NULL;
             }
 
             if (NULL != m_pStappleCache[i])
             {
-                checkCudaErrors(cudaFree(m_pStappleCache[i]));
+                checkCudaErrors(__cudaFree(m_pStappleCache[i]));
                 m_pStappleCache[i] = NULL;
             }
 
             if (NULL != m_pIndexPositionToSIndex[i])
             {
-                checkCudaErrors(cudaFree(m_pIndexPositionToSIndex[i]));
+                checkCudaErrors(__cudaFree(m_pIndexPositionToSIndex[i]));
                 m_pIndexPositionToSIndex[i] = NULL;
             }
-            if (NULL != m_pIndexPositionToSIndex[i])
+            if (NULL != m_pIndexLinkToSIndex[i])
             {
-                checkCudaErrors(cudaFree(m_pIndexLinkToSIndex[i]));
+                checkCudaErrors(__cudaFree(m_pIndexLinkToSIndex[i]));
                 m_pIndexLinkToSIndex[i] = NULL;
             }
             if (NULL != m_pGaugeMoveCache[i])
             {
-                checkCudaErrors(cudaFree(m_pGaugeMoveCache[i]));
+                checkCudaErrors(__cudaFree(m_pGaugeMoveCache[i]));
                 m_pGaugeMoveCache[i] = NULL;
             }
             if (NULL != m_pMoveCache[i])
             {
-                checkCudaErrors(cudaFree(m_pMoveCache[i]));
+                checkCudaErrors(__cudaFree(m_pMoveCache[i]));
                 m_pMoveCache[i] = NULL;
+            }
+            if (NULL != m_pNaikCache[i])
+            {
+                checkCudaErrors(__cudaFree(m_pNaikCache[i]));
+                m_pNaikCache[i] = NULL;
             }
         }
 
-        checkCudaErrors(cudaFree(m_pDeviceIndexPositionToSIndex));
-        checkCudaErrors(cudaFree(m_pDeviceIndexLinkToSIndex));
+        checkCudaErrors(__cudaFree(m_pDeviceIndexPositionToSIndex));
+        checkCudaErrors(__cudaFree(m_pDeviceIndexLinkToSIndex));
+
+        if (NULL != m_pGlobalCoordinateTable)
+        {
+            checkCudaErrors(__cudaFree(m_pGlobalCoordinateTable));
+            m_pGlobalCoordinateTable = NULL;
+        }
+        if (NULL != m_pHaloGatherIndex)
+        {
+            checkCudaErrors(__cudaFree(m_pHaloGatherIndex));
+            m_pHaloGatherIndex = NULL;
+        }
+        //checkCudaErrors(cudaFree(m_uiEvenOddTable));
     }
 
     __device__ __inline__ SSmallInt4 _deviceBigIndexToInt4(UINT uiBigIdx) const
     {
-        SSmallInt4 coord;
-        coord.x = static_cast<SBYTE>(uiBigIdx / m_pSmallData[kMultX]) - CIndexData::kCacheIndexEdge;
-        coord.y = static_cast<SBYTE>((uiBigIdx % m_pSmallData[kMultX]) / m_pSmallData[kMultY]) - CIndexData::kCacheIndexEdge;
-        coord.z = static_cast<SBYTE>((uiBigIdx % m_pSmallData[kMultY]) / m_pSmallData[kMultZ]) - CIndexData::kCacheIndexEdge;
-        coord.w = static_cast<SBYTE>(uiBigIdx % m_pSmallData[kMultZ]) - CIndexData::kCacheIndexEdge;
-        return coord;
+        return m_pMappingTable[uiBigIdx];
     }
 
     __device__ __inline__ UINT _deviceGetBigIndex(const SSmallInt4& inSite) const
@@ -164,7 +188,7 @@ public:
     // Directly using m_pDeviceIndexPositionToSIndex
     //====================================================
     //__device__ __inline__ SIndex _deviceIndexWalk(
-    //    BYTE byFieldId, const SSmallInt4& inSite, SBYTE uiWalkDir) const
+    //    BYTE byFieldId, const SSmallInt4& inSite, SCHAR uiWalkDir) const
     //{
     //    //walking
     //    return m_pDeviceIndexPositionToSIndex[byFieldId]
@@ -200,6 +224,9 @@ public:
     static void DebugEdgeGlue(BYTE byFieldId, const SSmallInt4& xyzt);
 
     static void DebugStapleTable(BYTE byFieldId);
+    static void DebugStapleTable(BYTE byFieldId, const SSmallInt4& xyzt);
+    static void DebugStapleTable(BYTE byFieldId, const SSmallInt4& xyzt, UINT uiDir);
+    static void DebugStapleTable(BYTE byFieldId, UINT uiIndex);
 
     static void DebugLinkDirichletOrDagger(BYTE byFieldId);
 
@@ -211,7 +238,10 @@ public:
     UINT* m_pSmallData;
     UINT* m_byRegionTable;
 
+    //BigIndex mappingtable
     SSmallInt4* m_pMappingTable;
+    //SiteIndex mapping table
+    SSmallInt4* m_pSiteMappingTable;
     //BYTE* m_pBondInfoTable[kMaxFieldCount];
 
     //extend site position to SIndex mapping (i.e. m_pIndexPositionToSIndex[index])
@@ -227,25 +257,54 @@ public:
 
     //16*site
     SIndex* m_pPlaqutteCache[kMaxFieldCount];
-    //24*links
+    //18*links
     SIndex* m_pStappleCache[kMaxFieldCount];
 
     SIndex* m_pGaugeMoveCache[kMaxFieldCount];
     SIndex* m_pMoveCache[kMaxFieldCount];
-    SIndex* m_pBosonMoveCache[kMaxFieldCount];
+    //SIndex* m_pBosonMoveCache[kMaxFieldCount];
 
     //eta mu table
     BYTE* m_pEtaMu;
 
+    //Multi-GPU (Phase 1, Improve-1 I8/3.7): 32-bit global coordinate for every
+    //slot of the field buffer, local slots [0, _DC_Volume) then halo slots
+    //[_DC_Volume, _DC_Volume + m_uiHaloSiteCount). Baked in BakeAllIndexBuffer
+    //for BOTH single- and multi-GPU (halo part empty on single-GPU), so
+    //_deviceSIndexToGlobalInt4 is a plain table lookup and never narrows through
+    //SCHAR. NULL until baked.
+    SInt4* m_pGlobalCoordinateTable;
+
+    //Multi-GPU (Phase 1, Improve-1 I8/3.7): halo gather map as SIndex. Index by
+    //halo SITE slot (0..haloSites-1, i.e. relative to _DC_Volume); the entry's
+    //m_uiSiteIndex is this rank's legal INTERIOR source site whose data feeds
+    //that halo slot -- exactly the periodic wrap of the out-of-lattice neighbour.
+    //CHaloManager packs from these sources and (for self-exchange) writes straight
+    //into the field buffer's halo tail. NULL and 0-sized on single-GPU / unsplit.
+    SIndex* m_pHaloGatherIndex;
+    UINT m_uiHaloSiteCount;
+
+    //[2*dir + 0] is the  3 site offset fermion
+    //[2*dir + 1] is the -3 site offset fermion, and with link to the cached 3-link gauge field
+    SIndex* m_pNaikCache[kMaxFieldCount];
+
+#if !_CLG_ASSUME_SQUARE_LATTICE
+    //For square lattice this is 4
     BYTE m_uiPlaqutteLength;
+    //For 4D square lattice this is 6 ( C(d,2) = 6 )
     BYTE m_uiPlaqutteCountPerSite;
+    //For 4D square lattice this is 6 ( 2(d-1) = 6 )
     BYTE m_uiPlaqutteCountPerLink;
+#endif
 
     //Real size
     UINT m_uiSiteNumber[kMaxFieldCount];
     UINT m_uiSiteXYZT;
     UINT m_uiSiteXYZ;
     UINT m_uiLinkNumber;
+
+    //this is slower
+    //UINT* m_uiEvenOddTable;
 
 };
 
@@ -259,73 +318,96 @@ static __device__ __inline__ UINT _deviceGetBigIndex(const SSmallInt4& sSite, co
         + (sSite.w + CIndexData::kCacheIndexEdge);
 }
 
-static __device__ __inline__ SSmallInt4 _deviceBigIndexToInt4(UINT uiBigIdx, const UINT* __restrict__ pSmallData)
+static __device__ __inline__ SSmallInt4 _deviceBigIndexToInt4(UINT uiBigIdx)
 {
-    SSmallInt4 coord;
-    coord.x = static_cast<SBYTE>(uiBigIdx / pSmallData[CIndexData::kMultX]) - CIndexData::kCacheIndexEdge;
-    coord.y = static_cast<SBYTE>((uiBigIdx % pSmallData[CIndexData::kMultX]) / pSmallData[CIndexData::kMultY]) - CIndexData::kCacheIndexEdge;
-    coord.z = static_cast<SBYTE>((uiBigIdx % pSmallData[CIndexData::kMultY]) / pSmallData[CIndexData::kMultZ]) - CIndexData::kCacheIndexEdge;
-    coord.w = static_cast<SBYTE>(uiBigIdx % pSmallData[CIndexData::kMultZ]) - CIndexData::kCacheIndexEdge;
-    return coord;
+    //SSmallInt4 coord;
+    //coord.x = static_cast<SCHAR>(uiBigIdx / pSmallData[CIndexData::kMultX]) - CIndexData::kCacheIndexEdge;
+    //coord.y = static_cast<SCHAR>((uiBigIdx % pSmallData[CIndexData::kMultX]) / pSmallData[CIndexData::kMultY]) - CIndexData::kCacheIndexEdge;
+    //coord.z = static_cast<SCHAR>((uiBigIdx % pSmallData[CIndexData::kMultY]) / pSmallData[CIndexData::kMultZ]) - CIndexData::kCacheIndexEdge;
+    //coord.w = static_cast<SCHAR>(uiBigIdx % pSmallData[CIndexData::kMultZ]) - CIndexData::kCacheIndexEdge;
+    //return coord;
+    return __idx->m_pMappingTable[uiBigIdx];
 }
 
-#define __fwd(dir) (dir + 1)
-#define __bck(dir) (-static_cast<INT>(dir) - 1)
+static __device__ __inline__ SSmallInt4 __deviceSiteIndexToInt4(UINT siteIndex)
+{
+    return __idx->m_pSiteMappingTable[siteIndex];
+}
+
+/**
+ * Improve-1 (3.7): global coordinate of any SIndex -- local site or halo
+ * slot -- as a plain lookup into the baked 32-bit table (local slots
+ * [0, _DC_Volume), then halo slots). Never narrows through SCHAR, so global
+ * extents beyond the SCHAR range are exact. An invalid SIndex has no legal
+ * global coordinate and fails the assert in debug builds.
+ */
+static __device__ __inline__ SInt4 _deviceSIndexToGlobalInt4(const SIndex& sIndex)
+{
+    assert(!sIndex.IsInvalid());
+    return __idx->m_pGlobalCoordinateTable[sIndex.m_uiSiteIndex];
+}
+
+#define __fwd(dir) static_cast<SCHAR>(dir + 1)
+#define __bck(dir) static_cast<SCHAR>(-static_cast<SCHAR>(dir) - 1)
 #define __bi(site) __idx->_deviceGetBigIndex(site)
-#define __bi4(site) __idx->_deviceGetBigIndex(site) * _DC_Dir
+#if _CLG_ASSUME_SQUARE_LATTICE
+#define __bi4(site) (__idx->_deviceGetBigIndex(site) << 2U)
+#else
+#define __bi4(site) (__idx->_deviceGetBigIndex(site) * _DC_Dir)
+#endif
+
+///**
+//* When both index and offset are known
+//*/
+//static __device__ __inline__ void _deviceSmallInt4Offset(SSmallInt4& sStart, INT idx, INT offset)
+//{
+//    sStart.m_byData4[idx] += offset;
+//}
+
+/**
+* assume dir != 0, otherwise let it crush
+*/
+static __device__ __inline__ void _deviceSmallInt4Offset(SSmallInt4& sStart, SCHAR dir)
+{
+    const SCHAR sign_mask = (dir >> (sizeof(SCHAR) * 8 - 1)); //-1 (0xFFFFFFFF) of <0, otherwise 0
+    // -1, -2, -3, -4, is 11111111, 11111110, 11111101, 11111100
+    //so (-1) ^ (-1) = 0
+    //   (-1) ^ (-2) = 1
+    //   (-1) ^ (-3) = 2
+    //   (-1) ^ (-4) = 3
+    //so when dir < 0, -dir-1 = sign_mask ^ dir
+    //when dir > 0, dir - 1   = sign_mask ^ (dir - 1)
+    //so, dir - sign_mask - 1, if dir < 0, it is dir, if dir >= 0, it is dir - 1
+    //idx = sign_mask ^ (dir - sign_mask - 1)
+    sStart.m_byData4[sign_mask ^ (dir - sign_mask - 1)] += 1 - (sign_mask & 2);
+}
 
 /**
  * dir = 1,2,3,4 for +x,+y,+z,+t
  * dir = -1,-2,-3,-4 for -x,-y,-z,-t
  */
-static __device__ __inline__ SSmallInt4 _deviceSmallInt4OffsetC(
-    const SSmallInt4& sStart, INT dir)
+static __device__ __inline__ SSmallInt4 _deviceSmallInt4OffsetC(const SSmallInt4& sStart, SCHAR dir)
 {
     SSmallInt4 ret = sStart;
-    if (0 == dir)
-    {
-        return ret;
-    }
-    const INT idx = dir < 0 ? (-dir - 1) : (dir - 1);
-    ret.m_byData4[idx] = ret.m_byData4[idx] + (dir > 0 ? 1 : (-1));
+    _deviceSmallInt4Offset(ret, dir);
     return ret;
 }
 
-static __device__ __inline__ void _deviceSmallInt4Offset(SSmallInt4& sStart, INT dir)
+static __device__ __inline__ void _deviceSmallInt4Offset(SSmallInt4& sStart, SCHAR* path, BYTE byLength)
 {
-    if (0 != dir)
+    for (BYTE i = 0U; i < byLength; ++i)
     {
-        const INT idx = dir < 0 ? (-dir - 1) : (dir - 1);
-        sStart.m_byData4[idx] = sStart.m_byData4[idx] + (dir > 0 ? 1 : (-1));
-    }
-}
-
-static __device__ __inline__ void _deviceSmallInt4Offset(
-    SSmallInt4& sStart, INT* path, BYTE byLength)
-{
-    for (BYTE i = 0; i < byLength; ++i)
-    {
-        if (0 == path[i])
-        {
-            continue;
-        }
-        const INT idx = path[i] < 0 ? (-path[i] - 1) : (path[i] - 1);
-        sStart.m_byData4[idx] = sStart.m_byData4[idx] + (path[i] > 0 ? 1 : (-1));
+        _deviceSmallInt4Offset(sStart, path[i]);
     }
 }
 
 static __device__ __inline__ SSmallInt4 _deviceSmallInt4OffsetC(
-    const SSmallInt4& sStart, const INT* __restrict__ path, BYTE byLength)
+    const SSmallInt4& sStart, const SCHAR* __restrict__ path, BYTE byLength)
 {
     SSmallInt4 ret = sStart;
-    for (BYTE i = 0; i < byLength; ++i)
+    for (BYTE i = 0U; i < byLength; ++i)
     {
-        if (0 == path[i])
-        {
-            continue;
-        }
-        const INT idx = path[i] < 0 ? (-path[i] - 1) : (path[i] - 1);
-        ret.m_byData4[idx] = ret.m_byData4[idx] + (path[i] > 0 ? 1 : (-1));
+        _deviceSmallInt4Offset(ret, path[i]);
     }
     return ret;
 }
@@ -344,10 +426,10 @@ inline static SSmallInt4 _hostBigIndexToInt4(UINT uiBigIdx)
     const UINT uiMZ = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
 
     SSmallInt4 coord;
-    coord.x = static_cast<SBYTE>(uiBigIdx / uiMX) - CIndexData::kCacheIndexEdge;
-    coord.y = static_cast<SBYTE>((uiBigIdx % uiMX) / uiMY) - CIndexData::kCacheIndexEdge;
-    coord.z = static_cast<SBYTE>((uiBigIdx % uiMY) / uiMZ) - CIndexData::kCacheIndexEdge;
-    coord.w = static_cast<SBYTE>(uiBigIdx % uiMZ) - CIndexData::kCacheIndexEdge;
+    coord.x = static_cast<SCHAR>(uiBigIdx / uiMX) - CIndexData::kCacheIndexEdge;
+    coord.y = static_cast<SCHAR>((uiBigIdx % uiMX) / uiMY) - CIndexData::kCacheIndexEdge;
+    coord.z = static_cast<SCHAR>((uiBigIdx % uiMY) / uiMZ) - CIndexData::kCacheIndexEdge;
+    coord.w = static_cast<SCHAR>(uiBigIdx % uiMZ) - CIndexData::kCacheIndexEdge;
     return coord;
 }
 

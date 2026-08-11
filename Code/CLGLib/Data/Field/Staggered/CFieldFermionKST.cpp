@@ -15,14 +15,27 @@
 
 __BEGIN_NAMESPACE
 
+CRationalFieldPointer* CRationalFieldPointer::GetInstance()
+{
+    if (NULL == m_pPointer)
+    {
+        m_pPointer = new CRationalFieldPointer();
+        GCLGManager.RegisterCache(dynamic_cast<CRegisteredBufferCache*>(m_pPointer));
+    }
+    return m_pPointer;
+}
+
+CRationalFieldPointer* CRationalFieldPointer::m_pPointer = NULL;
+
 __CLGIMPLEMENT_CLASS(CFieldFermionKSU1)
 
 __CLGIMPLEMENT_CLASS(CFieldFermionKSSU2)
+__CLGIMPLEMENT_CLASS(CFieldFermionKSSU3)
 __CLGIMPLEMENT_CLASS(CFieldFermionKSSU4)
-__CLGIMPLEMENT_CLASS(CFieldFermionKSSU5)
-__CLGIMPLEMENT_CLASS(CFieldFermionKSSU6)
-__CLGIMPLEMENT_CLASS(CFieldFermionKSSU7)
-__CLGIMPLEMENT_CLASS(CFieldFermionKSSU8)
+//__CLGIMPLEMENT_CLASS(CFieldFermionKSSU5)
+//__CLGIMPLEMENT_CLASS(CFieldFermionKSSU6)
+//__CLGIMPLEMENT_CLASS(CFieldFermionKSSU7)
+//__CLGIMPLEMENT_CLASS(CFieldFermionKSSU8)
 
 __END_NAMESPACE
 

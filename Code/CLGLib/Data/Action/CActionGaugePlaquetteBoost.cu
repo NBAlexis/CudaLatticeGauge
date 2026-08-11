@@ -5,6 +5,7 @@
 // This is the class for rotating su3
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [07/27/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -36,9 +37,11 @@ _kernelAdd4PlaqutteTermSU3_Boost(
 {
     intokernalInt4;
 
+#if !_CLG_ASSUME_SQUARE_LATTICE
     UINT plaqLength = __idx->m_pSmallData[CIndexData::kPlaqLengthIdx];
-    UINT plaqCountAll = __idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx] * plaqLength;
-    
+    UINT plaqCountAllSite = __idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx] * plaqLength;
+#endif
+
     //i=0: 12
     //  1: 13
     //  2: 14
@@ -52,16 +55,16 @@ _kernelAdd4PlaqutteTermSU3_Boost(
 
     //========================================
     //find plaqutte 1-4, or 2-4
-    SIndex first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
-    deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
+    SIndex first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAllSite];
+    deviceSU3 toAdd(_deviceGetGaugeBCT(byFieldId, pDeviceData, first));
     if (first.NeedToDagger())
     {
         toAdd.Dagger();
     }
     for (BYTE j = 1; j < plaqLength; ++j)
     {
-        first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
-        deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
+        first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAllSite];
+        deviceSU3 toMul(_deviceGetGaugeBCT(byFieldId, pDeviceData, first));
         if (first.NeedToDagger())
         {
             toAdd.MulDagger(toMul);
@@ -74,16 +77,16 @@ _kernelAdd4PlaqutteTermSU3_Boost(
     results[uiSiteIndex] = static_cast<DOUBLE>(betaOverN * (3.0 - toAdd.ReTr()) * fGsq);
 
     idx = 4;
-    first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
-    toAdd = _deviceGetGaugeBCSU3(byFieldId, pDeviceData, first);
+    first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAllSite];
+    toAdd = _deviceGetGaugeBCT(byFieldId, pDeviceData, first);
     if (first.NeedToDagger())
     {
         toAdd.Dagger();
     }
     for (BYTE j = 1; j < plaqLength; ++j)
     {
-        first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
-        deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
+        first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAllSite];
+        deviceSU3 toMul(_deviceGetGaugeBCT(byFieldId, pDeviceData, first));
         if (first.NeedToDagger())
         {
             toAdd.MulDagger(toMul);
@@ -117,11 +120,11 @@ _kernelAddChairTermSU3_Chair_Boost(
 
     //===============
     //V413
-    const Real fV413 = _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 0, 2, uiN);
+    const Real fV413 = _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 0, 2, uiN);
 
     //===============
     //V423
-    const Real fV423 = _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 1, 2, uiN);
+    const Real fV423 = _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 1, 2, uiN);
 
     results[uiSiteIndex] = (fV413 + fV423) * betaOverN * fG;
 }
@@ -142,35 +145,33 @@ _kernelAddForce4PlaqutteTermSU3_Boost(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(-0.5);
+#ifndef _CLG_DTK
     #pragma unroll
+#endif
     for (UINT idir = 0; idir < 3; ++idir)
     {
         if (2 == idir)
         {
             //We do not have z, BUT have T
             idir = 3;
-            UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+            const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
             //mu = idir, nu = i = sum _1-3
             deviceSU3 stap(_deviceStapleTerm_Boost(byFieldId, pDeviceData, sSite4, uiBigIdx, idir, 0));
             stap.Add(_deviceStapleTerm_Boost(byFieldId, pDeviceData, sSite4, uiBigIdx, idir, 1));
-            deviceSU3 force(pDeviceData[linkIndex]);
-            force.MulDagger(stap);
-            force.Ta();
-            force.MulReal(betaOverN * fGSq);
-            pForceData[linkIndex].Add(force);
+
+            stap.MulReal(betaOverN * fGSq);
+            pForceData[linkIndex].Add(stap);
         }
         else
         {
-            UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+            const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
             //mu = idir, nu = 4, i = mu
             deviceSU3 stap(_deviceStapleTerm_Boost(byFieldId, pDeviceData, sSite4, uiBigIdx, idir, 3));
-            deviceSU3 force(pDeviceData[linkIndex]);
-            force.MulDagger(stap);
-            force.Ta();
-            force.MulReal(betaOverN * fGSq);
-            pForceData[linkIndex].Add(force);
+
+            stap.MulReal(betaOverN * fGSq);
+            pForceData[linkIndex].Add(stap);
         }
     }
 }
@@ -195,15 +196,13 @@ _kernelAddForceChairTermSU3_Term413_3_Boost(
     //===============
     //g t V413
     //add force for rho=3
-    UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 2);
-    const deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(byFieldId, pDeviceData, 
+    const UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 2);
+    deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(byFieldId, pDeviceData, 
         sSite4, uiBigIdx,
         2, 0, 3);
-    deviceSU3 force(pDeviceData[uiLink]);
-    force.MulDagger(staple_term);
-    force.Ta();
-    force.MulReal(betaOverN);
-    pForceData[uiLink].Add(force);
+
+    staple_term.MulReal(betaOverN);
+    pForceData[uiLink].Add(staple_term);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -222,15 +221,13 @@ _kernelAddForceChairTermSU3_Term413_4_Boost(
     //===============
     //g t V413
     //add force for mu=4
-    UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 3);
-    const deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(byFieldId, pDeviceData, 
+    const UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 3);
+    deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(byFieldId, pDeviceData, 
         sSite4, uiBigIdx,
         3, 0, 2);
-    deviceSU3 force(pDeviceData[uiLink]);
-    force.MulDagger(staple_term);
-    force.Ta();
-    force.MulReal(betaOverN);
-    pForceData[uiLink].Add(force);
+
+    staple_term.MulReal(betaOverN);
+    pForceData[uiLink].Add(staple_term);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -249,16 +246,14 @@ _kernelAddForceChairTermSU3_Term413_1_Boost(
     //===============
     //+x Omega V413
     //add force for nu=1
-    UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 0);
+    const UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 0);
 
-    const deviceSU3 staple_term = _deviceStapleChairTerm2_Boost(byFieldId, pDeviceData, 
+    deviceSU3 staple_term = _deviceStapleChairTerm2_Boost(byFieldId, pDeviceData, 
         sSite4, uiBigIdx,
         3, 0, 2);
-    deviceSU3 force(pDeviceData[uiLink]);
-    force.MulDagger(staple_term);
-    force.Ta();
-    force.MulReal(betaOverN);
-    pForceData[uiLink].Add(force);
+
+    staple_term.MulReal(betaOverN);
+    pForceData[uiLink].Add(staple_term);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -277,15 +272,13 @@ _kernelAddForceChairTermSU3_Term423_3_Boost(
     //===============
     //g t V413
     //add force for rho=3
-    UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 2);
-    const deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(byFieldId, pDeviceData, 
+    const UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 2);
+    deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(byFieldId, pDeviceData, 
         sSite4, uiBigIdx,
         2, 1, 3);
-    deviceSU3 force(pDeviceData[uiLink]);
-    force.MulDagger(staple_term);
-    force.Ta();
-    force.MulReal(betaOverN);
-    pForceData[uiLink].Add(force);
+
+    staple_term.MulReal(betaOverN);
+    pForceData[uiLink].Add(staple_term);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -304,15 +297,13 @@ _kernelAddForceChairTermSU3_Term423_4_Boost(
     //===============
     //g t V413
     //add force for mu=4
-    UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 3);
-    const deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(byFieldId, pDeviceData, 
+    const UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 3);
+    deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(byFieldId, pDeviceData, 
         sSite4, uiBigIdx,
         3, 1, 2);
-    deviceSU3 force(pDeviceData[uiLink]);
-    force.MulDagger(staple_term);
-    force.Ta();
-    force.MulReal(betaOverN);
-    pForceData[uiLink].Add(force);
+
+    staple_term.MulReal(betaOverN);
+    pForceData[uiLink].Add(staple_term);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -331,16 +322,14 @@ _kernelAddForceChairTermSU3_Term423_2_Boost(
     //===============
     //+x Omega V413
     //add force for nu=1
-    UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 1);
+    const UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 1);
 
-    const deviceSU3 staple_term = _deviceStapleChairTerm2_Boost(byFieldId, pDeviceData, 
+    deviceSU3 staple_term = _deviceStapleChairTerm2_Boost(byFieldId, pDeviceData, 
         sSite4, uiBigIdx,
         3, 1, 2);
-    deviceSU3 force(pDeviceData[uiLink]);
-    force.MulDagger(staple_term);
-    force.Ta();
-    force.MulReal(betaOverN);
-    pForceData[uiLink].Add(force);
+
+    staple_term.MulReal(betaOverN);
+    pForceData[uiLink].Add(staple_term);
 }
 
 #pragma endregion
@@ -375,10 +364,10 @@ void CActionGaugePlaquetteBoost::Initial(class CLatticeData* pOwner, const CPara
     //if (centerArray.Num() > 3)
     //{
     //    SSmallInt4 sCenter;
-    //    sCenter.x = static_cast<SBYTE>(centerArray[0]);
-    //    sCenter.y = static_cast<SBYTE>(centerArray[1]);
-    //    sCenter.z = static_cast<SBYTE>(centerArray[2]);
-    //    sCenter.w = static_cast<SBYTE>(centerArray[3]);
+    //    sCenter.x = static_cast<SCHAR>(centerArray[0]);
+    //    sCenter.y = static_cast<SCHAR>(centerArray[1]);
+    //    sCenter.z = static_cast<SCHAR>(centerArray[2]);
+    //    sCenter.w = static_cast<SCHAR>(centerArray[3]);
     //    CCommonData::m_sCenter = sCenter;
     //}
     //else
@@ -401,36 +390,36 @@ UBOOL CActionGaugePlaquetteBoost::CalculateForceOnGaugeSingleField(const CFieldG
 
     preparethread;
 
-    _kernelAddForce4PlaqutteTermSU3_Boost << <block, threads >> >(
+    _LAUNCH_KERNEL(_kernelAddForce4PlaqutteTermSU3_Boost, block, threads, 
         pGaugeSU3->m_pDeviceData, 
         pForceSU3->m_pDeviceData, 
         m_fBetaOverNR, 
         CCommonData::m_fG * CCommonData::m_fG,
         pGauge->m_byFieldId);
 
-    //_kernelAddForceChairTermSU3_Term413_3_Boost << <block, threads >> >(pGaugeSU3->m_pDeviceData,
+    //_LAUNCH_KERNEL(_kernelAddForceChairTermSU3_Term413_3_Boost, block, threads, pGaugeSU3->m_pDeviceData,
     //    pForceSU3->m_pDeviceData, m_fBetaOverN, CCommonData::m_fG);
 
-    //_kernelAddForceChairTermSU3_Term413_4_Boost << <block, threads >> >(pGaugeSU3->m_pDeviceData,
+    //_LAUNCH_KERNEL(_kernelAddForceChairTermSU3_Term413_4_Boost, block, threads, pGaugeSU3->m_pDeviceData,
     //    pForceSU3->m_pDeviceData, m_fBetaOverN, CCommonData::m_fG);
 
-    //_kernelAddForceChairTermSU3_Term413_1_Boost << <block, threads >> >(pGaugeSU3->m_pDeviceData,
+    //_LAUNCH_KERNEL(_kernelAddForceChairTermSU3_Term413_1_Boost, block, threads, pGaugeSU3->m_pDeviceData,
     //    pForceSU3->m_pDeviceData, m_fBetaOverN, CCommonData::m_fG);
 
-    //_kernelAddForceChairTermSU3_Term423_3_Boost << <block, threads >> >(pGaugeSU3->m_pDeviceData,
+    //_LAUNCH_KERNEL(_kernelAddForceChairTermSU3_Term423_3_Boost, block, threads, pGaugeSU3->m_pDeviceData,
     //    pForceSU3->m_pDeviceData, m_fBetaOverN, CCommonData::m_fG);
 
-    //_kernelAddForceChairTermSU3_Term423_4_Boost << <block, threads >> >(pGaugeSU3->m_pDeviceData,
+    //_LAUNCH_KERNEL(_kernelAddForceChairTermSU3_Term423_4_Boost, block, threads, pGaugeSU3->m_pDeviceData,
     //    pForceSU3->m_pDeviceData, m_fBetaOverN, CCommonData::m_fG);
 
-    //_kernelAddForceChairTermSU3_Term423_2_Boost << <block, threads >> >(pGaugeSU3->m_pDeviceData,
+    //_LAUNCH_KERNEL(_kernelAddForceChairTermSU3_Term423_2_Boost, block, threads, pGaugeSU3->m_pDeviceData,
     //    pForceSU3->m_pDeviceData, m_fBetaOverN, CCommonData::m_fG);
 
     checkCudaErrors(cudaDeviceSynchronize());
     return TRUE;
 }
 
-DOUBLE CActionGaugePlaquetteBoost::EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+DOUBLE CActionGaugePlaquetteBoost::EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStaple)
 {
     if (bBeforeEvolution)
     {
@@ -449,7 +438,7 @@ DOUBLE CActionGaugePlaquetteBoost::EnergySingleField(UBOOL bBeforeEvolution, con
 
     appGetCudaHelper()->ThreadBufferZero(_D_RealThreadBuffer);
 
-    _kernelAdd4PlaqutteTermSU3_Boost << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelAdd4PlaqutteTermSU3_Boost, block, threads, 
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData, 
             appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
@@ -459,8 +448,13 @@ DOUBLE CActionGaugePlaquetteBoost::EnergySingleField(UBOOL bBeforeEvolution, con
 
     m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
+    //m_fNewEnergy is assembled from local partial sums (plaquette part plus
+    //the boost-term ThreadBufferSum); sum the total across ranks for the
+    //global action (P4-1.4). No-op on a lone rank.
+    appGlobalSum(m_fNewEnergy);
 
-    //_kernelAddChairTermSU3_Chair_Boost << <block, threads >> > (
+
+    //_LAUNCH_KERNEL(_kernelAddChairTermSU3_Chair_Boost, block, threads, 
     //    pGaugeSU3->m_pDeviceData,
     //    m_fBetaOverN,
     //    CCommonData::m_fG,

@@ -23,7 +23,7 @@ public:
     CGaugeFixingCoulombCornell()
         : CGaugeFixing()
         , m_fAlpha(F(0.08))
-        , m_pDDecomp(NULL)
+        //, m_pDDecomp(NULL)
         , m_pA11(NULL)
         , m_pA12(NULL)
         , m_pA13(NULL)
@@ -38,12 +38,28 @@ public:
         , m_pMomentumTable(NULL)
         , m_pTempFFTBuffer(NULL)
         , m_bFA(TRUE)
+#if _CLG_MULTI_GPU
+        , m_pSavedA11(NULL)
+        , m_pSavedA12(NULL)
+        , m_pSavedA13(NULL)
+        , m_pSavedA22(NULL)
+        , m_pSavedA23(NULL)
+        , m_pSavedGamma11(NULL)
+        , m_pSavedGamma12(NULL)
+        , m_pSavedGamma13(NULL)
+        , m_pSavedGamma22(NULL)
+        , m_pSavedGamma23(NULL)
+        , m_pSavedG(NULL)
+        , m_pSavedMomentumTable(NULL)
+        , m_pSavedTempFFTBuffer(NULL)
+        , m_iSavedLstDims{0, 0, 0}
+#endif
     {
     }
 
     ~CGaugeFixingCoulombCornell()
     {
-        cudaSafeFree(m_pDDecomp);
+        //cudaSafeFree(m_pDDecomp);
         cudaSafeFree(m_pA11);
         cudaSafeFree(m_pA12);
         cudaSafeFree(m_pA13);
@@ -62,15 +78,18 @@ public:
     void Initial(class CLatticeData* pOwner, const CParameters& params) override;
     void GaugeFixing(CFieldGauge* pResGauge) override;
     DOUBLE CheckRes(const CFieldGauge* pGauge) override;
-    void GaugeFixingOneTimeSlice(deviceSU3* pResGauge, SBYTE uiT, BYTE byFieldId);
+    void GaugeFixingOneTimeSlice(deviceSU3* pResGauge, SCHAR uiT, BYTE byFieldId);
     
     CCString GetInfos(const CCString& sTab) const override;
+
+    //P4-2.3: core deviation loop over one gauge buffer (local or gathered-global).
+    DOUBLE CheckResLocal(const deviceSU3* pGaugeData, BYTE byFieldId);
 
     DOUBLE m_fAlpha;
 
     //device SU3 is not alligned, therefor use CLGComplex*
-    UINT m_pHDecomp[6];
-    UINT* m_pDDecomp;
+    //UINT m_pHDecomp[6];
+    //UINT* m_pDDecomp;
 
     DOUBLE* m_pA11;
     cuDoubleComplex* m_pA12;
@@ -89,6 +108,32 @@ public:
     //FFT accelaration not support now
     UBOOL m_bFA;
     TArray<INT> m_lstDims;
+
+#if _CLG_MULTI_GPU
+    //P4-2.3: temporary global-lattice fixing buffers (rank 0 only), mirroring
+    //CGaugeFixingCoulombLosAlamos (P4-2.2): the buffers above are sized to the
+    //LOCAL lattice in Initial(); under the temporary GLOBAL context the kernels
+    //(and the cuFFT plans, sized from m_lstDims) sweep the whole lattice, so the
+    //buffers are re-allocated to the global 3D volume, m_lstDims is rebuilt to
+    //the global dims and the momentum table is re-baked, then everything is
+    //restored on exit.
+    void ResizeBuffersToGlobal();
+    void RestoreLocalBuffers();
+    DOUBLE* m_pSavedA11;
+    cuDoubleComplex* m_pSavedA12;
+    cuDoubleComplex* m_pSavedA13;
+    DOUBLE* m_pSavedA22;
+    cuDoubleComplex* m_pSavedA23;
+    DOUBLE* m_pSavedGamma11;
+    cuDoubleComplex* m_pSavedGamma12;
+    cuDoubleComplex* m_pSavedGamma13;
+    DOUBLE* m_pSavedGamma22;
+    cuDoubleComplex* m_pSavedGamma23;
+    deviceSU3* m_pSavedG;
+    DOUBLE* m_pSavedMomentumTable;
+    cuDoubleComplex* m_pSavedTempFFTBuffer;
+    INT m_iSavedLstDims[3];
+#endif
 };
 
 __END_NAMESPACE

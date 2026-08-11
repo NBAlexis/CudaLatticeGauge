@@ -1,0 +1,120 @@
+# PSU3WithBoundary application configuration
+#
+# PSU(3) fundamental-lift action with a Z3 2-form boundary field B:
+#   S(U,B) = -(Beta/3) * sum_p Re[B_p Tr(U_p)]
+#
+# WorkJob: EPSU3J_Simulate (HMC production, saves gauge + B companion files)
+#          EPSU3J_Measure  (loads configurations, measures Polyakov / energy /
+#                           Z3 monopole count of B)
+
+WorkJob : EPSU3J_Simulate
+
+JobSimulate:
+
+    VerboseLevel : PARANOIAC
+    VerboseOutput : stdout
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    MaxThreadPerBlock : 256
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 1
+    MeasureListLength : 0
+    Save : 0
+
+    Tensor2FieldCount : 1
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    Tensor2Field1:
+        FieldName : CFieldTensor2Z3
+        FieldInitialType : EFIT_Identity
+        FieldId : 3
+        Dynamic : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquettePSU3WithBoundary
+        GaugeFields : [1]
+        BoundaryFieldId : 3
+        Beta : 6.0
+        AllowMonopole : 1
+        Z3Sweeps : 1
+        GlobalTwistSweeps : 0
+        CheckMonopole : 0
+        DiscreteTheta : 0
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 0.5
+        IntegratorStep : 5
+
+    # Simulate parameters
+    BeforeEquvibStep : 2
+    EquvibStep : 3
+    SaveStartIndex : 0
+    SavePrefix : PSU3
+    SaveFileType : EFFT_CLGBin
+
+
+JobMeasure:
+
+    VerboseLevel : PARANOIAC
+    VerboseOutput : stdout
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    MaxThreadPerBlock : 256
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 1
+    MeasureListLength : 1
+    Save : 0
+
+    Tensor2FieldCount : 1
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    Tensor2Field1:
+        FieldName : CFieldTensor2Z3
+        FieldInitialType : EFIT_Identity
+        FieldId : 3
+        Dynamic : 1
+
+    Action1:
+        ActionName : CActionGaugePlaquettePSU3WithBoundary
+        GaugeFields : [1]
+        BoundaryFieldId : 3
+        Beta : 6.0
+        AllowMonopole : 1
+        Z3Sweeps : 1
+        GlobalTwistSweeps : 0
+        CheckMonopole : 0
+        DiscreteTheta : 0
+
+    Measure1:
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 0
+
+    # Measure parameters
+    StartN : 0
+    EndN : 2
+    SavePrefix : PSU3
+    LoadFileType : EFFT_CLGBin

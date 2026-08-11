@@ -1,0 +1,82 @@
+\subsection{\label{GrassmanNumberGaussianIntegerate}Grassman Number Gaussian integration}
+
+This is the note of measurement on propagators.
+All start from the Grassman number field Gaussian integration, with Lagrangian $L=\psi^{\dagger} A \psi$,
+\begin{equation}
+\begin{split}
+&\langle \psi_{j_1}\psi_{j_2}\ldots \psi_{j_n}\psi^{\dagger}_{i_n}\psi^{\dagger}_{i_{n-1}}\ldots \psi^{\dagger}_1  \rangle = \sum _P {\rm Sign}(P)A^{-1}_{j_1,i_{P_1}}\ldots A^{-1}_{j_n,i_{P_n}}\\
+\end{split}
+\end{equation}
+
+Considering $L=\bar{\psi} D \psi$, $A=\gamma _0 D$. using $(AB)^{-1}=B^{-1}A^{-1}$ and $\gamma _0^{-1}=\gamma _0$.
+For bilinear,
+\begin{equation}
+\begin{split}
+&\langle \psi {}^c\psi^{\dagger}{}_a\rangle = \sum _d {D^{-1}} {}^c{}_d \gamma _{0}{}^d{}_a ,\\
+&\langle \bar{\psi} M \psi\rangle = \sum _{a,b,c} \langle \psi^{\dagger}{} _a \gamma _{0}{}^a{}_b M{}^b{}_c \psi {}^c\rangle = \sum _{a,b,c,d}  \gamma _{0}{}^a{}_b M{}^b{}_c {D^{-1}} {}^c{}_d \gamma _{0}{}^d{}_a = {\rm Tr}[\gamma _0 M D^{-1}\gamma _0]={\rm Tr}[M D^{-1}],\\
+\end{split}
+\end{equation}
+
+For $\psi^4$, let $D_0^{-1}=D^{-1}\gamma _0$
+\begin{equation}
+\begin{split}
+&\langle \psi {}^a \psi {}^b \psi^{\dagger}{}_c \psi^{\dagger}{}_d\rangle = D_0^{-1} {}^b{}_c D_0^{-1} {}^a{}_d - D_0^{-1} {}^b{}_d D_0^{-1} {}^a{}_c,\\
+\end{split}
+\end{equation}
+so,
+\begin{equation}
+\begin{split}
+&\langle \bar{\psi} M_1 \psi \bar{\psi} M_2 \psi\rangle = \sum _{a,b,c,d} \langle \psi^{\dagger} {}_c\gamma _0 M_1{}^c{}_b \psi {}^b \psi^{\dagger} {}_d \gamma _0 M_2{}^d{}_a \psi {}^a\rangle\\
+&= \sum _{a,b,c,d}  \gamma _0 M_1{}^c{}_b \gamma _0 M_2{}^d{}_a \langle \psi^{\dagger} {}_c \psi {}^b \psi^{\dagger} {}_d  \psi {}^a\rangle\\
+&= \sum _{a,b,c,d}  \gamma _0 M_1{}^c{}_b \gamma _0 M_2{}^d{}_a \langle \psi {}^a \psi {}^b \psi^{\dagger}{}_c \psi^{\dagger}{}_d\rangle\\
+&= \sum _{a,b,c,d}  \left(\gamma _0 M_1{}^c{}_b \gamma _0 M_2{}^d{}_a D_0^{-1} {}^b{}_c D_0^{-1} {}^a{}_d - \gamma _0 M_1{}^c{}_b \gamma _0 M_2{}^d{}_a D_0^{-1} {}^b{}_d D_0^{-1} {}^a{}_c\right)\\
+&= \sum _{a,b,c,d}  \left(  D_0^{-1} {}^b{}_c \gamma _0 M_1{}^c{}_b D_0^{-1} {}^a{}_d \gamma _0 M_2{}^d{}_a -   D_0^{-1} {}^b{}_d  \gamma _0 M_2{}^d{}_a D_0^{-1} {}^a{}_c \gamma _0 M_1{}^c{}_b\right)\\
+&= {\rm Tr}\left[D_0^{-1} \gamma _0 M_1\right]{\rm Tr}\left[D_0^{-1} \gamma _0 M_2\right] - {\rm Tr}\left[D_0^{-1} \gamma _0 M_2 D_0^{-1} \gamma _0 M_1\right]\\
+&= {\rm Tr}\left[D^{-1}  M_1\right]{\rm Tr}\left[D^{-1}M_2\right] - {\rm Tr}\left[D^{-1} M_2 D^{-1} M_1\right]\\
+\end{split}
+\end{equation}
+
+Note that, the $\gamma _0$ comes in pairs, we do not track $\gamma _0$ any more.
+\begin{equation}
+\begin{split}
+&\langle \psi {}^a \psi {}^b \psi {}^c \bar{\psi}{}_d \bar{\psi}{}_e \bar{\psi} {}_f \rangle = D^{-1} {}^c{}_d D^{-1} {}^b{}_e D^{-1} {}^a{}_f + D^{-1} {}^b{}_d D^{-1} {}^a{}_e D^{-1} {}^c{}_f + D^{-1} {}^c{}_d D^{-1} {}^a{}_e D^{-1} {}^b{}_f \\
+& - D^{-1} {}^b{}_d D^{-1} {}^c{}_e D^{-1} {}^a{}_f -D^{-1} {}^a{}_d D^{-1} {}^b{}_e D^{-1} {}^c{}_f -D^{-1} {}^c{}_d D^{-1} {}^a{}_e D^{-1} {}^b{}_f\\
+\end{split}
+\end{equation}
+so,
+\begin{equation}
+\begin{split}
+&\langle \bar{\psi} M_1 \psi \bar{\psi} M_2 \psi \bar{\psi} M_3 \psi\rangle \\
+&= -{\rm Tr}\left[D^{-1}  M_1\right]{\rm Tr}\left[D^{-1}M_2\right]{\rm Tr}\left[D^{-1}M_3\right] - {\rm Tr}\left[D^{-1} M_1 D^{-1} M_2 D^{-1} M_3\right] - {\rm Tr}\left[D^{-1} M_1 D^{-1} M_3 D^{-1} M_2\right]\\
+& + {\rm Tr}\left[D^{-1} M_1 D^{-1} M_2\right]{\rm Tr}\left[D^{-1}M_3\right] + {\rm Tr}\left[D^{-1} M_1 D^{-1} M_3\right]{\rm Tr}\left[D^{-1}M_2\right] + {\rm Tr}\left[D^{-1} M_2 D^{-1} M_3\right]{\rm Tr}\left[D^{-1}M_1\right]\\
+\end{split}
+\end{equation}
+
+
+\subsubsection{\label{DisconnectedAndConnected}Disconnected and connected contribution}
+
+The ${\rm Tr}\left[D^{-1}  M_1\right]{\rm Tr}\left[D^{-1}M_2\right]$ is the disconnected contribution, and the ${\rm Tr}\left[D^{-1} M_2 D^{-1} M_1\right]$ term is connected contribution.
+
+If the coordinate is considered as quantum number, $M$ is local,
+\begin{equation}
+\begin{split}
+&\langle \bar{\psi}(x) M_1 \psi (x) \bar{\psi}(0) M_2 \psi (0)\rangle \\
+&= {\rm Tr}\left[D^{-1}(0,x) M_1(x)\right] {\rm Tr}\left[D^{-1}(x, 0)M_2(0)\right] - {\rm Tr}\left[D^{-1}(x,0) M_2 D^{-1}(0, x) M_1\right]\\
+\end{split}
+\end{equation}
+here the trace is only applied in the spinor space. Note that,
+\begin{equation}
+\begin{split}
+&\langle \bar{\psi}_{f_1}(x) M_1 \psi _{f_2}(x) \bar{\psi}_{f_2}(0) M_2 \psi_{f_1} (0)\rangle \\
+&= - {\rm Tr}\left[D^{-1}(x,0) M_2 D^{-1}(0, x) M_1\right]\\
+\end{split}
+\end{equation}
+
+The disconnected contribution is much easier to calculate, because, with pseudofermion $\phi$,
+\begin{equation}
+\begin{split}
+&D^{-1}(0,x) = \bar{\phi} (x) \gamma _0 D^{-1} \phi (0)\\
+\end{split}
+\end{equation}
+
+

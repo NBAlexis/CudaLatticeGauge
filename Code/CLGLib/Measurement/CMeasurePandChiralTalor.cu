@@ -62,8 +62,8 @@ _kernelTraceApplyM(
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
         //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-        deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIdx, idir);
-        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(byGaugeFieldId, pGauge, x_m_mu_Gauge);
+        deviceSU3 x_Gauge_element = _deviceGetGaugeBCDirT(byGaugeFieldId, pGauge, uiBigIdx, idir);
+        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCT(byGaugeFieldId, pGauge, x_m_mu_Gauge);
         if (x_m_mu_Gauge.NeedToDagger())
         {
             x_m_mu_Gauge_element.Dagger();
@@ -242,27 +242,31 @@ _kernelActionTalorOmega(
         return;
     }
 
+    //P4-3.7: position-dependent physics must use the GLOBAL site coordinate
+    //(P4-1.1); the local coordinate would silently offset the omega term on a
+    //decomposed lattice. Identity on single-GPU.
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
     betaOverN = F(0.125) * betaOverN;
-    const Real fXOmega = (sSite4.x - _DC_Centerx);
+    const Real fXOmega = (sSite4G.x - _DC_Centerx);
 
     //===============
     //+x Omega V412
-    const Real fV412 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 0, 1, uiN);
+    const Real fV412 = fXOmega * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 0, 1, uiN);
 
     //===============
     //+x Omega V432
-    const Real fV432 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
+    const Real fV432 = fXOmega * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
 
 
-    const Real fYOmega = -(sSite4.y - _DC_Centery);
+    const Real fYOmega = -(sSite4G.y - _DC_Centery);
 
     //===============
     //-y Omega V421
-    const Real fV421 = fYOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 1, 0, uiN);
+    const Real fV421 = fYOmega * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 1, 0, uiN);
 
     //===============
     //-y Omega V431
-    const Real fV431 = fYOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
+    const Real fV431 = fYOmega * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
 
     results[uiSiteIndex] = (fV412 + fV432 + fV421 + fV431) * betaOverN;
 }
@@ -280,9 +284,13 @@ _kernelActionTalorOmegaSq(
 {
     intokernalInt4;
 
+    //P4-3.7: global coordinate (see _kernelActionTalorOmega).
+    const SInt4 sSite4G = _deviceSIndexToGlobalInt4(__deviceSiteIndexToSIndex(uiSiteIndex));
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+#if !_CLG_ASSUME_SQUARE_LATTICE
     const UINT plaqLength = __idx->m_pSmallData[CIndexData::kPlaqLengthIdx];
-    const UINT plaqCountAll = __idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx] * plaqLength;
+    const UINT plaqCountAllSite = __idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx] * plaqLength;
+#endif
 
     DOUBLE res = 0.0;
 
@@ -303,16 +311,16 @@ _kernelActionTalorOmegaSq(
 
         //========================================
         //find plaqutte 1-4, or 2-4, or 3-4
-        SIndex first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
-        deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
+        SIndex first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAllSite];
+        deviceSU3 toAdd(_deviceGetGaugeBCT(byFieldId, pDeviceData, first));
         if (first.NeedToDagger())
         {
             toAdd.Dagger();
         }
         for (BYTE j = 1; j < plaqLength; ++j)
         {
-            first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
-            deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
+            first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAllSite];
+            deviceSU3 toMul(_deviceGetGaugeBCT(byFieldId, pDeviceData, first));
             if (first.NeedToDagger())
             {
                 toAdd.MulDagger(toMul);
@@ -341,11 +349,11 @@ _kernelActionTalorOmegaSq(
 
     if (!__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
     {
-        const Real fXYOmega2 = -(sSite4.x - _DC_Centerx) * (sSite4.y - _DC_Centery);
+        const Real fXYOmega2 = -(sSite4G.x - _DC_Centerx) * (sSite4G.y - _DC_Centery);
 
         //===============
         //+Omega^2 xy V132
-        const Real fV132 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
+        const Real fV132 = fXYOmega2 * _deviceChairTermT(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
 
         res += fV132 * F(0.125) * betaOverN;
     }
@@ -383,9 +391,9 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
 
     const CFieldFermionWilsonSquareSU3* pF1W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pZ4);
 
-    CFieldFermionWilsonSquareSU3* pF2W = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(pInverseZ4->m_byFieldId));
+    CFieldFermionWilsonSquareSU3* pF2W = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(pInverseZ4->m_byFieldId, _T(__FILE__), __LINE__));
     pInverseZ4->CopyTo(pF2W);
-    CFieldFermionWilsonSquareSU3* pTmp = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(pInverseZ4->m_byFieldId));
+    CFieldFermionWilsonSquareSU3* pTmp = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(pInverseZ4->m_byFieldId, _T(__FILE__), __LINE__));
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pAcceptGauge);
 
     preparethread;
@@ -395,10 +403,10 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
 
     //======= MD =========
     pF2W->CopyTo(pTmp);
-    _kernelTraceApplyM << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelTraceApplyM, block, threads, 
         pTmp->m_pDeviceData,
         pF2W->m_pDeviceData,
-        CCommonData::m_fKai,
+        pF1W->GetKai(),
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF2W->m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pMoveCache[pF2W->m_byFieldId],
@@ -413,7 +421,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
     TArray<const CFieldGauge*> gauges;
     gauges.AddItem(pAcceptGauge);
 
-    pF2W->InverseD(1, 0, gauges.GetData(), NULL);
+    pF2W->InverseD(1, 0, 0, gauges.GetData(), NULL, NULL);
 
 
     m_cTmpSum[ECPCTTT_DMD] = cuCadd(m_cTmpSum[ECPCTTT_DMD], pF1W->Dot(pF2W));
@@ -421,10 +429,10 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
     //======= MDMD =========
 
     pF2W->CopyTo(pTmp);
-    _kernelTraceApplyM << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelTraceApplyM, block, threads, 
         pTmp->m_pDeviceData,
         pF2W->m_pDeviceData,
-        CCommonData::m_fKai,
+        pF1W->GetKai(),
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF2W->m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pMoveCache[pF2W->m_byFieldId],
@@ -437,7 +445,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
 
     //======= DMDMD =========
 
-    pF2W->InverseD(1, 0, gauges.GetData(), NULL);
+    pF2W->InverseD(1, 0, 0, gauges.GetData(), NULL, NULL);
 
 
 #if _CLG_DOUBLEFLOAT
@@ -468,6 +476,15 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
             m_lstTraceRes[i].AddItem(m_cTmpSum[i]);
         }
 
+        if (NULL != m_pOwner)
+        {
+            m_pOwner->AddOneConfigurationResult(this, _T("TraceD"), m_cTmpSum[ECPCTTT_D]);
+            m_pOwner->AddOneConfigurationResult(this, _T("TraceMD"), m_cTmpSum[ECPCTTT_MD]);
+            m_pOwner->AddOneConfigurationResult(this, _T("TraceDMD"), m_cTmpSum[ECPCTTT_DMD]);
+            m_pOwner->AddOneConfigurationResult(this, _T("TraceMDMD"), m_cTmpSum[ECPCTTT_MDMD]);
+            m_pOwner->AddOneConfigurationResult(this, _T("TraceDMDMD"), m_cTmpSum[ECPCTTT_DMDMD]);
+        }
+
         ++m_uiConfigurationCount;
     }
 }
@@ -479,14 +496,25 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedSingleField(const CFieldGau
         appCrucial(_T("CMeasureMesonCorrelator only implemented with gauge SU3!\n"));
         return;
     }
+#if _CLG_MULTI_GPU
+    //I9: the Polyakov loop below is a per-site PRODUCT along t; with a split t
+    //direction each rank holds only a partial chain and polyakovSum is silently
+    //wrong (the omega terms below are purely local and would be fine, but the
+    //measurement is rejected as a whole, same rule as CMeasurePolyakovXY).
+    if (NULL != appGetComm() && appGetComm()->GpuGrid()[3] > 1)
+    {
+        appCrucial(_T("CMeasurePandChiralTalor: not supported on multi-GPU with a split t direction (cross-rank t chain not implemented). Rejected.\n"));
+        return;
+    }
+#endif
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     //const BYTE byGaugeFiledId = pGaugeSU3->m_byFieldId;
     preparethread;
-    const dim3 blockxyz(_HC_DecompX, _HC_DecompY, 1); 
+    const dim3 blockxyz(_HC_DecompX, _HC_DecompY, 1);
     const dim3 threadsxyz(_HC_DecompLx, _HC_DecompLy, 1);
 
     //=========== Calculate Polyakov loop ================
-    _kernelPolyakovLoopOfSiteTalor << <blockxyz, threadsxyz >> > (
+    _LAUNCH_KERNEL(_kernelPolyakovLoopOfSiteTalor, blockxyz, threadsxyz,
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
         _D_ComplexThreadBuffer,
@@ -495,26 +523,41 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedSingleField(const CFieldGau
 
 
     cuDoubleComplex polyakovSum = appGetCudaHelper()->ReduceComplex(_D_ComplexThreadBuffer, _HC_Volume_xyz);
+    //P4-3.7: local spatial sum -> global (t-loop product per spatial site is
+    //complete when t is not split; see PolyakovXY P4-3.3 for the same note).
+    appGlobalSum(polyakovSum);
 
     m_lstPolyakov.AddItem(polyakovSum);
 
+    if (NULL != m_pOwner)
+    {
+        m_pOwner->AddOneConfigurationResult(this, _T("Polyakov"), polyakovSum);
+    }
+
     //=========== Calculate Omega term ================
-    _kernelActionTalorOmega << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelActionTalorOmega, block, threads, 
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
         m_fBetaOverN,
         _D_RealThreadBuffer);
 
 #if _CLG_DOUBLEFLOAT
-    const Real omegaterm = appGetCudaHelper()->ReduceRealWithThreadCount(_D_RealThreadBuffer);
+    Real omegaterm = appGetCudaHelper()->ReduceRealWithThreadCount(_D_RealThreadBuffer);
 #else
-    const DOUBLE omegaterm = appGetCudaHelper()->ReduceRealWithThreadCount(_D_RealThreadBuffer);
+    DOUBLE omegaterm = appGetCudaHelper()->ReduceRealWithThreadCount(_D_RealThreadBuffer);
 #endif
+    //P4-3.7: local sum -> global.
+    GlobalSumReal(omegaterm);
 
     m_lstPolyakovSOmega.AddItem(omegaterm);
 
+    if (NULL != m_pOwner)
+    {
+        m_pOwner->AddOneConfigurationResult(this, _T("Omega"), omegaterm);
+    }
+
     //=========== Calculate Omega Squire term ================
-    _kernelActionTalorOmegaSq << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelActionTalorOmegaSq, block, threads, 
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
@@ -522,12 +565,19 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedSingleField(const CFieldGau
         _D_RealThreadBuffer);
 
 #if _CLG_DOUBLEFLOAT
-    const Real omegasqterm = appGetCudaHelper()->ReduceRealWithThreadCount(_D_RealThreadBuffer);
+    Real omegasqterm = appGetCudaHelper()->ReduceRealWithThreadCount(_D_RealThreadBuffer);
 #else
-    const DOUBLE omegasqterm = appGetCudaHelper()->ReduceRealWithThreadCount(_D_RealThreadBuffer);
+    DOUBLE omegasqterm = appGetCudaHelper()->ReduceRealWithThreadCount(_D_RealThreadBuffer);
 #endif
+    //P4-3.7: local sum -> global.
+    GlobalSumReal(omegasqterm);
 
     m_lstPolyakovSOmegaSq.AddItem(omegasqterm);
+
+    if (NULL != m_pOwner)
+    {
+        m_pOwner->AddOneConfigurationResult(this, _T("OmegaSq"), omegasqterm);
+    }
 }
 
 void CMeasurePandChiralTalor::Report()
@@ -535,7 +585,7 @@ void CMeasurePandChiralTalor::Report()
     appPushLogDate(FALSE);
     for (UINT i = 0; i < ECPCTTT_Max; ++i)
     {
-        assert(m_uiConfigurationCount == static_cast<UINT>(m_lstTraceRes[i].Num()));
+        appAssert(m_uiConfigurationCount == static_cast<UINT>(m_lstTraceRes[i].Num()));
 
         appGeneral(_T("\n==========================================================================\n"));
         appGeneral(_T("==================== Traces No %d (%d con)============================\n"), i, m_uiConfigurationCount);

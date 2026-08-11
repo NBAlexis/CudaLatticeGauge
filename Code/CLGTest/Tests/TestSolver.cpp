@@ -4,10 +4,60 @@
 // DESCRIPTION:
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [02/04/2019 nbale]
 //=============================================================================
 
 #include "CLGTest.h"
+
+//CG and deflated CG solve all operators via the Hermitian positive definite DDdagger
+//x = D^-1 b = D+ (D D+)^-1 b, x = (D+)^-1 b = (D D+)^-1 D b
+UINT TestSolverCG(CParameters& params)
+{
+    UINT uiError = 0;
+    Real fMaxError = F(0.0001);
+    params.FetchValueReal(_T("ExpectedErr"), fMaxError);
+
+    CField* pField = appGetLattice()->GetFieldById(2);
+    CFieldFermionWilsonSquareSU3* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pField);
+    const Real fLengthOfPhi = pFermion->DotReal(pFermion).x;
+    appGeneral(_T("| phi |^2 = %8.18f\n"), fLengthOfPhi);
+
+    static const EFieldOperator eForward[3] = { EFO_F_D, EFO_F_Ddagger, EFO_F_DDdagger };
+    static const EFieldOperator eInverse[3] = { EFO_F_InverseD, EFO_F_InverseDdagger, EFO_F_InverseDDdagger };
+    static const TCHAR* sNames[3] = { _T("D"), _T("D+"), _T("DD+") };
+
+    for (INT i = 0; i < 3; ++i)
+    {
+        //(Op)^-1 Op phi - phi
+        CFieldFermionWilsonSquareSU3* pResult1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pFermion->GetCopy());
+        pResult1->ApplyOperator(eForward[i], _FIELDS);
+        pResult1->ApplyOperator(eInverse[i], _FIELDS);
+        pResult1->AxpyMinus(pFermion);
+        const Real fError1 = _cuCabsf(pResult1->DotReal(pResult1));
+        appGeneral(_T("| %s^-1 %s phi - phi |^2 =%8.18f\n"), sNames[i], sNames[i], fError1);
+        if (appAbs(fError1) > fMaxError)
+        {
+            ++uiError;
+        }
+        appSafeDelete(pResult1);
+
+        //Op (Op)^-1 phi - phi
+        CFieldFermionWilsonSquareSU3* pResult2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pFermion->GetCopy());
+        pResult2->ApplyOperator(eInverse[i], _FIELDS);
+        pResult2->ApplyOperator(eForward[i], _FIELDS);
+        pResult2->AxpyMinus(pFermion);
+        const Real fError2 = _cuCabsf(pResult2->DotReal(pResult2));
+        appGeneral(_T("| %s %s^-1 phi - phi |^2 =%8.18f\n"), sNames[i], sNames[i], fError2);
+        if (appAbs(fError2) > fMaxError)
+        {
+            ++uiError;
+        }
+        appSafeDelete(pResult2);
+    }
+
+    return uiError;
+}
 
 UINT TestSolver(CParameters& params)
 {
@@ -119,17 +169,21 @@ UINT TestSolver(CParameters& params)
     return uiError;
 }
 
-__REGIST_TEST(TestSolver, Solver, TestSolverBiCGStab, BiCGStab);
+___REGIST_TEST(TestSolver, Solver, TestSolverBiCGStab, BiCGStab, _TEST_MULTIGPU);
 __REGIST_TEST(TestSolver, Solver, TestSolverGMRES, GMRES);
-//__REGIST_TEST(TestSolver, Solver, TestSolverGCR); //slow solver not used
-__REGIST_TEST(TestSolver, Solver, TestSolverGCRODR, GCRODR);
+___REGIST_TEST(TestSolverCG, Solver, TestSolverCG, CG, _TEST_MULTIGPU);
+___REGIST_TEST(TestSolverCG, Solver, TestSolverDeflatedCG, DeflatedCG, _TEST_MULTIGPU);
+//__REGIST_TEST(TestSolver, Solver, TestSolverGCR, GCR); //slow solver not used
+___REGIST_TEST(TestSolver, Solver, TestSolverGCRODR, GCRODR, _TEST_MULTIGPU);
+___REGIST_TEST(TestSolver, Solver, TestSolverGMRESDR, GMRESDR, _TEST_MULTIGPU);
 //__REGIST_TEST(TestSolver, Solver, TestSolverTFQMR); //slow solver not used
 __REGIST_TEST(TestSolver, Solver, TestSolverGMRESLowMode, GMRES-low);
 __REGIST_TEST(TestSolver, Solver, TestSolverGCRODRLowMode, GCRODR-low);
 ___REGIST_TEST(TestSolver, Solver, TestSolverBiCGStabLowMode, BiCGStab-low, _TEST_DOUBLE);
 
-__REGIST_TEST(TestSolver, Solver, TestEOSolverBiCGStab, BiCGStabEO);
-__REGIST_TEST(TestSolver, Solver, TestEOSolverGMRES, GMRESEO);
+//Even Odd precondition solver is given up in the future
+//__REGIST_TEST(TestSolver, Solver, TestEOSolverBiCGStab, BiCGStabEO);
+//__REGIST_TEST(TestSolver, Solver, TestEOSolverGMRES, GMRESEO);
 
 //__REGIST_TEST(TestSolver, Solver, TestEOSolverBiCGStabD);
 //__REGIST_TEST(TestSolver, Solver, TestEOSolverGMRESD);

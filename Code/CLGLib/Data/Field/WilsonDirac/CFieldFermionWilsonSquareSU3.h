@@ -8,6 +8,7 @@
 // Current implementation, assumes square lattice
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/25/2018 nbale]
 //=============================================================================
 
@@ -38,11 +39,6 @@ public:
     void InitialOtherParameters(CParameters& params) override;
     void DebugPrintMe() const override;
 
-    void Zero() override { InitialField(EFIT_Zero); }
-
-    void Identity() override
-    { appCrucial(_T("Not supported for CFermionWilsonSquareSU3!")); }
-
     void Dagger() override;
 
     //This is Axpy(1.0f, x)
@@ -50,14 +46,12 @@ public:
     void AxpyMinus(const CField* x) override;
     void Axpy(Real a, const CField* x) override;
     void Axpy(const CLGComplex& a, const CField* x) override;
-    void Mul(const CField* other, UBOOL bDagger = TRUE) override;
+    void Mul(const CField* other, UBOOL bDaggerLeft = TRUE, UBOOL bDaggerRight = FALSE) override;
+    void LeftMul(const CField* other, UBOOL bDaggerLeft = FALSE, UBOOL bDaggerRight = FALSE) override;
     void ScalarMultply(const CLGComplex& a) override;
     void ScalarMultply(Real a) override;
-#if !_CLG_DOUBLEFLOAT
     cuDoubleComplex Dot(const CField* other) const override;
-#else
-    CLGComplex Dot(const CField* other) const override;
-#endif
+    DOUBLE GetLength() const override;
 
     //=================================
     //It is tested, although, the DEBUG Mode, this is faster
@@ -70,6 +64,7 @@ public:
     //void ScalarMultply1(Real a);
     //CLGComplex Dot1(const CField* other) const;
 
+    void ZeroOnEvenOdd(UBOOL bEven) override;
 
 protected:
 
@@ -101,10 +96,12 @@ protected:
 
     void PrepareForHMCS(const CFieldGauge* pGauge) override;
     UBOOL CalculateForceS(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const override;
+    DOUBLE EnergyS(const CFieldGauge* pGauge) const override;
+
+    void ApplyGammaS(const CFieldGauge* pGauge, EGammaMatrix eGamma) override;
 
 public:
-
-    void ApplyGamma(EGammaMatrix eGamma) override;
+    
     TArray<CFieldFermion*> GetSourcesAtSiteFromPool(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const SSmallInt4& site) const override;
 
     void InitialAsSource(const SFermionBosonSource& sourceData) override;
@@ -113,11 +110,21 @@ public:
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;
     
     CCString GetInfos(const CCString &tab) const override;
+    void CopyBufferTo(CField* U) const override;
 
-    void SetKai(Real fKai);
+    void SetKai(DOUBLE fKai);
+    DOUBLE GetKai() const { return m_fKai; }
     UINT TestGamma5Hermitian(const CFieldGauge* pGauge, UBOOL bTestGamma5 = FALSE) const;
 
     deviceWilsonVectorSU3* m_pDeviceData;
+
+    //Multi-GPU (Phase 2): one Wilson spinor (4x3 complex) per site.
+    UINT GetSiteElementBytes() const override { return static_cast<UINT>(sizeof(deviceWilsonVectorSU3)); }
+
+    //Improve-1: this field's own buffer handle (pool copies each bind theirs).
+    CHaloBufferHandle m_HaloBuffer;
+    CHaloBufferHandle* GetHaloBufferHandle() override { return &m_HaloBuffer; }
+    const CHaloBufferHandle* GetHaloBufferHandle() const override { return &m_HaloBuffer; }
 
     _GetData
 
@@ -125,13 +132,13 @@ protected:
 
     void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, BYTE byGaugeFieldId,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
-    void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const override;
+    void DerivateDOperator(DOUBLE fCoeff, void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const override;
 
-    Real m_fKai;
+    DOUBLE m_fKai;
 
     //Not using, this is used in "Dot1" which create a thread for each element of a Wilson vector
     //In Debug, it is faster, in Release, it is slower, so not using.
-    Real* m_tmpBuffer2;
+    //Real* m_tmpBuffer2;
 
 };
 

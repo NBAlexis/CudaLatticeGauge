@@ -30,7 +30,7 @@ extern "C" {
     struct deviceSU2Vector
     {
     public:
-        __device__ deviceSU2Vector()
+        __host__ __device__ deviceSU2Vector()
         {
 
         }
@@ -86,12 +86,24 @@ extern "C" {
             return ret;
         }
 
+        __device__ __inline__ void Zero()
+        {
+            m_ve[0] = _make_cuComplex(F(0.0), F(0.0));
+            m_ve[1] = _make_cuComplex(F(0.0), F(0.0));
+        }
+
         __device__ __inline__ static deviceSU2Vector makeOneSU2Vector()
         {
             deviceSU2Vector ret;
             ret.m_ve[0] = _make_cuComplex(F(1.0), F(0.0));
             ret.m_ve[1] = _make_cuComplex(F(1.0), F(0.0));
             return ret;
+        }
+
+        __device__ __inline__ void Id()
+        {
+            m_ve[0] = _make_cuComplex(F(1.0), F(0.0));
+            m_ve[1] = _make_cuComplex(F(1.0), F(0.0));
         }
 
         __device__ __inline__ static deviceSU2Vector makeOneSU2VectorColor(BYTE byColor)
@@ -235,6 +247,13 @@ extern "C" {
             m_ve[1].y = -m_ve[1].y;
         }
 
+        __device__ __inline__ deviceSU2Vector OppositeC() const
+        {
+            deviceSU2Vector ret(*this);
+            ret.Opposite();
+            return ret;
+        }
+
         __device__ __inline__ void Conjugate()
         {
             m_ve[0].y = -m_ve[0].y;
@@ -281,13 +300,23 @@ extern "C" {
             }
         }
 
+        __device__ __inline__ Real Abs() const
+        {
+            Real len = ConjugateDotC(*this).x;
+            if (len > _CLG_FLT_MIN_)
+            {
+                return _sqrt(len);
+            }
+            return F(0.0);
+        }
+
         CLGComplex m_ve[2];
     };
 
     struct deviceSU3Vector
     {
     public:
-        __device__ deviceSU3Vector()
+        __host__ __device__ deviceSU3Vector()
         {
 
         }
@@ -352,6 +381,13 @@ extern "C" {
             return ret;
         }
 
+        __device__ __inline__ void Zero()
+        {
+            m_ve[0] = _make_cuComplex(F(0.0), F(0.0));
+            m_ve[1] = _make_cuComplex(F(0.0), F(0.0));
+            m_ve[2] = _make_cuComplex(F(0.0), F(0.0));
+        }
+
         __device__ __inline__ static deviceSU3Vector makeOneSU3Vector()
         {
             deviceSU3Vector ret;
@@ -359,6 +395,13 @@ extern "C" {
             ret.m_ve[1] = _make_cuComplex(F(1.0), F(0.0));
             ret.m_ve[2] = _make_cuComplex(F(1.0), F(0.0));
             return ret;
+        }
+
+        __device__ __inline__ void Id()
+        {
+            m_ve[0] = _make_cuComplex(F(1.0), F(0.0));
+            m_ve[1] = _make_cuComplex(F(1.0), F(0.0));
+            m_ve[2] = _make_cuComplex(F(1.0), F(0.0));
         }
 
         __device__ __inline__ static deviceSU3Vector makeOneSU3VectorColor(BYTE byColor)
@@ -520,6 +563,13 @@ extern "C" {
             m_ve[2].y = -m_ve[2].y;
         }
 
+        __device__ __inline__ deviceSU3Vector OppositeC() const
+        {
+            deviceSU3Vector ret(*this);
+            ret.Opposite();
+            return ret;
+        }
+
         __device__ __inline__ void Conjugate()
         {
             m_ve[0].y = -m_ve[0].y;
@@ -568,7 +618,22 @@ extern "C" {
             }
         }
 
+        __device__ __inline__ Real Abs() const
+        {
+            Real len = ConjugateDotC(*this).x;
+            if (len > _CLG_FLT_MIN_)
+            {
+                return _sqrt(len);
+            }
+            return F(0.0);
+        }
+
+        //CLGComplex m_ve[3];
+#if _CLG_PADDING
+        CLGComplex m_ve[4]; //only the first three are used, the last one is for padding
+#else
         CLGComplex m_ve[3];
+#endif
     };
 
 #if _CLG_DOUBLEFLOAT
@@ -578,7 +643,7 @@ extern "C" {
 #endif
     {
     public:
-        __device__ deviceWilsonVectorSU3() { ; }
+        __device__ deviceWilsonVectorSU3() {}
 
         __device__ deviceWilsonVectorSU3(const deviceWilsonVectorSU3& other)
         {
@@ -638,12 +703,26 @@ extern "C" {
             m_d[3].Opposite();
         }
 
+        __device__ __inline__ deviceWilsonVectorSU3 OppositeC() const
+        {
+            deviceWilsonVectorSU3 ret(*this);
+            ret.Opposite();
+            return ret;
+        }
+
         __device__ __inline__ void Conjugate()
         {
             m_d[0].Conjugate();
             m_d[1].Conjugate();
             m_d[2].Conjugate();
             m_d[3].Conjugate();
+        }
+
+        __device__ __inline__ deviceWilsonVectorSU3 ConjugateC() const
+        {
+            deviceWilsonVectorSU3 ret(*this);
+            ret.Conjugate();
+            return ret;
         }
 
         __device__ __inline__ static deviceWilsonVectorSU3 makeRandom(UINT fatIndex)
@@ -686,6 +765,14 @@ extern "C" {
             return ret;
         }
 
+        __device__ __inline__ void Zero()
+        {
+            m_d[0].Zero();
+            m_d[1].Zero();
+            m_d[2].Zero();
+            m_d[3].Zero();
+        }
+
         __device__ __inline__ static deviceWilsonVectorSU3 makeOneWilsonVectorSU3()
         {
             deviceWilsonVectorSU3 ret;
@@ -694,6 +781,14 @@ extern "C" {
             ret.m_d[2] = deviceSU3Vector::makeOneSU3Vector();
             ret.m_d[3] = deviceSU3Vector::makeOneSU3Vector();
             return ret;
+        }
+
+        __device__ __inline__ void Id()
+        {
+            m_d[0].Id();
+            m_d[1].Id();
+            m_d[2].Id();
+            m_d[3].Id();
         }
 
 #define makeOneWilsonVectorSU3SpinUnroll(bySp) \
@@ -831,6 +926,21 @@ extern "C" {
             m_d[3].Mul(other.m_d[3]);
         }
 
+        __device__ __inline__ void MulDagger(const deviceWilsonVectorSU3& other)
+        {
+            m_d[0].MulDagger(other.m_d[0]);
+            m_d[1].MulDagger(other.m_d[1]);
+            m_d[2].MulDagger(other.m_d[2]);
+            m_d[3].MulDagger(other.m_d[3]);
+        }
+
+        __device__ __inline__ deviceWilsonVectorSU3 MulDaggerC(const deviceWilsonVectorSU3& other) const
+        {
+            deviceWilsonVectorSU3 ret(*this);
+            ret.MulDagger(other);
+            return ret;
+        }
+
         __device__ __inline__ void MulComp(const CLGComplex& other)
         {
             m_d[0].MulComp(other);
@@ -874,20 +984,34 @@ extern "C" {
             {
                 len = __rcp(_sqrt(len));
                 MulReal(len);
-        }
+            }
         }
 
+        __device__ __inline__ Real Abs() const
+        {
+            Real len = ConjugateDotC(*this).x;
+            if (len > _CLG_FLT_MIN_)
+            {
+                return _sqrt(len);
+            }
+            return F(0.0);
+        }
+
+#if _CLG_PADDING
         union
         {
             deviceSU3Vector m_d[4];
-#if _CLG_DOUBLEFLOAT
             CLGComplex m_me[16];
             Real m_rme[32];
+        };
 #else
+        union
+        {
+            deviceSU3Vector m_d[4];
             CLGComplex m_me[12];
             Real m_rme[24];
-#endif
         };
+#endif
     };
 
 #if defined(__cplusplus)

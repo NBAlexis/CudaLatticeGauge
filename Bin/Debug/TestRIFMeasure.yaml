@@ -1,0 +1,252 @@
+# WorkJob : ERIF_MeasureHISQ / ERIF_MeasureHISQRotation
+WorkJob : ERIF_MeasureHISQ
+VerboseLevel : DETAILED
+VerboseOutput : datetime
+
+# ================================================================
+# hisq measure : plain HISQ fermion (CFieldFermionHISQSU3) chiral condensate
+# ================================================================
+MeasureHISQ:
+
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    MaxThreadPerBlock : 128
+    MILC_StaggeredPhase : 1
+
+    ListStart : 0
+    ListEnd : 2
+    # two ensembles (omega=0 and omega=0.1) share the same beta
+    BetaList : [7.3351, 7.3351]
+    PrefixList : [O0, O01]
+    StartN : 1
+    EndN : 50
+    StochasticFieldCount : 10
+    UseZ4 : 1
+    SubFolder : 1
+    SubFolderPrefix : /home/nbalexis/CLGLib/Bin/Debug/RIFEnsemble
+    # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
+    LoadType : EFFT_CLGBinFloat
+
+    SavePrefix : RIF12x6
+    CSVSavePrefix : RIF12x6O
+    # ERIFMJ_Polyakov, ERIFMJ_Chiral
+    DistributionJob : ERIFMJ_Polyakov
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 6]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    FermionFieldCount : 1
+    MeasureListLength : 2
+    CacheStaple : 0
+    AlsoCheckMD5 : 0
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        ## plain HISQ fermion, no rotation
+        FieldName : CFieldFermionHISQSU3
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.01888
+        FieldId : 2
+        PoolNumber : 30
+        EachSiteEta : 0
+        # do NOT use even pseudo-fermion for measurement
+        Even : 0
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare, x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force, x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Solver:
+
+        SolverForFieldId : 2
+
+        # rotation (or plain) D is not Hermitian positive definite: use GMRES, NOT CG
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 30
+
+        Accuracy : 0.001
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 0
+        MeasureDist : 1
+        MeasureZ : 0
+        ShiftCenter : 0
+        ZSlice : 1
+
+    Measure2:
+
+        MeasureName : CMeasureChiralCondensateKS
+        FieldId : 2
+        MeasureDist : 1
+        ShowResult : 0
+        ShiftCenter : 0
+        DebugDivation : 0
+        ZSlice : 1
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingHISQSU3
+        FieldId : 1
+        ProjSUN : 0
+
+# ================================================================
+# hisq rot measure : rotating HISQ fermion (CFieldFermionHISQSU3R) chiral condensate
+# ================================================================
+MeasureHISQRotation:
+
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    MaxThreadPerBlock : 128
+    MILC_StaggeredPhase : 1
+
+    ListStart : 0
+    ListEnd : 2
+    BetaList : [7.3351, 7.3351]
+    PrefixList : [O0, O01]
+    StartN : 1
+    EndN : 50
+    StochasticFieldCount : 10
+    UseZ4 : 1
+    SubFolder : 1
+    SubFolderPrefix : /home/nbalexis/CLGLib/Bin/Debug/RIFEnsemble
+    LoadType : EFFT_CLGBinFloat
+
+    SavePrefix : RIF12x6
+    CSVSavePrefix : RIF12x6OR
+    DistributionJob : ERIFMJ_Polyakov
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 6]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    FermionFieldCount : 1
+    MeasureListLength : 2
+    CacheStaple : 0
+    AlsoCheckMD5 : 0
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        ## rotating HISQ fermion: rotation link must be cached (CachedGauge=1)
+        FieldName : CFieldFermionHISQSU3R
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.01888
+        FieldId : 2
+        PoolNumber : 30
+        EachSiteEta : 0
+        # do NOT use even pseudo-fermion for measurement
+        Even : 0
+        Period : [1, 1, 1, -1]
+        CachedGauge : 1
+        ShiftCoord : 1
+
+        # MC is to prepare, x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force, x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Solver:
+
+        SolverForFieldId : 2
+
+        # rotation D is NOT Hermitian positive definite: use GMRES, NOT CG
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 30
+
+        Accuracy : 0.001
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 0
+        MeasureDist : 1
+        MeasureZ : 0
+        ShiftCenter : 0
+        ZSlice : 1
+
+    Measure2:
+
+        MeasureName : CMeasureChiralCondensateKS
+        FieldId : 2
+        MeasureDist : 1
+        ShowResult : 0
+        ShiftCenter : 0
+        DebugDivation : 0
+        ZSlice : 1
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingHISQSU3
+        FieldId : 1
+        ProjSUN : 0
+
+    StapleCache:
+
+        StapleCacheName : CStapleCacheSU3
+        FieldId : 1
+
+        CacheStaples : 0
+        CachePlaquttes : 0
+        CacheFmunu : 0
+        CacheRotationLink : 1
+
+        FermionUpdate : 1
+        GaugeUpdate : 0

@@ -5,8 +5,11 @@
 //  Use this string class instead of STL, to get rid of the warnings with dll-export
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [3/13/2018 nbale]
 //=============================================================================
+#pragma once
+
 #ifndef _CCSTRING_H_
 #define _CCSTRING_H_
 
@@ -42,6 +45,18 @@ inline INT appStrToINT(const TCHAR* s)
     else
         base = 10;
     return appStoI(p, base);
+}
+
+inline SCHAR appStrToSCHAR(const TCHAR* s)
+{
+    INT base;
+    TCHAR* p = const_cast<TCHAR*>(s);
+    appStrTrimLeft(p);
+    if ('0' == p[0] && ('x' == p[1] || 'X' == p[1]))
+        base = 16;
+    else
+        base = 10;
+    return static_cast<SCHAR>(appStoI(p, base));
 }
 
 inline UINT appStrToUINT(const TCHAR* s)
@@ -118,7 +133,7 @@ public:
 
     CCStringData* GetData() const
     {
-        assert(m_pchData != NULL); 
+        appAssert(m_pchData != NULL); 
         //skip myself
         return (CCStringData*)(m_pchData) - 1;
     }
@@ -140,8 +155,8 @@ protected:
     */
     void AllocBuffer(INT nLen)
     {
-        assert(nLen >= 0);
-        assert(nLen <= INT_MAX - 1);    // max size (enough room for 1 extra)
+        appAssert(nLen >= 0);
+        appAssert(nLen <= INT_MAX - 1);    // max size (enough room for 1 extra)
 
         if (nLen == 0)
             Init();
@@ -163,7 +178,7 @@ protected:
             Release();
             AllocBuffer(nLen);
         }
-        assert(GetData()->m_nRefs <= 1);
+        appAssert(GetData()->m_nRefs <= 1);
     }
     /**
     * will clone the data attached to this string
@@ -209,7 +224,7 @@ protected:
             AllocBuffer(pData->m_nDataLength);
             memcpy(m_pchData, pData->Data(), (pData->m_nDataLength + 1) * sizeof(TCHAR));
         }
-        assert(GetData()->m_nRefs <= 1);
+        appAssert(GetData()->m_nRefs <= 1);
     }
     /**
     * -- master concatenation routine
@@ -242,7 +257,7 @@ protected:
             // we have to grow the buffer, use the ConcatCopy routine
             CCStringData* pOldData = GetData();
             ConcatCopy(GetData()->m_nDataLength, m_pchData, nSrcLen, lpszSrcData);
-            assert(pOldData != NULL);
+            appAssert(pOldData != NULL);
             CCString::Release(pOldData);
         }
         else
@@ -250,7 +265,7 @@ protected:
             // fast concatenation when buffer big enough
             memcpy(m_pchData+GetData()->m_nDataLength, lpszSrcData, nSrcLen*sizeof(TCHAR));
             GetData()->m_nDataLength += nSrcLen;
-            assert(GetData()->m_nDataLength <= GetData()->m_nAllocLength);
+            appAssert(GetData()->m_nDataLength <= GetData()->m_nAllocLength);
             m_pchData[GetData()->m_nDataLength] = _T('\0');
         }
     }
@@ -265,8 +280,8 @@ public:
 
     TCHAR GetAt(INT nIndex) const
     {
-        assert(nIndex >= 0); 
-        assert(nIndex < GetData()->m_nDataLength); 
+        appAssert(nIndex >= 0); 
+        appAssert(nIndex < GetData()->m_nDataLength); 
         return m_pchData[nIndex]; 
     }
 
@@ -283,15 +298,15 @@ public:
         INT buf_len = GetLength() * 2+1;
         ANSICHAR* new_data = (ANSICHAR*)(appMalloc(buf_len)); 
         INT ret_len = appUnicodeToAnsi(new_data, (UNICHAR*)m_pchData/*with terminator*/, buf_len/*out buffer bytes*/);
-        assert(ret_len <= buf_len);
+        appAssert(ret_len <= buf_len);
         return (const ANSICHAR*)new_data;
     }
 #endif
 
     void SetAt(INT nIndex, TCHAR ch)
     { 
-        assert(nIndex >= 0);
-        assert(nIndex < GetData()->m_nDataLength);
+        appAssert(nIndex >= 0);
+        appAssert(nIndex < GetData()->m_nDataLength);
         CopyBeforeWrite();
         m_pchData[nIndex] = ch;
     }
@@ -350,8 +365,8 @@ public:
         if (nFirst > GetData()->m_nDataLength)
             nCount = 0;
 
-        assert(nFirst >= 0);
-        assert(nFirst + nCount <= GetData()->m_nDataLength);
+        appAssert(nFirst >= 0);
+        appAssert(nFirst + nCount <= GetData()->m_nDataLength);
 
         // optimize case of returning entire string
         if (nFirst == 0 && nFirst + nCount == GetData()->m_nDataLength)
@@ -681,7 +696,7 @@ defineToStr(UINT)
 defineToStr(WORD)
 defineToStr(SWORD)
 defineToStr(BYTE)
-defineToStr(SBYTE)
+defineToStr(SCHAR)
 defineToStr(LONGLONG)
 defineToStr(ULONGLONG)
 
@@ -810,7 +825,7 @@ enum EGetStringListFlag
 * appGetStringList( _T(".asdad.asdasda.   .    gag   aga ", '.', EGSLF_IgnorTabSpaceInSide);
 * there is "asdad"  "asdasda" ""  "gagaga" if not EGSLF_IgnorTabSpaceInSide, it's  "asdad"  "asdasda" "  "  "    gaga  ga"
 */
-inline TArray<CCString> appGetStringList(const CCString &orignString, TArray<INT> seperate, DWORD dwFlag = 0)
+inline TArray<CCString> appGetStringList(const CCString &orignString, TArray<INT> seperate, UINT dwFlag = 0)
 {
     TArray<CCString> outList;
     const CCBitFlag flag(dwFlag);
@@ -882,7 +897,7 @@ inline TArray<CCString> appGetStringList(const CCString &orignString, TArray<INT
     return outList;
 }
 
-inline TArray<CCString> appGetStringList(const CCString &orignString, INT seperate, DWORD dwFlag = 0)
+inline TArray<CCString> appGetStringList(const CCString &orignString, INT seperate, UINT dwFlag = 0)
 {
     TArray <INT> inSep;
     inSep.AddItem(seperate);

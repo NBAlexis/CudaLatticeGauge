@@ -1,0 +1,35 @@
+Task: Simulate
+WarmUp: 10
+SaveStartIndex: 0
+ConfigurationNumber: 5
+SavePrefix: t03_z2_conf
+
+Dim: 4
+Dir: 4
+LatticeLength: [8, 8, 8, 8]
+LatticeIndex: CIndexSquare
+LatticeBoundary: CBoundaryConditionTorusSquare
+ThreadAutoDecompose: 1
+MaxThreadPerBlock: 256
+RandomType: ER_Schrage
+RandomSeed: 1234567
+
+ActionListLength: 1
+GaugeFieldCount: 1
+MeasureListLength: 1
+
+Updator:
+    UpdatorType: CHeatbath
+
+Gauge:
+    FieldName: CFieldGaugeZ2
+    FieldInitialType: EFIT_Random
+
+Action1:
+    ActionName: CActionDiscreteZNPlaquette
+    Beta: 0.5
+    GaugeFields: [1]
+
+Measure1:
+    MeasureName: CMeasurePlaqutteEnergy
+    GaugeFields: [1]

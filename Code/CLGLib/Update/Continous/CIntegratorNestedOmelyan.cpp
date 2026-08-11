@@ -5,6 +5,7 @@
 // This is the Approximate force gradient integrator for HMC
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [03/05/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -85,23 +86,23 @@ void CIntegratorNestedOmelyan::NestedEvaluate(UBOOL bLast)
 {
     const Real fHalfEstep = F(0.5) * m_fNestedStepLength;
     appDetailed("  Omelyan nested sub step 0\n");
-    UpdatePG(m_f2Lambda * fHalfEstep, FALSE);
+    UpdatePG(m_f2Lambda * fHalfEstep);
 
     for (UINT uiStep = 1; uiStep < m_uiNestedStep + 1; ++uiStep)
     {
         UpdateU(fHalfEstep);
-        UpdatePG(m_fNestedStepLength * (F(1.0) - m_f2Lambda), FALSE);
+        UpdatePG(m_fNestedStepLength * (F(1.0) - m_f2Lambda));
         UpdateU(fHalfEstep);
 
         if (uiStep < m_uiNestedStep)
         {
             appDetailed("  Omelyan nested sub step %d\n", uiStep);
-            UpdatePG(m_fNestedStepLength * m_f2Lambda, FALSE);
+            UpdatePG(m_fNestedStepLength * m_f2Lambda);
         }
         else
         {
             appDetailed("  Omelyan nested last step %d\n", uiStep);
-            UpdatePG(m_f2Lambda * fHalfEstep, bLast);
+            UpdatePG(m_f2Lambda * fHalfEstep);
         }
     }
 }

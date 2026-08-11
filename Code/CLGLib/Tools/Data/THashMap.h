@@ -4,6 +4,7 @@
 // DESCRIPTION:
 // CCMemStack improved hash map
 // REVISION:
+//  [mm/dd/yy]
 //  [3/13/2018 nbale]
 //=============================================================================
 #pragma once
@@ -33,13 +34,13 @@ template<class ARG_KEY>
 inline UINT TMapHashKey(ARG_KEY key)
 {
     // default identity hash - works for most primitive values
-    return (UINT)((DWORD)(key) >> 4 );
+    return static_cast<UINT>((ULONGLONG)(key) >> 4 );
 }
 template<>
 inline UINT TMapHashKey<const CCString&>(const CCString& key)
 {
     const TCHAR* name = key;
-    DWORD hash = 0;
+    UINT hash = 0;
     while (*name)
     {
         const TCHAR Ch = (TCHAR)appToUpper(*name++);
@@ -122,7 +123,7 @@ public:
     ~THashMap()
     {
         RemoveAll();
-        assert(0 == m_nCount);
+        appAssert(0 == m_nCount);
     }
     void RemoveAll()
     {
@@ -340,7 +341,7 @@ protected:
     {
         pAssoc->TAssoc::~TAssoc();
         --m_nCount;
-        assert(m_nCount >= 0);  // make sure we don't underflow
+        appAssert(m_nCount >= 0);  // make sure we don't underflow
         // if no more elements, cleanup completely
         if (m_nCount == 0) RemoveAll();
     }

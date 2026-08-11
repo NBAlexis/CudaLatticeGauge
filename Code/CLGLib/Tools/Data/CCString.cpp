@@ -24,10 +24,10 @@ CLGAPI const TCHAR* __GEmptyString = (const TCHAR*)((BYTE*)&_NullString+sizeof(C
 */
 CCString::CCString(const CCString& stringSrc)
 {
-    assert(stringSrc.GetData()->m_nRefs != 0);
+    appAssert(stringSrc.GetData()->m_nRefs != 0);
     if (stringSrc.GetData()->m_nRefs >= 0)
     {
-        assert(stringSrc.GetData() != _EmptyStringData);
+        appAssert(stringSrc.GetData() != _EmptyStringData);
         m_pchData = stringSrc.m_pchData;
         //appInterlockedIncrement(&GetData()->m_nRefs);
         GetData()->m_nRefs++;
@@ -106,7 +106,7 @@ void CCString::Release()
 {
     if (GetData() != _EmptyStringData)
     {
-        assert(GetData()->m_nRefs != 0);
+        appAssert(GetData()->m_nRefs != 0);
         GetData()->m_nRefs--;
         //if (appInterlockedDecrement(&GetData()->m_nRefs) <= 0)
         if (GetData()->m_nRefs <= 0)
@@ -123,7 +123,7 @@ void CCString::Release(CCStringData* pData)
 {
     if (pData != _EmptyStringData)
     {
-        assert(pData->m_nRefs != 0);
+        appAssert(pData->m_nRefs != 0);
         pData->m_nRefs--;
         //if (appInterlockedDecrement(&pData->m_nRefs) <= 0)
         if (pData->m_nRefs <= 0)
@@ -143,8 +143,8 @@ void CCString::Empty()
         Release();
     else
         *this = &_NullChar;
-    assert(GetData()->m_nDataLength == 0);
-    assert(GetData()->m_nRefs < 0 || GetData()->m_nAllocLength == 0);
+    appAssert(GetData()->m_nDataLength == 0);
+    appAssert(GetData()->m_nRefs < 0 || GetData()->m_nAllocLength == 0);
 }
 
 /**
@@ -165,7 +165,7 @@ const CCString& CCString::operator=(const CCString& stringSrc)
         {
             // can just copy references around
             Release();
-            assert(stringSrc.GetData() != _EmptyStringData);
+            appAssert(stringSrc.GetData() != _EmptyStringData);
             m_pchData = stringSrc.m_pchData;
             //appInterlockedIncrement(&GetData()->m_nRefs);
             GetData()->m_nRefs++;
@@ -250,7 +250,7 @@ CCString CLGAPI operator+(TCHAR ch, const CCString& string)
 */
 TCHAR* CCString::GetBuffer(INT nMinBufLength)
 {
-    assert(nMinBufLength >= 0);
+    appAssert(nMinBufLength >= 0);
 
     if (GetData()->m_nRefs > 1 || nMinBufLength > GetData()->m_nAllocLength)
     {
@@ -269,10 +269,10 @@ TCHAR* CCString::GetBuffer(INT nMinBufLength)
         GetData()->m_nDataLength = nOldLen;
         CCString::Release(pOldData);
     }
-    assert(GetData()->m_nRefs <= 1);
+    appAssert(GetData()->m_nRefs <= 1);
 
     // return a pointer to the character storage for this string
-    assert(m_pchData != NULL);
+    appAssert(m_pchData != NULL);
     return m_pchData;
 }
 
@@ -287,7 +287,7 @@ void CCString::ReleaseBuffer(INT nNewLength)
     if (nNewLength == -1)
         nNewLength = (INT)appStrlen(m_pchData); // zero terminated
 
-    assert(nNewLength <= GetData()->m_nAllocLength);
+    appAssert(nNewLength <= GetData()->m_nAllocLength);
     GetData()->m_nDataLength = nNewLength;
     m_pchData[nNewLength] = _T('\0');
 }
@@ -298,7 +298,7 @@ void CCString::ReleaseBuffer(INT nNewLength)
 */
 TCHAR* CCString::GetBufferSetLength(INT nNewLength)
 {
-    assert(nNewLength >= 0);
+    appAssert(nNewLength >= 0);
 
     GetBuffer(nNewLength);
     GetData()->m_nDataLength = nNewLength;
@@ -312,16 +312,16 @@ TCHAR* CCString::GetBufferSetLength(INT nNewLength)
 */
 void CCString::FreeExtra()
 {
-    assert(GetData()->m_nDataLength <= GetData()->m_nAllocLength);
+    appAssert(GetData()->m_nDataLength <= GetData()->m_nAllocLength);
     if (GetData()->m_nDataLength != GetData()->m_nAllocLength)
     {
         CCStringData* pOldData = GetData();
         AllocBuffer(GetData()->m_nDataLength);
         memcpy(m_pchData, pOldData->Data(), pOldData->m_nDataLength * sizeof(TCHAR));
-        assert(_T('\0') == m_pchData[GetData()->m_nDataLength]);
+        appAssert(_T('\0') == m_pchData[GetData()->m_nDataLength]);
         CCString::Release(pOldData);
     }
-    assert(GetData() != NULL);
+    appAssert(GetData() != NULL);
 }
 
 /**
@@ -330,7 +330,7 @@ void CCString::FreeExtra()
 */
 void CCString::UnlockBuffer() const
 {
-    assert(GetData()->m_nRefs == -1);
+    appAssert(GetData()->m_nRefs == -1);
     if (GetData() != _EmptyStringData)
         GetData()->m_nRefs = 1;
 }
@@ -456,7 +456,7 @@ void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
                     ;
             }
         }
-        assert(nWidth >= 0);
+        appAssert(nWidth >= 0);
 
         INT nPrecision = 0;
         if (*lpsz == _T('.'))
@@ -476,7 +476,7 @@ void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
                 for (; *lpsz != _T('\0') && appIsDigit(*lpsz); lpsz = appStrInc(lpsz))
                     ;
             }
-            assert(nPrecision >= 0);
+            appAssert(nPrecision >= 0);
         }
 
         // now should be on specifier
@@ -546,7 +546,7 @@ void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
                     // 309 zeroes == max precision of a double
                     // 6 == adjustment in case precision is not specified,
                     //   which means that the precision defaults to 6
-                    const DWORD nLength = appMax(nWidth, 312 + nPrecision + 6);
+                    const UINT nLength = appMax(nWidth, 312 + nPrecision + 6);
                     pszTemp = (TCHAR*)appAlloca(nLength);
 
                     f = va_arg(argList, DOUBLE);
@@ -567,7 +567,7 @@ void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
                 break;
 
             default:
-                assert(FALSE);  // unknown formatting option
+                appAssert(FALSE);  // unknown formatting option
             }
         }
 
@@ -691,11 +691,11 @@ CCString CCString::Replace(const TCHAR* lpszOld, const TCHAR* lpszNew) const
     const std::string from(lpszOld);
     const std::string to(lpszNew);
     size_t start_pos = str.find(from);
-    INT nCount = 0;
+    //INT nCount = 0;
     while (start_pos != std::string::npos)
     {
         str.replace(start_pos, from.length(), to);
-        ++nCount;
+        //++nCount;
         start_pos = str.find(from);
     }
 

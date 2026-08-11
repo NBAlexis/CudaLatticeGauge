@@ -5,6 +5,7 @@
 // 
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/27/2023 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
@@ -119,6 +120,8 @@ _kernelDFermionKSRigidAcc(
     case EOCT_Complex:
         pResultData[uiSiteIndex].MulComp(cCoeff);
         break;
+    default:
+        break;
     }
 }
 
@@ -155,11 +158,11 @@ _kernelDFermionKSForceRigidAcc(
             const deviceSU3Vector* phi_i = pFermionPointers[uiR];
             const deviceSU3Vector* phi_id = pFermionPointers[uiR + uiRational];
 
-            deviceSU3Vector toContract = pGauge[linkIndex].MulVector(phi_i[x_p_mu_Fermion.m_uiSiteIndex]);
-            deviceSU3 thisTerm = deviceSU3::makeSU3ContractV(phi_id[uiSiteIndex], toContract);
+            //deviceSU3Vector toContract = pGauge[linkIndex].MulVector(phi_i[x_p_mu_Fermion.m_uiSiteIndex]);
+            deviceSU3 thisTerm = deviceSU3::makeSU3ContractV(phi_i[x_p_mu_Fermion.m_uiSiteIndex], phi_id[uiSiteIndex]);
 
-            toContract = pGauge[linkIndex].MulVector(phi_id[x_p_mu_Fermion.m_uiSiteIndex]);
-            thisTerm.Add(deviceSU3::makeSU3ContractV(toContract, phi_i[uiSiteIndex]));
+            //toContract = pGauge[linkIndex].MulVector(phi_id[x_p_mu_Fermion.m_uiSiteIndex]);
+            thisTerm.Sub(deviceSU3::makeSU3ContractV(phi_id[x_p_mu_Fermion.m_uiSiteIndex], phi_i[uiSiteIndex]));
 
             if (x_p_mu_Fermion.NeedToOpposite())
             {
@@ -170,7 +173,6 @@ _kernelDFermionKSForceRigidAcc(
                 thisTerm.MulReal(eta_mu * pNumerators[uiR]);
             }
 
-            thisTerm.Ta();
             if (3 != idir)
             {
                 thisTerm.MulReal(f1pgz);
@@ -194,7 +196,7 @@ void CFieldFermionKSSU3RigidAcc::DOperatorKS(void* pTargetBuffer, const void* pB
     const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
 
     preparethread;
-    _kernelDFermionKSRigidAcc << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDFermionKSRigidAcc, block, threads, 
         pSource,
         pGauge,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
@@ -209,37 +211,37 @@ void CFieldFermionKSSU3RigidAcc::DOperatorKS(void* pTargetBuffer, const void* pB
         fRealCoeff,
         cCmpCoeff);
 
-    if (m_bUseImaginaryGamma3)
-    {
-        CFieldFermionKSSU3Gamma::appApplyGammaKS(pTarget, pSource, pGauge,
-            GAMMA3, FALSE, bDagger, F(0.5) * CCommonData::m_fG,
-            eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
-    }
-    else
-    {
-        CLGComplex toMul = _make_cuComplex(F(1.0), F(0.0));
+    //if (m_bUseImaginaryGamma3)
+    //{
+    //    _FermionKernelGamma::appApplyGammaKS(pTarget, pSource, pGauge,
+    //        GAMMA3, FALSE, bDagger, F(0.5) * CCommonData::m_fG,
+    //        eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
+    //}
+    //else
+    //{
+    //    CLGComplex toMul = _make_cuComplex(F(1.0), F(0.0));
 
-        switch (eOCT)
-        {
-        case EOCT_None:
-            toMul = _make_cuComplex(F(0.0), F(-0.5) * CCommonData::m_fG);
-            break;
-        case EOCT_Minus:
-            toMul = _make_cuComplex(F(0.0), F(0.5) * CCommonData::m_fG);
-            break;
-        case EOCT_Real:
-            toMul = _make_cuComplex(F(0.0), F(-0.5) * CCommonData::m_fG * fRealCoeff);
-            break;
-        case EOCT_Complex:
-            toMul = _cuCmulf(cCmpCoeff, _make_cuComplex(F(0.0), F(-0.5) * CCommonData::m_fG));
-            break;
-        default:
-            break;
-        }
-        CFieldFermionKSSU3Gamma::appApplyGammaKS(pTarget, pSource, pGauge,
-            GAMMA3, FALSE, bDagger, F(1.0),
-            EOCT_Complex, F(1.0), toMul, m_byFieldId, byGaugeFieldId);
-    }
+    //    switch (eOCT)
+    //    {
+    //    case EOCT_None:
+    //        toMul = _make_cuComplex(F(0.0), F(-0.5) * CCommonData::m_fG);
+    //        break;
+    //    case EOCT_Minus:
+    //        toMul = _make_cuComplex(F(0.0), F(0.5) * CCommonData::m_fG);
+    //        break;
+    //    case EOCT_Real:
+    //        toMul = _make_cuComplex(F(0.0), F(-0.5) * CCommonData::m_fG * fRealCoeff);
+    //        break;
+    //    case EOCT_Complex:
+    //        toMul = _cuCmulf(cCmpCoeff, _make_cuComplex(F(0.0), F(-0.5) * CCommonData::m_fG));
+    //        break;
+    //    default:
+    //        break;
+    //    }
+    //    _FermionKernelGamma::appApplyGammaKS(pTarget, pSource, pGauge,
+    //        GAMMA3, FALSE, bDagger, F(1.0),
+    //        EOCT_Complex, F(1.0), toMul, m_byFieldId, byGaugeFieldId);
+    //}
 }
 
 /**
@@ -251,66 +253,72 @@ void CFieldFermionKSSU3RigidAcc::DerivateD0(
     const void* pGaugeBuffer, BYTE byGaugeFieldId) const
 {
     preparethread;
-    _kernelDFermionKSForceRigidAcc << <block, threads >> > (
+    _LAUNCH_KERNEL(_kernelDFermionKSForceRigidAcc, block, threads, 
         (const deviceSU3*)pGaugeBuffer,
         (deviceSU3*)pForce,
         appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pEtaMu,
-        m_pRationalFieldPointers,
-        m_pMDNumerator,
-        m_rMD.m_uiDegree,
+        CRationalFieldPointer::GetInstance()->GetRationPoint<deviceSU3Vector>(m_byRationFieldPointerBufferLength),
+        GRASet.m_pRASet[m_iMDIndex]->m_pDeviceData,
+        GRASet.m_pRASet[m_iMDIndex]->m_uiDegree,
         CCommonData::m_fG,
         m_byFieldId);
 
-    CFieldFermionKSSU3Gamma::GammaKSForce(pForce,
-        pGaugeBuffer,
-        m_pRationalFieldPointers,
-        m_pMDNumerator,
-        m_rMD.m_uiDegree,
-        F(0.5) * CCommonData::m_fG,
-        GAMMA3,
-        m_pDevicePathBuffer,
-        m_byFieldId,
-        byGaugeFieldId);
+    //_FermionKernelGamma::GammaKSForce(pForce,
+    //    pGaugeBuffer,
+    //    CRationalFieldPointer::GetInstance()->GetRationPoint<deviceSU3Vector>(m_byRationFieldPointerBufferLength),
+    //    GRASet.m_pRASet[m_iMDIndex]->m_pDeviceData,
+    //    GRASet.m_pRASet[m_iMDIndex]->m_uiDegree,
+    //    F(0.5) * CCommonData::m_fG,
+    //    GAMMA3,
+    //    m_pDevicePathBuffer,
+    //    m_byFieldId,
+    //    byGaugeFieldId);
 }
 
 #pragma endregion
 
 CFieldFermionKSSU3RigidAcc::CFieldFermionKSSU3RigidAcc() 
     : CFieldFermionKSSU3()
-    , m_bUseImaginaryGamma3(TRUE)
+    //, m_bUseImaginaryGamma3(TRUE)
     , m_pDevicePathBuffer(NULL)
 {
     m_bDiagonalMass = TRUE;
 
-    checkCudaErrors(cudaMalloc((void**)&m_pDevicePathBuffer, sizeof(INT) * 4));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDevicePathBuffer, sizeof(SCHAR) * 4));
 }
 
 CFieldFermionKSSU3RigidAcc::~CFieldFermionKSSU3RigidAcc()
 {
-    checkCudaErrors(cudaFree(m_pDevicePathBuffer));
+    checkCudaErrors(__cudaFree(m_pDevicePathBuffer));
 }
 
-void CFieldFermionKSSU3RigidAcc::CopyTo(CField* U) const
+void CFieldFermionKSSU3RigidAcc::CopyParamTo(CField* U) const
 {
-    CFieldFermionKSSU3::CopyTo(U);
+    CFieldFermionKSSU3::CopyParamTo(U);
 }
 
 void CFieldFermionKSSU3RigidAcc::InitialOtherParameters(CParameters& params)
 {
     CFieldFermionKSSU3::InitialOtherParameters(params);
 
-    INT iImGamma3 = 1;
-    if (params.FetchValueINT(_T("ImaginaryGamma3"), iImGamma3))
+    if (m_bEvenPseudofermion)
     {
-        m_bUseImaginaryGamma3 = (0 != iImGamma3);
+        appWarning(_T("CFieldFermionKSSU3RigidAcc does not support even-odd, change to full field\n"));
+        m_bEvenPseudofermion = FALSE;
     }
+
+    //INT iImGamma3 = 1;
+    //if (params.FetchValueINT(_T("ImaginaryGamma3"), iImGamma3))
+    //{
+    //    m_bUseImaginaryGamma3 = (0 != iImGamma3);
+    //}
 }
 
 CCString CFieldFermionKSSU3RigidAcc::GetInfos(const CCString& tab) const
 {
     CCString sRet = CFieldFermionKSSU3::GetInfos(tab);
-    sRet = sRet + tab + _T("Imaginary Gamma3 : ") + appToString(m_bUseImaginaryGamma3) + _T("\n");
+    //sRet = sRet + tab + _T("Imaginary Gamma3 : ") + appToString(m_bUseImaginaryGamma3) + _T("\n");
     sRet = sRet + tab + _T("G : ") + appToString(CCommonData::m_fG) + _T("\n");
     return sRet;
 }

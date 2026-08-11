@@ -7,6 +7,7 @@
 // So the implementation is in fact ORTHODIR
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [02/16/2019 nbale]
 //=============================================================================
 
@@ -32,10 +33,16 @@ public:
     void AllocateBuffers(const CField* pField) override;
     virtual void ReleaseBuffers();
     UBOOL Solve(CField* pFieldX, const CField* pFieldB, 
-        INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+        INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
         EFieldOperator uiM, ESolverPhase ePhase = ESP_Once, const CField* pStart = NULL) override;
 
 protected:
+
+    void GenerateNextP(CField* pNextP, CField* pAAP, CField* pR, CField* pAPJ,
+        const TArray<CField*>& pP, const TArray<CField*>& pAP, const TArray<Real>& lengthAP,
+        UINT uiCurrentStep, UINT uiCurrentIndex, UINT uiNextIndex,
+        INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldTensor2* const* tensor2Fields,
+        EFieldOperator uiM) const;
 
     UINT m_uiReStart;
     UINT m_uiMaxDim;

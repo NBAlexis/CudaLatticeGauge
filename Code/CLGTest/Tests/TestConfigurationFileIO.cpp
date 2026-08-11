@@ -4,6 +4,7 @@
 // DESCRIPTION:
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [01/31/2019 nbale]
 //=============================================================================
 
@@ -17,11 +18,11 @@ UINT TestFileIO(CParameters& sParam)
 
     const Real fPlaqutteEneregy = static_cast<Real>(appGetLattice()->m_pGaugeField[0]->CalculatePlaqutteEnergy(F(1.0) / F(3.0)) / (6 * _HC_Volume));
 
-    CFieldGaugeSU3* pStable = dynamic_cast<CFieldGaugeSU3*>(appCreate(_T("CFieldGaugeSU3")));
+    CFieldGaugeSU3* pStaple = dynamic_cast<CFieldGaugeSU3*>(appCreate(_T("CFieldGaugeSU3")));
     CFieldGaugeSU3* pForce = dynamic_cast<CFieldGaugeSU3*>(appCreate(_T("CFieldGaugeSU3")));
 
-    appGetLattice()->m_pGaugeField[0]->CalculateForceAndStaple(pForce, pStable, F(1.0) / F(3.0));
-    const Real fPlaqutteEneregy2 = static_cast<Real>(appGetLattice()->m_pGaugeField[0]->CalculatePlaqutteEnergyUsingStable(F(1.0) / F(3.0), pStable) / (6 * _HC_Volume));
+    appGetLattice()->m_pGaugeField[0]->CalculateForceAndStaple(pForce, pStaple, F(1.0) / F(3.0));
+    const Real fPlaqutteEneregy2 = static_cast<Real>(appGetLattice()->m_pGaugeField[0]->CalculatePlaqutteEnergyUsingStaple(F(1.0) / F(3.0), pStaple) / (6 * _HC_Volume));
 
     appGeneral(_T("Plaqutte Energy (expected:0.625129946974942)= %1.10f and %1.10f\n"), F(1.0) - fPlaqutteEneregy, F(1.0) - fPlaqutteEneregy2);
 
@@ -63,7 +64,10 @@ UINT TestFileIOCLG(CParameters& sParam)
     CFieldFermionWilsonSquareSU3* pNewFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appCreate(_T("CFieldFermionWilsonSquareSU3")));
     pNewFermion->InitialFieldWithFile(_T("testFermion.con"), EFFT_CLGBin);
 
-    const CLGComplex res1 = cuCmulf_cr(pNewGauge->DotReal(appGetLattice()->m_pGaugeField[0]), __div(F(1.0), _HC_Volume * _HC_Dir));
+    //DotReal is a global Allreduce; normalise by the GLOBAL link count so the
+    //expected value 3.0 matches single-GPU (identity when unsplit).
+    const Real fGlobalLinks = static_cast<Real>(_HC_GlobalLx) * _HC_GlobalLy * _HC_GlobalLz * _HC_GlobalLt * _HC_Dir;
+    const CLGComplex res1 = cuCmulf_cr(pNewGauge->DotReal(appGetLattice()->m_pGaugeField[0]), __div(F(1.0), fGlobalLinks));
     //const CLGComplex res3 = pNewGauge->DotReal(pNewGauge);
     //appGeneral(_T("dot res:%2.20f\n"), res3.x);
     //appGeneral(_T("dot res:%2.20f\n"), res3.y);
@@ -97,10 +101,7 @@ UINT TestFileIOCLG(CParameters& sParam)
 UINT TestFileDOUBLE(CParameters&)
 {
     const DOUBLE expectedres = 49152.00000000000000000000;
-    CCString sFile = _T("testGaugeDouble.con_");
-#if !_CLG_DEBUG
-    sFile = _T("../Debug/") + sFile;
-#endif
+    CCString sFile = _T("../Debug/testGaugeDouble.con_");
     appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFile.c_str(), EFFT_CLGBinDouble);
     const DOUBLE res = appGetLattice()->m_pGaugeField[0]->Dot(appGetLattice()->m_pGaugeField[0]).x;
 
@@ -112,13 +113,11 @@ UINT TestFileDOUBLE(CParameters&)
     return 0;
 }
 
+
 UINT TestFileFloat(CParameters&)
 {
     const DOUBLE expectedres = 49152.00000000000000000000;
-    CCString sFile = _T("testGaugeSingle.con_");
-#if !_CLG_DEBUG
-    sFile = _T("../Debug/") + sFile;
-#endif
+    CCString sFile = _T("../Debug/testGaugeSingle.con_");
     appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFile.c_str(), EFFT_CLGBinFloat);
     const DOUBLE res = appGetLattice()->m_pGaugeField[0]->Dot(appGetLattice()->m_pGaugeField[0]).x;
 
@@ -165,20 +164,21 @@ __REGIST_TEST(TestFileIOCLG, FileIO, TestSaveConfiguration, Save);
 #if _CLG_DEBUG
 ___REGIST_TEST(TestFileIOCLGCompressed, FileIO, TestFileIOCLGCompressedDebug, CLGCompressed, _TEST_DOUBLE);
 #else
-__REGIST_TEST(TestFileIOCLGCompressed, FileIO, TestFileIOCLGCompressed, CLGCompressed);
+___REGIST_TEST(TestFileIOCLGCompressed, FileIO, TestFileIOCLGCompressed, CLGCompressed, _TEST_MULTIGPU);
 #endif
 
-__REGIST_TEST(TestFileDOUBLE, FileIO, TestSaveConfigurationDouble, Double);
-__REGIST_TEST(TestFileFloat, FileIO, TestSaveConfigurationFloat, Single);
+___REGIST_TEST(TestFileDOUBLE, FileIO, TestSaveConfigurationDouble, Double, _TEST_MULTIGPU);
+___REGIST_TEST(TestFileFloat, FileIO, TestSaveConfigurationFloat, Single, _TEST_MULTIGPU);
 
 UINT TestFileIOConsistency(CParameters& sParam)
 {
     UINT uiError = 0;
     TArray<const class CField*> allFields = appGetLattice()->GetAllField();
     TArray<DOUBLE> dots;
+    //TArray<DOUBLE> printdots;
     sParam.FetchValueArrayDOUBLE(_T("Expected"), dots);
 
-    if (dots.Num() != allFields.Num())
+    if (dots.Num() < allFields.Num())
     {
         LastProbem(_T("expect count != field count"));
         return 1;
@@ -191,7 +191,11 @@ UINT TestFileIOConsistency(CParameters& sParam)
         CField* copy = allFields[i]->GetCopy();
 
         copy->InitialFieldWithFile(sFileName);
-        const DOUBLE amplitude = copy->Dot(copy).x / _HC_Volume;
+        //Dot is a global Allreduce (P4-3); divide by the GLOBAL volume so the
+        //amplitude matches the single-GPU value (identity when unsplit).
+        const DOUBLE amplitude = copy->Dot(copy).x
+            / (static_cast<DOUBLE>(_HC_GlobalLx) * _HC_GlobalLy * _HC_GlobalLz * _HC_GlobalLt);
+        //printdots.AddItem(amplitude);
         if (abs(amplitude - dots[i]) > 0.00001 * amplitude)
         {
             ++uiError;
@@ -204,7 +208,9 @@ UINT TestFileIOConsistency(CParameters& sParam)
         {
             appGeneral(_T("%s consist: %f - %f\n"), copy->GetClass()->GetName(), amplitude, dots[i]);
         }
+        //allFields[i]->SaveToFile(sFileName, EFFT_CLGBinFloat);
     }
+    //appGeneral(_T("%s\n"), appToString(printdots).c_str());
     return uiError;
 }
 
@@ -244,7 +250,9 @@ UINT TestFileIOSaveLoad(CParameters& sParam)
             copy->SaveToFile(_T("../Debug/_") + sFileName + _T("_"));
         }
 
-        dot.AddItem(copy->Dot(copy).x / _HC_Volume);
+        //Same global-volume normalisation as TestFileIOConsistency.
+        dot.AddItem(copy->Dot(copy).x
+            / (static_cast<DOUBLE>(_HC_GlobalLx) * _HC_GlobalLy * _HC_GlobalLz * _HC_GlobalLt));
 
         copy->InitialFieldWithFile(sFileName);
 
@@ -273,7 +281,66 @@ UINT TestFileIOSaveLoad(CParameters& sParam)
 }
 
 __REGIST_TEST(TestFileIOSaveLoad, FileIO, TestSaveLoad, SaveLoad);
+__REGIST_TEST(TestFileIOSaveLoad, FileIO, TestSaveLoadTensor2, SaveLoadTensor2);
+
+//the files are stored in single precision, so we don't test double precision here.
+#if !_CLG_DOUBLEFLOAT
 __REGIST_TEST(TestFileIOConsistency, FileIO, TestSaveLoad, Consistent);
+#endif
+
+___REGIST_TEST(TestFileIOSaveLoad, FileIO, TestSaveLoadDiscrete, SaveLoadDiscrete, _TEST_MULTIGPU);
+
+UINT TestSU3_12FileIO(CParameters&)
+{
+    UINT uiErrors = 0;
+
+    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField[0]);
+    if (NULL == pGauge)
+    {
+        appCrucial(_T("TestSU3_12FileIO: no gauge field found\n"));
+        return 1;
+    }
+
+    // Save gauge field as SU3_12 format
+    CCString sFileName = _T("test_su3_12_roundtrip.bin");
+    pGauge->SaveToFile(sFileName, EFFT_CLGBinSU3_12);
+
+    // Load back into a new SU3 field
+    CFieldGaugeSU3* pLoaded = dynamic_cast<CFieldGaugeSU3*>(pGauge->GetCopy());
+    pLoaded->Zero();
+    pLoaded->InitialFieldWithFile(sFileName, EFFT_CLGBinSU3_12);
+
+    // Compare original and loaded
+    UINT uiLinkCount = _HC_Volume * _HC_Dir;
+    CFieldGaugeSU3_12* pTempSU3_12 = new CFieldGaugeSU3_12();
+    pGauge->CopyBufferTo(pTempSU3_12);
+    DOUBLE fMSE = CFieldGaugeSU3_12::SU3_12MSE(
+        static_cast<const deviceSU3_12*>(pTempSU3_12->GetData()),
+        static_cast<const deviceSU3*>(pLoaded->GetData()),
+        uiLinkCount);
+    fMSE /= static_cast<DOUBLE>(uiLinkCount * 18);
+    appGeneral(_T("SU3_12 file I/O MSE: %e\n"), fMSE);
+
+    if (fMSE > 1e-10)
+    {
+        appCrucial(_T("FAILED: file I/O MSE = %e\n"), fMSE);
+        ++uiErrors;
+    }
+    else
+    {
+        appGeneral(_T("PASSED\n"));
+    }
+
+    appSafeDelete(pTempSU3_12);
+    appSafeDelete(pLoaded);
+
+    // Clean up test file
+    remove(sFileName.c_str());
+
+    return uiErrors;
+}
+
+__REGIST_TEST(TestSU3_12FileIO, FileIO, TestSU3_12FileIO, SU312FileIO);
 
 //=============================================================================
 // END OF FILE

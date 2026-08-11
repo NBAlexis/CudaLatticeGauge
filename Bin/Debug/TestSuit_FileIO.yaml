@@ -98,13 +98,13 @@ TestFileIOCLGCompressed:
     MeasureListLength : 0
 
     Gauge:
-    
+
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-        
+
 
 TestFileIOCLGCompressedDebug:
 
@@ -141,13 +141,13 @@ TestSaveConfigurationDouble:
     MeasureListLength : 0
 
     Gauge:
-    
+
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Identity
-        
+
 TestSaveConfigurationFloat:
 
     Dim : 4
@@ -169,6 +169,7 @@ TestSaveConfigurationFloat:
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Identity
 
+
 TestSaveLoad:
 
     Dim : 4
@@ -181,11 +182,11 @@ TestSaveLoad:
     ActionListLength : 0
     MeasureListLength : 0
     Save : 0
-    Expected : [0.202156, 9561.642069, 2508152.599227, 59885356.226258, 780022276.249573, 5665475351.710449, 28693478010.818359, 115365692783.281250, 1.416781, 1089.885933, 772.393989, 1458.638640, 1901.037939, 2268.477049, 2401.516421, 3253.789161, 0.328688, 569.751825, 1189.146596, 1644.046414, 1272.940862, 2146.594657, 3127.594420, 3117.302010]
+    Expected : [0.998640, 6.013106, 15.999421, 29.975310, 1.000000, 1.333675, 1.999972, 2.658817, 1.000000, 1.333219, 1.999730, 2.668151]
 
-    GaugeFieldCount : 8
-    BosonFieldCount : 8
-    FermionFieldCount : 8
+    GaugeFieldCount : 4
+    BosonFieldCount : 4
+    FermionFieldCount : 4
 
     Gauge:
         FieldName : CFieldGaugeU1
@@ -199,47 +200,124 @@ TestSaveLoad:
     Gauge4:
         FieldName : CFieldGaugeSU4
         FieldInitialType : EFIT_RandomGenerator
-    Gauge5:
-        FieldName : CFieldGaugeSU5
-        FieldInitialType : EFIT_RandomGenerator
-    Gauge6:
-        FieldName : CFieldGaugeSU6
-        FieldInitialType : EFIT_RandomGenerator
-    Gauge7:
-        FieldName : CFieldGaugeSU7
-        FieldInitialType : EFIT_RandomGenerator
-    Gauge8:
-        FieldName : CFieldGaugeSU8
-        FieldInitialType : EFIT_RandomGenerator
     BosonField1:
         FieldName : CFieldBosonU1
+        FieldInitialType : EFIT_Random
     BosonField2:
         FieldName : CFieldBosonSU2
+        FieldInitialType : EFIT_Random
     BosonField3:
         FieldName : CFieldBosonSU3
+        FieldInitialType : EFIT_Random
     BosonField4:
         FieldName : CFieldBosonSU4
-    BosonField5:
-        FieldName : CFieldBosonSU5
-    BosonField6:
-        FieldName : CFieldBosonSU6
-    BosonField7:
-        FieldName : CFieldBosonSU7
-    BosonField8:
-        FieldName : CFieldBosonSU8
+        FieldInitialType : EFIT_Random
     FermionField1:
         FieldName : CFieldFermionKSU1
+        FieldInitialType : EFIT_Random
     FermionField2:
         FieldName : CFieldFermionKSSU2
+        FieldInitialType : EFIT_Random
     FermionField3:
         FieldName : CFieldFermionKSSU3
+        FieldInitialType : EFIT_Random
     FermionField4:
         FieldName : CFieldFermionKSSU4
-    FermionField5:
-        FieldName : CFieldFermionKSSU5
-    FermionField6:
-        FieldName : CFieldFermionKSSU6
-    FermionField7:
-        FieldName : CFieldFermionKSSU7
-    FermionField8:
-        FieldName : CFieldFermionKSSU8
+        FieldInitialType : EFIT_Random
+
+TestSaveLoadTensor2:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    MeasureListLength : 0
+    Save : 0
+
+    Tensor2FieldCount : 4
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_RandomGenerator
+    Tensor2Field1:
+        FieldName : CFieldTensor2Real
+        FieldInitialType : EFIT_Random
+    Tensor2Field2:
+        FieldName : CFieldTensor2Complex
+        FieldInitialType : EFIT_Random
+    Tensor2Field3:
+        FieldName : CFieldTensor2SU2
+        FieldInitialType : EFIT_Random
+    Tensor2Field4:
+        FieldName : CFieldTensor2SU3
+        FieldInitialType : EFIT_Random
+
+# TestSU3_12FileIO round-trip save/load via EFFT_CLGBinSU3_12
+
+TestSaveLoadDiscrete:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    MeasureListLength : 0
+    Save : 0
+
+    GaugeFieldCount : 3
+
+    Gauge:
+        FieldName : CFieldGaugeZ3
+        FieldInitialType : EFIT_RandomGenerator
+    Gauge2:
+        FieldName : CFieldGaugeD3
+        FieldInitialType : EFIT_RandomGenerator
+    Gauge3:
+        FieldName : CFieldGaugeD4
+        FieldInitialType : EFIT_RandomGenerator
+
+
+
+TestSU3_12FileIO:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 10
+    CacheStaple : 0
+
+    ActionListLength : 1
+    GaugeFieldCount : 1
+    MeasureListLength : 0
+    FermionFieldCount : 0
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 0
+    BeforeMetropolisDebug : 0
+    Metropolis : 0
+    MetropolisDebug : 0
+    ExpectMiss : 0
+    ExpectMissDebug : 0
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 6.0
+
+
+

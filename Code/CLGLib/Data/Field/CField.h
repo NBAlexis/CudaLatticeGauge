@@ -5,11 +5,16 @@
 // This is the class for all fields, gauge, fermion and spin fields are inherent from it
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [12/3/2018 nbale]
 //=============================================================================
 
 #ifndef _CFIELD_H_
 #define _CFIELD_H_
+
+//Improve-1 (multi-GPU-improve1.md 3.1/3.2): buffer-extent halo identity; every
+//field MAY expose its managed device buffer through a CHaloBufferHandle.
+#include "Core/Distributed/CHaloBufferHandle.h"
 
 #define _GetData \
 const void* GetData() const override \
@@ -30,7 +35,8 @@ __DEFINE_ENUM(EFieldFileType,
     EFFT_CLGBinCompressed,
     EFFT_CLGBinFloat,
     EFFT_CLGBinDouble,
-    
+    EFFT_CLGBinSU3_12,
+
     EFFT_ForceDWORD = 0x7fffffff,
     )
 
@@ -70,8 +76,17 @@ enum EOperatorCoefficientType
 __DEFINE_ENUM(EFermionBosonSource,
     EFS_Point,
     EFS_Wall,
+    EFS_StaggeredWall,
+    EFS_StaggeredZWall,
     EFS_MomentumWall,
     )
+
+enum EFixBoundary
+{
+    EFB_Field,
+    EFB_Momentum,
+    EFB_Force,
+};
 
 struct SFermionBosonSource
 {
@@ -99,6 +114,7 @@ public:
     virtual void InitialWithByteCompressed(const CCString& sFileName) { appCrucial(_T("Not implemented compressed file format!\n")); }
     virtual void InitialOtherParameters(CParameters& param) 
     {
+        m_pClass = GetClass();
         param.FetchValueArrayBYTE(_T("GaugeFields"), m_byGaugeFieldIds);
         param.FetchValueArrayBYTE(_T("BosonFields"), m_byBosonFieldIds);
 
@@ -121,7 +137,9 @@ public:
     virtual const void* GetData() const = 0;
     virtual void* GetData() = 0;
 
-#pragma region BLAS
+    BYTE GetFieldId() const { return m_byFieldId; }
+
+    #pragma region BLAS
     //what is BLAS? see: https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms
 
     virtual void Zero()
@@ -129,24 +147,38 @@ public:
         InitialField(EFIT_Zero);
     }
 
+    virtual void ZeroOnEvenOdd(UBOOL bEven)
+    {
+        appCrucial(_T("ZeroOnEvenOdd not implemented!\n"));
+    }
+
     virtual void Identity()
     {
         InitialField(EFIT_Identity);
     }
 
-    virtual void FixBoundary() {}
+    virtual void FixBoundary(EFixBoundary eType) {}
 
     //This is Axpy(1.0f, x)
     virtual void AxpyPlus(const CField* x) = 0;
-    //This is Axpy(1.0f, x)
+    //This is Axpy(-1.0f, x)
     virtual void AxpyMinus(const CField* x) = 0;
 
+    //me = me + a * x
     virtual void Axpy(Real a, const CField* x) = 0;
     virtual void Axpy(const CLGComplex& a, const CField* x) = 0;
-    virtual void Mul(const CField* other, UBOOL bDagger = TRUE) = 0;
+    virtual void Mul(const CField* other, UBOOL bDaggerLeft = TRUE, UBOOL bDaggerRight = FALSE) = 0;
+    virtual void LeftMul(const CField* other, UBOOL bDaggerLeft = FALSE, UBOOL bDaggerRight = FALSE) = 0;
     virtual void Dagger() = 0;
 
-    DOUBLE GetLength() const { return m_fLength; }
+    virtual void ApplyPhaseC(const CField* other)
+    {
+        appCrucial(_T("ApplyPhaseC not implemented"));
+    }
+    virtual void ApplyPhaseR(const CField* other, Real fCharge)
+    {
+        appCrucial(_T("ApplyPhaseR not implemented"));
+    }
 
     //This is a * me
     virtual void ScalarMultply(const CLGComplex& a) = 0;
@@ -165,6 +197,11 @@ public:
         return m_bDynamic;
     }
 
+    virtual UBOOL IsDirichlet() const
+    {
+        return FALSE;
+    }
+
 #pragma endregion
 
 #pragma region Other useful operators
@@ -177,6 +214,11 @@ public:
     */
     virtual cuDoubleComplex Dot(const CField* other) const = 0;
 
+    /**
+    * Squared Length! this is just self dot self
+    */
+    virtual DOUBLE GetLength() const = 0;
+
     virtual CLGComplex DotReal(const CField* other) const
     {
 #if _CLG_DOUBLEFLOAT
@@ -186,26 +228,42 @@ public:
 #endif
     }
 
-    virtual void CopyTo(CField* U) const
-    {
-        assert(NULL != U);
-        U->m_pOwner = m_pOwner;
-        U->m_byFieldId = m_byFieldId;
-        U->m_bDynamic = m_bDynamic;
-        U->m_fLength = m_fLength;
-
-        U->m_byGaugeFieldIds = m_byGaugeFieldIds;
-        U->m_byBosonFieldIds = m_byBosonFieldIds;
-    }
-
     virtual CField* GetCopy() const = 0;
 
-    virtual UBOOL ApplyOperator(EFieldOperator op, INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType uiCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0), void* otherParameter = NULL) = 0;
+    virtual UBOOL ApplyOperator(EFieldOperator op, INT gaugeNum, INT bosonNum, INT tensor2Num, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, const CFieldTensor2* const* tensor2Fields, EOperatorCoefficientType uiCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0), void* otherParameter = NULL) = 0;
 
     virtual UBOOL IsGaugeField() const { return FALSE; }
     virtual UBOOL IsFermionField() const { return FALSE; }
     virtual UBOOL IsBosonField() const { return FALSE; }
     virtual UBOOL IsSpinField() const { return FALSE; }
+    virtual UBOOL IsTensor2Field() const { return FALSE; }
+
+    /**
+    * Improve-1 (multi-GPU-improve1.md 3.2): the handle describing this field's
+    * managed device buffer extent. NULL means the object is NOT under the
+    * automatic halo protocol (and must not be treated as a supported
+    * LocalOnly buffer in a plain launch). Halo-capable template bases hold
+    * and Bind one; pool copies each Bind their own extent.
+    */
+    virtual CHaloBufferHandle* GetHaloBufferHandle() { return NULL; }
+    virtual const CHaloBufferHandle* GetHaloBufferHandle() const { return NULL; }
+
+    /**
+    * Improve-1 (multi-GPU-improve1.md 3.5, I4): every host-side or BLAS write
+    * entry (InitialField / InitialWithByte / file load / CopyTo / CopyBufferTo
+    * target / BLAS mutators / pointer rebind) MUST end with this, so the next
+    * Ensure sees the write. Over-marking only costs an extra halo exchange;
+    * under-marking is a correctness bug. No-op for objects without a bound
+    * handle, so single-GPU and not-yet-wired fields are unaffected.
+    */
+    void NotifyWritten()
+    {
+        CHaloBufferHandle* pHandle = GetHaloBufferHandle();
+        if (NULL != pHandle && pHandle->IsBound())
+        {
+            pHandle->NotifyWritten();
+        }
+    }
 
 #pragma endregion
 
@@ -218,7 +276,27 @@ public:
 
     friend class CFieldPool;
 
-    void UpdatePooledParamters() const;
+    //void UpdatePooledParamters() const;
+
+    virtual void Connection(const CField* other, void* res) const
+    {
+        appCrucial(_T("Connect not implemented\n"));
+    }
+
+    virtual void ConnectionSelf(void* res, Real fCoeff) const
+    {
+        appCrucial(_T("ConnectionSelf not implemented\n"));
+    }
+
+    virtual void AddConnectionSelf(void* res, Real fCoeff) const
+    {
+        appCrucial(_T("AddConnectionSelf not implemented\n"));
+    }
+
+    virtual void AddConnectionTwoField(void* res, const CField* other, Real fCoeff) const
+    {
+        appCrucial(_T("AddConnection not implemented\n"));
+    }
 
 protected:
 
@@ -240,84 +318,102 @@ protected:
         return gaugeFields[gaugeIdx];
     }
 
-    class CFieldPool* m_pPool;
+    //class CFieldPool* m_pPool;
 
     TArray<BYTE> m_byGaugeFieldIds;
     TArray<BYTE> m_byBosonFieldIds;
+
+#pragma region pool
+
+public:
+
+    virtual void CopyParamTo(CField* U) const
+    {
+        appAssert(NULL != U);
+        U->m_pClass = m_pClass;
+        U->m_pOwner = m_pOwner;
+        U->m_byFieldId = m_byFieldId;
+        U->m_bDynamic = m_bDynamic;
+        U->m_fLength = m_fLength;
+
+        U->m_byGaugeFieldIds = m_byGaugeFieldIds;
+        U->m_byBosonFieldIds = m_byBosonFieldIds;
+
+        //Improve-1: the pool copy's own handle stays bound to ITS buffer;
+        //only the tag id follows the field id (identity is the buffer).
+        if (NULL != U->GetHaloBufferHandle())
+        {
+            U->GetHaloBufferHandle()->SetFieldId(m_byFieldId);
+        }
+    }
+
+    virtual void CopyBufferTo(CField* U) const = 0;
+
+    virtual void CopyTo(CField* U) const
+    {
+        CopyParamTo(U);
+        CopyBufferTo(U);
+    }
+
+    const CClass* m_pClass;
+
+    //only use for debug the pool
+    //const CFieldPool* ShowPool() const { return m_pPool; }
+
+#pragma endregion
+
 };
 
 class CLGAPI CFieldPool
 {
+
 public:
-    CFieldPool(CField* pOrignal, UINT uiCount)
-        : m_pOrignal(pOrignal)
+
+    struct CLGAPI CPooledFields
     {
-        for (UINT i = 0; i < uiCount; ++i)
+        UBOOL m_bInUse;
+        CField* m_pField;
+
+        UBOOL operator==(const CPooledFields& Other) const
         {
-            m_pPool.AddItem(CreateNew());
+            return m_pField == Other.m_pField;
         }
+    };
+
+    CFieldPool()
+    {
+
     }
 
     virtual ~CFieldPool()
     {
-        for (INT i = 0; i < m_pPool.Num(); ++i)
-        {
-            appSafeDelete(m_pPool[i]);
-        }
+        FreeFields();
     }
 
-    CField* GetOne()
+    void FreeFields()
     {
-        if (m_pPool.Num() > 0)
+        TArray<const CClass*> keys = m_pPool.GetAllKeys();
+        for (INT i = 0; i < keys.Num(); ++i)
         {
-            return m_pPool.Pop();
-        }
-        appGeneral(_T("Warning: Field Pool Out Number!!!\n"));
-        CField* newOne = CreateNew();
-        return newOne;
-    }
-
-    void Return(CField* pField)
-    {
-        assert(NULL != pField 
-            && pField->m_byFieldId == m_pOrignal->m_byFieldId 
-            && pField->m_pPool == this
-            && pField != m_pOrignal);
-        m_pPool.PushBack(pField);
-    }
-
-    void ClearAll()
-    {
-        for (INT i = 0; i < m_pPool.Num(); ++i)
-        {
-            appSafeDelete(m_pPool[i]);
+            TArray<CPooledFields>& fields = m_pPool[keys[i]];
+            for (INT j = 0; j < fields.Num(); ++j)
+            {
+                appSafeDelete(fields[j].m_pField);
+            }
         }
         m_pPool.RemoveAll();
     }
 
-    void ReCopyAll() const
-    {
-        for (INT i = 0; i < m_pAll.Num(); ++i)
-        {
-            m_pOrignal->CopyTo(m_pAll[i]);
-        }
-    }
+    CField* GetOne(const CField* pOrignal);
+    void Return(CField* pField);
 
-    CField* m_pOrignal;
-    TArray<CField*> m_pPool;
-    TArray<CField*> m_pAll;
-
-protected:
-
-    CField * CreateNew()
-    {
-        CField* pNew = m_pOrignal->GetCopy();
-        pNew->m_pPool = this;
-        m_pAll.AddItem(pNew);
-        return pNew;
-    }
+    THashMap<const CClass*, TArray<CPooledFields>> m_pPool;
 };
 
+/**
+* NOTE: CFieldCache is not tested for a long time
+* To be removed
+*/
 class CLGAPI CFieldCache
 {
 public:
@@ -368,8 +464,10 @@ public:
 /**
  * Maybe better to implement as a template?
  * No ..., for different inherent, the main work is just the kernel.
+ * 
+ * NOTE: CFieldMatrixOperation is implimented for deflation-restarted solver, not tested for a long time
  */
-class CLGAPI CFieldMatrixOperation
+ class CLGAPI CFieldMatrixOperation
 {
 public:
     virtual ~CFieldMatrixOperation() {}

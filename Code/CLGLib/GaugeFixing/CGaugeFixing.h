@@ -50,6 +50,32 @@ public:
     virtual CCString GetInfos(const CCString& sTab) const = 0;
     virtual DOUBLE CheckRes(const CFieldGauge* pGauge) = 0;
 
+#if _CLG_MULTI_GPU
+    /**
+     * P4-2.1: rank0 global-lattice fixer context helpers.
+     *
+     * Gauge fixing (esp. the cuFFT variants) needs the WHOLE lattice, so on a
+     * decomposed lattice the field is gathered to rank 0 and the existing
+     * single-GPU fixing loop runs there under a TEMPORARY GLOBAL lattice
+     * context (lattice constants + index cache sized to the global lattice).
+     *
+     * MGEnterGlobalFixerContext: on rank 0, saves the local (decomposed)
+     * lattice constants and index cache, switches the constants to the GLOBAL
+     * lattice (from CLGComm::GlobalLattice) and bakes a global index cache, so
+     * the subsequent fixing loop and CheckRes run over the whole lattice. On
+     * non-root ranks it returns FALSE immediately (they block on the scatter
+     * call in the caller). Returns TRUE only on rank 0 (the rank that must run
+     * the fixing loop); single-GPU builds (no comm) return TRUE as a no-op.
+     *
+     * MGExitGlobalFixerContext: rank 0 restores the local constants and index
+     * cache and frees the temporary global ones.
+     */
+    UBOOL MGEnterGlobalFixerContext();
+    void MGExitGlobalFixerContext();
+    UINT m_uiSavedConstIntegers[128];
+    class CIndexData* m_pSavedGlobalIndexCache;
+    class CIndex* m_pSavedGlobalIndex;
+#endif
 
     class CLatticeData* m_pOwner;
     Real m_fAccuracy;

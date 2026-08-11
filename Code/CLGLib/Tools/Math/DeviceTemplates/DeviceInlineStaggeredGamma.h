@@ -18,9 +18,9 @@ template<typename deviceGauge>
 static __device__ __inline__ deviceGauge _devicePlaneDiagonalT(
     const deviceGauge* __restrict__ pDeviceData,
     const SSmallInt4& sStartSite, BYTE byFieldId,
-    SBYTE dim1, SBYTE dim2)
+    SCHAR dim1, SCHAR dim2)
 {
-    INT dir1[2];
+    SCHAR dir1[2];
 
     dir1[0] = dim1; dir1[1] = dim2;
     deviceGauge sRet(_deviceLinkT(pDeviceData, sStartSite, 2, byFieldId, dir1));
@@ -43,9 +43,9 @@ template<typename deviceGauge>
 static __device__ __inline__ deviceGauge _deviceCubicDiagonalT(
     const deviceGauge* __restrict__ pDeviceData,
     const SSmallInt4& sStartSite, BYTE byFieldId,
-    SBYTE dim1, SBYTE dim2, SBYTE dim3)
+    SCHAR dim1, SCHAR dim2, SCHAR dim3)
 {
-    INT dir1[3];
+    SCHAR dir1[3];
 
     dir1[0] = dim1; dir1[1] = dim2; dir1[2] = dim3;
     deviceGauge sRet(_deviceLinkT(pDeviceData, sStartSite, 3, byFieldId, dir1));
@@ -73,18 +73,18 @@ template<typename deviceGauge>
 static __device__ __inline__ deviceGauge _deviceHyperCubicDiagonalT(
     const deviceGauge* __restrict__ pDeviceData,
     const SSmallInt4& sStartSite, BYTE byFieldId,
-    SBYTE dim1, SBYTE dim2, SBYTE dim3, SBYTE dim4)
+    SCHAR dim1, SCHAR dim2, SCHAR dim3, SCHAR dim4)
 {
     deviceGauge sRet = _makeZero<deviceGauge>();
-    const SBYTE dim1234[4] = { dim1, dim2, dim3, dim4 };
-    INT dir1[4];
-    SBYTE dim234[3];
+    const SCHAR dim1234[4] = { dim1, dim2, dim3, dim4 };
+    SCHAR dir1[4];
+    SCHAR dim234[3];
     for (BYTE k = 0; k < 4; ++k)
     {
         dir1[0] = dim1234[k];
         for (BYTE k2 = 0; k2 < 3; ++k2)
         {
-            BYTE idx = k2 + 1 + k;
+            SCHAR idx = k2 + 1 + k;
             idx = idx > 3 ? (idx - 4) : idx;
             dim234[k2] = dim1234[idx];
         }

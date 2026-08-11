@@ -24,7 +24,7 @@ TestBosonU1NoGauge:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [0.213143]
+    ExpectedRes : [0.152840]
     ExpectedResDebug : [0.213143]
 
     Updator:
@@ -237,7 +237,7 @@ TestBosonSU4:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [0.072059]
+    ExpectedRes : [0.103592]
     ExpectedResDebug : [0.072059]
 
     Updator:
@@ -664,7 +664,7 @@ TestBosonRotationP:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [0.322776]
+    ExpectedRes : [0.185709]
     ExpectedResDebug : [0.322776]
 
     Updator:
@@ -678,7 +678,7 @@ TestBosonRotationP:
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
         IntegratorStepDebug : 15
-        IntegratorStep : 10
+        IntegratorStep : 12
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:

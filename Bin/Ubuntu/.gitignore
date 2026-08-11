@@ -8,6 +8,7 @@
 /CLGTest
 /RotatingReproduce
 /libCLGLib.a
+/libCLGCPULib.a
 /MatchingRho
 /ConstAcc
 /502161/
@@ -27,3 +28,5 @@
 /StaggeredSpectrum
 /BetaGradient
 /ElectricChemical
+/HISQ
+/WilsonDiracElectricMagnetic

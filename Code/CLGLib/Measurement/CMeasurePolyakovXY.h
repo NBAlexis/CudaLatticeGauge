@@ -3,6 +3,10 @@
 // 
 // DESCRIPTION:
 // This is measurement for Polyakov loop
+// 
+// Now support all gauge fields
+// and support all U_mu, and all slice
+// and support r-distribution for Polyakov and Z loop
 //
 // REVISION:
 //  [05/29/2019 nbale]
@@ -17,7 +21,7 @@ __BEGIN_NAMESPACE
 /**
 * No need to initial pRes = 0
 */
-extern CLGAPI void _PolyakovAtSite(const deviceSU3* __restrict__ pDeviceBuffer, deviceSU3* pRes, BYTE byFieldId);
+//extern CLGAPI void _PolyakovAtSite(const deviceSU3* __restrict__ pDeviceBuffer, deviceSU3* pRes, BYTE byFieldId);
 
 __CLG_REGISTER_HELPER_HEADER(CMeasurePolyakovXY)
 
@@ -27,23 +31,35 @@ class CLGAPI CMeasurePolyakovXY : public CMeasure
 
 public:
 
-    enum { _kGammaInInterests = 8, };
+    //enum { _kGammaInInterests = 8, };
 
     CMeasurePolyakovXY()
         : CMeasure()
           , m_pXYHostLoopDensity(NULL)
+          , m_pXHostLoopDensity(NULL)
+          , m_pYHostLoopDensity(NULL)
           , m_pZHostLoopDensity(NULL)
-          , m_pTmpDeviceSum(NULL)
+          , m_pTHostLoopDensity(NULL)
           , m_pXYDeviceLoopDensity(NULL)
+          , m_pXDeviceLoopDensity(NULL)
+          , m_pYDeviceLoopDensity(NULL)
           , m_pZDeviceLoopDensity(NULL)
+          , m_pTDeviceLoopDensity(NULL)
 
           , m_pXYHostLoopDensityAbs(NULL)
+          , m_pXHostLoopDensityAbs(NULL)
+          , m_pYHostLoopDensityAbs(NULL)
           , m_pZHostLoopDensityAbs(NULL)
+          , m_pTHostLoopDensityAbs(NULL)
           , m_pXYDeviceLoopDensityAbs(NULL)
+          , m_pXDeviceLoopDensityAbs(NULL)
+          , m_pYDeviceLoopDensityAbs(NULL)
           , m_pZDeviceLoopDensityAbs(NULL)
+          , m_pTDeviceLoopDensityAbs(NULL)
 
           , m_pTmpLoop(NULL)
-
+          , m_pTmpLoopX(NULL)
+          , m_pTmpLoopY(NULL)
           , m_pTmpLoopZ(NULL)
 
           , m_pDistributionR(NULL)
@@ -55,9 +71,15 @@ public:
 
           , m_uiMaxR(1)
           , m_uiEdgeR(1)
-          , m_bMeasureDistribution(FALSE)
+          , m_bMeasureDistribution(TRUE)
+          , m_bMeasureAbs(FALSE)
+          , m_bMeasureLoopX(FALSE)
+          , m_bMeasureLoopY(FALSE)
           , m_bMeasureLoopZ(FALSE)
+          , m_bMeasureXSlice(FALSE)
+          , m_bMeasureYSlice(FALSE)
           , m_bMeasureZSlice(FALSE)
+          , m_bMeasureTSlice(FALSE)
           , m_bShiftCenter(FALSE)
           , m_cAverageLoop()
     {
@@ -75,71 +97,126 @@ public:
 
 protected:
 
-    CLGComplex* m_pXYHostLoopDensity;
-    CLGComplex* m_pZHostLoopDensity;
-    CLGComplex* m_pTmpDeviceSum;
-    CLGComplex* m_pXYDeviceLoopDensity;
-    CLGComplex* m_pZDeviceLoopDensity;
+    cuDoubleComplex* m_pXYHostLoopDensity;
+    cuDoubleComplex* m_pXHostLoopDensity;
+    cuDoubleComplex* m_pYHostLoopDensity;
+    cuDoubleComplex* m_pZHostLoopDensity;
+    cuDoubleComplex* m_pTHostLoopDensity;
 
-    Real* m_pXYHostLoopDensityAbs;
-    Real* m_pZHostLoopDensityAbs;
-    Real* m_pXYDeviceLoopDensityAbs;
-    Real* m_pZDeviceLoopDensityAbs;
+    cuDoubleComplex* m_pXYDeviceLoopDensity;
+    cuDoubleComplex* m_pXDeviceLoopDensity;
+    cuDoubleComplex* m_pYDeviceLoopDensity;
+    cuDoubleComplex* m_pZDeviceLoopDensity;
+    cuDoubleComplex* m_pTDeviceLoopDensity;
 
-    deviceSU3* m_pTmpLoop;
-    deviceSU3* m_pTmpLoopZ;
+    DOUBLE* m_pXYHostLoopDensityAbs;
+    DOUBLE* m_pXHostLoopDensityAbs;
+    DOUBLE* m_pYHostLoopDensityAbs;
+    DOUBLE* m_pZHostLoopDensityAbs;
+    DOUBLE* m_pTHostLoopDensityAbs;
+    DOUBLE* m_pXYDeviceLoopDensityAbs;
+    DOUBLE* m_pXDeviceLoopDensityAbs;
+    DOUBLE* m_pYDeviceLoopDensityAbs;
+    DOUBLE* m_pZDeviceLoopDensityAbs;
+    DOUBLE* m_pTDeviceLoopDensityAbs;
+
+    cuDoubleComplex* m_pTmpLoop;
+    cuDoubleComplex* m_pTmpLoopX;
+    cuDoubleComplex* m_pTmpLoopY;
+    cuDoubleComplex* m_pTmpLoopZ;
 
     //The count of points with x^2+y^2=r^2
     UINT* m_pDistributionR;
     //<P>(R^2)
-    CLGComplex* m_pDistributionP;
-    Real* m_pDistributionPAbs;
+    cuDoubleComplex* m_pDistributionP;
+    DOUBLE* m_pDistributionPAbs;
 
     UINT* m_pHostDistributionR;
-    CLGComplex* m_pHostDistributionP;
-    Real* m_pHostDistributionPAbs;
+    cuDoubleComplex* m_pHostDistributionP;
+    DOUBLE* m_pHostDistributionPAbs;
 
     UINT m_uiMaxR;
     UINT m_uiEdgeR;
     UBOOL m_bMeasureDistribution;
+    UBOOL m_bMeasureAbs;
 
 public:
 
+    UBOOL m_bMeasureLoopX;
+    UBOOL m_bMeasureLoopY;
     UBOOL m_bMeasureLoopZ;
+    UBOOL m_bMeasureXSlice;
+    UBOOL m_bMeasureYSlice;
     UBOOL m_bMeasureZSlice;
+    UBOOL m_bMeasureTSlice;
+
+    //shift center is used to decide r
     UBOOL m_bShiftCenter;
 
     //all
-    TArray<CLGComplex> m_lstLoop;
+    TArray<cuDoubleComplex> m_lstLoop;
+    TArray<cuDoubleComplex> m_lstLoopX;
+    TArray<cuDoubleComplex> m_lstLoopY;
+    TArray<cuDoubleComplex> m_lstLoopZ;
+
     //inner
-    TArray<CLGComplex> m_lstLoopInner;
-
-    TArray<Real> m_lstLoopAbs;
-    TArray<Real> m_lstLoopAbsInner;
-
-    //not using
-    //TArray<CLGComplex> m_lstLoopDensity;
+    TArray<cuDoubleComplex> m_lstLoopInner;
+    TArray<cuDoubleComplex> m_lstLoopInnerZ;
 
     //all
-    TArray<CLGComplex> m_lstLoopZ;
+    TArray<DOUBLE> m_lstLoopAbs;
+    TArray<DOUBLE> m_lstLoopAbsZ;
+
     //inner
-    TArray<CLGComplex> m_lstLoopZInner;
+    TArray<DOUBLE> m_lstLoopAbsInner;
+    TArray<DOUBLE> m_lstLoopAbsInnerZ;
 
-    TArray<CLGComplex> m_lstLoopZAbs;
-    TArray<CLGComplex> m_lstLoopZAbsInner;
-
-    //not using
-    TArray<CLGComplex> m_lstLoopZDensity;
-
+    //not using, only for log
     CLGComplex m_cAverageLoop;
-    //TArray<CLGComplex> m_lstAverageLoopDensity;
-
     TArray<UINT> m_lstR;
-    TArray<CLGComplex> m_lstP;
-    TArray<Real> m_lstPAbs;
-    TArray<CLGComplex> m_lstPZ;
-    TArray<CLGComplex> m_lstPZSlice;
-    TArray<Real> m_lstPZSliceAbs;
+
+    //OVER R
+    TArray<cuDoubleComplex> m_lstP;
+    TArray<DOUBLE> m_lstPAbs;
+
+    //OVER R
+    TArray<cuDoubleComplex> m_lstPZ;
+    TArray<DOUBLE> m_lstPZAbs;
+
+    TArray<cuDoubleComplex> m_lstP_XSlice;
+    TArray<cuDoubleComplex> m_lstP_YSlice;
+    TArray<cuDoubleComplex> m_lstP_ZSlice;
+    TArray<DOUBLE> m_lstP_XSliceAbs;
+    TArray<DOUBLE> m_lstP_YSliceAbs;
+    TArray<DOUBLE> m_lstP_ZSliceAbs;
+
+    TArray<cuDoubleComplex> m_lstPX_YSlice;
+    TArray<cuDoubleComplex> m_lstPX_ZSlice;
+    TArray<cuDoubleComplex> m_lstPX_TSlice;
+    TArray<DOUBLE> m_lstPX_YSliceAbs;
+    TArray<DOUBLE> m_lstPX_ZSliceAbs;
+    TArray<DOUBLE> m_lstPX_TSliceAbs;
+
+    TArray<cuDoubleComplex> m_lstPY_XSlice;
+    TArray<cuDoubleComplex> m_lstPY_ZSlice;
+    TArray<cuDoubleComplex> m_lstPY_TSlice;
+    TArray<DOUBLE> m_lstPY_XSliceAbs;
+    TArray<DOUBLE> m_lstPY_ZSliceAbs;
+    TArray<DOUBLE> m_lstPY_TSliceAbs;
+
+    TArray<cuDoubleComplex> m_lstPZ_XSlice;
+    TArray<cuDoubleComplex> m_lstPZ_YSlice;
+    TArray<cuDoubleComplex> m_lstPZ_TSlice;
+    TArray<DOUBLE> m_lstPZ_XSliceAbs;
+    TArray<DOUBLE> m_lstPZ_YSliceAbs;
+    TArray<DOUBLE> m_lstPZ_TSliceAbs;
+
+    void Export(const CCString& sCSV, UINT uiStart, UINT uiEnd, UINT uiO, UINT uiOStart) const
+    {
+        Export(sCSV, uiStart, uiEnd, appToString(uiO), uiO, uiOStart);
+    }
+
+    void Export(const CCString& sCSV, UINT uiStart, UINT uiEnd, const CCString& sOName, UINT uiO, UINT uiOStart) const;
 };
 
 __END_NAMESPACE

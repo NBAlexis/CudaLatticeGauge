@@ -4,6 +4,17 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit, fsolve
 
+from AutoCorrelation import AutoCorrelationSingleVariable
+from Visualization import errorbar
+
+"""
+197.326 9788(12) MeV fm = 1
+1 fm = 1/197.326 9788 (MeV^-1)
+
+r0 = 0.5fm = 0.5/197.326 9788 (MeV^-1) 
+a^{-1}r0 = x
+a^{-1} = x / r0 = x * 197.3269788 / 0.5 (MeV)
+"""
 
 def LoadMathematicaCSV(fileName: str):
     with open(fileName) as f:
@@ -89,11 +100,11 @@ def FitWilsonLoop(vr, pr, halfT, tStart, tEnd, maxR, showFig=False):
     for r in range(len(pr)):
         xdata = [t + 1 for t in range(tStart, tEnd)]
         ydata = [meanWrt[r][t] for t in range(tStart, tEnd)]
-        parameters, _ = curve_fit(expfit, xdata, ydata)
+        parameters, _ = curve_fit(expfit, xdata, ydata, maxfev=10000)
         crlst.append(parameters[0])
         vrlst.append(parameters[1])
     vrlst = np.array(vrlst)
-    parameters2, _ = curve_fit(potentialfit, pr[0:maxR], vrlst[0:maxR])
+    parameters2, _ = curve_fit(potentialfit, pr[0:maxR], vrlst[0:maxR], maxfev=10000)
     if showFig:
         fig = plt.figure()
         ax1 = fig.subplots()
@@ -111,6 +122,18 @@ def FitWilsonLoop(vr, pr, halfT, tStart, tEnd, maxR, showFig=False):
 
 
 def JacknifeWilsonLoop(vr, pr, halfT, tStart, tEnd, maxR, showProgress="", showFirtFig=False):
+    """
+
+    :param vr:
+    :param pr: radius list
+    :param halfT: Lt/2
+    :param tStart: usually start from 1 or 2, if you are confidence about accuracy, use 2
+    :param tEnd: usually end to Lt/6 or Lt/8
+    :param maxR: index of the last V(r)
+    :param showProgress: too slow, please always show progress
+    :param showFirtFig: whether show the first figure
+    :return:
+    """
     aOrignal, bOrignal, cOrignal = FitWilsonLoop(vr, pr, halfT, tStart, tEnd, maxR, showFirtFig)
     orignalR0 = np.sqrt((1.65 - cOrignal) / bOrignal)
     orignalR1 = np.sqrt((1 - cOrignal) / bOrignal)
@@ -174,7 +197,7 @@ class FitMesonSimple:
 
     def expToSolve(self, m):
         return [self.r - (np.exp(-m[0] * (self.t + self.d)) + np.exp(-m[0] * (self.T - self.t - self.d))) / (
-                    np.exp(-m[0] * self.t) + np.exp(-m[0] * (self.T - self.t)))]
+                np.exp(-m[0] * self.t) + np.exp(-m[0] * (self.T - self.t)))]
 
 
 def FitStaggeredMeson(pt, T, showFig=False):
@@ -195,7 +218,7 @@ def FitStaggeredMeson(pt, T, showFig=False):
 def FitStaggeredMesonSimple(pt, T, d):
     meanpt = np.mean(pt, axis=0)
     meanpt2 = []
-    for i in range(T//2):
+    for i in range(T // 2):
         if i != (T // 2) - 1:
             meanpt2.append((meanpt[i] + meanpt[T - 2 - i]) / 2)
         else:
@@ -210,7 +233,7 @@ def FitStaggeredMesonSimple(pt, T, d):
         root = fsolve(fitf.expToSolve, [trystart])
         while trytimes < 10 and root[0] < 0:
             trytimes = trytimes + 1
-            trystart = trystart + 2**trytimes
+            trystart = trystart + 2 ** trytimes
             root = fsolve(fitf.expToSolve, [trystart])
         roots.append(root)
     return np.mean(roots)
@@ -233,8 +256,9 @@ def JacknifeMeasonSimple(lst, T, d, progressBarTitle=""):
         PrintProgressBar(progressBarTitle, size, size)
     return unbaisv, np.sqrt(argsv)
 
+
 def PrintAsMathematicaArray(arr, header="") -> str:
-    ret = str(np.array(arr))
+    ret = np.array2string(arr, threshold=np.inf)
     ret = ret.replace("\n", "")
     ret = ret.replace("\r", "")
     ret = ret.replace(" ", ",")
@@ -269,7 +293,67 @@ def PrintAsMatlabArray(arr, header="") -> str:
         ret = ret.replace(" i", "i")
     ret = ret.replace(",]", "]")
     ret = ret.replace("[,", "[")
-    ret = ret + ";"
+    ret = ret.replace("],", "];")
+    # ret = ret + ";"
     if 0 != len(header):
         ret = header + "=" + ret
     return ret
+
+
+class FitWDMassFunction:
+
+    def __init__(self, halfT):
+        self.halfT = halfT
+
+    def cosh(self, t, m):
+        return np.cosh(m * (t - self.halfT)) / np.cosh(m * (t + 1 - self.halfT))
+
+
+def fitOneConfigWDMass(lst):
+    halfT = len(lst) / 2
+    lst = np.real(np.array(lst))
+    lst = np.append(lst, lst[0])
+    lst2 = np.array([lst[n] / lst[n + 1] for n in range(2, len(lst) - 1)])
+    tdata = np.array([n + 1 for n in range(len(lst2))])
+    fitfunction = FitWDMassFunction(halfT)
+    parameters, _ = curve_fit(fitfunction.cosh, tdata, lst2)
+    return parameters[0]
+
+
+def FitWDMass(data, showfig=True):
+    alldata = np.real(np.array(data))
+    means = np.mean(alldata, axis=0)
+    stds = np.std(alldata, axis=0)
+    if showfig:
+        errorbar(range(len(means)), [means], [stds], ylog=True)
+    masslst = []
+    print(np.shape(alldata))
+    for i in range(len(alldata)):
+        masslst.append(fitOneConfigWDMass(alldata[i, :]))
+    return AutoCorrelationSingleVariable(masslst)
+
+
+def MatchingUsingR0(r0, r0e):
+    """
+    ar0 = 0.5fm
+    a = 0.5fm / r0
+    a^-1 = r0 / 0.5 / fm
+    1 = 197.326 9788(12) MeV fm
+    a^-1 = 2 r0 197.326 9788 (MeV)
+    """
+    r0 = np.array(r0)
+    r0e = np.array(r0e)
+    return 2 * r0 * 197.3269788, 2 * r0e * 197.3269788
+
+def MatchingUsingR1(r1, r1e):
+    """
+    arXiv:1111.1710
+    ar1 = 0.3106 +- 0.003
+    :param r1:
+    :param r1e:
+    :return:
+    """
+    r1 = np.array(r1)
+    r1e = np.array(r1e)
+    doverc = 0.003 / (0.3106 * 0.3106)
+    return r1 * 197.3269788 / 0.3106, np.sqrt(r1e * r1e / (0.3106 * 0.3106) + r1 * r1 * doverc * doverc)

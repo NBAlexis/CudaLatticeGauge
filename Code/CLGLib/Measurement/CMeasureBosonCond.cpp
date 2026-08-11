@@ -16,7 +16,7 @@ __BEGIN_NAMESPACE
 __CLGIMPLEMENT_CLASS(CMeasureBosonCond)
 
 
-void CMeasureBosonCond::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple)
+void CMeasureBosonCond::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, INT tensor2Num, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldTensor2* const* tensor2Fields, const class CFieldGauge* const* pCorrespondingStaple)
 {
     if (m_lstBosonFieldIds.Num() < 1)
     {
@@ -35,6 +35,11 @@ void CMeasureBosonCond::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, cons
     UpdateRealResult(_cuCabsf(condsq) / _HC_Volume / bosonfield->VectorN());
 
     m_lstElement.AddItem(bosonfield->Sum());
+    if (NULL != m_pOwner)
+    {
+        m_pOwner->AddOneConfigurationResult(this, _T("Condensate"), GetLastRealRes());
+        m_pOwner->AddOneConfigurationResult(this, _T("Elements"), m_lstElement[m_lstElement.Num() - 1]);
+    }
 }
 
 void CMeasureBosonCond::Reset()
@@ -47,8 +52,8 @@ void CMeasureBosonCond::Reset()
 void CMeasureBosonCond::Average()
 {
     CMeasure::Average();
-    assert(m_lstElement.Num() == static_cast<INT>(m_uiConfigurationCount));
-    assert(m_uiConfigurationCount > 0);
+    appAssert(m_lstElement.Num() == static_cast<INT>(m_uiConfigurationCount));
+    appAssert(m_uiConfigurationCount > 0);
 
     m_lstAverageElement.RemoveAll();
     for (UINT i = 0; i < m_uiConfigurationCount; ++i)

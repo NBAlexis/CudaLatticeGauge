@@ -1,0 +1,346 @@
+\subsection{\label{sec:psu3}PSU3}
+
+\subsubsection{Action}
+
+The link variables are represented by matrices $U_\mu(n)\in SU(3)$, but the
+action is chosen to be insensitive to the center of $SU(3)$.  For
+$z\in Z_3$ the adjoint representation satisfies
+\begin{equation}
+D_{\rm adj}(zU)=D_{\rm adj}(U).
+\end{equation}
+Equivalently, the character identity following from
+$\mathbf{3}\otimes\overline{\mathbf{3}}=\mathbf{1}\oplus\mathbf{8}$ is
+\begin{equation}
+\operatorname{Tr}_{\rm adj} U
+=|\operatorname{Tr}_{F}U|^2-1 .
+\end{equation}
+The adjoint Wilson plaquette action can therefore be evaluated using only
+fundamental $3\times3$ matrices:
+\begin{equation}
+S_A=-\beta_A\sum_n\sum_{\mu<\nu}\frac{1}{8}
+\left(|\operatorname{Tr}U_{\mu\nu}(n)|^2-1\right),
+\end{equation}
+where $1/8$ is the normalization by the dimension of the adjoint
+representation and
+\begin{equation}
+U_{\mu\nu}(n)=U_\mu(n)U_\nu(n+\hat\mu)
+U_\mu^\dagger(n+\hat\nu)U_\nu^\dagger(n).
+\end{equation}
+
+This remains a one-plaquette action.  The squared quantity is the modulus of
+the fundamental trace; it is neither $U_{\mu\nu}^2$ nor a geometrically
+doubled plaquette.  It appears only because the adjoint character is being
+written in terms of fundamental matrices.
+
+Indeed, the links may be transformed independently as
+\begin{equation}
+U_\mu(n)\longrightarrow z_\mu(n)U_\mu(n),
+\qquad z_\mu(n)\in Z_3.
+\end{equation}
+For a plaquette this gives
+\begin{equation}
+U_{\mu\nu}(n)\longrightarrow z_{\mu\nu}(n)U_{\mu\nu}(n),
+\qquad z_{\mu\nu}(n)\in Z_3,
+\end{equation}
+and hence
+\begin{equation}
+|\operatorname{Tr}U_{\mu\nu}(n)|^2
+\longrightarrow
+|z_{\mu\nu}(n)|^2|\operatorname{Tr}U_{\mu\nu}(n)|^2
+=|\operatorname{Tr}U_{\mu\nu}(n)|^2.
+\end{equation}
+Thus center-related $SU(3)$ link matrices represent the same physical
+$PSU(3)=SU(3)/Z_3$ link variable.  The continuous Lie algebra is nevertheless
+the usual $\mathfrak{su}(3)$ algebra, so the HMC momenta and tangent-space
+projection are the same as for an $SU(3)$ link model.
+
+The additive constant in $S_A$ does not affect molecular dynamics.  Defining
+\begin{equation}
+\widetilde\beta=\frac{\beta_A}{8},
+\end{equation}
+the dynamic part used below is
+\begin{equation}
+\boxed{
+S_{\rm dyn}=-\widetilde\beta\sum_n\sum_{\mu<\nu}
+|\operatorname{Tr}U_{\mu\nu}(n)|^2 .
+}
+\end{equation}
+
+\subsubsection{HMC Force}
+
+Fix one link and abbreviate
+\begin{equation}
+U=U_\mu(n).
+\end{equation}
+For every $\nu\ne\mu$, two plaquettes in the $\mu\nu$ plane contain this
+link.  After cyclically rotating the trace, both can be written with $U$ as
+their first factor:
+\begin{align}
+W_{+}(\mu,\nu,n)&=U B_{+}(\mu,\nu,n),\\
+W_{-}(\mu,\nu,n)&=U B_{-}(\mu,\nu,n),
+\end{align}
+where
+\begin{align}
+B_{+}(\mu,\nu,n)
+&=U_\nu(n+\hat\mu)U_\mu^\dagger(n+\hat\nu)U_\nu^\dagger(n),\\
+B_{-}(\mu,\nu,n)
+&=U_\nu^\dagger(n+\hat\mu-\hat\nu)
+  U_\mu^\dagger(n-\hat\nu)U_\nu(n-\hat\nu).
+\end{align}
+Their traces satisfy
+\begin{align}
+t_{+}&\equiv\operatorname{Tr}W_{+}
+      =\operatorname{Tr}U_{\mu\nu}(n),\\
+t_{-}&\equiv\operatorname{Tr}W_{-}
+      =\operatorname{Tr}U_{\nu\mu}(n-\hat\nu).
+\end{align}
+
+We first calculate the raw component derivative by regarding $U$ and
+$U^\dagger$ as independent variables.  In particular, $U^\dagger$ is held
+fixed in $\partial S/\partial U$.  For a generic path $W=UB$,
+\begin{equation}
+\operatorname{Tr}W=U^l{}_k B^k{}_l,
+\end{equation}
+and therefore
+\begin{equation}
+\frac{\partial\operatorname{Tr}W}{\partial U^j{}_i}
+=\delta^l{}_j\delta^i{}_k B^k{}_l
+=B^i{}_j.
+\end{equation}
+Since the conjugate trace is held fixed in this raw derivative,
+\begin{equation}
+\left.
+\frac{\partial |\operatorname{Tr}W|^2}{\partial U^j{}_i}
+\right|_{U^\dagger}
+=(\operatorname{Tr}W)^*B^i{}_j.
+\end{equation}
+It follows that the raw derivative of the action with respect to the chosen
+link is
+\begin{equation}
+\boxed{
+\left.
+\left(\frac{\partial S}{\partial U_\mu(n)}\right)^i{}_j
+\right|_{U^\dagger}
+=-\widetilde\beta\sum_{\nu\ne\mu}
+\left[t_{+}^* B_{+}{}^i{}_j+t_{-}^* B_{-}{}^i{}_j\right].
+}
+\end{equation}
+Equivalently, in terms of the original plaquette notation,
+\begin{equation}
+\boxed{
+\left.
+\left(\frac{\partial S}{\partial U_\mu(n)}\right)^i{}_j
+\right|_{U^\dagger}
+=-\widetilde\beta\sum_{\nu\ne\mu}
+\left[
+\operatorname{Tr}U_{\nu\mu}(n)B_{+}{}^i{}_j
++\operatorname{Tr}U_{\mu\nu}(n-\hat\nu)B_{-}{}^i{}_j
+\right].
+}
+\end{equation}
+
+The coefficient is $-\widetilde\beta$, rather than
+$-\widetilde\beta/2$.  One may write the action as
+\begin{equation}
+S_{\rm dyn}=-\frac{\widetilde\beta}{2}
+\sum_n\sum_{\mu\ne\nu}
+\operatorname{Tr}U_{\mu\nu}(n)\operatorname{Tr}U_{\nu\mu}(n),
+\end{equation}
+but the ordered sum contains both $(\mu,\nu)$ and $(\nu,\mu)$.  Their
+identical derivatives cancel the explicit factor $1/2$.
+
+To compare the component derivative with the force field stored by the
+action, define the code staple by
+\begin{equation}
+\Sigma_P=B_P^\dagger,
+\qquad U_P=U\Sigma_P^\dagger=UB_P.
+\end{equation}
+The raw field is
+\begin{equation}
+Y_\mu(n)=-\widetilde\beta\sum_{P\ni(n,\mu)}
+\operatorname{Tr}(U_P)\Sigma_P(n).
+\end{equation}
+Consequently, the tensor-element result is precisely
+\begin{equation}
+\boxed{
+\left.\frac{\partial S}{\partial U_\mu(n)}\right|_{U^\dagger}
+=Y_\mu^\dagger(n),
+}
+\end{equation}
+with the index placement understood as in the component equations above.
+
+For completeness, the same result may be expressed directly as an
+$\mathfrak{su}(3)$ variation.  Let $A$ be traceless and anti-Hermitian and
+vary the link from the left,
+\begin{equation}
+U\longrightarrow e^A U,
+\qquad \delta U=AU.
+\end{equation}
+For one oriented plaquette $U_P=UB_P$ this gives
+\begin{equation}
+\delta S_P=-\widetilde\beta\operatorname{Tr}\left\{
+A\left[
+\operatorname{Tr}(U_P^\dagger)U_P
+-\operatorname{Tr}(U_P)U_P^\dagger
+\right]\right\}.
+\end{equation}
+Defining the mathematical force by
+$\delta S=-\operatorname{Tr}(AF_\mu(n))$, one obtains
+\begin{equation}
+\boxed{
+F_\mu(n)=\widetilde\beta\sum_{P\ni(n,\mu)}X_P,
+\qquad
+X_P=\operatorname{Tr}(U_P^\dagger)U_P
+-\operatorname{Tr}(U_P)U_P^\dagger .
+}
+\end{equation}
+The matrix $X_P$ is automatically traceless and anti-Hermitian.  This last
+form is only the tangent-space version of the tensor derivative above; the
+two expressions are not independent force formulas.
+
+\subsubsection{CLGLib force convention}
+
+The matrix $F_\mu(n)$ defined above is the mathematical force in
+\begin{equation}
+\delta S=-\operatorname{Tr}\bigl(A F_\mu(n)\bigr).
+\end{equation}
+CLGLib stores a different, but directly related, matrix in its force field.
+The gauge momentum is anti-Hermitian and has kinetic energy
+\begin{equation}
+K=-\operatorname{Tr}(P^2).
+\end{equation}
+With the molecular-dynamics equation $\dot U=PU$, one has
+\begin{equation}
+\dot S=-\operatorname{Tr}(P F),
+\qquad
+\dot K=-2\operatorname{Tr}(P\dot P).
+\end{equation}
+Energy conservation therefore requires
+\begin{equation}
+\boxed{
+\dot P=-\frac{1}{2}F.
+}
+\end{equation}
+Thus the matrix added to the momentum by the integrator is
+\begin{equation}
+F^{\rm code}_\mu(n)=-\frac{1}{2}F_\mu(n).
+\end{equation}
+
+For any matrix $M$, CLGLib's operation \texttt{TA()} is
+\begin{equation}
+{\rm TA}(M)=\frac{1}{2}(M-M^\dagger)
+-\frac{1}{3}\operatorname{Tr}\left[\frac{1}{2}(M-M^\dagger)\right]\mathbf 1.
+\end{equation}
+The action kernel stores the raw matrix $Y_\mu(n)$, after which the common
+integrator performs
+\begin{equation}
+\boxed{
+F^{\rm code}_\mu(n)
+={\rm TA}\Bigl(U_\mu(n)Y_\mu^\dagger(n)\Bigr).
+}
+\end{equation}
+There is no additional factor $-1/2$ outside \texttt{TA()}; the factor
+$1/2$ is already part of the anti-Hermitian projection.
+
+Indeed, using
+\begin{equation}
+Y_\mu(n)=-\widetilde\beta\sum_{P\ni(n,\mu)}
+\operatorname{Tr}(U_P)\Sigma_P(n),
+\qquad
+U_P=U_\mu(n)\Sigma_P^\dagger(n),
+\end{equation}
+one obtains
+\begin{align}
+U_\mu(n)Y_\mu^\dagger(n)
+&=-\widetilde\beta\sum_P
+  \operatorname{Tr}(U_P^\dagger)
+  U_\mu(n)\Sigma_P^\dagger(n)\nonumber\\
+&=-\widetilde\beta\sum_P
+  \operatorname{Tr}(U_P^\dagger)U_P.
+\end{align}
+Taking the traceless anti-Hermitian part gives
+\begin{equation}
+\boxed{
+F^{\rm code}_\mu(n)
+=-\frac{\widetilde\beta}{2}\sum_{P\ni(n,\mu)}X_P
+=-\frac{1}{2}F_\mu(n).
+}
+\end{equation}
+
+\subsubsection{CUDA implementation}
+
+The implementation in \texttt{CActionGaugePlaquettePSU3.cu} follows the
+preceding equations in two stages.
+
+For each link, \texttt{\_kernelForce\_PSU3} loops over the surrounding
+three-link paths supplied by the staple cache.  For each path it performs
+\begin{align}
+\Sigma_P&\leftarrow\text{cached three-link path},\\
+U_P&\leftarrow U_\mu(n)\Sigma_P^\dagger,\\
+t_P&\leftarrow\operatorname{Tr}(U_P),\\
+Y_\mu(n)&\leftarrow
+Y_\mu(n)-\widetilde\beta\,t_P\Sigma_P.
+\end{align}
+After all actions have contributed their raw fields, the common integrator
+performs \texttt{LeftMul(gauge, FALSE, TRUE)}, which replaces the raw field by
+$U_\mu Y_\mu^\dagger$, and then calls \texttt{TA()}.
+
+The trace $t_P$ must be computed separately for every plaquette.  Although
+the trace itself is linear, the force contains the weighted sum
+\begin{equation}
+\sum_P \operatorname{Tr}(U_P)\Sigma_P,
+\end{equation}
+whose weight depends on $P$.  It cannot be reconstructed from one trace of a
+pre-summed staple.
+
+For the $SU(N)$ fields supported by this class, the normalization uses the
+adjoint dimension:
+\begin{equation}
+\texttt{Beta}=\beta_A,
+\qquad
+\widetilde\beta=\frac{\beta_A}{N^2-1}
+=\begin{cases}
+\beta_A/8, & SU(3),\\[2pt]
+\beta_A/3, & SU(2).
+\end{cases}
+\end{equation}
+
+There are two implementation qualifications:
+\begin{itemize}
+\item Raw gauge forces in CLGLib are additive because several actions may
+contribute to the same link.  The kernel therefore \emph{adds} its raw
+contribution to the shared force field via \texttt{\_add(pForceData[uiLinkIndex], res)},
+exactly as the standard plaquette kernel does; the field is zeroed once by the
+integrator before any action is evaluated.
+\item The coupling is normalized by the adjoint dimension $N^2-1$, so the same
+class works for $SU(3)$ ($\widetilde\beta=\beta_A/8$) and $SU(2)$
+($\widetilde\beta=\beta_A/3$).  Other matrix sizes are reported as unsupported
+at initialization and are rejected by the force and energy routines.
+\end{itemize}
+
+\subsubsection{Coupling to fermions}
+
+At the level of the HMC program, this gauge action can be combined with a
+fermion action using the same $SU(3)$ link matrices: each action contributes
+to the total energy and adds its force to the shared force field.  However,
+the resulting theory is a genuine $PSU(3)$ gauge theory only if the fermions
+are neutral under the center $Z_3$.
+
+For example, a fundamental-fermion hopping term contains
+\begin{equation}
+\overline\psi(n)U_\mu(n)\psi(n+\hat\mu).
+\end{equation}
+Under the independent link-center transformation
+$U_\mu(n)\to z_\mu(n)U_\mu(n)$, this term acquires the factor $z_\mu(n)$ and
+is not invariant.  A fundamental $\mathbf 3$ is therefore a representation of
+$SU(3)$, but not a representation of $PSU(3)=SU(3)/Z_3$.
+
+Consequently, combining the adjoint plaquette action with ordinary
+fundamental $SU(3)$ fermions is a valid lattice model, but it should be
+interpreted as an $SU(3)$ gauge theory with an adjoint gauge action.  The
+fermion action removes the independent local $Z_3$ identification that made
+the pure-gauge sector center blind.  To preserve the $PSU(3)$ interpretation,
+one should use center-neutral, zero-triality matter, such as adjoint fermions.
+Introducing fundamental matter while retaining a quotient-gauge
+interpretation requires additional structure and is not achieved by simply
+adding a standard fundamental-fermion action.

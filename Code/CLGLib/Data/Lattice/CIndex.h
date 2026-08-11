@@ -3,6 +3,8 @@
 // 
 // DESCRIPTION:
 // This is the class for index on lattice
+// 
+// For the furture possible realization of traingular lattice, this is a virtual class
 //
 // Concepts:
 //  site index: UINT, unique for every site, 
@@ -56,7 +58,7 @@ class CLGAPI CIndex : public CBase
 {
 public:
 
-    CIndex() : m_pBoundaryCondition(NULL), m_bNeedToFixBoundary(FALSE) {  }
+    CIndex() : m_pBoundaryCondition(NULL) {  }
     ~CIndex()
     {
         appSafeDelete(m_pBoundaryCondition);
@@ -65,7 +67,7 @@ public:
     void SetBoundaryCondition(class CBoundaryCondition * pBc) 
     { 
         m_pBoundaryCondition = pBc; 
-        m_bNeedToFixBoundary = pBc->NeedToFixBoundary();
+        //m_bNeedToFixBoundary = pBc->NeedToFixBoundary();
     }
 
     /**
@@ -90,6 +92,13 @@ public:
     virtual void BakeEtaMuTable(class CIndexData* pData) = 0;
 
     /**
+    * This is slower
+    */
+    //virtual void BakeEvenOddTable(class CIndexData* pData) = 0;
+
+    virtual void BakeNaikTable(class CIndexData* pData, BYTE byFieldId) = 0;
+
+    /**
     * Call this after BakePlaquttes
     */
     virtual UINT GetPlaqutteCount(BYTE byFieldId) const = 0;
@@ -100,12 +109,12 @@ public:
     */
     virtual void CalculateSiteCount(class CIndexData* pData) const;
 
-    UBOOL NeedToFixBoundary() const { return m_bNeedToFixBoundary; }
+    //UBOOL NeedToFixBoundary() const { return m_bNeedToFixBoundary; }
 
     class CBoundaryCondition* GetBoudanryCondition() const { return m_pBoundaryCondition; }
 
     class CBoundaryCondition * m_pBoundaryCondition;
-    UBOOL m_bNeedToFixBoundary;
+    //UBOOL m_bNeedToFixBoundary;
 };
 
 

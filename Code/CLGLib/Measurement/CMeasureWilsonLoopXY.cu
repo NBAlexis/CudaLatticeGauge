@@ -9,6 +9,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "Tools/Math/DeviceInlineTemplate.h"
 #include "CMeasureWilsonLoopXY.h"
 
 __BEGIN_NAMESPACE
@@ -73,7 +74,7 @@ _kernelWilsonLoopsXY(
     const SSmallInt4 shift, 
     const SSmallInt4 center, 
     const INT product, const INT linkLength, const UINT shiftLength,
-    const INT link1, const INT link2, const INT link3,
+    const SCHAR link1, const SCHAR link2, const SCHAR link3,
     const UINT maxLength, const BYTE tstart, UINT* counter, CLGComplex* correlator)
 {
     INT iZ = threadIdx.x + blockIdx.x * blockDim.x;
@@ -102,11 +103,11 @@ _kernelWilsonLoopsXY(
             __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(point2)].m_uiSiteIndex);
     }
 
-    INT links[3] = { link1, link2, link3};
+    SCHAR links[3] = { link1, link2, link3};
     for (INT prod = 1; prod <= product; ++prod)
     {
-        w1.Mul(_deviceLink(pDeviceData, point1, linkLength, byFieldId, links));
-        w2.Mul(_deviceLink(pDeviceData, point2, linkLength, byFieldId, links));
+        w1.Mul(_deviceLinkT(pDeviceData, point1, linkLength, byFieldId, links));
+        w2.Mul(_deviceLinkT(pDeviceData, point2, linkLength, byFieldId, links));
 
         //======= shift the coordinate =====
         point1.Add(shift);
@@ -188,17 +189,17 @@ CMeasureWilsonLoopXY::~CMeasureWilsonLoopXY()
 
     if (NULL != m_pTmpLoop)
     {
-        checkCudaErrors(cudaFree(m_pTmpLoop));
+        checkCudaErrors(__cudaFree(m_pTmpLoop));
     }
 
     if (NULL != m_pCorrelator)
     {
-        checkCudaErrors(cudaFree(m_pCorrelator));
+        checkCudaErrors(__cudaFree(m_pCorrelator));
     }
 
     if (NULL != m_pCorrelatorCounter)
     {
-        checkCudaErrors(cudaFree(m_pCorrelatorCounter));
+        checkCudaErrors(__cudaFree(m_pCorrelatorCounter));
     }
 }
 
@@ -206,7 +207,7 @@ void CMeasureWilsonLoopXY::Initial(CMeasurementManager* pOwner, CLatticeData* pL
 {
     CMeasure::Initial(pOwner, pLatticeData, param, byId);
 
-    checkCudaErrors(cudaMalloc((void**)&m_pTmpLoop, sizeof(deviceSU3) * _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt));
+    checkCudaErrors(__cudaMalloc((void**)&m_pTmpLoop, sizeof(deviceSU3) * _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt));
 
     m_uiMaxLengthSq = ((_HC_Lx + 1) / 2) * ((_HC_Lx + 1) / 2)
         + ((_HC_Ly + 1) / 2) * ((_HC_Ly + 1) / 2)
@@ -221,8 +222,8 @@ void CMeasureWilsonLoopXY::Initial(CMeasurementManager* pOwner, CLatticeData* pL
         m_uiMaxLengthSq = _HC_ThreadConstraintX;
     }
 
-    checkCudaErrors(cudaMalloc((void**)&m_pCorrelator, sizeof(CLGComplex) * m_uiMaxLengthSq * (_HC_Lt - 1)));
-    checkCudaErrors(cudaMalloc((void**)&m_pCorrelatorCounter, sizeof(UINT) * m_uiMaxLengthSq));
+    checkCudaErrors(__cudaMalloc((void**)&m_pCorrelator, sizeof(CLGComplex) * m_uiMaxLengthSq * (_HC_Lt - 1)));
+    checkCudaErrors(__cudaMalloc((void**)&m_pCorrelatorCounter, sizeof(UINT) * m_uiMaxLengthSq));
 
     m_pHostCorrelator = (CLGComplex*)malloc(sizeof(CLGComplex) * m_uiMaxLengthSq * (_HC_Lt - 1));
     m_pHostCorrelatorCounter = (UINT*)malloc(sizeof(UINT) * m_uiMaxLengthSq);
@@ -249,7 +250,7 @@ void CMeasureWilsonLoopXY::OnConfigurationAcceptedSingleField(const class CField
     dim3 block2(tm1, 1, 1);
     dim3 threads2(m_uiMaxLengthSq, 1, 1);
 
-    _kernelInitialWilsonCorrelatorOfSiteXY << <block2, threads2 >> > (m_pCorrelatorCounter, m_pCorrelator);
+    _LAUNCH_KERNEL(_kernelInitialWilsonCorrelatorOfSiteXY, block2, threads2, m_pCorrelatorCounter, m_pCorrelator);
 
     SSmallInt4 sOffsets[8] = 
     {
@@ -263,8 +264,8 @@ void CMeasureWilsonLoopXY::OnConfigurationAcceptedSingleField(const class CField
         SSmallInt4(-1, -1, 0, 0)
     };
 
-    SBYTE sCenterX = static_cast<SBYTE>(_HC_Centerx);
-    SBYTE sCenterY = static_cast<SBYTE>(_HC_Centery);
+    SCHAR sCenterX = static_cast<SCHAR>(_HC_Centerx);
+    SCHAR sCenterY = static_cast<SCHAR>(_HC_Centery);
     SSmallInt4 sCenter[8] =
     {
         SSmallInt4(sCenterX, sCenterY, 0, 0),
@@ -289,7 +290,7 @@ void CMeasureWilsonLoopXY::OnConfigurationAcceptedSingleField(const class CField
         2, 2, 2, 2
     };
 
-    INT iPaths[8][3] = 
+    SCHAR iPaths[8][3] =
     {
         {1, 2, 0},
         {2, 1, 0},
@@ -309,7 +310,7 @@ void CMeasureWilsonLoopXY::OnConfigurationAcceptedSingleField(const class CField
         //_HC_DecompY * _HC_DecompLy = Lz
         dim3 block1(_HC_DecompX, _HC_DecompY, 1);
         dim3 threads1(_HC_DecompLx, _HC_DecompLy, 1);
-        _kernelWilsonLoopCalculatePXY << <block1, threads1 >> > (
+        _LAUNCH_KERNEL(_kernelWilsonLoopCalculatePXY, block1, threads1, 
             pGaugeSU3->m_pDeviceData, m_pTmpLoop, pGaugeSU3->m_byFieldId, t);
 
         for (INT i = 0; i < 8; ++i)
@@ -318,7 +319,7 @@ void CMeasureWilsonLoopXY::OnConfigurationAcceptedSingleField(const class CField
                 static_cast<INT>(sOffsets[i].x)* static_cast<INT>(sOffsets[i].x)
                 + static_cast<INT>(sOffsets[i].y)* static_cast<INT>(sOffsets[i].y)
                 );
-            _kernelWilsonLoopsXY << <block0, threads0 >> > (
+            _LAUNCH_KERNEL(_kernelWilsonLoopsXY, block0, threads0, 
                 pGaugeSU3->m_byFieldId,
                 pGaugeSU3->m_pDeviceData,
                 m_pTmpLoop,
@@ -336,7 +337,7 @@ void CMeasureWilsonLoopXY::OnConfigurationAcceptedSingleField(const class CField
         }
     }
 
-    _kernelAverageWilsonLoopXY << <block2, threads2 >> > (m_pCorrelatorCounter, m_pCorrelator);
+    _LAUNCH_KERNEL(_kernelAverageWilsonLoopXY, block2, threads2, m_pCorrelatorCounter, m_pCorrelator);
 
     //extract res
     checkCudaErrors(cudaMemcpy(m_pHostCorrelatorCounter, m_pCorrelatorCounter, sizeof(UINT) * m_uiMaxLengthSq, cudaMemcpyDeviceToHost));
@@ -348,8 +349,8 @@ void CMeasureWilsonLoopXY::OnConfigurationAcceptedSingleField(const class CField
     TArray<TArray<CLGComplex>> thisConf;
     if (0 == m_uiConfigurationCount)
     {
-        assert(0 == m_lstR.Num());
-        assert(0 == m_lstC.Num());
+        appAssert(0 == m_lstR.Num());
+        appAssert(0 == m_lstC.Num());
 
         //we do not have L^2 < 1 Wilson loop
         for (UINT uiL = 1; uiL < m_uiMaxLengthSq; ++uiL)
@@ -383,7 +384,7 @@ void CMeasureWilsonLoopXY::OnConfigurationAcceptedSingleField(const class CField
     {
         for (INT i = 0; i < m_lstR.Num(); ++i)
         {
-            assert(m_pHostCorrelatorCounter[m_lstR[i]] > 0);
+            appAssert(m_pHostCorrelatorCounter[m_lstR[i]] > 0);
             TArray<CLGComplex> thisR;
             for (UINT t = 0; t < tm1; ++t)
             {
@@ -407,6 +408,12 @@ void CMeasureWilsonLoopXY::OnConfigurationAcceptedSingleField(const class CField
     }
     m_lstC.AddItem(thisConf);
 
+    if (NULL != m_pOwner)
+    {
+        m_pOwner->AddOneConfigurationResult(this, _T("RSquared"), m_lstR);
+        m_pOwner->AddOneConfigurationResult(this, _T("Correlator"), thisConf);
+    }
+
     if (m_bShowResult)
     {
         appPopLogDate();
@@ -416,12 +423,12 @@ void CMeasureWilsonLoopXY::OnConfigurationAcceptedSingleField(const class CField
 
 void CMeasureWilsonLoopXY::Report()
 {
-    assert(m_uiConfigurationCount > 0);
-    assert(static_cast<UINT>(m_uiConfigurationCount)
+    appAssert(m_uiConfigurationCount > 0);
+    appAssert(static_cast<UINT>(m_uiConfigurationCount)
         == static_cast<UINT>(m_lstC.Num()));
-    assert(static_cast<UINT>(m_lstR.Num())
+    appAssert(static_cast<UINT>(m_lstR.Num())
         == static_cast<UINT>(m_lstC[0].Num()));
-    assert((_HC_Lt - 1)
+    appAssert((_HC_Lt - 1)
         == static_cast<UINT>(m_lstC[0][0].Num()));
 
     appPushLogDate(FALSE);

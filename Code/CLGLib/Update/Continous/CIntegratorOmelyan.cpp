@@ -5,6 +5,7 @@
 // This is the Omelyan integrator for HMC
 //
 // REVISION:
+//  [mm/dd/yy]
 //  [02/12/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"

@@ -1,64 +1,74 @@
+# configurations of Nf2 is for matching
+# VerboseLevel : DETAILED
 VerboseLevel : PARANOIAC
 VerboseOutput : datetime
-
 Dim : 4
 Dir : 4
-LatticeLength : [4, 4, 4, 8]
+LatticeLength : [12, 12, 12, 12]
 LatticeIndex : CIndexSquare
 LatticeBoundary : CBoundaryConditionTorusSquare
 ThreadAutoDecompose : 1
 RandomType : ER_Schrage
 RandomSeed : 1234567
 ActionListLength : 2
-FermionFieldCount : 1
+GaugeFieldCount : 1
+FermionFieldCount : 2
 MeasureListLength : 1
+CacheSolution : 0
+MaxThreadPerBlock : 256
+ExponentialPrecision : 8
+Profiler : 1
 
 Updator:
-
     UpdatorType : CHMC
-
     Metropolis : 1
-    IntegratorType : CIntegratorNestedLeapFrog
+    IntegratorType : CIntegratorNestedForceGradient
+    # IntegratorType : CIntegratorForceGradient
     IntegratorStepLength : 1
-    IntegratorStep : 20
-    NestedStep : 5
+    IntegratorStep : 10
+    NestedStep : 20
 
 Gauge:
     
-    FieldName : CFieldGaugeSU3
+    FieldName : CFieldGaugeSU3TreeImproved
+    # FieldName : CFieldGaugeSU3
     FieldInitialType : EFIT_Random
+    RectOverPlaq : -0.05
         
 FermionField1:
         
-    FieldName : CFieldFermionWilsonSquareSU3
+    FieldName : CFieldFermionWilsonSquareCloverSU3
+
     FieldInitialType : EFIT_RandomGaussian
-
     Hopping : 0.1575
-
     FieldId : 2
     PoolNumber : 26
-
     Period : [1, 1, 1, -1]
 
 Solver:
 
     SolverName : CSLASolverGMRES
     SolverForFieldId : 2
-    MaxDim : 20
-    Accuracy : 0.0001
-    Restart : 15
+    MaxDim : 50
+    Accuracy : 0.000000001
+    Restart : 50
     AbsoluteAccuracy : 1
 
 Action1:
    
     ActionName : CActionGaugePlaquette
-    Beta : 5.5
+    Beta : 7.0
 
 Action2:
 
-    ActionName : CActionFermionWilsonNf2
+    ActionName : CActionFermionKS
     FieldId : 2
 
 Measure1:
 
     MeasureName : CMeasurePlaqutteEnergy
+
+StapleCache:
+
+    StapleCacheName : CStapleCacheSU3
+    FieldId : 1
